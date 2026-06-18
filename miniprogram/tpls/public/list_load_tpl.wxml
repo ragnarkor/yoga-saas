@@ -1,0 +1,15 @@
+<!-- [AI_START TIMESTAMP=2025-01-25 14:58:00] -->
+<template name="listLoadTpl">
+	<view wx:if="{{!dataList || (dataList && dataList.page < dataList.count)}}"
+		class="list-loading-wrap">
+		<van-loading size="32rpx" color="#5b8a72" custom-class="list-loading" />
+	</view>
+	<view wx:if="{{dataList && dataList.page > 1 && dataList.page == dataList.count }}"
+		class="load text-grey over {{skin}}"></view>
+
+	<van-empty wx:if="{{dataList && dataList.total == 0}}" description="{{noHint?noHint:'暂无记录哦~'}}" />
+
+	<view style="height:100rpx;"></view>
+
+</template>
+<!-- [AI_END LINES=13 TIMESTAMP=2025-01-25 14:58:00] -->

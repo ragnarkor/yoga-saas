@@ -1,0 +1,9 @@
+<!-- [AI_START TIMESTAMP=2025-01-25 18:55:00] -->
+<view wx:if="{{!isLoad}}" class="loading-wrap"><van-loading size="40rpx">加载中...</van-loading></view>
+<!-- [AI_END LINES=1 TIMESTAMP=2025-01-25 18:55:00] -->
+<view class="main-admin" wx:if="{{isAdmin&&isLoad}}">
+	<import src="../admin_news_form_tpl.wxml" />
+
+	<template is="newsForm"
+		data="{{contentDesc,cateIdOptions,imgMax,imgList,isPicCheck,formDesc,formUrl,formUrlFocus,formOrder,formOrderFocus,formType,formCateId,formCateIdFocus,formTitle,formTitleFocus,formContent,formContentFocus}}" />
+</view>

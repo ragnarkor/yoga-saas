@@ -1,0 +1,6 @@
+<!-- [AI_START TIMESTAMP=2025-01-25 15:07:00] -->
+<template name="meetCheckinTpl">
+	<view class="loading-wrap">
+		<van-loading size="48rpx" color="#5b8a72" type="spinner" />
+	</view>
+</template>

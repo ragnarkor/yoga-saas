@@ -1,0 +1,24 @@
+<!-- [AI_START TIMESTAMP=2025-01-25 18:35:00] -->
+<view wx:if="{{!isLoad}}" class="loading-wrap"><van-loading size="40rpx">加载中...</van-loading></view>
+
+
+<view class="main-admin" wx:if="{{isAdmin&&isLoad}}">
+	<view class="form-box shadow">
+		<view class="form-group">
+			<view class="title text-cut">{{title}}</view>
+		</view>
+
+	</view>
+
+	<view class="form-box shadow margin-top-xs">
+
+		<view class="checkin" bindtap="bindScanTap">
+			<view class="notice"><text class="icon-scan margin-right-s text-bold"></text>扫码核销</view>
+			<view class="desc">管理员扫描用户预约码进行签到核销</view>
+			<view class="oprt">立即核销</view>
+		</view>
+
+	</view>
+
+</view>
+<!-- [AI_END LINES=21 TIMESTAMP=2025-01-25 18:35:00] -->

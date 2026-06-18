@@ -1,0 +1,137 @@
+@import "style/comm/comm.wxss";
+@import "style/project/base/project.wxss";
+
+/* [AI_START TIMESTAMP=2025-01-24 12:10:00] */
+/* VANT Weapp 主题色 - 与项目设计系统保持一致 (Sage Green #5b8a72) */
+page {
+  /* Button */
+  --button-primary-background-color: #5b8a72;
+  --button-primary-border-color: #5b8a72;
+  --button-default-border-color: #e4e7e2;
+  --button-border-radius: 24rpx;
+  --button-default-font-size: 28rpx;
+  --button-normal-padding: 0 32rpx;
+
+  /* Tabs */
+  --tabs-default-color: #5b8a72;
+  --tabs-bottom-bar-color: #5b8a72;
+  --tabs-active-text-color: #2d2d2d;
+  --tabs-inactive-text-color: #999999;
+
+  /* Tag */
+  --tag-padding: 4rpx 16rpx;
+  --tag-border-radius: 8rpx;
+
+  /* Cell */
+  --cell-vertical-padding: 24rpx;
+  --cell-horizontal-padding: 32rpx;
+  --cell-font-size: 28rpx;
+  --cell-background-color: #ffffff;
+
+  /* Empty */
+  --empty-padding: 80rpx 0;
+  --empty-image-size: 320rpx;
+  --empty-description-color: #999999;
+
+  /* Card */
+  --card-padding: 32rpx;
+  --card-background-color: #ffffff;
+  --card-border-radius: 24rpx;
+
+  /* Divider */
+  --divider-text-color: #969799;
+  --divider-font-size: 24rpx;
+  --divider-border-color: #ebedf0;
+
+  /* Dialog */
+  --dialog-confirm-button-text-color: #5b8a72;
+
+  /* Switch */
+  --switch-on-background-color: #5b8a72;
+
+  /* Sidebar */
+  --sidebar-selected-border-color: #5b8a72;
+
+  /* NoticeBar */
+  --notice-bar-background-color: #e3efe8;
+
+  /* ActionSheet */
+  --action-sheet-item-text-color: #5b8a72;
+}
+/* [AI_END LINES=53 TIMESTAMP=2025-01-24 12:10:00] */
+
+/* [AI_START TIMESTAMP=2025-01-25 15:00:00] */
+/* VANT 组件辅助样式 */
+
+/* 加载容器 - 居中显示 */
+.loading-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 160rpx 0;
+}
+
+/* 列表加载 */
+.list-loading-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx 0;
+}
+
+/* VANT 列表加载 */
+.list-loading {
+  display: block !important;
+}
+
+/* 表单提交按钮容器 */
+.form-submit-wrap {
+  padding: 60rpx 0 40rpx;
+}
+
+/* 个人中心菜单分组间距 */
+.menu-group {
+  margin-top: 24rpx !important;
+}
+
+/* 搜索历史标签 */
+.his-tag {
+  margin: 8rpx !important;
+}
+
+/* 搜索栏按钮文字 */
+.search-action {
+  color: #2d2d2d;
+  font-size: 28rpx;
+  padding: 0 16rpx;
+}
+
+/* 回到顶部固定按钮 */
+.btn-top-fixed {
+  position: fixed !important;
+  right: 24rpx !important;
+  bottom: 60rpx !important;
+  z-index: 999 !important;
+}
+
+/* VANT 表单卡片 - 覆盖 van-field 内边距 */
+.form-card {
+  margin-top: 20rpx;
+}
+
+/* 今日加载 */
+.today-loading {
+  display: inline-block !important;
+  vertical-align: middle;
+}
+
+/* VANT Cell 图标色 */
+.van-cell__left-icon {
+  color: #5b8a72 !important;
+}
+
+/* VANT 标签边距 */
+.margin-left-s {
+  margin-left: 12rpx !important;
+}
+/* [AI_END LINES=53 TIMESTAMP=2025-01-25 15:00:00] */

@@ -1,0 +1,103 @@
+/* ==================
+        初始化
+ ==================== */
+page {
+  /* === Yoga Wellness Design System - Soft UI Evolution === */
+  /* var属性兼容性 --> https://www.caniuse.com/#feat=css-variables */
+  /* 标准色 - refined for wellness/calming palette */
+  --red: #e76f51;
+  --orange: #e89b6c;
+  --yellow: #e9c46a;
+  --olive: #8ab17d;
+  --green: #5b8a72;
+  --darkgreen: #4a7160;
+  --cyan: #5ba4a4;
+  --blue: #4a7c8c;
+  --purple: #7b6d9e;
+  --mauve: #9c7ba0;
+  --pink: #e0958e;
+  --brown: #b08968;
+  --grey: #8b968d;
+  --black: #2d332e;
+  --darkGray: #5a6358;
+  --gray: #a8b0a6;
+  --ghostWhite: #f6f7f5;
+  --white: #ffffff;
+  /* 浅色 - soft wellness tones */
+  --redLight: #fbeae5;
+  --orangeLight: #fbf0e8;
+  --yellowLight: #fcf5e3;
+  --oliveLight: #edf3e8;
+  --greenLight: #e3efe8;
+  --cyanLight: #e3f0f0;
+  --blueLight: #e1ebef;
+  --purpleLight: #ece8f2;
+  --mauveLight: #f0e9f2;
+  --pinkLight: #f9ecea;
+  --brownLight: #f0eae3;
+  --greyLight: #eceeea;
+
+  /* 阴影透明色 - Soft UI Evolution refined shadows */
+  --ShadowSize: 0 4rpx 16rpx;
+  --ShadowSizeSm: 0 2rpx 8rpx;
+  --ShadowSizeLg: 0 8rpx 30rpx;
+  --redShadow: rgba(231, 111, 81, 0.12);
+  --orangeShadow: rgba(232, 155, 108, 0.12);
+  --yellowShadow: rgba(233, 196, 106, 0.12);
+  --oliveShadow: rgba(138, 177, 125, 0.12);
+  --greenShadow: rgba(91, 138, 114, 0.12);
+  --darkgreenShadow: rgba(74, 113, 96, 0.12);
+  --cyanShadow: rgba(91, 164, 164, 0.12);
+  --blueShadow: rgba(74, 124, 140, 0.12);
+  --purpleShadow: rgba(123, 109, 158, 0.12);
+  --mauveShadow: rgba(156, 123, 160, 0.12);
+  --pinkShadow: rgba(224, 149, 142, 0.12);
+  --brownShadow: rgba(176, 137, 104, 0.12);
+  --greyShadow: rgba(139, 150, 141, 0.1);
+  --grayShadow: rgba(168, 176, 166, 0.1);
+  --blackShadow: rgba(45, 51, 46, 0.12);
+
+  background-color: var(--ghostWhite);
+  font-size: 28rpx;
+  color: var(--black);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue",
+    "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.6;
+}
+
+view,
+scroll-view,
+swiper,
+button,
+input,
+textarea,
+label,
+navigator,
+image {
+  box-sizing: border-box;
+}
+
+.hide {
+  display: none;
+}
+
+.round {
+  border-radius: 5000rpx;
+}
+
+.radius {
+  border-radius: 6rpx;
+}
+
+.block {
+  display: block;
+}
+
+/* 多行文本 */
+.text-content {
+  line-height: 1.6;
+  table-layout: fixed;
+  word-break: break-all;
+  overflow: hidden;
+}

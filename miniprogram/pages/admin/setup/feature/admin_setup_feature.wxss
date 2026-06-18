@@ -1,0 +1,17 @@
+/* [AI_START TIMESTAMP=2025-01-25 12:00:00] */
+.main-admin {
+  min-height: 100vh;
+  background-color: #f7f8fa;
+}
+
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 200rpx;
+}
+
+.form-submit-wrap {
+  padding: 30rpx;
+}
+/* [AI_END LINES=14 TIMESTAMP=2025-01-25 12:00:00]

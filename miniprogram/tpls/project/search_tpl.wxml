@@ -1,0 +1,39 @@
+<!-- [AI_START TIMESTAMP=2025-01-25 14:30:00] -->
+<template name="searchTpl">
+	<view class="main main-search">
+		<!-- VANT 搜索栏 -->
+		<van-search
+			value="{{ search }}"
+			placeholder="请输入搜索内容"
+			shape="round"
+			background="#f5f6f8"
+			use-action-slot
+			bind:change="bindSearchChange"
+			bind:search="bindSearchConfirm"
+			bind:clear="bindClearKeyTap"
+		>
+			<view slot="action" class="search-action" bindtap="url" data-type="back">返回</view>
+		</van-search>
+
+		<view class="his">
+			<view class="title">
+				<view class="tit">历史记录</view>
+				<van-icon name="delete-o" size="36rpx" color="#999" bindtap="bindDelHisTap" />
+			</view>
+
+			<view class="search-content">
+				<van-tag
+					wx:for="{{hisKeys}}"
+					wx:key="key"
+					data-key="{{item}}"
+					bindtap="bindKeyTap"
+					plain
+					round
+					type="primary"
+					custom-class="his-tag"
+				>{{item}}</van-tag>
+			</view>
+		</view>
+	</view>
+</template>
+<!-- [AI_END LINES=34 TIMESTAMP=2025-01-25 14:30:00] -->

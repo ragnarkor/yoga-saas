@@ -1,0 +1,116 @@
+<!-- [AI_START TIMESTAMP=2025-01-24 12:20:00] -->
+<template name="calendarIndexTpl">
+	<van-empty wx:if="{{isLoad===null}}" description="暂无课程数据" />
+	<view wx:if="{{isLoad===false}}" class="loading-wrap">
+		<van-loading size="48rpx" color="#5b8a72" type="spinner" />
+	</view>
+
+	<view class="booking-main" wx:if="{{isLoad}}">
+
+		<!-- 动态页面标题 -->
+		<view class="page-header">
+			<view class="page-header-bg"></view>
+			<view class="page-header-content">
+				<view class="page-title">{{pageTitle}}</view>
+				<view class="page-subtitle">{{pageSubtitle}}</view>
+			</view>
+		</view>
+
+		<!-- 课程分类标签 -->
+		<van-tabs active="{{activeTab}}" bind:change="bindTabChange" 
+			color="#5b8a72" 
+			title-active-color="#2d2d2d" 
+			title-inactive-color="#999"
+			line-width="40rpx" 
+			line-height="6rpx"
+			ellipsis="{{false}}"
+			swipeable>
+			
+			<van-tab wx:for="{{tabs}}" wx:key="id" title="{{item.name}}">
+
+				<!-- 日期选择条 -->
+				<view class="date-selector">
+					<scroll-view class="date-scroll" scroll-x scroll-with-animation enhanced show-scrollbar="{{false}}">
+						<view class="date-list">
+							<view class="date-item {{item.day === selectedDate ? 'active' : ''}}" 
+								wx:for="{{dateList}}" wx:key="day" wx:for-item="dateItem"
+								bindtap="bindDateSelect" data-day="{{dateItem.day}}">
+								<view class="date-weekday">{{dateItem.weekday}}</view>
+								<view class="date-day">{{dateItem.dateDay}}</view>
+								<view class="date-month">{{dateItem.dateMonth}}</view>
+								<view class="date-indicator" wx:if="{{dateItem.hasCourse}}"></view>
+							</view>
+						</view>
+					</scroll-view>
+				</view>
+
+				<!-- 课程列表 -->
+				<view class="course-list" wx:if="{{courseList && courseList.length > 0}}">
+					<view class="course-card" wx:for="{{courseList}}" wx:key="key" 
+						bindtap="url" data-url="../../meet/detail/meet_detail?id={{item._id}}">
+						
+						<view class="card-time-section">
+							<view class="time-primary">{{item.timeStart}}</view>
+							<view class="time-secondary">{{item.timeEnd}}</view>
+							<view class="time-duration">{{item.duration}}</view>
+						</view>
+						
+						<view class="card-info-section">
+							<view class="course-name text-cut">{{item.title}}</view>
+							<view class="course-tags">
+								<van-tag plain type="success" size="medium" custom-class="course-tag" wx:if="{{item.level}}">{{item.level}}</van-tag>
+								<van-tag plain type="warning" size="medium" custom-class="course-tag" wx:if="{{item.typeName}}">{{item.typeName}}</van-tag>
+							</view>
+							<view class="course-coach">
+								<view class="coach-avatar-wrap">
+									<image class="coach-avatar" src="{{item.coachAvatar || '/images/default_cover_pic.gif'}}" mode="aspectFill" />
+								</view>
+								<text class="coach-name">{{item.coachName}}</text>
+							</view>
+						</view>
+
+						<view class="card-action-section">
+							<view class="slots-info">
+								<block wx:if="{{item.status === 'available'}}">
+									<text class="slots-number">{{item.slots}}</text>
+									<text class="slots-label">余位</text>
+								</block>
+								<block wx:elif="{{item.status === 'booked'}}">
+									<text class="slots-status booked">已预约</text>
+								</block>
+								<block wx:elif="{{item.status === 'full'}}">
+									<text class="slots-status full">已满员</text>
+								</block>
+								<block wx:else>
+									<text class="slots-number">{{item.slots}}</text>
+									<text class="slots-label">余位</text>
+								</block>
+							</view>
+							<view class="book-btn {{item.status === 'full' ? 'disabled' : ''}}">
+								<text>{{item.status === 'booked' ? '查看' : item.status === 'full' ? '候补' : '预约'}}</text>
+							</view>
+						</view>
+					</view>
+				</view>
+
+				<!-- 空状态 -->
+				<view class="empty-state" wx:if="{{!courseList || courseList.length === 0}}">
+					<view class="empty-illustration">
+						<van-icon name="calendar-o" size="120rpx" color="#c8d5cd" />
+					</view>
+					<view class="empty-text">{{emptyText}}</view>
+					<van-button size="small" round bindtap="bindReload" custom-style="margin-top: 30rpx; padding: 0 40rpx;">
+						重新加载
+					</van-button>
+				</view>
+
+			</van-tab>
+		</van-tabs>
+
+	</view>
+
+	<!-- 底部安全区 -->
+	<view class="safe-bottom" wx:if="{{isLoad}}"></view>
+
+</template>
+<!-- [AI_END LINES=97 TIMESTAMP=2025-01-24 12:20:00] -->

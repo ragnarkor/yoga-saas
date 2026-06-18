@@ -1,0 +1,46 @@
+<!-- [AI_START TIMESTAMP=2025-01-25 18:55:00] -->
+<van-empty wx:if="{{isLoad===null}}" description="暂无数据" />
+<view wx:if="{{isLoad===false}}" class="loading-wrap"><van-loading size="40rpx">加载中...</van-loading></view>
+<!-- [AI_END LINES=3 TIMESTAMP=2025-01-25 18:55:00] -->
+
+<block wx:if="{{isAdmin}}">
+	<view class="main-admin">
+		<view class="text-pic-list-box">
+			<view class="item shadow" wx:for="{{temps}}" wx:key="key">
+				<view class="title">
+					<text bindtap="bindSelectTap" data-idx="{{index}}" class="temp-name text-cut">{{item.TEMP_NAME}}</text>
+					<van-button type="primary" size="small" bind:click="bindSelectTap" data-idx="{{index}}" custom-class="margin-right-s">选用</van-button>
+					<text bindtap="bindOprtTap" data-idx="{{index}}" class="icon-moreandroid more"></text>
+				</view>
+				<view class="time-list">
+					<view wx:for="{{item.TEMP_TIMES}}" wx-for wx:key="key1" wx:for-item="timesItem" wx:for-index="timesIndex" class="time-item">
+						<view class="detail">
+							<text class="up">{{timesItem.start}}～{{timesItem.end}}</text>
+							<text wx:if="{{timesItem.isLimit}}" class="text-admin">{{timesItem.limit}}人</text>
+							<text wx:else class="text-admin">不限人数</text>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+	</view>
+
+	<cmpt-modal model:show="{{curTimeModalShow}}" type="dialog" title="批量设置人数上限" bind:click="bindAllLimitSetCmpt" class="modal-form">
+		<view class="modal-desc text-green">统一设置该模板下各时段可约人数</view>
+
+		<view class="form-group">
+			<view class="title">是否限制人数</view>
+			<switch wx:if="{{curTimeIsLimit}}" bindchange="switchModel" data-item="curTimeIsLimit" class="green sm" checked="true">
+			</switch>
+			<switch wx:elif="{{!curTimeIsLimit}}" bindchange="switchModel" data-item="curTimeIsLimit" class="green sm">
+			</switch>
+		</view>
+		<view class="form-group">
+			<view class="title">人数上限</view>
+			<block wx:if="{{curTimeIsLimit}}">
+				<input type="number" maxlength="4" placeholder="请输入本时段人数上限" model:value="{{curTimeLimit}}" class="text-red margin-right-xs"></input>人
+			</block>
+			<text wx:else>不限制人数</text>
+		</view>
+	</cmpt-modal>
+</block>

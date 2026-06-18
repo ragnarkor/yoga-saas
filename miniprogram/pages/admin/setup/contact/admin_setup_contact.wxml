@@ -1,0 +1,35 @@
+<!-- [AI_START TIMESTAMP=2025-01-25 18:30:00] -->
+<view wx:if="{{!isLoad}}" class="loading-wrap"><van-loading size="40rpx">加载中...</van-loading></view>
+
+<view class="main-admin" wx:if="{{isAdmin&&isLoad}}">
+
+		<view class="form-box shadow">
+			<view class="form-group">
+				<view class="title">地址：</view>
+			</view>
+			<view class="form-group">
+				<textarea placeholder="填写地址" placeholder-class="phc" model:value="{{formAddress}}" maxlength="200" focus="{{formAddressFocus}}" auto-height="{{true}}"></textarea>
+			</view>
+			<view wx:if="{{formAddressFocus}}" class="hint-desc error">{{formAddressFocus}}</view>
+
+			<view class="form-group">
+				<view class="title">电话：</view>
+			</view>
+
+			<view class="form-group">
+				<textarea placeholder="填写电话" placeholder-class="phc" model:value="{{formPhone}}" maxlength="50" focus="{{formPhoneFocus}}" auto-height="{{true}}"></textarea>
+			</view>
+			<view wx:if="{{formPhoneFocus}}" class="hint-desc error">{{formPhoneFocus}}</view>
+
+
+			<cmpt-img-upload isShowSize="{{false}}" title="客服二维码图片 (微信，企业微信等）：" imgMax="8" imgList="{{formServicePic}}" isCheck="{{false}}" bind:upload="bindUploadCmpt" data-item="formServicePic" />
+
+			<cmpt-img-upload isShowSize="{{false}}" title="官微二维码图片 (公众号，微博等）：" imgMax="8" imgList="{{formOfficePic}}" isCheck="{{false}}" bind:upload="bindUploadCmpt" data-item="formOfficePic" />
+		</view>
+
+		<view class="form-submit-wrap">
+			<van-button type="primary" block bind:click="bindFormSubmit">提交</van-button>
+		</view>
+
+</view>
+<!-- [AI_END LINES=34 TIMESTAMP=2025-01-25 18:30:00] -->

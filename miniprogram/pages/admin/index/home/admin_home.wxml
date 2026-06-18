@@ -1,0 +1,104 @@
+<!-- [AI_START TIMESTAMP=2025-01-25 18:20:00] -->
+<view wx:if="{{!isLoad}}" class="loading-wrap"><van-loading size="40rpx">加载中...</van-loading></view>
+
+<view class="main-admin" wx:if="{{isLoad && isAdmin}}">
+
+	<view class="admin-info bg-admin">
+		<view class="pic"><text class="icon-peoplefill"></text></view>
+		<view class="right">
+			<view class="name">
+				<text class="text-xl">{{admin.name}}</text>
+
+				<van-tag wx:if="{{admin.type=='owner'}}" type="warning" size="medium" custom-class="margin-left-s">馆长</van-tag>
+					<van-tag wx:if="{{admin.type=='teacher'}}" type="success" size="medium" custom-class="margin-left-s">教师</van-tag>
+
+			</view>
+			<view class="desc text-s">共登录{{admin.cnt}}次，上次{{admin.last}}</view>
+		</view>
+		<view class="exit-admin" bindtap="bindExitTap"><text class="icon-exit"></text></view>
+	</view>
+
+
+	<view class="comm-list grid col-4">
+		<view class="item" bindtap="url" data-url="../../meet/list/admin_meet_list">{{data.meetCnt||'...'}}<text class="text-black">活动/预约数</text></view>
+		<view class="item" bindtap="url" data-url="../../info/admin_info_list">{{data.joinCnt||'...'}}<text class="text-black">预约数</text></view>
+		<view class="item" bindtap="url" data-url="../../user/list/admin_user_list">{{data.userCnt||'...'}}<text class="text-black">用户</text></view>
+		<view class="item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="../../news/list/admin_news_list">{{data.newsCnt||'...'}}<text class="text-black">文章数</text></view>
+
+	</view>
+
+	<view class="bar bg-white solid-bottom margin-top-s ">
+		<view class="action">
+			<text class="icon-title"></text>功能管理
+		</view>
+	</view>
+
+	<view class="comm-list grid col-3">
+		<view class="item" bindtap="url" data-url="../../meet/list/admin_meet_list"> <text class="icon-activityfill text-blue"></text> <text class="text-black">活动/预约管理</text>
+		</view>
+		<view class="item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="../../user/list/admin_user_list"> <text class="icon-peoplefill text-green"></text> <text class="text-black">用户管理</text>
+		</view>
+		<view class="item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="../../news/list/admin_news_list"> <text class="icon-newsfill text-darkgreen"></text> <text class="text-black">内容管理</text>
+		</view>
+	</view>
+
+
+	<!-- BOTTOM begin -->
+	<!-- [AI_START TIMESTAMP=2025-01-25 12:00:00] -->
+	<van-cell-group custom-class="menu-group" wx:if="{{admin.type=='owner'}}">
+		<van-cell is-link bind:click="url" data-url="../../setup/about/admin_setup_about">
+			<view slot="title">
+				<text class="icon-edit text-darkgreen margin-right-s"></text>
+				<text class="text-black">编辑 - 关于我们</text>
+			</view>
+		</van-cell>
+
+		<van-cell is-link bind:click="url" data-url="../../setup/contact/admin_setup_contact">
+			<view slot="title">
+				<text class="icon-post text-pink margin-right-s"></text>
+				<text class="text-black">编辑 - 联系我们</text>
+			</view>
+		</van-cell>
+
+		<van-cell is-link bind:click="url" data-url="../../setup/qr/admin_setup_qr">
+			<view slot="title">
+				<text class="icon-qr_code text-mauve margin-right-s"></text>
+				<text class="text-black">小程序二维码</text>
+			</view>
+		</van-cell>
+
+		<!-- [AI_START TIMESTAMP=2025-01-25 12:00:00] -->
+		<van-cell is-link bind:click="url" data-url="../../setup/feature/admin_setup_feature">
+			<view slot="title">
+				<text class="icon-settings text-blue margin-right-s"></text>
+				<text class="text-black">功能开关设置</text>
+			</view>
+		</van-cell>
+		<!-- [AI_END LINES=7 TIMESTAMP=2025-01-25 12:00:00] -->
+	</van-cell-group>
+
+	<van-cell-group custom-class="menu-group margin-bottom-xl">
+		<van-cell wx:if="{{admin.type=='owner'}}" is-link bind:click="url" data-url="../../mgr/log/admin_log_list">
+			<view slot="title">
+				<text class="icon-footprint text-brown margin-right-s"></text>
+				<text class="text-black">管理员操作日志</text>
+			</view>
+		</van-cell>
+
+		<van-cell is-link bind:click="bindSettingTap">
+			<view slot="title">
+				<text class="icon-settings text-grey margin-right-s"></text>
+				<text class="text-black">设置</text>
+			</view>
+		</van-cell>
+	</van-cell-group>
+
+	<!-- BOTTOM END -->
+	<view class="form-submit-wrap">
+		<van-button type="danger" block bind:click="bindExitTap">退出登录</van-button>
+	</view>
+
+	<view class="foot-bottom"><cmpt-foot /></view>
+
+</view>
+<!-- [AI_END LINES=83 TIMESTAMP=2025-01-25 18:20:00] -->

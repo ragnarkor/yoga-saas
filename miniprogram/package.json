@@ -1,0 +1,8 @@
+{
+  "name": "yoga-miniprogram",
+  "version": "1.0.0",
+  "description": "Yoga Mini Program with VANT UI",
+  "dependencies": {
+    "@vant/weapp": "^1.11.7"
+  }
+}

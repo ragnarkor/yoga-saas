@@ -1,0 +1,45 @@
+<!-- [AI_START TIMESTAMP=2025-01-25 19:30:00] -->
+<view class="main-admin bg-admin">
+
+	<view class="tenant-header">
+		<view class="pic"><text class="icon-rankfill text-admin"></text></view>
+		<view class="hint">请选择您所在的瑜伽馆</view>
+	</view>
+
+	<view wx:if="{{loading}}" class="loading-box">
+		<van-loading size="48rpx" type="spinner" color="#4a7c8c">加载中...</van-loading>
+	</view>
+
+	<view wx:elif="{{tenantList.length === 0}}" class="empty-box">
+		<view class="empty-icon">📋</view>
+		<view class="empty-text">暂无可用场馆</view>
+		<view class="empty-sub">请联系管理员添加场馆</view>
+		<van-button plain type="primary" size="small" bind:click="bindRefreshTap" custom-class="retry-btn">刷新</van-button>
+	</view>
+
+	<view wx:else class="tenant-list">
+		<van-cell-group inset>
+			<van-cell
+				wx:for="{{tenantList}}"
+				wx:key="_id"
+				title="{{item.TENANT_NAME}}"
+				label="{{item.TENANT_DESC || ''}}"
+				data-pid="{{item._pid}}"
+				data-name="{{item.TENANT_NAME}}"
+				bind:click="bindSelectTap"
+				is-link
+				title-style="font-weight: bold; color: #333;"
+			>
+				<view slot="icon" class="tenant-icon">
+					<text class="icon-home text-admin"></text>
+				</view>
+			</van-cell>
+		</van-cell-group>
+	</view>
+
+	<view class="foot-bottom">
+		<cmpt-foot />
+	</view>
+
+</view>
+<!-- [AI_END LINES=46 TIMESTAMP=2025-01-25 19:30:00] -->
