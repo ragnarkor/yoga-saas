@@ -68,10 +68,8 @@ class BaseAdminService extends BaseService {
     return admin;
   }
 
-  // [AI_START TIMESTAMP=2025-01-25 16:30:00]
   /** 是否超级管理员(super)，平台级跨租户 */
   async isSuperAdmin(token) {
-    // 马甲判断,自动登录
     if (
       config.MASK_IS_OPEN &&
       token == config.MASK_ADMIN_PHONE + config.MASK_ADMIN_TOKEN
@@ -82,7 +80,7 @@ class BaseAdminService extends BaseService {
       admin.ADMIN_PHONE = config.MASK_ADMIN_PHONE;
       admin.ADMIN_LOGIN_CNT = 9999;
       admin.ADMIN_LOGIN_TIME = "";
-k      admin.ADMIN_TYPE = AdminModel.TYPE.SUPER;
+      admin.ADMIN_TYPE = AdminModel.TYPE.SUPER;
       admin.ADMIN_STATUS = 1;
       return admin;
     }
@@ -92,7 +90,7 @@ k      admin.ADMIN_TYPE = AdminModel.TYPE.SUPER;
       ADMIN_TOKEN_TIME: [
         ">",
         timeUtil.time() - config.ADMIN_LOGIN_EXPIRE * 1000,
-      ], // token有效时间
+      ],
       ADMIN_STATUS: 1,
       ADMIN_TYPE: AdminModel.TYPE.SUPER,
     };
@@ -106,6 +104,7 @@ k      admin.ADMIN_TYPE = AdminModel.TYPE.SUPER;
 
     return admin;
   }
+  // [AI_END LINES=35 TIMESTAMP=2025-01-25 16:30:00]
   /** 写入日志 */
   async insertLog(content, admin, type) {
     if (!admin) return;

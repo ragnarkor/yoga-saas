@@ -1,16 +1,8 @@
-let behavior = require("../../../../behavior/calendar_index_bh.js");
-let PassortBiz = require("../../../../biz/passport_biz.js");
-let skin = require("../../skin/skin.js");
+const { createPage } = require("../../../../helper/create_page.js");
 
-Page({
-  behaviors: [behavior],
-
-  onReady: function () {
-    PassortBiz.initPage({
-      skin,
-      that: this,
-      isLoadSkin: true,
-      tabIndex: 1,
-    });
-  },
+createPage({
+  behaviorKey: "calendar_index_bh",
+  isLoadSkin: true,
+  tabIndex: 1,
+  tabBarIndex: 1,
 });

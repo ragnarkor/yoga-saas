@@ -12,18 +12,13 @@ const cloudBase = require("../../../framework/cloud/cloud_base.js");
 const timeUtil = require("../../../framework/utils/time_util.js");
 const config = require("../../../config/config.js");
 const AdminModel = require("../../model/admin_model.js");
+const TenantModel = require("../../model/tenant_model.js");
 const LogModel = require("../../model/log_model.js");
-
 const UserModel = require("../../model/user_model.js");
 const MeetModel = require("../../model/meet_model.js");
 const NewsModel = require("../../model/news_model.js");
 const JoinModel = require("../../model/join_model.js");
-// [AI_START TIMESTAMP=2025-01-25 12:00:00]
 const SetupModel = require("../../model/setup_model.js");
-// [AI_END LINES=1 TIMESTAMP=2025-01-25 12:00:00]
-// [AI_START TIMESTAMP=2025-01-25 17:30:00]
-const TenantModel = require("../../model/tenant_model.js");
-// [AI_END LINES=1 TIMESTAMP=2025-01-25 17:30:00]
 
 class AdminHomeService extends BaseAdminService {
   /**
@@ -35,7 +30,7 @@ class AdminHomeService extends BaseAdminService {
     if (adminType === AdminModel.TYPE.SUPER && !global.PID) {
       let tenantList = await TenantModel.getAll(
         { TENANT_STATUS: TenantModel.STATUS.OPEN },
-        "_pid,TENANT_ID,TENANT_NAME",
+        "_pid,TENANT_ID,TENANT_NAME,TENANT_TEMPLATE",
         { TENANT_ADD_TIME: -1 },
         100,
         false,
@@ -119,11 +114,23 @@ class AdminHomeService extends BaseAdminService {
     // 写日志
     this.insertLog("登录了系统", admin, LogModel.TYPE.SYS);
 
+    let template = "default";
+    if (pid && pid !== "admin") {
+      let tenant = await TenantModel.getOne(
+        { _pid: pid, TENANT_STATUS: TenantModel.STATUS.OPEN },
+        "TENANT_TEMPLATE",
+        {},
+        false,
+      );
+      if (tenant && tenant.TENANT_TEMPLATE) template = tenant.TENANT_TEMPLATE;
+    }
+
     return {
       token,
       name: admin.ADMIN_NAME,
       type,
       pid,
+      template,
       last,
       cnt,
     };

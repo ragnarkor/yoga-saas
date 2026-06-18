@@ -2,7 +2,7 @@
 	<view class="meet-list-box sub-margin-bottom">
 		<block wx:for="{{dataList}}" wx:key="key">
 			<!--上下图 Begin-->
-			<view wx:if="{{listMode=='upimg'}}" class="item card-project shadow-project item-upimg" bindtap="url" data-url="../../{{item.type}}/detail/{{item.type}}_detail?id={{item._id}}">
+			<view wx:if="{{listMode=='upimg'}}" class="item card-project shadow-project item-upimg" bindtap="url" data-url="/pages/default/{{item.type}}/detail/{{item.type}}_detail?id={{item._id}}">
 				<image mode="widthFix" lazy-load="{{true}}" class="loading" src="{{item.pic}}" />
 				<view class="upimg-title content-cut-two">{{item.title}}</view>
 				<view class="data-desc content-cut-two">{{item.desc}}</view>
@@ -13,7 +13,7 @@
 			<!--上下图 END-->
 
 			<!--右边图 Begin-->
-			<view wx:elif="{{listMode=='rightpic'}}" class="item card-project shadow-project item-rightpic" bindtap="url" data-url="../../{{item.type}}/detail/{{item.type}}_detail?id={{item._id}}">
+			<view wx:elif="{{listMode=='rightpic'}}" class="item card-project shadow-project item-rightpic" bindtap="url" data-url="/pages/default/{{item.type}}/detail/{{item.type}}_detail?id={{item._id}}">
 				<view class="title content-cut-two">{{item.title}}</view>
 				<view class="desc">
 					<text class="content-cut-three">{{item.desc}}</text>
@@ -27,7 +27,7 @@
 			<!--右边图 END-->
 
 			<!--左边图 Begin-->
-			<view wx:elif="{{listMode=='leftpic'}}" class="item card-project shadow-project item-leftpic" bindtap="url" data-url="../../{{item.type}}/detail/{{item.type}}_detail?id={{item._id}}">
+			<view wx:elif="{{listMode=='leftpic'}}" class="item card-project shadow-project item-leftpic" bindtap="url" data-url="/pages/default/{{item.type}}/detail/{{item.type}}_detail?id={{item._id}}">
 				<view class="title content-cut-two">{{item.title}}</view>
 				<view class="desc">
 					<image class="pic loading" lazy-load="{{true}}" mode="aspectFill" src="{{item.pic}}">
@@ -41,7 +41,7 @@
 			<!--左边图 END-->
 
 			<!--左大图 Begin-->
-			<view wx:elif="{{listMode=='leftbig'||listMode=='leftbig2' ||listMode=='leftbig3'}}" class="item card-project shadow-project item-{{listMode}}" bindtap="url" data-url="../../{{item.type}}/detail/{{item.type}}_detail?id={{item._id}}">
+			<view wx:elif="{{listMode=='leftbig'||listMode=='leftbig2' ||listMode=='leftbig3'}}" class="item card-project shadow-project item-{{listMode}}" bindtap="url" data-url="/pages/default/{{item.type}}/detail/{{item.type}}_detail?id={{item._id}}">
 				<image mode="aspectFill" lazy-load="{{true}}" class="leftbig-left loading" src="{{item.pic}}">
 				</image>
 				<view class="leftbig-right">
@@ -59,7 +59,7 @@
 			<!--左大图 END-->
 
 			<!--大文字 Begin-->
-			<view wx:elif="{{listMode=='bigtext'}}" class="item card-project shadow-project item-bigtext" bindtap="url" data-url="../../{{item.type}}/detail/{{item.type}}_detail?id={{item._id}}">
+			<view wx:elif="{{listMode=='bigtext'}}" class="item card-project shadow-project item-bigtext" bindtap="url" data-url="/pages/default/{{item.type}}/detail/{{item.type}}_detail?id={{item._id}}">
 				<view class="left">
 					<image mode="aspectFill" lazy-load="{{true}}" class="{{item.pic?'loading':''}}" src="{{item.pic}}" />
 				</view>

@@ -13,28 +13,47 @@ const config = require("../../../config/config.js");
 class AdminSetupService extends BaseAdminService {
   /** 关于我们 */
   async setupAbout({ about, aboutPic }) {
-    this.AppError("此功能暂不开放，如有需要请加作者微信：cclinux0730");
+    let where = {};
+    let setup = await SetupModel.getOne(where, "SETUP_ABOUT_PIC");
+    let oldPics = (setup && setup.SETUP_ABOUT_PIC) || [];
+    aboutPic = await cloudUtil.handlerCloudFiles(oldPics, aboutPic || []);
+    await SetupModel.edit(where, {
+      SETUP_ABOUT: about,
+      SETUP_ABOUT_PIC: aboutPic,
+    });
   }
 
   /** 联系我们设置 */
   async setupContact({ address, phone, officePic, servicePic }) {
-    this.AppError("此功能暂不开放，如有需要请加作者微信：cclinux0730");
+    let where = {};
+    let setup = await SetupModel.getOne(
+      where,
+      "SETUP_OFFICE_PIC,SETUP_SERVICE_PIC",
+    );
+    let oldOffice = (setup && setup.SETUP_OFFICE_PIC) || [];
+    let oldService = (setup && setup.SETUP_SERVICE_PIC) || [];
+    officePic = await cloudUtil.handlerCloudFiles(oldOffice, officePic || []);
+    servicePic = await cloudUtil.handlerCloudFiles(oldService, servicePic || []);
+    await SetupModel.edit(where, {
+      SETUP_ADDRESS: address || "",
+      SETUP_PHONE: phone || "",
+      SETUP_OFFICE_PIC: officePic,
+      SETUP_SERVICE_PIC: servicePic,
+    });
   }
 
   /** 小程序码 */
   async genMiniQr() {
-    //生成小程序qr buffer
     let cloud = cloudBase.getCloud();
 
-    let page =
-      "projects/" + this.getProjectId() + "/default/index/default_index";
+    let page = "pages/default/index/default_index";
     console.log(page);
 
     let result = await cloud.openapi.wxacode.getUnlimited({
       scene: "qr",
       width: 280,
       check_path: false,
-      env_version: "release", //trial,develop
+      env_version: "release",
       page,
     });
 
@@ -48,7 +67,6 @@ class AdminSetupService extends BaseAdminService {
     return upload.fileID;
   }
 
-  // [AI_START TIMESTAMP=2025-01-25 12:00:00]
   /** 功能开关设置 */
   async setupFeature(features) {
     let where = {};
@@ -61,7 +79,6 @@ class AdminSetupService extends BaseAdminService {
     let setup = await SetupModel.getOne({}, "SETUP_FEATURES");
     return (setup && setup.SETUP_FEATURES) || {};
   }
-  // [AI_END LINES=12 TIMESTAMP=2025-01-25 12:00:00]
 }
 
 module.exports = AdminSetupService;

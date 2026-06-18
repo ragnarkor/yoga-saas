@@ -2,7 +2,7 @@
   "pages": [
     "pages/tenant/select/tenant_select",
 
-    "pages/default/default/index/default_index",
+    "pages/default/index/default_index",
     "pages/default/about/index/about_index",
     "pages/default/about/contact/about_contact",
     "pages/default/calendar/index/calendar_index",
@@ -20,7 +20,10 @@
     "pages/default/news/cate2/news_cate2",
     "pages/default/search/search",
 
-    "projects/A00/default/index/default_index",
+    "projects/A00/index/default_index",
+
+    "pages/public/hint/hint",
+    "pages/public/web_article/web_article",
 
     "cmpts/public/form/form_set/field/form_set_field",
     "pages/admin/index/tenant/admin_tenant",
@@ -58,34 +61,26 @@
     "navigationBarTextStyle": "white"
   },
   "tabBar": {
-    "custom": false,
+    "custom": true,
     "backgroundColor": "#fefefe",
     "color": "#999999",
     "selectedColor": "#5B8A72",
     "list": [
       {
-        "pagePath": "pages/default/default/index/default_index",
-        "text": "首页",
-        "iconPath": "/pages/default/skin/images/tabbar/home.png",
-        "selectedIconPath": "/pages/default/skin/images/tabbar/home_cur.png"
+        "pagePath": "pages/default/index/default_index",
+        "text": "首页"
       },
       {
         "pagePath": "pages/default/calendar/index/calendar_index",
-        "text": "约课",
-        "iconPath": "/pages/default/skin/images/tabbar/day.png",
-        "selectedIconPath": "/pages/default/skin/images/tabbar/day_cur.png"
+        "text": "约课"
       },
       {
         "pagePath": "pages/default/news/cate1/news_cate1",
-        "text": "课程",
-        "iconPath": "/pages/default/skin/images/tabbar/cate1.png",
-        "selectedIconPath": "/pages/default/skin/images/tabbar/cate1_cur.png"
+        "text": "课程"
       },
       {
         "pagePath": "pages/default/my/index/my_index",
-        "text": "我的",
-        "iconPath": "/pages/default/skin/images/tabbar/my.png",
-        "selectedIconPath": "/pages/default/skin/images/tabbar/my_cur.png"
+        "text": "我的"
       }
     ]
   },

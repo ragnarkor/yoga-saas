@@ -2,7 +2,7 @@ const cacheHelper = require('../helper/cache_helper.js');
 const pageHelper = require('../helper/page_helper.js');
 const cloudHelper = require('../helper/cloud_helper.js');
 const timeHelper = require('../helper/time_helper.js');
-const PassortBiz = require('../biz/passport_biz.js');
+const PassportBiz = require('../biz/passport_biz.js');
 const setting = require('../setting/setting.js');
 
 module.exports = Behavior({
@@ -102,6 +102,10 @@ module.exports = Behavior({
 			pageHelper.url(e, this);
 		},
 
+		bindSetTap: function (e) {
+			this.setTap(e, this.data.skin);
+		},
+
 		setTap: function (e, skin) {
 			let itemList = ['清除缓存', '后台管理'];
 			wx.showActionSheet({
@@ -116,7 +120,7 @@ module.exports = Behavior({
 					if (idx == 1) {
 						pageHelper.setSkin(skin);
 						if (setting.IS_SUB) {
-							PassortBiz.adminLogin('admin', '123456', this);
+							PassportBiz.adminLogin('admin', '123456', this);
 						} else {
 							wx.reLaunch({
 								url: '/pages/admin/index/login/admin_login',

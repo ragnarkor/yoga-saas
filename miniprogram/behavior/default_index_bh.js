@@ -19,15 +19,28 @@ module.exports = Behavior({
 			if (setting.IS_SUB) wx.hideHomeButton();
 		},
 
-		_loadList: async function () { 
+		_loadList: async function () {
 			let opts = {
 				title: 'bar'
 			}
-			await cloudHelper.callCloudSumbit('news/home_list', {}, opts).then(res => {
+			try {
+				let res = await cloudHelper.callCloudSumbit('news/home_list', {}, opts);
+				let list = (res && res.data) ? res.data : [];
+				if (Array.isArray(list)) {
+					list = list.map((item) => ({
+						...item,
+						pic: pageHelper.fmtImgUrl(item.pic),
+					}));
+				}
 				this.setData({
-					dataList: res.data
+					dataList: list
 				});
-			})
+			} catch (err) {
+				console.error(err);
+				this.setData({
+					dataList: []
+				});
+			}
 		},
 
 		/**

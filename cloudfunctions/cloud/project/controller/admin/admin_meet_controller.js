@@ -11,6 +11,7 @@ const timeUtil = require("../../../framework/utils/time_util.js");
 const dataUtil = require("../../../framework/utils/data_util.js");
 const cacheUtil = require("../../../framework/utils/cache_util.js");
 const LogModel = require("../../model/log_model.js");
+const FeatureGate = require("../../utils/feature_gate.js");
 
 class AdminMeetController extends BaseAdminController {
   // 计算可约天数
@@ -43,6 +44,7 @@ class AdminMeetController extends BaseAdminController {
   /** 生成自助签到码 */
   async genSelfCheckinQr() {
     await this.isAdmin();
+    await FeatureGate.check("selfCheckin");
 
     let rules = {
       page: "must|string",
@@ -59,6 +61,7 @@ class AdminMeetController extends BaseAdminController {
   /** 管理员按钮核销 */
   async checkinJoin() {
     await this.isAdmin();
+    await FeatureGate.check("checkin");
 
     let rules = {
       joinId: "must|id",
@@ -75,6 +78,7 @@ class AdminMeetController extends BaseAdminController {
   /** 管理员扫码核验 */
   async scanJoin() {
     await this.isAdmin();
+    await FeatureGate.check("checkin");
 
     let rules = {
       meetId: "must|id",

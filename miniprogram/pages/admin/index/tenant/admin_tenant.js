@@ -1,26 +1,16 @@
-// [AI_START TIMESTAMP=2025-01-25 19:30:00]
 const pageHelper = require("../../../../helper/page_helper.js");
 const cloudHelper = require("../../../../helper/cloud_helper.js");
 
 Page({
-  /**
-   * 页面的初始数据
-   */
   data: {
     tenantList: [],
     loading: true,
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad: function (options) {
+  onLoad: function () {
     this._loadTenantList();
   },
 
-  /**
-   * 加载馆列表
-   */
   _loadTenantList: async function () {
     try {
       let res = await cloudHelper.callCloudData("tenant/list", {});
@@ -38,19 +28,14 @@ Page({
     }
   },
 
-  /**
-   * 选择馆
-   */
   bindSelectTap: function (e) {
-    let pid = e.currentTarget.dataset.pid;
-    let name = e.currentTarget.dataset.name;
+    let item = e.currentTarget.dataset.item;
+    if (!item || !item._pid) return;
 
-    if (!pid) return;
-
-    pageHelper.setPID(pid);
+    pageHelper.setTenant(item);
 
     wx.showToast({
-      title: "已选择「" + name + "」",
+      title: "已选择「" + item.TENANT_NAME + "」",
       icon: "none",
       duration: 1000,
     });
@@ -62,12 +47,8 @@ Page({
     }, 1000);
   },
 
-  /**
-   * 刷新列表
-   */
   bindRefreshTap: function () {
     this.setData({ loading: true });
     this._loadTenantList();
   },
 });
-// [AI_END LINES=64 TIMESTAMP=2025-01-25 19:30:00]

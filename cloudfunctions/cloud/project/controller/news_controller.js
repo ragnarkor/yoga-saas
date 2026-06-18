@@ -7,6 +7,7 @@
 const BaseController = require('./base_controller.js');
 const NewsService = require('../service/news_service.js');
 const timeUtil = require('../../framework/utils/time_util.js');
+const FeatureGate = require('../utils/feature_gate.js');
 
 class NewsController extends BaseController {
 
@@ -28,6 +29,7 @@ class NewsController extends BaseController {
 
 	/** 首页资讯列表 */
 	async getHomeNewsList() {
+		await FeatureGate.check('news');
 		let rules = {};
 
 		// 取得数据
@@ -47,6 +49,7 @@ class NewsController extends BaseController {
 
 	/** 资讯列表 */
 	async getNewsList() {
+		await FeatureGate.check('news');
 
 		// 数据校验
 		let rules = {
@@ -82,6 +85,7 @@ class NewsController extends BaseController {
 
 	/** 浏览资讯信息 */
 	async viewNews() {
+		await FeatureGate.check('news');
 		// 数据校验
 		let rules = {
 			id: 'must|id',

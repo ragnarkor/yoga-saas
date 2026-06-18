@@ -41,7 +41,8 @@ class BaseService {
 
   async initSetup() {
     if (await dbUtil.isExistCollection("ax_setup")) {
-      let setupCnt = await SetupModel.count({});
+      // mustPID=false: 跨租户全局判断是否已初始化（否则 count 会带 _pid='ONE' 过滤，导致已 seed 的多租户被误判为空）
+      let setupCnt = await SetupModel.count({}, false);
       if (setupCnt > 0) return;
     }
 
@@ -107,7 +108,7 @@ class BaseService {
               val: title + "内容1",
             },
           ];
-          data.NEWS_PIC = ["../../../../images/default_cover_pic.gif"];
+          data.NEWS_PIC = ["/images/default_cover_pic.gif"];
 
           await NewsModel.insert(data);
         }
@@ -128,7 +129,7 @@ class BaseService {
           data.MEET_TITLE = title;
           data.MEET_STYLE_SET = {
             desc: title + " - 欢迎预约体验",
-            pic: "../../../../images/default_cover_pic.gif",
+            pic: "/images/default_cover_pic.gif",
           };
           data.MEET_TYPE_ID = typeId;
           data.MEET_TYPE_NAME = title;
@@ -233,7 +234,7 @@ class BaseService {
     }
 
     if (await dbUtil.isExistCollection("ax_setup")) {
-      let setupCnt = await SetupModel.count({});
+      let setupCnt = await SetupModel.count({}, false);
       if (setupCnt == 0) {
         let data = {};
         data.SETUP_ABOUT = "关于我们";
@@ -251,11 +252,13 @@ class BaseService {
 
     // [AI_START TIMESTAMP=2025-01-25 14:45:00]
     if (await dbUtil.isExistCollection("ax_tenant")) {
-      let tenantCnt = await TenantModel.count({});
+      // mustPID=false: 全局判断是否存在租户，避免重复创建默认馆（_pid='ONE' 幻影分区）
+      let tenantCnt = await TenantModel.count({}, false);
       if (tenantCnt == 0) {
         let tenantData = {};
         tenantData.TENANT_NAME = "静心瑜伽馆";
         tenantData.TENANT_DESC = "专业瑜伽课程预约平台";
+        tenantData.TENANT_TEMPLATE = "default";
         tenantData.TENANT_STATUS = TenantModel.STATUS.OPEN;
         await TenantModel.insert(tenantData);
       }
@@ -295,7 +298,8 @@ class BaseService {
     // ===== Step 3: 定义两个租户配置 =====
     let tenantConfigs = [
       {
-        pid: null, // 自动生成 PID，使用 default 标准模板页面
+        pid: null,
+        template: "default",
         name: "静心瑜伽馆",
         desc: "专业瑜伽课程预约平台",
         admins: [
@@ -321,7 +325,8 @@ class BaseService {
         project: "default（标准模板页面）",
       },
       {
-        pid: "A001", // 固定 PID，前端 getProjectName() 匹配后走 A00 定制首页
+        pid: "A001",
+        template: "A00",
         name: "健心瑜伽馆",
         desc: "高端定制瑜伽体验中心",
         admins: [
@@ -367,6 +372,7 @@ class BaseService {
       tenantData.TENANT_ID = tenantId;
       tenantData.TENANT_NAME = tc.name;
       tenantData.TENANT_DESC = tc.desc;
+      tenantData.TENANT_TEMPLATE = tc.template || "default";
       tenantData.TENANT_STATUS = TenantModel.STATUS.OPEN;
       await TenantModel.insert(tenantData, false);
 
@@ -401,7 +407,7 @@ class BaseService {
         data.NEWS_CATE_NAME = title;
         data.NEWS_ADMIN_ID = ownerId || "1";
         data.NEWS_CONTENT = [{ type: "text", val: title + "内容1" }];
-        data.NEWS_PIC = ["../../../../images/default_cover_pic.gif"];
+        data.NEWS_PIC = ["/images/default_cover_pic.gif"];
         await NewsModel.insert(data);
       }
 
@@ -414,7 +420,7 @@ class BaseService {
         data.MEET_TITLE = title;
         data.MEET_STYLE_SET = {
           desc: title + " - 欢迎预约体验",
-          pic: "../../../../images/default_cover_pic.gif",
+          pic: "/images/default_cover_pic.gif",
         };
         data.MEET_TYPE_ID = typeId;
         data.MEET_TYPE_NAME = title;
@@ -501,6 +507,7 @@ class BaseService {
       result.tenants.push({
         name: tc.name,
         pid: tenantId,
+        template: tc.template || "default",
         project: tc.project,
       });
     }

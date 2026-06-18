@@ -1,6 +1,6 @@
 /* [AI_START TIMESTAMP=2025-01-26 11:00:00] */
 /* A00 定制首页 - 深色高级感主题（金色 + 深蓝黑） */
-@import "../../skin/skin.wxss";
+@import "../skin/skin.wxss";
 
 page {
   background: #0f0f1a !important;

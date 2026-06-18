@@ -33,7 +33,7 @@
 
 		<van-cell-group custom-class="menu-group margin-bottom-xl">
 			<van-cell wx:for="{{data.tenantList}}" wx:key="TENANT_ID"
-				is-link bind:click="bindTenantTap" data-pid="{{item._pid}}" data-name="{{item.TENANT_NAME}}">
+				is-link bind:click="bindTenantTap" data-item="{{item}}">
 				<view slot="title">
 					<text class="icon-homefill text-blue margin-right-s"></text>
 					<text class="text-black">{{item.TENANT_NAME}}</text>

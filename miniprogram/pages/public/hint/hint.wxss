@@ -1,0 +1,10 @@
+.hint-page {
+  padding: 80rpx 40rpx;
+  text-align: center;
+}
+
+.hint-msg {
+  font-size: 32rpx;
+  color: #333;
+  margin-bottom: 40rpx;
+}

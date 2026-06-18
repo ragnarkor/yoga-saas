@@ -1,14 +1,5 @@
-let behavior = require('../../../../behavior/about_index_bh.js');
-let PassortBiz = require('../../../../biz/passport_biz.js');
-let skin = require('../../skin/skin.js');
+const { createPage } = require("../../../../helper/create_page.js");
 
-Page({
-	behaviors: [behavior],
-
-	onReady: function () {
-		PassortBiz.initPage({
-			skin,
-			that: this
-		});
-	},
-})
+createPage({
+  behaviorKey: "about_index_bh",
+});

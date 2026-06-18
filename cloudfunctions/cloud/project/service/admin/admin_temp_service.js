@@ -1,48 +1,51 @@
 /**
  * Notes: 预约后台管理
  * Ver : CCMiniCloud Framework 2.0.1 ALL RIGHTS RESERVED BY cclinux@qq.com
- * Date: 2021-12-08 07:48:00 
+ * Date: 2021-12-08 07:48:00
  */
 
-const BaseAdminService = require('./base_admin_service.js');
-const TempModel = require('../../model/temp_model.js');
+const BaseAdminService = require("./base_admin_service.js");
+const TempModel = require("../../model/temp_model.js");
 
 class AdminTempService extends BaseAdminService {
+  /**添加模板 */
+  async insertTemp({ name, times }) {
+    let data = {};
+    data.TEMP_NAME = name;
+    data.TEMP_TIMES = times;
+    await TempModel.insert(data);
+  }
 
-	/**添加模板 */
-	async insertTemp({
-		name,
-		times,
-	}) {
-		this.AppError('此功能暂不开放，如有需要请加作者微信：cclinux0730');
-	}
+  /**更新数据 */
+  async editTemp({ id, limit, isLimit }) {
+    let where = { _id: id };
+    let temp = await TempModel.getOne(where, "TEMP_TIMES");
+    if (!temp) this.AppError("模板不存在");
 
-	/**更新数据 */
-	async editTemp({
-		id,
-		limit,
-		isLimit
-	}) {
-		this.AppError('此功能暂不开放，如有需要请加作者微信：cclinux0730');
-	}
+    let times = temp.TEMP_TIMES || [];
+    for (let k in times) {
+      times[k].isLimit = isLimit;
+      times[k].limit = limit;
+    }
+    await TempModel.edit(where, { TEMP_TIMES: times });
+    return await this.getTempList();
+  }
 
+  /**删除数据 */
+  async delTemp(id) {
+    await TempModel.del({ _id: id });
+  }
 
-	/**删除数据 */
-	async delTemp(id) {
-		this.AppError('此功能暂不开放，如有需要请加作者微信：cclinux0730');
-	}
+  /**分页列表 */
+  async getTempList() {
+    let orderBy = {
+      TEMP_ADD_TIME: "desc",
+    };
+    let fields = "TEMP_NAME,TEMP_TIMES";
 
-
-	/**分页列表 */
-	async getTempList() {
-		let orderBy = {
-			'TEMP_ADD_TIME': 'desc'
-		};
-		let fields = 'TEMP_NAME,TEMP_TIMES';
-
-		let where = {};
-		return await TempModel.getAll(where, fields, orderBy);
-	}
+    let where = {};
+    return await TempModel.getAll(where, fields, orderBy);
+  }
 }
 
 module.exports = AdminTempService;

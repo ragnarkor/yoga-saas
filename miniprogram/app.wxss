@@ -17,6 +17,8 @@ page {
   --tabs-bottom-bar-color: #5b8a72;
   --tabs-active-text-color: #2d2d2d;
   --tabs-inactive-text-color: #999999;
+  --tab-text-color: #999999;
+  --tab-active-text-color: #2d2d2d;
 
   /* Tag */
   --tag-padding: 4rpx 16rpx;

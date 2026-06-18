@@ -10,99 +10,137 @@ const cacheHelper = require("./cache_helper.js");
 const picHelper = require("./pic_helper.js");
 const CACHE_SKIN = "SKIN_PID";
 const CACHE_TENANT = "CACHE_TENANT";
-// [AI_START TIMESTAMP=2025-01-25 21:00:00]
+const CACHE_TEMPLATE = "CACHE_TENANT_TEMPLATE";
+const tenantPages = require("../projects/page_registry.js");
 const skinDefault = require("../pages/default/skin/skin.js");
 const skinA00 = require("../projects/A00/skin/skin.js");
 
-/**
- * 获取当前项目名称（决定页面路由前缀）
- * 普通租户 → 'default'（pages/default/）
- * 特殊定制租户 A001 → 'A00'（projects/A00/）
- */
-function getProjectName() {
-  let pid = cacheHelper.get(CACHE_TENANT);
-  if (pid === "A001") return "A00";
-  return "default";
+const SKIN_MAP = {
+  default: skinDefault,
+  A00: skinA00,
+};
+
+/** 获取当前租户页面模板 ID */
+function getTemplate() {
+  return cacheHelper.get(CACHE_TEMPLATE) || "default";
 }
 
-/**
- * 获取当前皮肤配置（动态加载对应项目的 skin）
- */
+/** 获取当前皮肤配置 */
 function getSkin() {
-  if (getProjectName() === "A00") return skinA00;
-  return skinDefault;
+  const template = getTemplate();
+  return SKIN_MAP[template] || skinDefault;
 }
-// [AI_END LINES=20 TIMESTAMP=2025-01-25 21:00:00]
+
+/** 设置租户上下文（PID + 模板） */
+function setTenant(pid, template) {
+  if (typeof pid === "object" && pid !== null) {
+    template = pid.TENANT_TEMPLATE || pid.template || "default";
+    pid = pid._pid || pid.pid;
+  }
+  cacheHelper.set(CACHE_TENANT, pid, 86400 * 365);
+  cacheHelper.set(CACHE_TEMPLATE, template || "default", 86400 * 365);
+}
+
+/** 设置当前选中的租户PID（多租户模式） */
+function setPID(pid, template) {
+  setTenant(pid, template);
+}
+
+/** 清除当前租户上下文 */
+function clearPID() {
+  cacheHelper.remove(CACHE_TENANT);
+  cacheHelper.remove(CACHE_TEMPLATE);
+}
+
+function getPID() {
+  if (setting.PID) return setting.PID;
+
+  let tenantPid = cacheHelper.get(CACHE_TENANT);
+  if (tenantPid) return tenantPid;
+
+  return "";
+}
+
+/** 标准化页面相对路径，如 index/default_index */
+function normalizePagePath(url) {
+  let path = url.split("?")[0];
+  if (!path.startsWith("/")) path = "/" + path;
+  path = path.slice(1);
+
+  if (path.startsWith("pages/default/")) {
+    return path.slice("pages/default/".length);
+  }
+  if (path.startsWith("pages/")) {
+    return path.slice("pages/".length);
+  }
+  if (path.startsWith("projects/")) {
+    return path.replace(/^projects\/[^/]+\//, "");
+  }
+  return path;
+}
+
+/** 全局页面（不参与租户路由） */
+function isGlobalPage(url) {
+  return (
+    url.indexOf("/pages/public/") >= 0 ||
+    url.indexOf("/pages/admin/") >= 0 ||
+    url.indexOf("/pages/tenant/") >= 0 ||
+    url.indexOf("pages/public/") === 0 ||
+    url.indexOf("pages/admin/") === 0 ||
+    url.indexOf("pages/tenant/") === 0
+  );
+}
+
+/** 本地图片路径标准化（兼容种子数据里的相对路径） */
+function fmtImgUrl(url) {
+  if (!url || typeof url !== "string") return "";
+  if (
+    url.indexOf("cloud://") >= 0 ||
+    url.indexOf("http://") >= 0 ||
+    url.indexOf("https://") >= 0
+  ) {
+    return url;
+  }
+  if (url.startsWith("/")) return url;
+  const imgIdx = url.indexOf("images/");
+  if (imgIdx >= 0) return "/" + url.slice(imgIdx);
+  return url;
+}
+
+/** 根据租户模板解析页面 URL */
+function fmtURLByPID(url) {
+  if (isGlobalPage(url)) {
+    return url.startsWith("/") ? url : "/" + url;
+  }
+
+  const query = url.includes("?") ? "?" + url.split("?").slice(1).join("?") : "";
+  const pagePath = normalizePagePath(url);
+  const template = getTemplate();
+  const customPages = tenantPages[template] || [];
+  const isCustom = customPages.some(
+    (p) => pagePath === p || pagePath.startsWith(p + "/"),
+  );
+
+  if (isCustom && template !== "default") {
+    return `/projects/${template}/${pagePath}${query}`;
+  }
+  return `/pages/default/${pagePath}${query}`;
+}
 
 function getCurrentPageURL() {
   const pages = getCurrentPages();
   const currentPage = pages[pages.length - 1];
-  const url = `/${currentPage.route}`;
-  return url;
+  return `/${currentPage.route}`;
 }
 
 function setSkin(skin) {
   cacheHelper.set(CACHE_SKIN, skin, 86400 * 365);
 }
 
-/** 设置当前选中的租户PID（多租户模式） */
-function setPID(pid) {
-  cacheHelper.set(CACHE_TENANT, pid, 86400 * 365);
-}
-
-/** 清除当前租户PID */
-function clearPID() {
-  cacheHelper.remove(CACHE_TENANT);
-}
-
-function getPID() {
-  if (setting.PID) return setting.PID; // 已配置的情况
-
-  // [AI_START TIMESTAMP=2025-01-25 19:00:00]
-  // 多租户模式：优先读取用户选择的租户PID缓存（前台后台通用）
-  let tenantPid = cacheHelper.get(CACHE_TENANT);
-  if (tenantPid) return tenantPid;
-  // [AI_END LINES=3 TIMESTAMP=2025-01-25 19:00:00]
-
-  // [AI_START TIMESTAMP=2025-01-25 20:00:00]
-  // 多租户模式下，无缓存PID时返回空字符串
-  // 超级管理员未选馆时 getPID()="" → global.PID="" → 首页返回馆列表
-  // 用户未选馆时 getPID()="" → tenant_select 页面拦截引导选馆
-  // 不再回退到 skin.PID 或 URL 路径提取（那些是单租户模式的逻辑）
-  return "";
-  // [AI_END LINES=6 TIMESTAMP=2025-01-25 20:00:00]
-}
-
-// [AI_START TIMESTAMP=2025-01-25 21:30:00]
-function fmtURLByPID(url, PID = "") {
-  let project = getProjectName();
-  // A00仅保留首页定制，其他页面统一走 default
-  let isCustomHome =
-    project === "A00" && url.includes("default/index/default_index");
-
-  if (isCustomHome) {
-    // 特殊租户首页 → projects/A00/default/index/default_index
-    if (url.startsWith("/pages/")) {
-      url = url.replace("/pages/", "/projects/A00/");
-    } else {
-      url = "/projects/A00/" + url;
-    }
-  } else {
-    // 所有其他页面 → pages/default/
-    if (url.startsWith("/pages/")) {
-      url = url.replace("/pages/", "/pages/default/");
-    } else {
-      url = "/pages/default/" + url;
-    }
-  }
-  return url;
-}
-// [AI_END LINES=18 TIMESTAMP=2025-01-25 21:30:00]
-
 /** 定时器销毁 */
 function clearTimer(that, timerName = "timer") {
   if (helper.isDefined(that.data[timerName])) {
-    clearInterval(null);
+    clearInterval(that.data[timerName]);
   }
 }
 
@@ -640,9 +678,8 @@ function url(e, that) {
     }
     case "out": {
       wx.navigateTo({
-        url: fmtURLByPID(
+        url:
           "/pages/public/web_article?url=" + encodeURIComponent(url),
-        ),
       });
       break;
     }
@@ -772,18 +809,10 @@ function getOptions(that, options, idName = "id") {
 
 // 页面提示
 function hint(msg, type = "redirect") {
-  if (type == "reLaunch")
-    wx.reLaunch({
-      url: fmtURLByPID(
-        "/pages/public/hint?type=9&msg=" + encodeURIComponent(msg),
-      ),
-    });
-  else
-    wx.redirectTo({
-      url: fmtURLByPID(
-        "/pages/public/hint?type=9&msg=" + encodeURIComponent(msg),
-      ),
-    });
+  const url =
+    "/pages/public/hint?type=9&msg=" + encodeURIComponent(msg);
+  if (type == "reLaunch") wx.reLaunch({ url });
+  else wx.redirectTo({ url });
 }
 
 // 跳转操作，找到页面中的目标，出栈后面的 delta=1为上一页面
@@ -875,30 +904,28 @@ function queryMulti(that, e, key, val, def) {
  * @param {*} listKey  数据项KEY
  */
 function cacheListExist(key, that, listKey = "list") {
-  key = key.toUpperCase();
-  if (setting.CACHE_IS_LIST)
-    return cacheHelper.get(key + "_LIST") && that.data && that.data[listKey];
-  else return false;
+  const bizHelper = require("../biz/biz_helper.js");
+  return bizHelper.isCacheList(key) && that.data && that.data[listKey];
 }
 
 function cacheListRemove(key) {
-  key = key.toUpperCase();
-  if (setting.CACHE_IS_LIST) cacheHelper.remove(key + "_LIST");
+  require("../biz/biz_helper.js").removeCacheList(key);
 }
 
 function cacheListSet(key, time = setting.CACHE_LIST_TIME) {
-  key = key.toUpperCase();
-  if (setting.CACHE_IS_LIST) cacheHelper.set(key + "_LIST", "TRUE", time);
+  require("../biz/biz_helper.js").setCacheList(key, time);
 }
 
 module.exports = {
   setSkin,
   getSkin,
+  getTemplate,
+  setTenant,
   setPID,
   clearPID,
   getPID,
+  fmtImgUrl,
   fmtURLByPID,
-  getProjectName,
 
   //### form
   formClearFocus,

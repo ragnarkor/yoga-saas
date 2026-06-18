@@ -72,12 +72,11 @@ Page({
   // [AI_START TIMESTAMP=2025-01-25 18:30:00]
   /** 超级管理员：选择馆 */
   bindTenantTap: function (e) {
-    let pid = e.currentTarget.dataset.pid;
-    let name = e.currentTarget.dataset.name;
-    if (!pid) return;
+    let item = e.currentTarget.dataset.item;
+    if (!item || !item._pid) return;
 
-    pageHelper.setPID(pid);
-    pageHelper.showSuccToast("已切换到「" + name + "」", 1500, () => {
+    pageHelper.setTenant(item);
+    pageHelper.showSuccToast("已切换到「" + item.TENANT_NAME + "」", 1500, () => {
       this._loadDetail();
     });
   },

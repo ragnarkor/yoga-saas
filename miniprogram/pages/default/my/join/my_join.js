@@ -1,17 +1,6 @@
-let behavior = require('../../../../behavior/my_join_bh.js');
-let PassortBiz = require('../../../../biz/passport_biz.js');
-let skin = require('../../skin/skin.js');
+const { createPage } = require("../../../../helper/create_page.js");
 
-Page({
-	behaviors: [behavior], 
-
-	onReady: function () {
-		PassortBiz.initPage({
-			skin,
-			that: this,
-			isLoadSkin: true,
-		});
-
-		this.getSearchMenu(skin, this);
-	},
-})
+createPage({
+  behaviorKey: "my_join_bh",
+  isLoadSkin: true,
+});

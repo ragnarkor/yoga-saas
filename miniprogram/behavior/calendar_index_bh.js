@@ -1,16 +1,7 @@
-// [AI_START TIMESTAMP=2025-01-24 12:30:00]
 const cloudHelper = require("../helper/cloud_helper.js");
 const pageHelper = require("../helper/page_helper.js");
 const setting = require("../setting/setting.js");
 const timeHelper = require("../helper/time_helper.js");
-// [AI_START TIMESTAMP=2025-01-25 21:10:00]
-// 动态加载皮肤：普通租户用 default，特殊租户 A001 用 A00
-const cacheHelper = require("../helper/cache_helper.js");
-const skinDefault = require("../pages/default/skin/skin.js");
-const skinA00 = require("../projects/A00/skin/skin.js");
-let _pid = cacheHelper.get("CACHE_TENANT");
-const skin = _pid === "A001" ? skinA00 : skinDefault;
-// [AI_END LINES=6 TIMESTAMP=2025-01-25 21:10:00]
 
 module.exports = Behavior({
   data: {
@@ -38,11 +29,14 @@ module.exports = Behavior({
 
       this._initTabs();
       this._initDateList();
+      await this._loadHasList();
+      await this._loadList();
     },
 
     _initTabs: function () {
+      let skin = pageHelper.getSkin();
       let meetTypeStr = skin.MEET_TYPE || "";
-      let tabs = [];
+      let tabs = [{ id: "0", name: "全部课程" }];
       let parts = meetTypeStr.split(",");
       for (let part of parts) {
         let keyValue = part.split("|")[0];
@@ -54,8 +48,8 @@ module.exports = Behavior({
           });
         }
       }
-      if (tabs.length === 0) {
-        tabs.push({ id: "0", name: "全部课程" });
+      if (tabs.length === 1) {
+        tabs[0].name = "全部课程";
       }
 
       let now = new Date();
@@ -130,17 +124,18 @@ module.exports = Behavior({
         this.setData({
           courseList: null,
         });
-        await cloudHelper
-          .callCloudSumbit("meet/list_by_day", params, opts)
-          .then((res) => {
-            let rawList = res.data || [];
-            let courseList = this._transformCourseData(rawList);
-            this.setData({
-              list: rawList,
-              courseList,
-              isLoad: true,
-            });
-          });
+        const res = await cloudHelper.callCloudSumbit(
+          "meet/list_by_day",
+          params,
+          opts,
+        );
+        const rawList = (res && res.data) ? res.data : [];
+        const courseList = this._transformCourseData(rawList);
+        this.setData({
+          list: rawList,
+          courseList,
+          isLoad: true,
+        });
       } catch (err) {
         console.error(err);
         this.setData({
@@ -157,7 +152,7 @@ module.exports = Behavior({
         ? this.data.tabs[this.data.activeTab].id
         : "0";
 
-      let result = rawList.map((item, index) => {
+      let result = rawList.map((item) => {
         // 后端已返回 timeStart / timeEnd，直接使用
         let timeStart = item.timeStart || "";
         let timeEnd = item.timeEnd || "";
@@ -182,6 +177,10 @@ module.exports = Behavior({
           duration = this._calcDuration(timeStart, timeEnd);
         }
 
+        const skin = pageHelper.getSkin();
+        const defaultCover =
+          skin.IMG_DEFAULT_COVER || "/images/default_cover_pic.gif";
+
         return {
           _id: item._id,
           title: item.title || "未命名课程",
@@ -191,16 +190,18 @@ module.exports = Behavior({
           timeEnd,
           duration,
           coachName: item.coachName || "专业教练",
-          coachAvatar: item.coachAvatar || "/images/default_cover_pic.gif",
+          coachAvatar: pageHelper.fmtImgUrl(item.coachAvatar || item.pic) || defaultCover,
           slots: slots === 99 ? "不限" : slots,
           status,
           level: item.level || "",
-          pic: item.pic || "",
+          pic: pageHelper.fmtImgUrl(item.pic),
         };
       });
 
       if (activeTabId !== "0") {
-        result = result.filter((item) => item.typeId === activeTabId);
+        result = result.filter(
+          (item) => String(item.typeId) === String(activeTabId),
+        );
       }
 
       return result;
@@ -249,9 +250,11 @@ module.exports = Behavior({
     onReady: function () {},
 
     onShow: async function () {
+      const today = timeHelper.time("Y-M-D");
       this.setData(
         {
-          day: timeHelper.time("Y-M-D"),
+          day: today,
+          selectedDate: today,
         },
         async () => {
           await this._loadHasList();
@@ -272,16 +275,10 @@ module.exports = Behavior({
 
     onShareAppMessage: function () {},
 
-    bindTabChange: async function (e) {
-      let activeTab = e.detail.index;
-      this.setData(
-        {
-          activeTab,
-        },
-        async () => {
-          await this._loadList();
-        },
-      );
+    bindTabChange: function (e) {
+      const activeTab = e.detail.index;
+      const courseList = this._transformCourseData(this.data.list);
+      this.setData({ activeTab, courseList });
     },
 
     bindDateSelect: async function (e) {

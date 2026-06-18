@@ -4,10 +4,10 @@
 
 		<!--top area begin-->
 		<view class="upside upside-shadow">
-			<image wx:if="{{upImg}}" mode="aspectFill" lazy-load class="upImg loading" src="{{upImg}}" />
+			<image mode="aspectFill" lazy-load class="upImg loading" src="{{skin.IMG_UPIMG}}" />
 			<view class="user-bar">
 				<view class="avatar">
-					<image mode="aspectFit" src="../../skin/images/tabbar/my_cur.png" />
+					<image mode="aspectFit" src="/pages/default/skin/images/tabbar/my_cur.png" />
 				</view>
 				<view class="detail" bindtap="url" data-url="../edit/my_edit">
 					<view class="name text-cut">{{user?user.USER_NAME:'欢迎回来~~~'}}</view>

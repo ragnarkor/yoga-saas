@@ -24,8 +24,7 @@
 				wx:key="_id"
 				title="{{item.TENANT_NAME}}"
 				label="{{item.TENANT_DESC || ''}}"
-				data-pid="{{item._pid}}"
-				data-name="{{item.TENANT_NAME}}"
+				data-item="{{item}}"
 				bind:click="bindSelectTap"
 				is-link
 				title-style="font-weight: bold; color: #333;"

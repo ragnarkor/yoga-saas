@@ -10,6 +10,7 @@ const timeUtil = require('../../framework/utils/time_util.js');
 const JoinModel = require('../model/join_model.js');
 const cacheUtil = require('../../framework/utils/cache_util.js');
 const config = require('../../config/config.js');
+const FeatureGate = require('../utils/feature_gate.js');
 
 const CACHE_CALENDAR_INDEX = 'cache_calendar_index';
 const CACHE_CALENDAR_HAS_DAY = 'cache_calendar_has_day';
@@ -220,6 +221,7 @@ class MeetController extends BaseController {
 
 	/** 用户自助签到 */
 	async userSelfCheckin() {
+		await FeatureGate.check('selfCheckin');
 
 		// 数据校验
 		let rules = {
@@ -277,6 +279,7 @@ class MeetController extends BaseController {
 
 	/** 预约前检测 */
 	async beforeJoin() {
+		await FeatureGate.check('booking');
 		// 数据校验
 		let rules = {
 			meetId: 'must|id',
@@ -292,6 +295,7 @@ class MeetController extends BaseController {
 
 	/** 预约提交 */
 	async join() {
+		await FeatureGate.check('booking');
 		// 数据校验
 		let rules = {
 			meetId: 'must|id',

@@ -1,0 +1,4 @@
+<view class="hint-page">
+  <view class="hint-msg">{{msg || '操作提示'}}</view>
+  <button wx:if="{{type==9}}" bindtap="url" data-type="reLaunch" data-url="/pages/tenant/select/tenant_select">返回</button>
+</view>

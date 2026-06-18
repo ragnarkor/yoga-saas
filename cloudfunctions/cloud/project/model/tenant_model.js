@@ -1,14 +1,11 @@
-// [AI_START TIMESTAMP=2025-01-25 10:00:00]
 /**
  * Notes: 租户实体
- * Date: 2025-01-25
  */
 
 const BaseModel = require("./base_model.js");
 
 class TenantModel extends BaseModel {}
 
-// 集合名
 TenantModel.CL = "ax_tenant";
 
 TenantModel.DB_STRUCTURE = {
@@ -18,6 +15,7 @@ TenantModel.DB_STRUCTURE = {
   TENANT_NAME: "string|true|comment=瑜伽馆名称",
   TENANT_LOGO: "string|false|comment=馆LOGO cloudId",
   TENANT_DESC: "string|false|comment=简介",
+  TENANT_TEMPLATE: "string|true|default=default|comment=页面模板ID，如 default/A00",
   TENANT_STATUS: "int|true|default=1|comment=0=关闭 1=开放",
 
   TENANT_ADD_TIME: "int|true",
@@ -26,14 +24,11 @@ TenantModel.DB_STRUCTURE = {
   TENANT_EDIT_IP: "string|false",
 };
 
-// 字段前缀
 TenantModel.FIELD_PREFIX = "TENANT_";
 
-// 状态
 TenantModel.STATUS = {
   CLOSE: 0,
   OPEN: 1,
 };
 
 module.exports = TenantModel;
-// [AI_END LINES=35 TIMESTAMP=2025-01-25 10:00:00]

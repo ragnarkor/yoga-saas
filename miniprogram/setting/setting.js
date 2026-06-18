@@ -17,12 +17,9 @@ module.exports = {
   MEET_CAN_NULL_TIME: false, // 是否允许有无时段的日期保存和展示
   MEET_PIC_PATH: "meet/pic/",
 
-  //#################
-  CHECK_CONTENT: false, //图片文字是否校验
-
-  // ### 内容安全
-  CLIENT_CHECK_CONTENT: false, //前台图片文字是否校验
-  ADMIN_CHECK_CONTENT: false, //后台图片文字是否校验
+  // ### 内容安全（与 cloud/config.js 保持一致）
+  CLIENT_CHECK_CONTENT: false,
+  ADMIN_CHECK_CONTENT: false,
 
   IMG_UPLOAD_SIZE: 20, //图片上传大小M兆
 

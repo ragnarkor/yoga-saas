@@ -16,7 +16,7 @@
 
 	<view class="tenant-list" wx:if="{{list.length>0}}">
 		<view class="tenant-card" wx:for="{{list}}" wx:key="TENANT_ID"
-			bindtap="bindSelectTap" data-pid="{{item._pid}}" data-name="{{item.TENANT_NAME}}">
+			bindtap="bindSelectTap" data-item="{{item}}">
 
 			<view class="tenant-logo">
 				<image wx:if="{{item.TENANT_LOGO}}" src="{{item.TENANT_LOGO}}" mode="aspectFill" class="logo-img" />

@@ -2,14 +2,14 @@
 <template name="defaultIndexTpl">
 	<view class="main">
 		<view class="up">
-			<image mode="aspectFill" src="{{upImg}}" />
+			<image mode="aspectFill" src="{{skin.IMG_DEFAULT_INDEX_BG}}" />
 		</view>
 		<view class="down">
 			<view class="menu card-project shadow-project">
 				<!-- 资讯分类入口 -->
-				<view bindtap="url" data-url="../../news/index/news_index?id={{item.val}}" class="item" wx:for="{{skin.newsCateArr}}" wx:key="key">
+				<view bindtap="url" data-url="/pages/default/news/index/news_index?id={{item.val}}" class="item" wx:for="{{skin.newsCateArr}}" wx:key="key">
 					<view class="item-inner">
-						<view class="img"><image src="../../skin/images/menu/news_{{item.val}}.png" /></view>
+						<view class="img"><image src="/pages/default/skin/images/menu/news_{{item.val}}.png" /></view>
 						<view class="title">{{item.label}}</view>
 					</view>
 				</view>

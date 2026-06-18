@@ -1,19 +1,6 @@
-let behavior = require('../../../../behavior/meet_detail_bh.js');
-let PassortBiz = require('../../../../biz/passport_biz.js');
-let skin = require('../../skin/skin.js');
+const { createPage } = require("../../../../helper/create_page.js");
 
-Page({
-	behaviors: [behavior], 
-	
-	onReady: function () {
-		PassortBiz.initPage({
-			skin,
-			that: this,
-			isLoadSkin: true,
-		});
-
-		wx.setNavigationBarTitle({
-			title: skin.MEET_NAME + '详情'
-		});
-	},
-})
+createPage({
+  behaviorKey: "meet_detail_bh",
+  isLoadSkin: true,
+});

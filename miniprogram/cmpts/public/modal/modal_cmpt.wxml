@@ -42,8 +42,8 @@
 			<slot />
 		</view>
 		<view class="modal-bar"> 
-			<view class="" bindtap="bindHideModalTap">{{cancelText}}</view>
-			<view wx:if="{{showConfirm}}" class="modal-bar-comfirm" bindtap="bindComfirmTap">{{confirmText}}</view> 
+			<view class="modal-bar-item" bindtap="bindHideModalTap">{{cancelText}}</view>
+			<view wx:if="{{showConfirm}}" class="modal-bar-item modal-bar-comfirm" bindtap="bindComfirmTap">{{confirmText}}</view> 
 		</view>
 	</view>
 </view>
@@ -62,8 +62,8 @@
 			<slot />
 		</view>
 		<view class="modal-bar"> 
-			<view class="" bindtap="bindHideModalTap">{{cancelText}}</view>
-			<view wx:if="{{showConfirm}}" class="modal-bar-comfirm" bindtap="bindComfirmTap">{{confirmText}}</view> 
+			<view class="modal-bar-item" bindtap="bindHideModalTap">{{cancelText}}</view>
+			<view wx:if="{{showConfirm}}" class="modal-bar-item modal-bar-comfirm" bindtap="bindComfirmTap">{{confirmText}}</view> 
 		</view>
 	</view>
 </view>
@@ -74,7 +74,7 @@
 <view wx:if="{{type=='image'}}" class="modal  {{show?'show':''}}">
 	<view class="dialog">
 		<view class="bg-img" style="height:{{height}}rpx;">
-			<image mode="aspectFill" src="{{imgURL}}"></image>
+			<image class="bg-img-cover" mode="aspectFill" src="{{imgURL}}"></image>
 			<view class="bar justify-end text-white">
 				<view class="action" bindtap="bindHideModalTap">
 					<text class="icon-close"></text>

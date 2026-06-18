@@ -20,18 +20,15 @@ App({
 		this.globalData = {};
 
 		// 用于自定义导航栏
-		wx.getSystemInfo({
-			success: e => {
-				this.globalData.statusBar = e.statusBarHeight;
-				let capsule = wx.getMenuButtonBoundingClientRect();
-				if (capsule) {
-					this.globalData.custom = capsule;
-					this.globalData.customBar = capsule.bottom + capsule.top - e.statusBarHeight;
-				} else {
-					this.globalData.customBar = e.statusBarHeight + 50;
-				} 
-			}
-		});
+		const windowInfo = wx.getWindowInfo();
+		this.globalData.statusBar = windowInfo.statusBarHeight;
+		let capsule = wx.getMenuButtonBoundingClientRect();
+		if (capsule) {
+			this.globalData.custom = capsule;
+			this.globalData.customBar = capsule.bottom + capsule.top - windowInfo.statusBarHeight;
+		} else {
+			this.globalData.customBar = windowInfo.statusBarHeight + 50;
+		}
 	},
 
 
