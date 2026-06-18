@@ -1,0 +1,37 @@
+<!-- [AI_START TIMESTAMP=2025-01-25 19:10:00] -->
+<view wx:if="{{!isLoad}}" class="loading-wrap">
+	<van-loading size="40rpx">加载中...</van-loading>
+</view>
+
+<view class="tenant-select" wx:if="{{isLoad}}">
+	<view class="header">
+		<text class="icon-homefill text-xxl text-blue"></text>
+		<text class="text-xl margin-left-s">选择瑜伽馆</text>
+	</view>
+
+	<view wx:if="{{list.length==0}}" class="empty-tip">
+		<text class="icon-text text-gray"></text>
+		<view class="text-grey margin-top">暂无可用瑜伽馆</view>
+	</view>
+
+	<view class="tenant-list" wx:if="{{list.length>0}}">
+		<view class="tenant-card" wx:for="{{list}}" wx:key="TENANT_ID"
+			bindtap="bindSelectTap" data-pid="{{item._pid}}" data-name="{{item.TENANT_NAME}}">
+
+			<view class="tenant-logo">
+				<image wx:if="{{item.TENANT_LOGO}}" src="{{item.TENANT_LOGO}}" mode="aspectFill" class="logo-img" />
+				<text wx:else class="icon-homefill text-xxxl text-blue"></text>
+			</view>
+
+			<view class="tenant-info">
+				<view class="tenant-name text-lg">{{item.TENANT_NAME}}</view>
+				<view class="tenant-desc text-s text-grey" wx:if="{{item.TENANT_DESC}}">{{item.TENANT_DESC}}</view>
+			</view>
+
+			<view class="tenant-arrow">
+				<text class="icon-right text-grey"></text>
+			</view>
+		</view>
+	</view>
+</view>
+<!-- [AI_END LINES=31 TIMESTAMP=2025-01-25 19:10:00] -->

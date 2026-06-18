@@ -10,53 +10,29 @@ const cacheHelper = require("./cache_helper.js");
 const picHelper = require("./pic_helper.js");
 const CACHE_SKIN = "SKIN_PID";
 const CACHE_TENANT = "CACHE_TENANT";
+// [AI_START TIMESTAMP=2025-01-25 21:00:00]
+const skinDefault = require("../pages/default/skin/skin.js");
+const skinA00 = require("../projects/A00/skin/skin.js");
 
-function getSkin() {
-  return {
-    PID: "A00", //瑜伽
-
-    NAV_COLOR: "#ffffff",
-    NAV_BG: "#484487",
-
-    MEET_NAME: "预约",
-
-    MENU_ITEM: ["首页", "预约日历", "我的"], // 第1,4,5菜单
-
-    NEWS_CATE: "1=本店动态|rightpic,2=瑜伽常识|leftpic",
-    MEET_TYPE: "1=教练预约|leftbig3,2=课程预约|leftbig2",
-
-    DEFAULT_FORMS: [
-      {
-        type: "line",
-        title: "姓名",
-        desc: "请填写您的姓名",
-        must: true,
-        len: 50,
-        onlySet: {
-          mode: "all",
-          cnt: -1,
-        },
-        selectOptions: ["", ""],
-        mobileTruth: true,
-        checkBoxLimit: 2,
-      },
-      {
-        type: "line",
-        title: "手机",
-        desc: "请填写您的手机号码",
-        must: true,
-        len: 50,
-        onlySet: {
-          mode: "all",
-          cnt: -1,
-        },
-        selectOptions: ["", ""],
-        mobileTruth: true,
-        checkBoxLimit: 2,
-      },
-    ],
-  };
+/**
+ * 获取当前项目名称（决定页面路由前缀）
+ * 普通租户 → 'default'（pages/default/）
+ * 特殊定制租户 A001 → 'A00'（projects/A00/）
+ */
+function getProjectName() {
+  let pid = cacheHelper.get(CACHE_TENANT);
+  if (pid === "A001") return "A00";
+  return "default";
 }
+
+/**
+ * 获取当前皮肤配置（动态加载对应项目的 skin）
+ */
+function getSkin() {
+  if (getProjectName() === "A00") return skinA00;
+  return skinDefault;
+}
+// [AI_END LINES=20 TIMESTAMP=2025-01-25 21:00:00]
 
 function getCurrentPageURL() {
   const pages = getCurrentPages();
@@ -81,32 +57,47 @@ function clearPID() {
 
 function getPID() {
   if (setting.PID) return setting.PID; // 已配置的情况
-  let route = getCurrentPageURL();
 
-  if (route.includes("/admin/")) {
-    // 后台：优先读皮肤缓存，其次读租户缓存
-    let skin = getSkin();
-    if (skin && skin.PID) return skin.PID;
-    let tenantPid = cacheHelper.get(CACHE_TENANT);
-    if (tenantPid) return tenantPid;
-    return "";
-  } else if (route.startsWith("/projects/A")) {
-    // 前台根据路径判定
-    let PID = route.replace("/projects/", "");
-    PID = PID.split("/")[0];
-    return PID;
-  } else return "";
+  // [AI_START TIMESTAMP=2025-01-25 19:00:00]
+  // 多租户模式：优先读取用户选择的租户PID缓存（前台后台通用）
+  let tenantPid = cacheHelper.get(CACHE_TENANT);
+  if (tenantPid) return tenantPid;
+  // [AI_END LINES=3 TIMESTAMP=2025-01-25 19:00:00]
+
+  // [AI_START TIMESTAMP=2025-01-25 20:00:00]
+  // 多租户模式下，无缓存PID时返回空字符串
+  // 超级管理员未选馆时 getPID()="" → global.PID="" → 首页返回馆列表
+  // 用户未选馆时 getPID()="" → tenant_select 页面拦截引导选馆
+  // 不再回退到 skin.PID 或 URL 路径提取（那些是单租户模式的逻辑）
+  return "";
+  // [AI_END LINES=6 TIMESTAMP=2025-01-25 20:00:00]
 }
 
+// [AI_START TIMESTAMP=2025-01-25 21:30:00]
 function fmtURLByPID(url, PID = "") {
-  if (!PID) PID = getPID();
-  if (url.startsWith("/pages/")) {
-    url = url.replace("/pages/", "/projects/" + PID + "/");
+  let project = getProjectName();
+  // A00仅保留首页定制，其他页面统一走 default
+  let isCustomHome =
+    project === "A00" && url.includes("default/index/default_index");
+
+  if (isCustomHome) {
+    // 特殊租户首页 → projects/A00/default/index/default_index
+    if (url.startsWith("/pages/")) {
+      url = url.replace("/pages/", "/projects/A00/");
+    } else {
+      url = "/projects/A00/" + url;
+    }
   } else {
-    url = "/projects/" + PID + "/" + url;
+    // 所有其他页面 → pages/default/
+    if (url.startsWith("/pages/")) {
+      url = url.replace("/pages/", "/pages/default/");
+    } else {
+      url = "/pages/default/" + url;
+    }
   }
   return url;
 }
+// [AI_END LINES=18 TIMESTAMP=2025-01-25 21:30:00]
 
 /** 定时器销毁 */
 function clearTimer(that, timerName = "timer") {
@@ -606,7 +597,8 @@ function url(e, that) {
   if (!type) type = "url";
 
   switch (type) {
-    case "picker": { //picker 选择trigger
+    case "picker": {
+      //picker 选择trigger
       let item = e.currentTarget.dataset.item;
       that.setData({
         [item]: e.detail,
@@ -736,7 +728,8 @@ function url(e, that) {
       picHelper.getWritePhotosAlbum(callback);
       break;
     }
-    case "bool": { //正反
+    case "bool": {
+      //正反
       that.setData({
         [url]: !that.data[url],
       });
@@ -905,6 +898,7 @@ module.exports = {
   clearPID,
   getPID,
   fmtURLByPID,
+  getProjectName,
 
   //### form
   formClearFocus,

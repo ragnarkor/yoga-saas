@@ -40,7 +40,8 @@ AdminModel.FIELD_PREFIX = "ADMIN_";
 // [AI_START TIMESTAMP=2025-01-25 10:00:00]
 // 命名角色常量（替代 0/1 数字）
 AdminModel.TYPE = {
-  OWNER: "owner", // 馆长：全馆管理权限
+  SUPER: "super", // 超级管理员：平台级，管理所有馆（_pid=admin，不绑定租户）
+  OWNER: "owner", // 馆长：单个馆的完整管理权限
   TEACHER: "teacher", // 教师：只能管理自己创建的课程
 };
 // [AI_END LINES=5 TIMESTAMP=2025-01-25 10:00:00]

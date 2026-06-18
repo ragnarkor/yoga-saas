@@ -1,9 +1,8 @@
-// [AI_START TIMESTAMP=2025-01-24 12:00:00]
 module.exports = {
-  PID: "A00", //瑜伽
+  PID: "default", // 标准模板
 
   NAV_COLOR: "#ffffff",
-  NAV_BG: "#1a1a2e",
+  NAV_BG: "#5B8A72",
 
   MEET_NAME: "约课",
 

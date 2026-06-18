@@ -9,6 +9,9 @@ const AdminBiz = require("./admin_biz.js");
 const setting = require("../setting/setting.js");
 const dataHelper = require("../helper/data_helper.js");
 const cloudHelper = require("../helper/cloud_helper.js");
+// [AI_START TIMESTAMP=2025-01-25 17:00:00]
+const pageHelper = require("../helper/page_helper.js");
+// [AI_END LINES=1 TIMESTAMP=2025-01-25 17:00:00]
 
 class PassportBiz extends BaseBiz {
   /**
@@ -79,7 +82,18 @@ class PassportBiz extends BaseBiz {
       await cloudHelper
         .callCloudSumbit("admin/login", params, opt)
         .then((res) => {
-          if (res && res.data && res.data.name) AdminBiz.adminLogin(res.data);
+          if (res && res.data && res.data.name) {
+            AdminBiz.adminLogin(res.data);
+            // [AI_START TIMESTAMP=2025-01-25 17:00:00]
+            // 登录成功后保存租户PID，供后续API请求使用
+            if (res.data.pid) {
+              pageHelper.setPID(res.data.pid);
+            } else {
+              // 超级管理员无绑定租户，清除PID缓存
+              pageHelper.clearPID();
+            }
+            // [AI_END LINES=5 TIMESTAMP=2025-01-25 17:00:00]
+          }
 
           wx.reLaunch({
             url: "/pages/admin/index/home/admin_home",

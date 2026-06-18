@@ -1,22 +1,26 @@
 {
   "pages": [
+    "pages/tenant/select/tenant_select",
+
+    "pages/default/default/index/default_index",
+    "pages/default/about/index/about_index",
+    "pages/default/about/contact/about_contact",
+    "pages/default/calendar/index/calendar_index",
+    "pages/default/meet/index/meet_index",
+    "pages/default/meet/join/meet_join",
+    "pages/default/meet/detail/meet_detail",
+    "pages/default/meet/self/meet_self",
+    "pages/default/my/index/my_index",
+    "pages/default/my/edit/my_edit",
+    "pages/default/my/join/my_join",
+    "pages/default/my/join_detail/my_join_detail",
+    "pages/default/news/index/news_index",
+    "pages/default/news/detail/news_detail",
+    "pages/default/news/cate1/news_cate1",
+    "pages/default/news/cate2/news_cate2",
+    "pages/default/search/search",
+
     "projects/A00/default/index/default_index",
-    "projects/A00/about/index/about_index",
-    "projects/A00/about/contact/about_contact",
-    "projects/A00/calendar/index/calendar_index",
-    "projects/A00/meet/index/meet_index",
-    "projects/A00/meet/join/meet_join",
-    "projects/A00/meet/detail/meet_detail",
-    "projects/A00/meet/self/meet_self",
-    "projects/A00/my/index/my_index",
-    "projects/A00/my/edit/my_edit",
-    "projects/A00/my/join/my_join",
-    "projects/A00/my/join_detail/my_join_detail",
-    "projects/A00/news/index/news_index",
-    "projects/A00/news/detail/news_detail",
-    "projects/A00/news/cate1/news_cate1",
-    "projects/A00/news/cate2/news_cate2",
-    "projects/A00/search/search",
 
     "cmpts/public/form/form_set/field/form_set_field",
     "pages/admin/index/tenant/admin_tenant",
@@ -60,28 +64,28 @@
     "selectedColor": "#5B8A72",
     "list": [
       {
-        "pagePath": "projects/A00/default/index/default_index",
+        "pagePath": "pages/default/default/index/default_index",
         "text": "首页",
-        "iconPath": "/projects/A00/skin/images/tabbar/home.png",
-        "selectedIconPath": "/projects/A00/skin/images/tabbar/home_cur.png"
+        "iconPath": "/pages/default/skin/images/tabbar/home.png",
+        "selectedIconPath": "/pages/default/skin/images/tabbar/home_cur.png"
       },
       {
-        "pagePath": "projects/A00/calendar/index/calendar_index",
+        "pagePath": "pages/default/calendar/index/calendar_index",
         "text": "约课",
-        "iconPath": "/projects/A00/skin/images/tabbar/day.png",
-        "selectedIconPath": "/projects/A00/skin/images/tabbar/day_cur.png"
+        "iconPath": "/pages/default/skin/images/tabbar/day.png",
+        "selectedIconPath": "/pages/default/skin/images/tabbar/day_cur.png"
       },
       {
-        "pagePath": "projects/A00/news/cate1/news_cate1",
+        "pagePath": "pages/default/news/cate1/news_cate1",
         "text": "课程",
-        "iconPath": "/projects/A00/skin/images/tabbar/cate1.png",
-        "selectedIconPath": "/projects/A00/skin/images/tabbar/cate1_cur.png"
+        "iconPath": "/pages/default/skin/images/tabbar/cate1.png",
+        "selectedIconPath": "/pages/default/skin/images/tabbar/cate1_cur.png"
       },
       {
-        "pagePath": "projects/A00/my/index/my_index",
+        "pagePath": "pages/default/my/index/my_index",
         "text": "我的",
-        "iconPath": "/projects/A00/skin/images/tabbar/my.png",
-        "selectedIconPath": "/projects/A00/skin/images/tabbar/my_cur.png"
+        "iconPath": "/pages/default/skin/images/tabbar/my.png",
+        "selectedIconPath": "/pages/default/skin/images/tabbar/my_cur.png"
       }
     ]
   },

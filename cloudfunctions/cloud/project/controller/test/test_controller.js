@@ -8,7 +8,9 @@ const config = require("../../../config/config.js");
 // [AI_START TIMESTAMP=2025-01-25 14:30:00]
 const BaseService = require("../../service/base_service.js");
 // [AI_END LINES=1 TIMESTAMP=2025-01-25 14:30:00]
-class TestController {
+// [AI_START TIMESTAMP=2025-01-25 15:30:00]
+class TestController extends BaseController {
+  // [AI_END LINES=1 TIMESTAMP=2025-01-25 15:30:00]
   async test() {
     console.log("1111");
 

@@ -1,21 +1,21 @@
 page {
-  background-color: #0f0f1a;
+  background-color: #f6f7f5;
 
-  /* === Premium Dark + Gold Design System (A00 Custom) === */
-  --projectColor: #c9a96e;
-  --projectColorLight: #2a2a3e;
+  /* === Yoga Wellness Design System - Sage Green + Warm Terracotta === */
+  --projectColor: #5b8a72;
+  --projectColorLight: #e3efe8;
   --projectCompareColor: #d4956b;
-  --projectColorDark: #b8975a;
-  --projectAccent: #c9a96e;
-  --projectBgSoft: #1a1a2e;
+  --projectColorDark: #4a7160;
+  --projectAccent: #c8895a;
+  --projectBgSoft: #fafbf9;
 
   /*#### 父组件日历颜色定义*/
   /* 整体颜色 */
-  --calendarPageColor: #1a1a2e;
+  --calendarPageColor: #fff;
   /* 加重颜色*/
-  --calendarMainColor: #c9a96e !important;
+  --calendarMainColor: #5b8a72 !important;
   /* 加重的亮颜色 用于选中日期的数据小圆点 */
-  --calendarLightColor: #d4b87a;
+  --calendarLightColor: #8bb3a0;
 }
 
 .text-project {

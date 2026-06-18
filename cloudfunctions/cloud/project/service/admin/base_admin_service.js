@@ -18,8 +18,7 @@ const UserModel = require("../../model/user_model.js");
 const NewsModel = require("../../model/news_model.js");
 
 class BaseAdminService extends BaseService {
-  /** 是否管理员 */
-  /** 是否管理员 */
+  /** 是否管理员（token 全局唯一，不按 PID 过滤） */
   async isAdmin(token) {
     // 马甲判断,自动登录
     if (
@@ -56,16 +55,21 @@ class BaseAdminService extends BaseService {
       ], // token有效时间
       ADMIN_STATUS: 1,
     };
+    // [AI_START TIMESTAMP=2025-01-25 16:30:00]
     let admin = await AdminModel.getOne(
       where,
       "ADMIN_ID,ADMIN_PHONE,ADMIN_NAME,ADMIN_TYPE",
+      {},
+      false,
     );
+    // [AI_END LINES=4 TIMESTAMP=2025-01-25 16:30:00]
     if (!admin) this.AppError("管理员不存在", appCode.ADMIN_ERROR);
 
     return admin;
   }
 
-  /** 是否馆长(owner) */
+  // [AI_START TIMESTAMP=2025-01-25 16:30:00]
+  /** 是否超级管理员(super)，平台级跨租户 */
   async isSuperAdmin(token) {
     // 马甲判断,自动登录
     if (
@@ -78,7 +82,7 @@ class BaseAdminService extends BaseService {
       admin.ADMIN_PHONE = config.MASK_ADMIN_PHONE;
       admin.ADMIN_LOGIN_CNT = 9999;
       admin.ADMIN_LOGIN_TIME = "";
-      admin.ADMIN_TYPE = AdminModel.TYPE.OWNER;
+k      admin.ADMIN_TYPE = AdminModel.TYPE.SUPER;
       admin.ADMIN_STATUS = 1;
       return admin;
     }
@@ -90,13 +94,15 @@ class BaseAdminService extends BaseService {
         timeUtil.time() - config.ADMIN_LOGIN_EXPIRE * 1000,
       ], // token有效时间
       ADMIN_STATUS: 1,
-      ADMIN_TYPE: AdminModel.TYPE.OWNER,
+      ADMIN_TYPE: AdminModel.TYPE.SUPER,
     };
     let admin = await AdminModel.getOne(
       where,
       "ADMIN_ID,ADMIN_PHONE,ADMIN_NAME,ADMIN_TYPE",
+      {},
+      false,
     );
-    if (!admin) this.AppError("馆长权限不足", appCode.ADMIN_ERROR);
+    if (!admin) this.AppError("超级管理员权限不足", appCode.ADMIN_ERROR);
 
     return admin;
   }

@@ -60,14 +60,16 @@ class AdminBiz extends BaseBiz {
     return admin.name;
   }
 
+  // [AI_START TIMESTAMP=2025-01-25 16:30:00]
   /**
-   * 是否超级管理员
+   * 是否超级管理员（平台级 super）
    */
   static isSuperAdmin() {
     let admin = cacheHelper.get(constants.CACHE_ADMIN);
     if (!admin) return false;
-    return admin.type == "owner";
+    return admin.type == "super";
   }
+  // [AI_END LINES=1 TIMESTAMP=2025-01-25 16:30:00]
 
   //  登录状态判定
   static isAdmin(that) {

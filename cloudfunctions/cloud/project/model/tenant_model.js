@@ -22,6 +22,8 @@ TenantModel.DB_STRUCTURE = {
 
   TENANT_ADD_TIME: "int|true",
   TENANT_EDIT_TIME: "int|true",
+  TENANT_ADD_IP: "string|false",
+  TENANT_EDIT_IP: "string|false",
 };
 
 // 字段前缀

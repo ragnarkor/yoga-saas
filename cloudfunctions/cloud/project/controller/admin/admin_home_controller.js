@@ -18,7 +18,10 @@ class AdminHomeController extends BaseAdminController {
     let input = this.validateData(rules);
 
     let service = new AdminHomeService();
-    return await service.adminHome();
+    // [AI_START TIMESTAMP=2025-01-25 17:30:00]
+    // 传入管理员类型，超级管理员将返回馆列表
+    return await service.adminHome(this._adminType);
+    // [AI_END LINES=2 TIMESTAMP=2025-01-25 17:30:00]
   }
 
   // 清除缓存

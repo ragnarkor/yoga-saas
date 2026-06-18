@@ -3,7 +3,14 @@ const cloudHelper = require("../helper/cloud_helper.js");
 const pageHelper = require("../helper/page_helper.js");
 const setting = require("../setting/setting.js");
 const timeHelper = require("../helper/time_helper.js");
-const skin = require("../projects/A00/skin/skin.js");
+// [AI_START TIMESTAMP=2025-01-25 21:10:00]
+// 动态加载皮肤：普通租户用 default，特殊租户 A001 用 A00
+const cacheHelper = require("../helper/cache_helper.js");
+const skinDefault = require("../pages/default/skin/skin.js");
+const skinA00 = require("../projects/A00/skin/skin.js");
+let _pid = cacheHelper.get("CACHE_TENANT");
+const skin = _pid === "A001" ? skinA00 : skinDefault;
+// [AI_END LINES=6 TIMESTAMP=2025-01-25 21:10:00]
 
 module.exports = Behavior({
   data: {
