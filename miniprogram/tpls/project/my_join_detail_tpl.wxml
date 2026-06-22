@@ -13,21 +13,21 @@
 				<view class="item card-project shadow-project">
 					<view class="title-line" bindtap="url" data-url="../../meet/detail/meet_detail?id={{join.JOIN_MEET_ID}}">
 						<view class="title content-cut-two">{{join.JOIN_MEET_TITLE}} </view>
-						<view class="arrow"><text class="icon-right"></text></view>
+						<view class="arrow"><van-icon name="arrow" size="32rpx"  /></view>
 					</view>
 
 					<view class="author">
-						<text class="icon-remind margin-right-xs text-s"></text><text class="text-cut">{{join.JOIN_MEET_DAY}} {{join.JOIN_MEET_TIME_START}}～{{join.JOIN_MEET_TIME_END}}</text>
+						<van-icon name="bell" size="26rpx" custom-class="margin-right-xs text-s"  /><text class="text-cut">{{join.JOIN_MEET_DAY}} {{join.JOIN_MEET_TIME_START}}～{{join.JOIN_MEET_TIME_END}}</text>
 					</view>
 					<view class="data">
-						<text wx:if="{{join.JOIN_STATUS==1}}" class="text-green"><text class="icon-newshot margin-right-xxs"></text>预约成功{{join.JOIN_IS_CHECKIN==1?'，已签到':''}}</text>
+						<text wx:if="{{join.JOIN_STATUS==1}}" class="text-green"><van-icon name="passed" size="32rpx" custom-class="margin-right-xxs"  />预约成功{{join.JOIN_IS_CHECKIN==1?'，已签到':''}}</text>
 
 						<van-button wx:if="{{(join.JOIN_STATUS==1||join.JOIN_STATUS==0) && join.JOIN_IS_CHECKIN==0}}" size="small" plain type="danger" bindtap="bindCancelTap" custom-class="margin-left-s">取消预约</van-button>
 
-						<text wx:if="{{join.JOIN_STATUS==10}}" class="text-grey"><text class="icon-bad margin-right-xxs"></text>已取消</text>
+						<text wx:if="{{join.JOIN_STATUS==10}}" class="text-grey"><van-icon name="close" size="32rpx" custom-class="margin-right-xxs"  />已取消</text>
 
 						<block wx:if="{{join.JOIN_STATUS==99}}">
-							<text class="text-orange"><text class="icon-bad margin-right-xxs"></text>系统取消<text class="text-grey" wx:if="{{join.JOIN_REASON}}">：{{join.JOIN_REASON}}</text></text>
+							<text class="text-orange"><van-icon name="close" size="32rpx" custom-class="margin-right-xxs"  />系统取消<text class="text-grey" wx:if="{{join.JOIN_REASON}}">：{{join.JOIN_REASON}}</text></text>
 						</block>
 					</view>
 

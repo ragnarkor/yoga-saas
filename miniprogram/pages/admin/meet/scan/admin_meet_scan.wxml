@@ -13,7 +13,7 @@
 	<view class="form-box shadow margin-top-xs">
 
 		<view class="checkin" bindtap="bindScanTap">
-			<view class="notice"><text class="icon-scan margin-right-s text-bold"></text>扫码核销</view>
+			<view class="notice"><van-icon name="scan" size="32rpx" custom-class="margin-right-s text-bold"  />扫码核销</view>
 			<view class="desc">管理员扫描用户预约码进行签到核销</view>
 			<view class="oprt">立即核销</view>
 		</view>

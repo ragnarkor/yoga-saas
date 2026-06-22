@@ -153,6 +153,11 @@
  				resolve(res.result);
  			},
  			fail: function (err) {
+				if (err && err.errMsg && err.errMsg.includes('timeout')) {
+					console.warn('[cloud timeout] route=' + route, err);
+				} else {
+					console.warn('[cloud fail] route=' + route, err);
+				}
  				if (hint) {
  					console.log(err)
  					if (err && err.errMsg && err.errMsg.includes('-501000') && err.errMsg.includes('Environment not found')) {
@@ -182,7 +187,7 @@
  							showCancel: false
  						});
  				}
- 				reject(err.result);
+				reject((err && err.result) || err);
  				return;
  			},
  			complete: function (res) {
@@ -298,7 +303,8 @@
  	for (let i = 0; i < imgList.length; i++) {
 
  		let filePath = imgList[i];
- 		let ext = filePath.match(/\.[^.]+?$/)[0];
+ 		let extMatch = filePath.match(/\.[^.]+?$/);
+ 		let ext = extMatch ? extMatch[0] : '.png';
 
  		// 是否为临时文件
  		if (filePath.includes('tmp') || filePath.includes('temp') || filePath.includes('wxfile')) {

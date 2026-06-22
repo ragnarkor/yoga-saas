@@ -4,7 +4,7 @@
 <view class="main-admin" wx:if="{{isLoad && isAdmin}}">
 
 	<view class="admin-info bg-admin">
-		<view class="pic"><text class="icon-peoplefill"></text></view>
+		<view class="pic"><van-icon name="user-o" size="32rpx"  /></view>
 		<view class="right">
 			<view class="name">
 				<text class="text-xl">{{admin.name}}</text>
@@ -18,7 +18,7 @@
 			</view>
 			<view class="desc text-s">共登录{{admin.cnt}}次，上次{{admin.last}}</view>
 		</view>
-		<view class="exit-admin" bindtap="bindExitTap"><text class="icon-exit"></text></view>
+		<view class="exit-admin" bindtap="bindExitTap"><van-icon name="revoke" size="32rpx"  /></view>
 	</view>
 
 
@@ -27,7 +27,7 @@
 	<block wx:if="{{data.isSuper}}">
 		<view class="bar bg-white solid-bottom margin-top-s">
 			<view class="action">
-				<text class="icon-title"></text>选择瑜伽馆管理
+				<van-icon name="label-o" size="32rpx"  />选择瑜伽馆管理
 			</view>
 		</view>
 
@@ -35,7 +35,7 @@
 			<van-cell wx:for="{{data.tenantList}}" wx:key="TENANT_ID"
 				is-link bind:click="bindTenantTap" data-item="{{item}}">
 				<view slot="title">
-					<text class="icon-homefill text-blue margin-right-s"></text>
+					<van-icon name="home-o" size="32rpx" color="#0081ff" custom-class="text-blue margin-right-s"  />
 					<text class="text-black">{{item.TENANT_NAME}}</text>
 				</view>
 			</van-cell>
@@ -56,27 +56,27 @@
 		<!-- [AI_END LINES=4 TIMESTAMP=2025-01-25 18:30:00] -->
 
 		<view class="comm-list grid col-4">
-			<view class="item" bindtap="url" data-url="../../meet/list/admin_meet_list">{{data.meetCnt||'...'}}<text class="text-black">活动/预约数</text></view>
-			<view class="item" bindtap="url" data-url="../../info/admin_info_list">{{data.joinCnt||'...'}}<text class="text-black">预约数</text></view>
-			<view class="item" bindtap="url" data-url="../../user/list/admin_user_list">{{data.userCnt||'...'}}<text class="text-black">用户</text></view>
+			<view class="item" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">{{data.meetCnt||'...'}}<text class="text-black">活动/预约数</text></view>
+			<view class="item" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">{{data.joinCnt||'...'}}<text class="text-black">预约数</text></view>
+			<view class="item" bindtap="url" data-url="/pages/admin/user/list/admin_user_list">{{data.userCnt||'...'}}<text class="text-black">用户</text></view>
 			<!-- [AI_START TIMESTAMP=2025-01-25 18:30:00] -->
-			<view class="item" wx:if="{{admin.type=='owner' || admin.type=='super'}}" bindtap="url" data-url="../../news/list/admin_news_list">{{data.newsCnt||'...'}}<text class="text-black">文章数</text></view>
+			<view class="item" wx:if="{{admin.type=='owner' || admin.type=='super'}}" bindtap="url" data-url="/pages/admin/news/list/admin_news_list">{{data.newsCnt||'...'}}<text class="text-black">文章数</text></view>
 			<!-- [AI_END LINES=1 TIMESTAMP=2025-01-25 18:30:00] -->
 		</view>
 
 		<view class="bar bg-white solid-bottom margin-top-s ">
 			<view class="action">
-				<text class="icon-title"></text>功能管理
+				<van-icon name="label-o" size="32rpx"  />功能管理
 			</view>
 		</view>
 
 		<view class="comm-list grid col-3">
-			<view class="item" bindtap="url" data-url="../../meet/list/admin_meet_list"> <text class="icon-activityfill text-blue"></text> <text class="text-black">活动/预约管理</text>
+			<view class="item" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list"> <van-icon name="fire-o" size="32rpx" color="#0081ff" custom-class="text-blue"  /> <text class="text-black">活动/预约管理</text>
 			</view>
 			<!-- [AI_START TIMESTAMP=2025-01-25 18:30:00] -->
-			<view class="item" wx:if="{{admin.type=='owner' || admin.type=='super'}}" bindtap="url" data-url="../../user/list/admin_user_list"> <text class="icon-peoplefill text-green"></text> <text class="text-black">用户管理</text>
+			<view class="item" wx:if="{{admin.type=='owner' || admin.type=='super'}}" bindtap="url" data-url="/pages/admin/user/list/admin_user_list"> <van-icon name="user-o" size="32rpx" color="#5b8a72" custom-class="text-green"  /> <text class="text-black">用户管理</text>
 			</view>
-			<view class="item" wx:if="{{admin.type=='owner' || admin.type=='super'}}" bindtap="url" data-url="../../news/list/admin_news_list"> <text class="icon-newsfill text-darkgreen"></text> <text class="text-black">内容管理</text>
+			<view class="item" wx:if="{{admin.type=='owner' || admin.type=='super'}}" bindtap="url" data-url="/pages/admin/news/list/admin_news_list"> <van-icon name="new-o" size="32rpx" color="#39b54a" custom-class="text-darkgreen"  /> <text class="text-black">内容管理</text>
 			</view>
 			<!-- [AI_END LINES=4 TIMESTAMP=2025-01-25 18:30:00] -->
 		</view>
@@ -85,38 +85,45 @@
 		<!-- BOTTOM begin -->
 		<!-- [AI_START TIMESTAMP=2025-01-25 12:00:00] -->
 		<van-cell-group custom-class="menu-group" wx:if="{{admin.type=='owner' || admin.type=='super'}}">
-			<van-cell is-link bind:click="url" data-url="../../setup/about/admin_setup_about">
+			<van-cell is-link link-type="navigateTo" url="/pages/admin/mgr/bind/admin_mgr_bind">
 				<view slot="title">
-					<text class="icon-edit text-darkgreen margin-right-s"></text>
+					<van-icon name="link-o" size="32rpx" color="#0081ff" custom-class="text-blue margin-right-s"  />
+					<text class="text-black">微信绑定码管理</text>
+				</view>
+			</van-cell>
+
+			<van-cell is-link link-type="navigateTo" url="/pages/admin/setup/about/admin_setup_about">
+				<view slot="title">
+					<van-icon name="edit" size="32rpx" color="#39b54a" custom-class="text-darkgreen margin-right-s"  />
 					<text class="text-black">编辑 - 关于我们</text>
 				</view>
 			</van-cell>
 
-			<van-cell is-link bind:click="url" data-url="../../setup/contact/admin_setup_contact">
+			<van-cell is-link link-type="navigateTo" url="/pages/admin/setup/contact/admin_setup_contact">
 				<view slot="title">
-					<text class="icon-post text-pink margin-right-s"></text>
+					<van-icon name="notes-o" size="32rpx" color="#e03997" custom-class="text-pink margin-right-s"  />
 					<text class="text-black">编辑 - 联系我们</text>
 				</view>
 			</van-cell>
 
-			<van-cell is-link bind:click="url" data-url="../../setup/qr/admin_setup_qr">
+			<van-cell is-link link-type="navigateTo" url="/pages/admin/setup/qr/admin_setup_qr">
 				<view slot="title">
-					<text class="icon-qr_code text-mauve margin-right-s"></text>
+					<van-icon name="qr" size="32rpx" color="#9c26b0" custom-class="text-mauve margin-right-s"  />
 					<text class="text-black">小程序二维码</text>
 				</view>
 			</van-cell>
 
 			<!-- [AI_START TIMESTAMP=2025-01-25 12:00:00] -->
-			<van-cell is-link bind:click="url" data-url="../../setup/feature/admin_setup_feature">
+			<van-cell is-link link-type="navigateTo" url="/pages/admin/setup/feature/admin_setup_feature">
 				<view slot="title">
-					<text class="icon-settings text-blue margin-right-s"></text>
+					<van-icon name="setting-o" size="32rpx" color="#0081ff" custom-class="text-blue margin-right-s"  />
 					<text class="text-black">功能开关设置</text>
 				</view>
 			</van-cell>
 
-			<van-cell is-link bind:click="url" data-url="../../home/content/admin_home_content">
+			<van-cell is-link link-type="navigateTo" url="/pages/admin/home/content/admin_home_content">
 				<view slot="title">
-					<text class="icon-homefill text-green margin-right-s"></text>
+					<van-icon name="home-o" size="32rpx" color="#5b8a72" custom-class="text-green margin-right-s"  />
 					<text class="text-black">首页内容管理</text>
 				</view>
 			</van-cell>
@@ -124,16 +131,16 @@
 		</van-cell-group>
 
 		<van-cell-group custom-class="menu-group margin-bottom-xl">
-			<van-cell wx:if="{{admin.type=='owner' || admin.type=='super'}}" is-link bind:click="url" data-url="../../mgr/log/admin_log_list">
+			<van-cell wx:if="{{admin.type=='owner' || admin.type=='super'}}" is-link link-type="navigateTo" url="/pages/admin/mgr/log/admin_log_list">
 				<view slot="title">
-					<text class="icon-footprint text-brown margin-right-s"></text>
+					<van-icon name="location-o" size="32rpx" color="#a5673f" custom-class="text-brown margin-right-s"  />
 					<text class="text-black">管理员操作日志</text>
 				</view>
 			</van-cell>
 
 			<van-cell is-link bind:click="bindSettingTap">
 				<view slot="title">
-					<text class="icon-settings text-grey margin-right-s"></text>
+					<van-icon name="setting-o" size="32rpx" color="#999999" custom-class="text-grey margin-right-s"  />
 					<text class="text-black">设置</text>
 				</view>
 			</van-cell>

@@ -37,10 +37,10 @@
 				</view>
 
 				<view class="form-group" wx:for="{{formSelectOptions}}" wx:key="key">
-					<input bindinput='bindSelectOptionsBlur' data-idx="{{index}}" placeholder="请输入选项{{index+1}} （30字以内)" maxlength="30" placeholder-class="phc" value="{{item}}"></input><text bindtap="bindDelSelectOptionsTap" data-idx="{{index}}" class="icon-roundclose margin-left-xs text-red select-close"></text>
+					<input bindinput='bindSelectOptionsBlur' data-idx="{{index}}" placeholder="请输入选项{{index+1}} （30字以内)" maxlength="30" placeholder-class="phc" value="{{item}}"></input><van-icon name="clear" size="32rpx" color="#e54d42" custom-class="margin-left-xs text-red select-close"  bindtap="bindDelSelectOptionsTap" />
 				</view>
 				<view class="form-group" bindtap="bindAddSelectOptionsTap">
-					<view class="title text-blue" style="font-weight:normal;font-size:30rpx;"> <text class="icon-roundadd margin-right-s  select-close" style="font-size:35rpx;"></text>添加新选项
+					<view class="title text-blue" style="font-weight:normal;font-size:30rpx;"> <van-icon name="add-o" size="32rpx" custom-class="margin-right-s select-close"  />添加新选项
 					</view>
 
 				</view>

@@ -18,9 +18,30 @@ const UserModel = require("../../model/user_model.js");
 const NewsModel = require("../../model/news_model.js");
 
 class BaseAdminService extends BaseService {
-  /** 是否管理员（token 全局唯一，不按 PID 过滤） */
-  async isAdmin(token) {
-    // 马甲判断,自动登录
+  /** 解析管理员：token 优先，其次 openid+当前馆 PID（馆长/教练） */
+  async resolveAdmin(token, openId, pid) {
+    let admin = await this._tryTokenAdmin(token);
+    if (admin) return admin;
+
+    if (openId && pid) {
+      admin = await AdminModel.getOne(
+        {
+          _pid: pid,
+          ADMIN_MINI_OPENID: openId,
+          ADMIN_STATUS: 1,
+          ADMIN_TYPE: ["in", [AdminModel.TYPE.OWNER, AdminModel.TYPE.TEACHER]],
+        },
+        "ADMIN_ID,ADMIN_PHONE,ADMIN_NAME,ADMIN_TYPE,_pid",
+        {},
+        false,
+      );
+      if (admin) return admin;
+    }
+
+    this.AppError("管理员不存在", appCode.ADMIN_ERROR);
+  }
+
+  async _tryTokenAdmin(token) {
     if (
       config.MASK_IS_OPEN &&
       token == config.MASK_ADMIN_PHONE + config.MASK_ADMIN_TOKEN
@@ -34,8 +55,8 @@ class BaseAdminService extends BaseService {
       admin.ADMIN_TYPE = AdminModel.TYPE.OWNER;
       admin.ADMIN_STATUS = 1;
       return admin;
-    } else if (config.IS_DEMO) {
-      // 演示版本
+    }
+    if (config.IS_DEMO) {
       let admin = {};
       admin.ADMIN_NAME = "体验用户";
       admin.ADMIN_ID = "1";
@@ -47,25 +68,27 @@ class BaseAdminService extends BaseService {
       return admin;
     }
 
+    if (!token) return null;
+
     let where = {
       ADMIN_TOKEN: token,
       ADMIN_TOKEN_TIME: [
         ">",
         timeUtil.time() - config.ADMIN_LOGIN_EXPIRE * 1000,
-      ], // token有效时间
+      ],
       ADMIN_STATUS: 1,
     };
-    // [AI_START TIMESTAMP=2025-01-25 16:30:00]
-    let admin = await AdminModel.getOne(
+    return await AdminModel.getOne(
       where,
-      "ADMIN_ID,ADMIN_PHONE,ADMIN_NAME,ADMIN_TYPE",
+      "ADMIN_ID,ADMIN_PHONE,ADMIN_NAME,ADMIN_TYPE,_pid",
       {},
       false,
     );
-    // [AI_END LINES=4 TIMESTAMP=2025-01-25 16:30:00]
-    if (!admin) this.AppError("管理员不存在", appCode.ADMIN_ERROR);
+  }
 
-    return admin;
+  /** 是否管理员（token 全局唯一，不按 PID 过滤） */
+  async isAdmin(token, openId, pid) {
+    return await this.resolveAdmin(token, openId, pid);
   }
 
   /** 是否超级管理员(super)，平台级跨租户 */

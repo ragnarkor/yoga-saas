@@ -76,8 +76,7 @@
   margin-top: 10rpx;
 }
 
-.login .tenant-info .icon-home {
-  font-size: 32rpx;
+.login .tenant-info van-icon {
   margin-right: 8rpx;
 }
 

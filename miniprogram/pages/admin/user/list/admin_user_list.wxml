@@ -24,7 +24,7 @@
 					<view class="info-item" bindtap="url" data-type="phone" data-url="{{item.USER_MOBILE}}">
 						<view class="title">手机</view>
 						<view class="mao">：</view>
-						<view class="content">{{item.USER_MOBILE||'未填写'}} <text wx:if="{{item.USER_MOBILE}}" class="icon-phone margin-left-s"></text></view>
+						<view class="content">{{item.USER_MOBILE||'未填写'}}  wx:if="{{item.USER_MOBILE}}"<van-icon name="phone-o" size="32rpx" custom-class="margin-left-s"  /></view>
 					</view> 
 
 					<view class="info-item">
@@ -53,7 +53,7 @@
 
 					<view class="oprt">
 
-						<view bindtap="bindDelTap" data-id="{{item.USER_MINI_OPENID}}" class="btn  margin-right-s"><text class="icon-delete margin-right-xxs text-orange"></text>删除</view>
+						<view bindtap="bindDelTap" data-id="{{item.USER_MINI_OPENID}}" class="btn  margin-right-s"><van-icon name="delete-o" size="32rpx" color="#ff976a" custom-class="margin-right-xxs text-orange"  />删除</view>
 
 					</view>
 				</view>

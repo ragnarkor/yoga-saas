@@ -3,44 +3,36 @@
 /* ==================
           文本
  ==================== */ 
- .text-xs,
- [class*="icon-"].text-xs {
+ .text-xs {
 	 font-size: 20rpx!important;
  }
  
- .text-s,
- [class*="icon-"].text-s {
+ .text-s {
 	 font-size: 24rpx!important;
  }
  
- .text-normal,
- [class*="icon-"].text-normal {
+ .text-normal {
 	 font-size: 28rpx!important;
 	 font-weight:normal;
  }
  
- .text-l,
- [class*="icon-"].text-l {
+ .text-l {
 	 font-size: 32rpx!important;
  }
  
- .text-xl,
- [class*="icon-"].text-xl {
+ .text-xl {
 	 font-size: 36rpx!important;
  }
  
- .text-xxl,
- [class*="icon-"].text-xxl {
+ .text-xxl {
 	 font-size: 44rpx!important;
  }
  
- .text-xxxl,
- [class*="icon-"].text-xxxl {
+ .text-xxxl {
 	 font-size: 80rpx!important;
  }
  
- .text-xxxxl,
- [class*="icon-"].text-xxxxl {
+ .text-xxxxl {
 	 font-size: 120rpx!important;
  }
  

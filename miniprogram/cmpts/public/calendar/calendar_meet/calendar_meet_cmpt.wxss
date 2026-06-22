@@ -203,43 +203,41 @@ page {
 /* 当日有数据 */
 .data-has {
 	position: relative;
-	font-family: "icon";
-	font-size: inherit;
-	font-style: normal;
 }
 
 .data-has::before {
 	position: absolute;
-	content: '\e699';
-	right: 1rpx;
-	bottom: 0rpx;
-	color: #999;
-	font-size: 22rpx;
+	content: '';
+	width: 10rpx;
+	height: 10rpx;
+	border-radius: 50%;
+	background: #999;
+	right: 6rpx;
+	bottom: 6rpx;
 }
 
 .cube.data-checked.data-has::before {
-	color: #fff;
+	background: #fff;
 }
 
 /* 当日有预约 */
 .join-has {
 	position: relative;
-	font-family: "icon";
-	font-size: inherit;
-	font-style: normal;
 }
 
 .join-has::before {
 	position: absolute;
-	content: '\e6c0';
-	right: 1rpx;
-	bottom: 0rpx;
-	color: #999;
-	font-size: 24rpx;
+	content: '';
+	width: 12rpx;
+	height: 12rpx;
+	border-radius: 50%;
+	background: #5b8a72;
+	right: 4rpx;
+	bottom: 4rpx;
 }
 
 .cube.data-checked.join-has::before {
-	color: #fff;
+	background: #fff;
 }
 
 

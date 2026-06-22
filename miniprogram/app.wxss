@@ -136,4 +136,11 @@ page {
 .margin-left-s {
   margin-left: 12rpx !important;
 }
+
+/* 图标与文字同行 */
+.icon-inline {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
 /* [AI_END LINES=53 TIMESTAMP=2025-01-25 15:00:00] */

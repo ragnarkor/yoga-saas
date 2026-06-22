@@ -1,0 +1,43 @@
+.bind-page {
+  min-height: 100vh;
+  background: #f6f4fb;
+  padding: 48rpx;
+  box-sizing: border-box;
+}
+
+.bind-center {
+  margin-top: 120rpx;
+  text-align: center;
+}
+
+.bind-icon {
+  width: 120rpx;
+  height: 120rpx;
+  line-height: 120rpx;
+  margin: 0 auto 32rpx;
+  border-radius: 50%;
+  background: #9b6fd4;
+  color: #fff;
+  font-size: 64rpx;
+}
+
+.bind-title {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.bind-title.fail {
+  color: #e54d42;
+}
+
+.bind-desc {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.bind-btn {
+  margin-top: 24rpx !important;
+}

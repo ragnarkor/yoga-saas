@@ -2,7 +2,7 @@
 <view class="main-admin bg-admin">
 
 	<view class="tenant-header">
-		<view class="pic"><text class="icon-rankfill text-admin"></text></view>
+		<view class="pic"><van-icon name="manager-o" size="32rpx" color="#8799a3" custom-class="text-admin"  /></view>
 		<view class="hint">请选择您所在的瑜伽馆</view>
 	</view>
 
@@ -30,7 +30,7 @@
 				title-style="font-weight: bold; color: #333;"
 			>
 				<view slot="icon" class="tenant-icon">
-					<text class="icon-home text-admin"></text>
+					<van-icon name="home-o" size="32rpx" color="#8799a3" custom-class="text-admin"  />
 				</view>
 			</van-cell>
 		</van-cell-group>

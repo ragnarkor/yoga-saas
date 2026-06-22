@@ -16,7 +16,7 @@
 					<view class="left text-cut"><text wx:if="{{item.MEET_ORDER==0}}" class="text-black" style="font-weight:normal;font-size:24rpx">[置顶]</text> {{item.MEET_TITLE}}
 					</view>
 					<view class="right" bindtap="bindScanTap" data-id="{{item._id}}" data-title="{{item.MEET_TITLE}}">
-						<text class="icon-scan"></text>
+						<van-icon name="scan" size="32rpx"  />
 					</view>
 				</view>
 
@@ -51,11 +51,11 @@
 					</view>
 
 					<view class="oprt">
-						<view bindtap="url" data-url="../edit/admin_meet_edit?id={{item._id}}" class="btn margin-right-s"><text class="icon-settings margin-right-xxs text-blue"></text>设置</view>
+						<view bindtap="url" data-url="../edit/admin_meet_edit?id={{item._id}}" class="btn margin-right-s"><van-icon name="setting-o" size="32rpx" color="#0081ff" custom-class="margin-right-xxs text-blue"  />设置</view>
 
 						<view bindtap="bindRecordSelectTap" data-id="{{item._id}}" data-title="{{item.MEET_TITLE}}" class="btn margin-right-s">名单与核销</view>
 
-						<view bindtap="bindStatusSelectTap" data-id="{{item._id}}" class="btn   margin-right-s"><text class="icon-cascades margin-right-xxs text-orange"></text>状态</view>
+						<view bindtap="bindStatusSelectTap" data-id="{{item._id}}" class="btn   margin-right-s"><van-icon name="apps-o" size="32rpx" color="#ff976a" custom-class="margin-right-xxs text-orange"  />状态</view>
 
 						<view bindtap="bindMoreSelectTap" data-id="{{item._id}}" class="btn">更多操作</view>
 

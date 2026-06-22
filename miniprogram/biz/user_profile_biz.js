@@ -31,11 +31,21 @@ class UserProfileBiz {
     if (!formatted.startsWith("cloud://")) return formatted;
 
     try {
-      const res = await wx.cloud.getTempFileURL({ fileList: [formatted] });
+      const tempUrlTask = wx.cloud
+        .getTempFileURL({ fileList: [formatted] })
+        .catch((err) => {
+          console.warn("[resolveAvatarUrl:getTempFileURL]", err);
+          return null;
+        });
+      const res = await Promise.race([
+        tempUrlTask,
+        new Promise((resolve) => setTimeout(() => resolve(null), 5000)),
+      ]);
+      if (!res) return formatted;
       const item = res.fileList && res.fileList[0];
       if (item && item.tempFileURL) return item.tempFileURL;
     } catch (err) {
-      console.error("[resolveAvatarUrl]", err);
+      console.warn("[resolveAvatarUrl]", err);
     }
     return formatted;
   }

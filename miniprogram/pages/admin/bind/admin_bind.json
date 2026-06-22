@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "微信绑定",
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index",
+    "van-button": "@vant/weapp/button/index"
+  }
+}

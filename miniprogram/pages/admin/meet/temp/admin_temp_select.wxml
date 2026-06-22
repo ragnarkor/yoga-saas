@@ -10,7 +10,7 @@
 				<view class="title">
 					<text bindtap="bindSelectTap" data-idx="{{index}}" class="temp-name text-cut">{{item.TEMP_NAME}}</text>
 					<van-button type="primary" size="small" bind:click="bindSelectTap" data-idx="{{index}}" custom-class="margin-right-s">选用</van-button>
-					<text bindtap="bindOprtTap" data-idx="{{index}}" class="icon-moreandroid more"></text>
+					<van-icon name="ellipsis" size="32rpx" custom-class="more"  bindtap="bindOprtTap" />
 				</view>
 				<view class="time-list">
 					<view wx:for="{{item.TEMP_TIMES}}" wx-for wx:key="key1" wx:for-item="timesItem" wx:for-index="timesIndex" class="time-item">

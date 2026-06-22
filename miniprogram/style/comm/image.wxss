@@ -21,21 +21,19 @@ image.loading::before {
 }
 
 image.loading::after {
-	content: "\e7f1";
-	font-family: "icon";
+	content: "";
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 32rpx;
 	height: 32rpx;
-	line-height: 32rpx;
 	right: 0;
 	bottom: 0;
 	z-index: -1;
-	font-size: 32rpx;
 	margin: auto;
-	color: #ccc;
-	-webkit-animation: icon-spin 2s infinite linear;
-	animation: icon-spin 2s infinite linear;
+	border: 4rpx solid #ddd;
+	border-top-color: #ccc;
+	border-radius: 50%;
+	animation: icon-spin 1s infinite linear;
 	display: block;
 }

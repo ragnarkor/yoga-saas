@@ -13,7 +13,7 @@
 	<view class="form-box shadow margin-top-xs">
 
 		<view class="checkin">
-			<view class="notice"><text class="icon-scan margin-right-s text-bold"></text>用户自助核销/签到</view>
+			<view class="notice"><van-icon name="scan" size="32rpx" custom-class="margin-right-s text-bold"  />用户自助核销/签到</view>
 			<view class="desc">
 				<text class="text-black text-bold">※ 签到规则</text>
 				<text user-select="true">1. 预约用户自行扫描下方小程序码完成核销/签到

@@ -5,12 +5,12 @@
 
 <view class="tenant-select" wx:if="{{isLoad}}">
 	<view class="header">
-		<text class="icon-homefill text-xxl text-blue"></text>
+		<van-icon name="home-o" size="44rpx" color="#0081ff" custom-class="text-xxl text-blue"  />
 		<text class="text-xl margin-left-s">选择瑜伽馆</text>
 	</view>
 
 	<view wx:if="{{list.length==0}}" class="empty-tip">
-		<text class="icon-text text-gray"></text>
+		<van-icon name="notes-o" size="32rpx" color="#999999" custom-class="text-gray"  />
 		<view class="text-grey margin-top">暂无可用瑜伽馆</view>
 	</view>
 
@@ -20,7 +20,7 @@
 
 			<view class="tenant-logo">
 				<image wx:if="{{item.TENANT_LOGO}}" src="{{item.TENANT_LOGO}}" mode="aspectFill" class="logo-img" />
-				<text wx:else class="icon-homefill text-xxxl text-blue"></text>
+				 wx:else<van-icon name="home-o" size="56rpx" color="#0081ff" custom-class="text-xxxl text-blue"  />
 			</view>
 
 			<view class="tenant-info">
@@ -29,7 +29,7 @@
 			</view>
 
 			<view class="tenant-arrow">
-				<text class="icon-right text-grey"></text>
+				<van-icon name="arrow" size="32rpx" color="#999999" custom-class="text-grey"  />
 			</view>
 		</view>
 	</view>

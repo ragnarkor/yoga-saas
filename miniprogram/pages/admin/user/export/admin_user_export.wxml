@@ -42,7 +42,7 @@
 	</view>
 
 	<view class="form-group" wx:if="{{url}}">
-		<view class="title-desc text-red"><text class="icon-info margin-right-xs"></text>为了防止隐私数据泄露，请在下载上述文件后及时点击按钮删除
+		<view class="title-desc text-red"><van-icon name="info-o" size="32rpx" custom-class="margin-right-xs"  />为了防止隐私数据泄露，请在下载上述文件后及时点击按钮删除
 		</view>
 	</view>
 </view>

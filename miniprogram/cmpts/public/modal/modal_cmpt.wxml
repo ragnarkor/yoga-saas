@@ -4,7 +4,7 @@
 		<view class="bar bg-white justify-end">
 			<view class="content">{{title}}</view>
 			<view class="action" bindtap="bindHideModalTap">
-				<text class="icon-close text-red"></text>
+				<van-icon name="cross" size="32rpx" color="#e54d42" custom-class="text-red"  />
 			</view>
 		</view>
 		<view class="padding-xl">
@@ -77,7 +77,7 @@
 			<image class="bg-img-cover" mode="aspectFill" src="{{imgURL}}"></image>
 			<view class="bar justify-end text-white">
 				<view class="action" bindtap="bindHideModalTap">
-					<text class="icon-close"></text>
+					<van-icon name="cross" size="32rpx"  />
 				</view>
 			</view>
 		</view>

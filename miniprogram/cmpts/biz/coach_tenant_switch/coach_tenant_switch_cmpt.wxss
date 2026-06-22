@@ -1,0 +1,54 @@
+.tenant-top-spacer {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.tenant-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 28rpx;
+  padding-right: 190rpx;
+  background: #5b8a72;
+  color: #fff;
+  box-shadow: 0 6rpx 18rpx rgba(45, 85, 64, 0.12);
+}
+
+.tenant-title {
+  min-width: 0;
+  font-size: 32rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+
+.tenant-action {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  max-width: 360rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.tenant-name {
+  min-width: 0;
+  max-width: 240rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 24rpx;
+}
+
+.tenant-switch {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  opacity: 0.9;
+}

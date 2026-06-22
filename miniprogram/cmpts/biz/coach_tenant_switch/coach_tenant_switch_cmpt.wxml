@@ -1,0 +1,8 @@
+<view class="tenant-top-spacer" style="height: {{customBar}}px;"></view>
+<view class="tenant-top" style="height: {{customBar}}px; padding-top: {{statusBar}}px; background: {{navBg}};">
+  <view class="tenant-title">{{title}}</view>
+  <view class="tenant-action" bindtap="bindSwitchTap">
+    <text class="tenant-name">{{tenantName}}</text>
+    <text class="tenant-switch">切换</text>
+  </view>
+</view>

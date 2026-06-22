@@ -10,7 +10,7 @@
 @import "nav.wxss";
 @import "shadow.wxss";
 @import "tag.wxss";
-@import "icon.wxss";
+@import "spin.wxss";
 @import "form.wxss";
 @import "text.wxss";
 @import "list.wxss";

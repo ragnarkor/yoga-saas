@@ -53,9 +53,7 @@
 	justify-content: center;
 }
 
-.avatar-placeholder .icon-peoplefill {
-	font-size: 68rpx;
-	color: var(--projectColor, #5b8a72);
+.avatar-placeholder van-icon {
 	line-height: 1;
 }
 

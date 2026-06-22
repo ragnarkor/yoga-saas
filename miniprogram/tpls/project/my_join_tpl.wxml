@@ -12,19 +12,19 @@
 
 				<view class="item card-project shadow-project" wx:for="{{dataList.list}}" wx:key="index">
 					<view wx:if="{{item.isTimeout}}" class="status">已结束</view>
-					<view bindtap="url" data-url="../join_detail/my_join_detail?id={{item._id}}" wx:elif="{{item.JOIN_STATUS==1}}" class="qr"><text class="icon-qrcode"></text></view>
+					<view bindtap="url" data-url="../join_detail/my_join_detail?id={{item._id}}" wx:elif="{{item.JOIN_STATUS==1}}" class="qr"><van-icon name="qr" size="32rpx"  /></view>
 					<view class="title content-cut-two" bindtap="url" data-url="../join_detail/my_join_detail?id={{item._id}}">{{item.JOIN_MEET_TITLE}}</view>
 					<view class="author" bindtap="url" data-url="../join_detail/my_join_detail?id={{item._id}}">
-						<text class="icon-time margin-right-xs text-s"></text><text class="text-cut">{{item.JOIN_MEET_DAY}} {{item.JOIN_MEET_TIME_START}}～{{item.JOIN_MEET_TIME_END}}</text>
+						<van-icon name="clock-o" size="26rpx" custom-class="margin-right-xs text-s"  /><text class="text-cut">{{item.JOIN_MEET_DAY}} {{item.JOIN_MEET_TIME_START}}～{{item.JOIN_MEET_TIME_END}}</text>
 					</view>
 
 					<view class="data" bindtap="url" data-url="../join_detail/my_join_detail?id={{item._id}}">
-						<text wx:if="{{item.JOIN_STATUS==1}}" class="text-green"><text class="icon-newshot margin-right-xxs"></text>预约成功{{item.JOIN_IS_CHECKIN==1?'，已签到':''}}</text>
+						<text wx:if="{{item.JOIN_STATUS==1}}" class="text-green"><van-icon name="passed" size="32rpx" custom-class="margin-right-xxs"  />预约成功{{item.JOIN_IS_CHECKIN==1?'，已签到':''}}</text>
 
-						<text wx:elif="{{item.JOIN_STATUS==10}}" class="text-grey"><text class="icon-bad margin-right-xxs"></text>已取消</text>
+						<text wx:elif="{{item.JOIN_STATUS==10}}" class="text-grey"><van-icon name="close" size="32rpx" custom-class="margin-right-xxs"  />已取消</text>
 
 						<block wx:elif="{{item.JOIN_STATUS==99}}">
-							<text class="text-orange"><text class="icon-bad margin-right-xxs"></text>系统取消<text class="text-grey" wx:if="{{item.JOIN_REASON}}">：{{item.JOIN_REASON}}</text></text>
+							<text class="text-orange"><van-icon name="close" size="32rpx" custom-class="margin-right-xxs"  />系统取消<text class="text-grey" wx:if="{{item.JOIN_REASON}}">：{{item.JOIN_REASON}}</text></text>
 						</block>
 
 					</view>

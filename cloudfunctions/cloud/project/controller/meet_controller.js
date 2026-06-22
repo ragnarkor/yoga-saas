@@ -175,10 +175,8 @@ class MeetController extends BaseController {
 		let service = new MeetService();
 		let list = await service.getMyJoinSomeday(this._userId, input.day);
 
-		// 数据格式化  
-		for (let k in list) {
-
-		}
+		if (!list) list = [];
+		if (!Array.isArray(list)) list = Object.values(list);
 
 		return list;
 

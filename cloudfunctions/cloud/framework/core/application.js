@@ -88,6 +88,12 @@ async function app(event, context) {
 			'my/my_join_someday': 1,
 			'my/my_join_list': 1,
 			'my/my_join_detail': 1,
+			'admin/home': 1,
+			'admin/wx_session': 1,
+			'admin/wx_bind': 1,
+			'admin/wx_tenant_list': 1,
+			'admin/wx_unbind': 1,
+			'admin/bind_admin_list': 1,
 		};
 		if (!FAST_ROUTES[r]) {
 			await controller['initSetup']();

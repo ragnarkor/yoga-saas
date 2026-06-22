@@ -28,6 +28,9 @@ AdminModel.DB_STRUCTURE = {
   ADMIN_TOKEN: "string|false|comment=当前登录token",
   ADMIN_TOKEN_TIME: "int|true|default=0|comment=当前登录token time",
 
+  ADMIN_MINI_OPENID: "string|false|comment=绑定的微信openid，用于静默登录",
+  ADMIN_BIND_TIME: "int|true|default=0|comment=微信绑定时间",
+
   ADMIN_ADD_TIME: "int|true",
   ADMIN_EDIT_TIME: "int|true",
   ADMIN_ADD_IP: "string|false",

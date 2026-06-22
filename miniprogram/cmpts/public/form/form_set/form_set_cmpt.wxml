@@ -1,7 +1,7 @@
 <view class="form-group arrow {{cur==index?'cur':''}}" hoverClass="form-group-active" wx:for="{{fields}}" wx:key="key" style="padding-left:10rpx">
 	<view class="field-oprt">
-		<view bindtap="bindUpTap" wx:if="{{index>0}}" data-idx="{{index}}"><text class="icon-refresharrow up"></text></view>
-		<view bindtap="bindDownTap" wx:if="{{index<fields.length-1}}" data-idx="{{index}}"><text class="icon-refresharrow"></text></view>  
+		<view bindtap="bindUpTap" wx:if="{{index>0}}" data-idx="{{index}}"><van-icon name="arrow-up" size="32rpx"  /></view>
+		<view bindtap="bindDownTap" wx:if="{{index<fields.length-1}}" data-idx="{{index}}"><van-icon name="arrow-down" size="32rpx"  /></view>  
 	</view>
 							
 	<view class="title text-cut" bindtap="url" data-url="/cmpts/public/form/form_set/field/form_set_field?idx={{index}}"> 
@@ -31,6 +31,6 @@
 
 <view class="form-group" bindtap="url" data-url="/cmpts/public/form/form_set/field/form_set_field">
 	<view class="title text-cut text-blue text-bold">
-		<text class="icon-roundadd margin-right-xs"></text>添加新字段
+		<van-icon name="add-o" size="32rpx" custom-class="margin-right-xs"  />添加新字段
 	</view>
 </view>

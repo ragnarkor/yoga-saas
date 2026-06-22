@@ -107,7 +107,7 @@
   align-items: center;
 }
 
-.article-box .article .address .address-left .icon-location {
+.article-box .article .address .address-left van-icon {
   font-size: 26rpx;
   display: flex;
   flex-direction: column;

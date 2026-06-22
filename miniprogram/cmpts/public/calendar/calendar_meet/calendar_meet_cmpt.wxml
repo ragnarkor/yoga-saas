@@ -11,20 +11,16 @@
 	};
 </wxs>
 <view class="cal-container">
-	<view bindtap="bindLastTap" class="left"><text class="icon-back"></text></view>
+	<view bindtap="bindLastTap" class="left"><van-icon name="arrow-left" size="32rpx"  /></view>
 	<view class="cal-main">
 		<view class="text-center cal-nav">
 			<view class="to-now" bindtap="bindToNowTap">本月</view>
 			<view class="select-item">
-				<!--<view class="arrow text-grey" bindtap="bindLastTap"><text class="icon-backwardfill" /></view>-->
 				<view class="text-lg">{{year}}年{{month}}月</view>
-				<!--<view class="arrow text-grey" bindtap="bindNextTap"><text class=" icon-play_forward_fill" /></view>-->
 			</view>
 			<block wx:if="{{mode=='one'}}">
-				<view wx:if="{{!fold}}" class="fold text-grey" bindtap="bindFoldTap"><text
-						class="icon-fold calendar-text"></text></view>
-				<view wx:if="{{fold}}" class="fold" bindtap="bindFoldTap"><text class="icon-unfold calendar-text"></text>
-				</view>
+				<view wx:if="{{!fold}}" class="fold text-grey" bindtap="bindFoldTap"><van-icon name="arrow-up" size="32rpx" custom-class="calendar-text" /></view>
+				<view wx:if="{{fold}}" class="fold" bindtap="bindFoldTap"><van-icon name="arrow-down" size="32rpx" custom-class="calendar-text" /></view>
 			</block>
 		</view>
 
@@ -57,5 +53,5 @@
 		</view>
 
 	</view>
-	<view bindtap="bindNextTap" class="left"><text class="icon-right"></text></view>
+	<view bindtap="bindNextTap" class="left"><van-icon name="arrow" size="32rpx"  /></view>
 </view> 

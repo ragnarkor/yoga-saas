@@ -44,19 +44,19 @@
 	<!-- 功能入口 -->
 	<view class="a00-features">
 		<view class="a00-feat-card" bindtap="url" data-type="switch" data-url="/pages/default/calendar/index/calendar_index">
-			<view class="a00-feat-icon a00-icon-1">🧘</view>
+			<view class="a00-feat-icon a00-icon-1"><van-icon name="calendar-o" size="44rpx" color="#c9a96e" /></view>
 			<view class="a00-feat-name">课程预约</view>
 		</view>
 		<view class="a00-feat-card" bindtap="url" data-url="/pages/default/news/index/news_index?id=1">
-			<view class="a00-feat-icon a00-icon-2">📋</view>
+			<view class="a00-feat-icon a00-icon-2"><van-icon name="notes-o" size="44rpx" color="#5b8a72" /></view>
 			<view class="a00-feat-name">馆内动态</view>
 		</view>
 		<view class="a00-feat-card" bindtap="url" data-url="/pages/default/news/index/news_index?id=2">
-			<view class="a00-feat-icon a00-icon-3">💡</view>
+			<view class="a00-feat-icon a00-icon-3"><van-icon name="bulb-o" size="44rpx" color="#e89b6c" /></view>
 			<view class="a00-feat-name">瑜伽常识</view>
 		</view>
 		<view class="a00-feat-card" bindtap="url" data-url="/pages/default/about/index/about_index">
-			<view class="a00-feat-icon a00-icon-4">🏠</view>
+			<view class="a00-feat-icon a00-icon-4"><van-icon name="home-o" size="44rpx" color="#1a1a2e" /></view>
 			<view class="a00-feat-name">关于我们</view>
 		</view>
 	</view>

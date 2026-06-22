@@ -57,7 +57,7 @@
 
 						<view bindtap="bindStatusSelectTap" data-id="{{item._id}}" class="btn margin-right-s">状态修改</view> 
 
-						<view bindtap="bindReviewTap" data-id="{{item._id}}" class="btn margin-right-s"><text class="icon-attention margin-right-xxs"></text>预览</view> 
+						<view bindtap="bindReviewTap" data-id="{{item._id}}" class="btn margin-right-s"><van-icon name="eye-o" size="32rpx" custom-class="margin-right-xxs"  />预览</view> 
 
 					</view>
 				</view>

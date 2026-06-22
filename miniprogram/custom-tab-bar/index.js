@@ -12,8 +12,7 @@ const TAB_DEFS = [
   {
     key: "home",
     text: "首页",
-    iconPath: "/pages/default/skin/images/tabbar/home.png",
-    selectedIconPath: "/pages/default/skin/images/tabbar/home_cur.png",
+    icon: "home-o",
     routeMatchers: [
       "pages/default/index/default_index",
       "projects/A00/index/default_index",
@@ -22,22 +21,19 @@ const TAB_DEFS = [
   {
     key: "calendar",
     text: "约课",
-    iconPath: "/pages/default/skin/images/tabbar/day.png",
-    selectedIconPath: "/pages/default/skin/images/tabbar/day_cur.png",
+    icon: "calendar-o",
     routeMatchers: ["pages/default/calendar/index/calendar_index"],
   },
   {
     key: "cate1",
     text: "课程",
-    iconPath: "/pages/default/skin/images/tabbar/cate1.png",
-    selectedIconPath: "/pages/default/skin/images/tabbar/cate1_cur.png",
+    icon: "notes-o",
     routeMatchers: ["pages/default/news/cate1/news_cate1"],
   },
   {
     key: "my",
     text: "我的",
-    iconPath: "/pages/default/skin/images/tabbar/my.png",
-    selectedIconPath: "/pages/default/skin/images/tabbar/my_cur.png",
+    icon: "smile-o",
     routeMatchers: ["pages/default/my/index/my_index"],
   },
 ];
@@ -82,8 +78,7 @@ Component({
       const list = TAB_DEFS.map((item, index) => ({
         key: item.key,
         text: item.text,
-        iconPath: item.iconPath,
-        selectedIconPath: item.selectedIconPath,
+        icon: item.icon,
         pagePath:
           index === 0
             ? pageHelper.fmtURLByPID("/pages/index/default_index")

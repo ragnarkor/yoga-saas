@@ -4,6 +4,8 @@
 
 const BaseAdminController = require("./base_admin_controller.js");
 const AdminHomeService = require("../../service/admin/admin_home_service.js");
+const AdminWxService = require("../../service/admin/admin_wx_service.js");
+const AdminModel = require("../../model/admin_model.js");
 
 class AdminHomeController extends BaseAdminController {
   async getBannerList() {
@@ -151,6 +153,116 @@ class AdminHomeController extends BaseAdminController {
     let input = this.validateData(rules);
     let service = new AdminHomeService();
     await service.delPhoto(input.id);
+  }
+
+  /** 密码登录（超管/备用） */
+  async adminLogin() {
+    let rules = {
+      phone: "must|string|min:5|max:30|name=手机号",
+      pwd: "must|string|min:5|max:30|name=密码",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminWxService();
+    return await service.adminLogin(input.phone, input.pwd, this._userId);
+  }
+
+  /** 后台首页统计 */
+  async adminHome() {
+    await this.isAdmin();
+    let service = new AdminWxService();
+    let pid = global.PID || "";
+    if (this._adminType === AdminModel.TYPE.SUPER && !pid) {
+      return await service.adminHome(this._adminType, "");
+    }
+    return await service.adminHome(this._adminType, pid);
+  }
+
+  /** 微信静默会话（馆长/教练） */
+  async wxSession() {
+    let service = new AdminWxService();
+    let pid = global.PID || this.getParameter("pid") || "";
+    return await service.wxSession(this._userId, pid);
+  }
+
+  /** 绑定码消费 */
+  async wxBind() {
+    let rules = {
+      code: "must|string|min:10|max:64|name=绑定码",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminWxService();
+    return await service.wxBind(input.code, this._userId);
+  }
+
+  /** 已绑定馆列表 */
+  async wxTenantList() {
+    let service = new AdminWxService();
+    return await service.wxTenantList(this._userId);
+  }
+
+  /** 解除微信绑定 */
+  async wxUnbind() {
+    let rules = {
+      adminId: "id|name=管理员ID",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminWxService();
+    let operator = null;
+    if (input.adminId) {
+      await this.isAdmin();
+      operator = await AdminModel.getOne(
+        { ADMIN_ID: this._adminId },
+        "*",
+        {},
+        false,
+      );
+    }
+    return await service.wxUnbind(
+      this._userId,
+      global.PID || "",
+      operator,
+      input.adminId || "",
+    );
+  }
+
+  /** 生成绑定码 */
+  async genBindCode() {
+    await this.isAdmin();
+    let rules = { adminId: "must|id|name=管理员ID" };
+    let input = this.validateData(rules);
+    let operator = await AdminModel.getOne(
+      { ADMIN_ID: this._adminId },
+      "*",
+      {},
+      false,
+    );
+    let service = new AdminWxService();
+    return await service.genBindCode(input.adminId, operator);
+  }
+
+  /** 可绑定管理员列表 */
+  async listBindableAdmins() {
+    await this.isAdmin();
+    let pid = global.PID || this.getParameter("pid") || "";
+    let operator = await AdminModel.getOne(
+      { ADMIN_ID: this._adminId },
+      "*",
+      {},
+      false,
+    );
+    if (!operator && this._token) {
+      operator = await AdminModel.getOne(
+        {
+          ADMIN_TOKEN: this._token,
+          ADMIN_STATUS: 1,
+        },
+        "*",
+        {},
+        false,
+      );
+    }
+    let service = new AdminWxService();
+    return await service.listBindableAdmins(pid, operator, this._adminType);
   }
 }
 

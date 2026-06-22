@@ -1,0 +1,11 @@
+{
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "营销",
+  "navigationBarBackgroundColor": "#c4b5fd",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "coach-tab-bar": "/cmpts/biz/coach_tab_bar/coach_tab_bar_cmpt",
+    "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt",
+    "van-icon": "@vant/weapp/icon/index"
+  }
+}

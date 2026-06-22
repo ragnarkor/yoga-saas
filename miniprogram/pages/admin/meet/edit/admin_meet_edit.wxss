@@ -38,11 +38,11 @@
 	font-weight: bold;
 }
 
-.modal-rules .item.cur .icon-right {
+.modal-rules .item.cur van-icon {
 	color: var(--adminColor)!important;
 }
 
-.modal-rules .item .icon-right {
+.modal-rules .item van-icon {
 	right: 10rpx;
 	position: absolute;
 	top: 50rpx;

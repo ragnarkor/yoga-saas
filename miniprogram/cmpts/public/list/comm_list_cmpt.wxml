@@ -2,10 +2,10 @@
 	<!-- search form BEGIN -->
 	<view class="bar search bg-white " style="width:100%">
 		<view class="search-form round">
-			<text class="icon-search text-l text-grey"></text>
+			<van-icon name="search" size="32rpx" color="#999999" custom-class="text-l text-grey"  />
 			<input type="text" maxlength="30" value="{{search}}" placeholder="{{placeholder}}" disabled='true' bindtap="bindSearchTap"></input>
 			<view wx:if="{{search}}" class="text-xl" bindtap="bindSearchClearTap">
-				<text class="icon-roundclose text-right  text-gray"></text>
+				<van-icon name="clear" size="32rpx" color="#999999" custom-class="text-right text-gray"  />
 			</view>
 		</view>
 		<slot name="searchEnd" />
@@ -17,7 +17,7 @@
 		<!-- pulldown menu begin-->
 		<view wx:for="{{sortItems}}" wx:key="key" bindtap='bindSortTap' class="tab {{sortIndex == index ? 'text-orange cur  ' : ''}} " data-index="{{index}}">
 			<text class="pulldown-text">{{ index==sortIndex && item.items[sortItemIndex] ? item.items[sortItemIndex].label: item.items[0].label}}</text>
-			<text class="icon-{{item.show?'fold':'unfold'}} large text-black"></text>
+			<van-icon name="{{item.show ? 'arrow-up' : 'arrow-down'}}" size="32rpx" color="#333" custom-class="large text-black" />
 		</view>
 		<!-- pulldown menu end-->
 
@@ -58,7 +58,7 @@
 <!-- content END -->
   
 <!-- top begin -->
-<button wx:if="{{topShow}}"  class="btn-fixed bg-gray text-gray btn-top" bindtap="bindTopTap" style="bottom:{{topBottom}}rpx"><text class="icon-top"></text></button>
+<button wx:if="{{topShow}}"  class="btn-fixed bg-gray text-gray btn-top" bindtap="bindTopTap" style="bottom:{{topBottom}}rpx"><van-icon name="back-top" size="32rpx"  /></button>
 <!-- top END. -->
 
 <!-- pulldown detail [modal] begin-->  

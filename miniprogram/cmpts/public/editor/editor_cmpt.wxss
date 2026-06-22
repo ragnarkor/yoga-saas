@@ -22,14 +22,26 @@
 	background-color: #ff5858;
 }
 
-.iconfont {
-	font-size: 32rpx;
-	font-style: normal;
+.editor-delete {
+	position: absolute;
+	z-index: 999;
+	display: flex;
+	text-align: center;
+	align-items: center;
+	justify-content: center;
+	gap: 8rpx;
+	top: -30rpx;
+	right: 0rpx;
+	color: #999;
+	background: hsla(0, 0%, 100%, .95);
+	border-radius: 40rpx;
+	padding: 15rpx;
+	box-shadow: 0 0 5px rgba(0, 0, 0, .1);
 }
 
 .editor-wrapper {
 	padding: 30rpx;
-	box-sizing: border-box; 
+	box-sizing: border-box;
 }
 
 .editor-add-wrapper {
@@ -48,25 +60,18 @@
 	text-align: center;
 }
 
-.editor-add-wrapper .iconfont {
-	padding: 20rpx;
-	color: #666;
-	font-size: 48rpx;
-	box-sizing: border-box;
-}
-
 .editor-node-wrapper {
 	position: relative;
 	width: 100%;
 	margin-top: 10rpx;
 	margin-bottom: 10rpx;
 	border: 1rpx dashed #999;
-	background: #fff; 
-} 
+	background: #fff;
+}
 
-.editor-node-wrapper.is-view{ 
+.editor-node-wrapper.is-view {
 	border: 1rpx solid #fff;
-	border-radius: 10rpx; 
+	border-radius: 10rpx;
 }
 
 .editor-node-wrapper.cur {
@@ -84,23 +89,7 @@
 	}
 }
 
-.editor-delete {
-	position: absolute;
-	z-index: 999;
-	display: flex;
-	text-align: center;
-	align-items: center;
-	justify-content: center;
-	top: -30rpx;
-	right: 0rpx;
-	color: #999;
-	background: hsla(0, 0%, 100%, .95);
-	border-radius: 40rpx;
-	padding: 15rpx;
-	box-shadow: 0 0 5px rgba(0, 0, 0, .1);
-}
-
-.editor-delete .iconfont {
+.editor-delete van-icon {
 	padding: 0 20rpx;
 }
 

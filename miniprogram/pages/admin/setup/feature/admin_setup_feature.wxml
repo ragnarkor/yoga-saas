@@ -5,7 +5,7 @@
 <view class="main-admin" wx:if="{{isLoad}}">
   <view class="bar bg-white solid-bottom">
     <view class="action">
-      <text class="icon-title"></text>功能开关配置
+      <van-icon name="label-o" size="32rpx"  />功能开关配置
     </view>
   </view>
 

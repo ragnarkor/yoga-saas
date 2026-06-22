@@ -10,15 +10,20 @@
 }
 
 .load::before {
-  font-family: "icon";
   display: inline-block;
   margin-right: 6rpx;
+  vertical-align: middle;
 }
 
 .load.loading::before,
 .load.loading-none::before {
-  content: "\e67a";
-  animation: icon-spin 2s infinite linear;
+  content: "";
+  width: 28rpx;
+  height: 28rpx;
+  border: 4rpx solid #ddd;
+  border-top-color: var(--projectColor, #5b8a72);
+  border-radius: 50%;
+  animation: icon-spin 0.8s infinite linear;
 }
 
 .load.loading::after {
@@ -26,7 +31,7 @@
 }
 
 .load.over::before {
-  content: "\e64a";
+  display: none;
 }
 
 .load.over::after {
@@ -34,7 +39,7 @@
 }
 
 .load.error::before {
-  content: "\e658";
+  display: none;
 }
 /*
 .load.error::after {
@@ -42,7 +47,7 @@
 }*/
 
 .load.notexist::before {
-  content: "\e658";
+  display: none;
 }
 
 .load.notexist::after {
@@ -82,7 +87,7 @@
   line-height: 2.4em;
 }
 
-.load.load-modal [class*="icon-"] {
+.load.load-modal van-icon {
   font-size: 60rpx;
 }
 

@@ -63,8 +63,7 @@
   font-weight: normal;
 }
 
-.form-group > text[class*="icon-"] {
-  font-size: 36rpx;
+.form-group > van-icon {
   padding: 0;
   box-sizing: border-box;
 }
@@ -91,10 +90,9 @@
   width: 30rpx;
   height: 30rpx;
   color: var(--grey);
-  content: "\e6a3";
+  content: "›";
   text-align: center;
   font-size: 34rpx;
-  font-family: "icon";
   line-height: 30rpx;
   margin-top: auto;
   margin-right: auto;
@@ -137,9 +135,8 @@
 
 .form-group .picker::after,
 .form-group .picker-null::after {
-  font-family: "icon";
   display: block;
-  content: "\e6a3";
+  content: "›";
   position: absolute;
   font-size: 34rpx;
   color: var(--grey);
@@ -164,8 +161,7 @@ radio {
 
 switch::after,
 switch::before {
-  font-family: "icon";
-  content: "\e645";
+  content: "✓";
   position: absolute;
   color: var(--white) !important;
   top: 0%;
@@ -184,7 +180,7 @@ switch::before {
 }
 
 switch::before {
-  content: "\e646";
+  content: "×";
   right: 0;
   transform: scale(1, 1);
   left: auto;
@@ -206,8 +202,7 @@ switch[checked]::before {
 
 radio::before,
 checkbox::before {
-  font-family: "icon";
-  content: "\e645";
+  content: "✓";
   position: absolute;
   color: var(--white) !important;
   top: 50%;
@@ -548,8 +543,7 @@ radio.white[checked] .wx-radio-input {
   position: absolute;
 }
 
-.form-group .upload-img > view > text[class*="icon-"] {
-  font-size: 52rpx;
+.form-group .upload-img > view > van-icon {
   position: absolute;
   color: var(--grey);
   margin: auto;
@@ -560,7 +554,6 @@ radio.white[checked] .wx-radio-input {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
 }
 
 .form-group .upload-img .tag {
@@ -587,11 +580,11 @@ radio.white[checked] .wx-radio-input {
 /* [AI_END LINES=1 TIMESTAMP=2025-01-20 12:00:00] */
 
 .form-box .hint-desc.error::before {
-  font-family: "icon";
   font-size: 24rpx !important;
   display: inline-block;
-  content: "\e663";
+  content: "!";
   margin-right: 5rpx;
+  font-weight: bold;
 }
 
 .form-box .hint-desc.error::before {

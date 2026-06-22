@@ -428,31 +428,6 @@
 	overflow: hidden;
 }
 
-.grid.grid-square .cu-tag {
-	position: absolute;
-	right: 0;
-	top: 0;
-	border-bottom-left-radius: 6rpx;
-	padding: 6rpx 12rpx;
-	height: auto;
-	background-color: rgba(0, 0, 0, 0.5);
-}
-
-.grid.grid-square>view>text[class*="cuIcon-"] {
-	font-size: 52rpx;
-	position: absolute;
-	color: var(--grey);
-	margin: auto;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-}
-
 .grid.grid-square>view {
 	margin-right: 20rpx;
 	margin-bottom: 20rpx;

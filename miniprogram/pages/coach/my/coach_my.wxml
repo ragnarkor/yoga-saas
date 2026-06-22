@@ -1,0 +1,44 @@
+<view class="coach-page">
+  <coach-tenant-switch title="我的" bind:change="bindCoachTenantChange" />
+
+  <view class="coach-profile-header">
+    <view class="coach-profile-avatar">
+      <image wx:if="{{showAvatar}}" src="{{avatarSrc}}" mode="aspectFill" />
+      <view wx:else class="avatar-placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+        <van-icon name="user-o" size="60rpx" color="#9b6fd4" />
+      </view>
+    </view>
+    <view>
+      <view class="coach-profile-name">{{userName}}</view>
+      <view class="coach-profile-tag">{{roleTag}}</view>
+    </view>
+  </view>
+
+  <view class="coach-menu-group">
+    <view class="coach-menu-item" wx:for="{{menus}}" wx:key="name" bindtap="onMenuTap" data-url="{{item.url}}">
+      <text>{{item.name}}</text>
+      <text class="arrow">></text>
+    </view>
+  </view>
+
+  <view class="coach-menu-group">
+    <view class="coach-menu-item" bindtap="onSwitchMember">
+      <text>切换回会员版</text>
+      <text class="arrow">></text>
+    </view>
+    <view class="coach-menu-item" bindtap="onUnbindWx">
+      <text>解除微信绑定</text>
+      <text class="arrow">></text>
+    </view>
+    <view class="coach-menu-item" bindtap="onAdminLogin">
+      <text>超管密码登录（备用）</text>
+      <text class="arrow">></text>
+    </view>
+    <view class="coach-menu-item" bindtap="onLogout">
+      <text>退出当前会话</text>
+      <text class="arrow">></text>
+    </view>
+  </view>
+
+  <coach-tab-bar active="{{3}}" />
+</view>

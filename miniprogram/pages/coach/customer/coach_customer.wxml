@@ -1,0 +1,15 @@
+<view class="coach-page">
+  <coach-tenant-switch title="客户" bind:change="bindCoachTenantChange" />
+
+  <view class="coach-header coach-header-compact"></view>
+
+  <view class="coach-customer-grid">
+    <view class="coach-customer-card" wx:for="{{cards}}" wx:key="label" bindtap="onCardTap">
+      <van-icon name="{{item.icon}}" color="#c4b5fd" size="40rpx" />
+      <view class="coach-customer-num">{{item.num}}</view>
+      <view class="coach-customer-label">{{item.label}}</view>
+    </view>
+  </view>
+
+  <coach-tab-bar active="{{1}}" />
+</view>

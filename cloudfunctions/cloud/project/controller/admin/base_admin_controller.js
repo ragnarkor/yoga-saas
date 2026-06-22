@@ -22,9 +22,12 @@ class AdminController extends BaseController {
 
   /** 是否管理员  */
   async isAdmin() {
-    // 判断是否管理员
     let service = new BaseAdminService();
-    let admin = await service.isAdmin(this._token);
+    let admin = await service.isAdmin(
+      this._token,
+      this._userId,
+      global.PID || "",
+    );
     this._admin = admin;
     this._adminId = admin.ADMIN_ID;
     this._adminType = admin.ADMIN_TYPE;

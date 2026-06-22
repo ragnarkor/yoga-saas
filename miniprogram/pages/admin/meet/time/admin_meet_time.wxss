@@ -58,10 +58,9 @@
 	margin-bottom: 30rpx;
 }
 
-.time-title .icon-moreandroid {
+.time-title van-icon {
 	position: absolute;
 	right: 0rpx;
-	color: #888;
 	width: 100rpx;
 	text-align: right;
 	padding-right: 20rpx;
@@ -135,11 +134,10 @@
 	justify-content: center;
 }
 
-.time-line .limit .icon-right {
+.time-line .limit van-icon {
 	position: absolute;
 	color: #ccc;
 	right: 0rpx;
-	font-size: 24rpx;
 }
 
 .time-oprt {

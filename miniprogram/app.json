@@ -21,6 +21,11 @@
     "pages/default/teacher/detail/teacher_detail",
     "pages/default/announcement/detail/announcement_detail",
 
+    "pages/coach/index/coach_index",
+    "pages/coach/customer/coach_customer",
+    "pages/coach/marketing/coach_marketing",
+    "pages/coach/my/coach_my",
+
     "projects/A00/index/default_index",
 
     "pages/public/hint/hint",
@@ -31,6 +36,8 @@
     "pages/admin/index/home/admin_home",
     "pages/admin/home/content/admin_home_content",
     "pages/admin/index/login/admin_login",
+    "pages/admin/bind/admin_bind",
+    "pages/admin/mgr/bind/admin_mgr_bind",
     "pages/admin/content/admin_content",
     "pages/admin/meet/content/admin_meet_content",
     "pages/admin/meet/cover/admin_meet_cover",

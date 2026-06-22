@@ -45,6 +45,12 @@ module.exports = {
   //***########### ADMIN ################## */
   "admin/login": "admin/admin_home_controller@adminLogin",
   "admin/home": "admin/admin_home_controller@adminHome",
+  "admin/wx_session": "admin/admin_home_controller@wxSession",
+  "admin/wx_bind": "admin/admin_home_controller@wxBind",
+  "admin/wx_tenant_list": "admin/admin_home_controller@wxTenantList",
+  "admin/bind_code_gen": "admin/admin_home_controller@genBindCode#noDemo",
+  "admin/wx_unbind": "admin/admin_home_controller@wxUnbind#noDemo",
+  "admin/bind_admin_list": "admin/admin_home_controller@listBindableAdmins",
   "admin/clear_cache": "admin/admin_home_controller@clearCache#noDemo",
 
   "admin/setup_about": "admin/admin_setup_controller@setupAbout#noDemo",

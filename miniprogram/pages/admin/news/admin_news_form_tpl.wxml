@@ -48,7 +48,7 @@
 			</view>
 			<view wx:if="{{formUrlFocus}}" class="hint-desc error">{{formUrlFocus}}</view>
 
-			<view class="title-desc text-orange"><text class="icon-info margin-right-xs"></text>必须是您关联的公众号或者业务域名下的文章</view>
+			<view class="title-desc text-orange"><van-icon name="info-o" size="32rpx" custom-class="margin-right-xs"  />必须是您关联的公众号或者业务域名下的文章</view>
 
 		</block>
 		<block wx:else>

@@ -11,14 +11,14 @@
 					<view class="item">
 						<view class="title">起始日期：</view>
 						<cmpt-picker-time mode="day" style="flex:1" startYear="2022" endYear="2025" item="{{searchDayStart}}" bind:select="url" data-type='picker' data-item="searchDayStart">
-							<view class="content">{{searchDayStart}}<text wx:if="{{!searchDayStart}}" class="margin-left-xxs icon-calendar"></text></view>
+							<view class="content">{{searchDayStart}} wx:if="{{!searchDayStart}}"<van-icon name="calendar-o" size="32rpx" custom-class="margin-left-xxs"  /></view>
 						</cmpt-picker-time>
 					</view>
 
 					<view class="item">
 						<view class="title">结束日期：</view>
 						<cmpt-picker-time mode="day" style="flex:1" startYear="2022" endYear="2025" item="{{searchDayEnd}}" bind:select="url" data-type='picker' data-item="searchDayEnd">
-							<view class="content">{{searchDayEnd}}<text wx:if="{{!searchDayEnd}}" class="margin-left-xxs icon-calendar"></text></view>
+							<view class="content">{{searchDayEnd}} wx:if="{{!searchDayEnd}}"<van-icon name="calendar-o" size="32rpx" custom-class="margin-left-xxs"  /></view>
 						</cmpt-picker-time>
 					</view>
 					<view class="oprt"> 
@@ -51,7 +51,7 @@
 
 					<view class="td text-grey" style="width:150rpx">{{itm.stat.cancelCnt+itm.stat.adminCancelCnt}}</view>
 					
-					<view bindtap="url" data-url="../join/admin_meet_join?meetId={{meetId}}&mark={{itm.mark}}&dayidx={{index}}&timeidx={{idx}}&title={{titleEn}}&time={{(item.day+' ' + itm.start + '-' + itm.end)}}" class="td full">名单<text class="icon-right"></text></view>
+					<view bindtap="url" data-url="../join/admin_meet_join?meetId={{meetId}}&mark={{itm.mark}}&dayidx={{index}}&timeidx={{idx}}&title={{titleEn}}&time={{(item.day+' ' + itm.start + '-' + itm.end)}}" class="td full">名单<van-icon name="arrow" size="32rpx"  /></view>
 				</view>
 			</view>
 

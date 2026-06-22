@@ -11,7 +11,7 @@
 		<view class="bg-img" wx:for="{{imgList}}" wx:key="index" bindtap="bindPreviewImgTap" data-url="{{imgList[index]}}">
 			<image src='{{imgList[index]}}' mode='aspectFill'></image>
 			<view class="tag bg-red" catchtap="catchDelImgTap" data-index="{{index}}">
-				<text class="icon-close"></text>
+				<van-icon name="cross" size="32rpx"  />
 			</view>
 
 			<view wx:if="{{isShowNo}}" class="bg-olive img-no">
@@ -19,7 +19,7 @@
 			</view>
 		</view>
 		<view class="solid" bindtap="bindChooseImgTap" wx:if="{{imgList.length < imgMax}}">
-			<text class="icon-cameraadd"></text>
+			<van-icon name="photograph" size="32rpx"  />
 		</view>
 	</view>
 </view>

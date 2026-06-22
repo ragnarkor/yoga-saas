@@ -1,0 +1,19 @@
+<view class="bind-page">
+  <view wx:if="{{loading}}" class="bind-center">
+    <van-loading size="48rpx">绑定中...</van-loading>
+  </view>
+
+  <view wx:elif="{{success}}" class="bind-center">
+    <view class="bind-icon">✓</view>
+    <view class="bind-title">绑定成功</view>
+    <view class="bind-desc">您已以「{{roleLabel}}」身份绑定</view>
+    <view class="bind-desc" wx:if="{{tenantName}}">当前馆：{{tenantName}}</view>
+    <van-button type="primary" block custom-class="bind-btn" bind:click="bindGoCoach">进入教练版</van-button>
+    <van-button plain block custom-class="bind-btn" bind:click="bindGoHome">返回我的</van-button>
+  </view>
+
+  <view wx:else class="bind-center">
+    <view class="bind-title fail">绑定失败</view>
+    <view class="bind-desc">{{errMsg}}</view>
+  </view>
+</view>

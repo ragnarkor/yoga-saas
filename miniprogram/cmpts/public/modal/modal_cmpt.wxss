@@ -12,7 +12,7 @@
 	height: 100%;
 }
 
-.bg-img .action .icon-close {
+.bg-img .action van-icon {
 	font-size: 50rpx !important;
 	font-weight: bold;
 } 

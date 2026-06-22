@@ -10,16 +10,14 @@
 			<image bindtap="url" data-type="image" data-url="{{node.val}}"  id="editor-node-{{index}}" wx:if="{{node.type==='img'}}" mode="widthFix" class="loading editor-image" src="{{node.val}}" lazy-load="true"></image>
 
 			<view class="editor-delete" wx:if="{{!isView}}">
-				<!--<view bindtap="bindTopTap" class="iconfont icon-top" data-idx="{{index}}" wx:if="{{index>1}}"></view>-->
-				<view bindtap="bindUpTap" class="iconfont icon-refresharrow up" data-idx="{{index}}" wx:if="{{index>0}}"></view>
-				<view bindtap="bindDownTap" class="iconfont icon-refresharrow" data-idx="{{index}}" wx:if="{{index<nodeList.length-1}}"></view>
-				<!--<view bindtap="bindBottomTap" class="iconfont icon-down" data-idx="{{index}}" wx:if="{{index<(nodeList.length-2)}}"></view>-->
-				<view bindtap="bidnDeleteNodeTap" class="iconfont icon-delete" data-idx="{{index}}"></view>
+				<view bindtap="bindUpTap" data-idx="{{index}}" wx:if="{{index>0}}"><van-icon name="arrow-up" size="32rpx" /></view>
+				<view bindtap="bindDownTap" data-idx="{{index}}" wx:if="{{index<nodeList.length-1}}"><van-icon name="arrow-down" size="32rpx" /></view>
+				<view bindtap="bidnDeleteNodeTap" data-idx="{{index}}"><van-icon name="delete-o" size="32rpx" /></view>
 			</view>
 		</view>
 		<view class="editor-add-wrapper" wx:if="{{!isView}}">
-			<view bindtap="bindAddTextTap" data-idx="{{index}}"><text class="icon-roundadd margin-right-xs"></text>添加文本</view>
-			<view bindtap="bindAddImageTap" data-idx="{{index}}"><text class="icon-pic margin-right-xs"></text>添加图片</view>
+			<view bindtap="bindAddTextTap" data-idx="{{index}}"><van-icon name="add-o" size="32rpx" custom-class="margin-right-xs"  />添加文本</view>
+			<view bindtap="bindAddImageTap" data-idx="{{index}}"><van-icon name="photo-o" size="32rpx" custom-class="margin-right-xs"  />添加图片</view>
 		</view>
 	</block>
 </view>

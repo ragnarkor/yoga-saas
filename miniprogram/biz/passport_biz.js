@@ -86,11 +86,10 @@ class PassportBiz extends BaseBiz {
             AdminBiz.adminLogin(res.data);
             // [AI_START TIMESTAMP=2025-01-25 17:00:00]
             // 登录成功后保存租户PID，供后续API请求使用
-            if (res.data.pid) {
-              pageHelper.setTenant(res.data.pid, res.data.template);
-            } else {
-              // 超级管理员无绑定租户，清除PID缓存
+            if (res.data.type === "super") {
               pageHelper.clearPID();
+            } else if (res.data.pid) {
+              pageHelper.setPID(res.data.pid);
             }
             // [AI_END LINES=5 TIMESTAMP=2025-01-25 17:00:00]
           }

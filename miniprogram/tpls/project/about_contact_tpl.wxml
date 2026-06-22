@@ -9,17 +9,17 @@
 		<view class="main-content">
 			<view class="content card-project shadow-project">
 				<block wx:if="{{about.SETUP_ADDRESS}}">
-					<view class="title text-project"><text class="icon-location margin-right-xs"></text>地址</view>
+					<view class="title text-project"><van-icon name="location-o" size="32rpx" custom-class="margin-right-xs"  />地址</view>
 					<view class="txt"><text user-select="true">{{about.SETUP_ADDRESS}}</text></view>
 				</block>
 
 				<block wx:if="{{about.SETUP_PHONE}}">
-					<view class="title text-project"><text class="icon-phone margin-right-xs"></text>电话</view>
-					<view bindtap="url" data-type="phone" data-url="{{about.SETUP_PHONE}}" class="txt"><text user-select="true">{{about.SETUP_PHONE}}</text><text class="icon-phone margin-left-xxs"></text></view>
+					<view class="title text-project"><van-icon name="phone-o" size="32rpx" custom-class="margin-right-xs"  />电话</view>
+					<view bindtap="url" data-type="phone" data-url="{{about.SETUP_PHONE}}" class="txt"><text user-select="true">{{about.SETUP_PHONE}}</text><van-icon name="phone-o" size="32rpx" custom-class="margin-left-xxs"  /></view>
 				</block>
 
 				<block wx:if="{{about.SETUP_SERVICE_PIC.length>0}}">
-					<view class="title text-project"><text class="icon-service margin-right-xs"></text>客服</view>
+					<view class="title text-project"><van-icon name="service-o" size="32rpx" custom-class="margin-right-xs"  />客服</view>
 					<view class="pics">
 						<image wx:key="key" wx:for="{{about.SETUP_SERVICE_PIC}}" show-menu-by-longpress="{{true}}" class="loading" mode='widthFix' lazy-load="true" src="{{item}}">
 						</image>
@@ -27,7 +27,7 @@
 				</block>
 
 				<block wx:if="{{about.SETUP_OFFICE_PIC.length>0}}">
-					<view class="title text-project"><text class="icon-weixin margin-right-xs"></text>官微</view>
+					<view class="title text-project"><van-icon name="wechat" size="32rpx" custom-class="margin-right-xs"  />官微</view>
 					<view class="pics">
 						<image wx:key="key" wx:for="{{about.SETUP_OFFICE_PIC}}" show-menu-by-longpress="{{true}}" class="loading" mode='widthFix' lazy-load="true" src="{{item}}">
 						</image>

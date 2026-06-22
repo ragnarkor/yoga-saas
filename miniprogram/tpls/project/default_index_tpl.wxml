@@ -89,7 +89,7 @@
 			<view class="menu">
 				<view bindtap="url" data-type="switch" data-url="/pages/default/calendar/index/calendar_index" class="item">
 					<view class="item-inner">
-						<view class="img"><image src="/pages/default/skin/images/tabbar/day.png" /></view>
+						<view class="img"><van-icon name="calendar-o" size="48rpx" color="#5b8a72" /></view>
 						<view class="title">约课</view>
 					</view>
 				</view>

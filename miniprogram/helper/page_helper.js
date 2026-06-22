@@ -104,9 +104,11 @@ function isGlobalPage(url) {
   return (
     url.indexOf("/pages/public/") >= 0 ||
     url.indexOf("/pages/admin/") >= 0 ||
+    url.indexOf("/pages/coach/") >= 0 ||
     url.indexOf("/pages/tenant/") >= 0 ||
     url.indexOf("pages/public/") === 0 ||
     url.indexOf("pages/admin/") === 0 ||
+    url.indexOf("pages/coach/") === 0 ||
     url.indexOf("pages/tenant/") === 0
   );
 }
@@ -127,8 +129,38 @@ function fmtImgUrl(url) {
   return url;
 }
 
+/** 将 ../../xxx 相对路径解析为以 / 开头的绝对小程序路径 */
+function resolveRelativePageUrl(url) {
+  if (!url || (!url.includes("../") && !url.startsWith("./"))) {
+    return url;
+  }
+
+  const pages = getCurrentPages();
+  if (!pages.length) return url;
+
+  const route = pages[pages.length - 1].route || "";
+  const dirParts = route.split("/");
+  dirParts.pop();
+
+  const query = url.includes("?") ? "?" + url.split("?").slice(1).join("?") : "";
+  const pathOnly = url.split("?")[0];
+
+  for (const part of pathOnly.split("/")) {
+    if (part === "..") dirParts.pop();
+    else if (part && part !== ".") dirParts.push(part);
+  }
+
+  return "/" + dirParts.join("/") + query;
+}
+
 /** 根据租户模板解析页面 URL */
 function fmtURLByPID(url) {
+  if (!url) return url;
+
+  if (url.includes("../") || url.startsWith("./")) {
+    url = resolveRelativePageUrl(url);
+  }
+
   if (isGlobalPage(url)) {
     return url.startsWith("/") ? url : "/" + url;
   }
@@ -650,8 +682,15 @@ function anchor(id, that) {
 
 // 页面跳转/图片预览
 function url(e, that) {
-  let url = e.currentTarget.dataset.url;
-  let type = e.currentTarget.dataset.type;
+  let url =
+    (e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.url) ||
+    (e.target && e.target.dataset && e.target.dataset.url) ||
+    (e.mark && e.mark.url) ||
+    "";
+  let type =
+    (e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.type) ||
+    (e.target && e.target.dataset && e.target.dataset.type) ||
+    "";
   if (!type) type = "url";
 
   switch (type) {
