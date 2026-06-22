@@ -1,139 +1,120 @@
 /**
- * Notes: 后台HOME/登录模块
- * Date: 2021-03-15 07:48:00
+ * Notes: 首页内容后台管理
  */
 
 const BaseAdminService = require("./base_admin_service.js");
-
-const dataUtil = require("../../../framework/utils/data_util.js");
-const cacheUtil = require("../../../framework/utils/cache_util.js");
-
-const cloudBase = require("../../../framework/cloud/cloud_base.js");
-const timeUtil = require("../../../framework/utils/time_util.js");
-const config = require("../../../config/config.js");
-const AdminModel = require("../../model/admin_model.js");
-const TenantModel = require("../../model/tenant_model.js");
-const LogModel = require("../../model/log_model.js");
-const UserModel = require("../../model/user_model.js");
-const MeetModel = require("../../model/meet_model.js");
-const NewsModel = require("../../model/news_model.js");
-const JoinModel = require("../../model/join_model.js");
-const SetupModel = require("../../model/setup_model.js");
+const cloudUtil = require("../../../framework/cloud/cloud_util.js");
+const util = require("../../../framework/utils/util.js");
+const BannerModel = require("../../model/banner_model.js");
+const AnnouncementModel = require("../../model/announcement_model.js");
+const TeacherModel = require("../../model/teacher_model.js");
+const PhotoModel = require("../../model/photo_model.js");
 
 class AdminHomeService extends BaseAdminService {
-  /**
-   * 首页数据归集
-   */
-  async adminHome(adminType) {
-    // [AI_START TIMESTAMP=2025-01-25 17:30:00]
-    // 超级管理员未选馆时：返回所有馆列表（选馆后PID会被设置，走正常统计流程）
-    if (adminType === AdminModel.TYPE.SUPER && !global.PID) {
-      let tenantList = await TenantModel.getAll(
-        { TENANT_STATUS: TenantModel.STATUS.OPEN },
-        "_pid,TENANT_ID,TENANT_NAME,TENANT_TEMPLATE",
-        { TENANT_ADD_TIME: -1 },
-        100,
-        false,
-      );
-      return { isSuper: true, tenantList: tenantList || [] };
-    }
-    // [AI_END LINES=8 TIMESTAMP=2025-01-25 17:30:00]
-
-    let where = {};
-
-    let userCnt = await UserModel.count(where);
-    let meetCnt = await MeetModel.count(where);
-    let newsCnt = await NewsModel.count(where);
-    let joinCnt = await JoinModel.count(where);
-    // [AI_START TIMESTAMP=2025-01-25 12:00:00]
-    let features = {};
-    try {
-      let setup = await SetupModel.getOne({}, "SETUP_FEATURES");
-      if (setup && setup.SETUP_FEATURES) features = setup.SETUP_FEATURES;
-    } catch (e) {}
-    // [AI_END LINES=5 TIMESTAMP=2025-01-25 12:00:00]
-    return {
-      userCnt,
-      meetCnt,
-      newsCnt,
-      joinCnt,
-      features,
-    };
+  async getBannerList() {
+    return await BannerModel.getAll(
+      { BANNER_STATUS: 1 },
+      "*",
+      { BANNER_ORDER: "asc", BANNER_ADD_TIME: "desc" },
+      100,
+    );
   }
 
-  /** 清除缓存 */
-  async clearCache() {
-    await cacheUtil.clear();
+  async insertBanner(data) {
+    data.BANNER_STATUS = 1;
+    return await BannerModel.insert(data);
   }
 
-  /**
-   * 管理员登录（多租户模式下按手机号+密码查库）
-   * @param {*} phone
-   * @param {*} password
-   */
-  async adminLogin(phone, password) {
-    // [AI_START TIMESTAMP=2025-01-25 16:30:00]
-    // 跨租户查询（super 可不选馆直接登录，owner/teacher 也可全局匹配）
-    let where = {
-      ADMIN_PHONE: phone,
-      ADMIN_PWD: password,
-      ADMIN_STATUS: 1,
-    };
-    let fields =
-      "_pid,ADMIN_ID,ADMIN_NAME,ADMIN_TYPE,ADMIN_LOGIN_TIME,ADMIN_LOGIN_CNT";
-    let admin = await AdminModel.getOne(where, fields, {}, false);
-    // [AI_END LINES=8 TIMESTAMP=2025-01-25 16:30:00]
-    if (!admin) this.AppError("管理员账号或密码不正确");
+  async editBanner(id, data) {
+    await BannerModel.edit({ _id: id }, data);
+  }
 
-    // [AI_START TIMESTAMP=2025-01-25 16:30:00]
-    // 超级管理员设定 PID=admin
-    let pid = admin._pid || "admin";
-    // [AI_END LINES=2 TIMESTAMP=2025-01-25 16:30:00]
+  async delBanner(id) {
+    let item = await BannerModel.getOne({ _id: id }, "BANNER_PIC,BANNER_VIDEO");
+    if (!item) return;
+    let files = [];
+    if (item.BANNER_PIC) files.push(item.BANNER_PIC);
+    if (item.BANNER_VIDEO) files.push(item.BANNER_VIDEO);
+    if (files.length) await cloudUtil.deleteFiles(files);
+    await BannerModel.del({ _id: id });
+  }
 
-    let cnt = admin.ADMIN_LOGIN_CNT;
+  async getAnnounceList() {
+    return await AnnouncementModel.getAll(
+      {},
+      "*",
+      { ANNOUNCE_ORDER: "asc", ANNOUNCE_ADD_TIME: "desc" },
+      100,
+    );
+  }
 
-    // 生成token
-    let token = dataUtil.genRandomString(32);
-    let tokenTime = timeUtil.time();
-    let data = {
-      ADMIN_TOKEN: token,
-      ADMIN_TOKEN_TIME: tokenTime,
-      ADMIN_LOGIN_TIME: timeUtil.time(),
-      ADMIN_LOGIN_CNT: cnt + 1,
-    };
-    // [AI_START TIMESTAMP=2025-01-25 16:30:00]
-    await AdminModel.edit(where, data, false);
-    // [AI_END LINES=1 TIMESTAMP=2025-01-25 16:30:00]
+  async insertAnnounce(data) {
+    data.ANNOUNCE_STATUS = 1;
+    data.ANNOUNCE_CONTENT = data.ANNOUNCE_CONTENT || [];
+    return await AnnouncementModel.insert(data);
+  }
 
-    // ADMIN_TYPE 已改为 string 类型（super/owner/teacher）
-    let type = admin.ADMIN_TYPE;
-    let last = !admin.ADMIN_LOGIN_TIME
-      ? "尚未登录"
-      : timeUtil.timestamp2Time(admin.ADMIN_LOGIN_TIME);
+  async editAnnounce(id, data) {
+    await AnnouncementModel.edit({ _id: id }, data);
+  }
 
-    // 写日志
-    this.insertLog("登录了系统", admin, LogModel.TYPE.SYS);
+  async delAnnounce(id) {
+    await AnnouncementModel.del({ _id: id });
+  }
 
-    let template = "default";
-    if (pid && pid !== "admin") {
-      let tenant = await TenantModel.getOne(
-        { _pid: pid, TENANT_STATUS: TenantModel.STATUS.OPEN },
-        "TENANT_TEMPLATE",
-        {},
-        false,
-      );
-      if (tenant && tenant.TENANT_TEMPLATE) template = tenant.TENANT_TEMPLATE;
-    }
+  async getTeacherList() {
+    return await TeacherModel.getAll(
+      {},
+      "*",
+      { TEACHER_ORDER: "asc", TEACHER_ADD_TIME: "desc" },
+      100,
+    );
+  }
 
-    return {
-      token,
-      name: admin.ADMIN_NAME,
-      type,
-      pid,
-      template,
-      last,
-      cnt,
-    };
+  async insertTeacher(data) {
+    data.TEACHER_STATUS = 1;
+    data.TEACHER_PIC = data.TEACHER_PIC || [];
+    data.TEACHER_HOME = util.isDefined(data.TEACHER_HOME) ? data.TEACHER_HOME : 1;
+    return await TeacherModel.insert(data);
+  }
+
+  async editTeacher(id, data) {
+    await TeacherModel.edit({ _id: id }, data);
+  }
+
+  async delTeacher(id) {
+    let item = await TeacherModel.getOne({ _id: id }, "TEACHER_AVATAR,TEACHER_PIC");
+    if (!item) return;
+    let files = [];
+    if (item.TEACHER_AVATAR) files.push(item.TEACHER_AVATAR);
+    if (item.TEACHER_PIC && item.TEACHER_PIC.length) files = files.concat(item.TEACHER_PIC);
+    if (files.length) await cloudUtil.deleteFiles(files);
+    await TeacherModel.del({ _id: id });
+  }
+
+  async getPhotoList() {
+    return await PhotoModel.getAll(
+      {},
+      "*",
+      { PHOTO_ORDER: "asc", PHOTO_ADD_TIME: "desc" },
+      100,
+    );
+  }
+
+  async insertPhoto(data) {
+    data.PHOTO_STATUS = 1;
+    return await PhotoModel.insert(data);
+  }
+
+  async editPhoto(id, data) {
+    await PhotoModel.edit({ _id: id }, data);
+  }
+
+  async delPhoto(id) {
+    let item = await PhotoModel.getOne({ _id: id }, "PHOTO_PIC");
+    if (!item) return;
+    if (item.PHOTO_PIC) await cloudUtil.deleteFiles([item.PHOTO_PIC]);
+    await PhotoModel.del({ _id: id });
   }
 }
 

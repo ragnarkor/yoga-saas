@@ -18,6 +18,7 @@ page {
   height: 540rpx;
   overflow: hidden;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  margin-top: 0;
 }
 
 .a00-hero-bg {
@@ -91,7 +92,7 @@ page {
   display: flex;
   justify-content: space-around;
   padding: 48rpx 20rpx 32rpx;
-  margin: -60rpx 24rpx 0;
+  margin: 32rpx 24rpx 0;
   background: rgba(26, 26, 46, 0.85);
   border-radius: 24rpx;
   border: 1rpx solid rgba(201, 169, 110, 0.15);
@@ -250,4 +251,141 @@ page {
   margin: 0 20rpx;
   letter-spacing: 4rpx;
 }
-/* [AI_END LINES=172 TIMESTAMP=2025-01-26 11:00:00] */
+
+/* === 横幅轮播 === */
+.a00-banner-swiper,
+.a00-banner-item,
+.a00-banner-img {
+  width: 100%;
+  height: 540rpx;
+}
+
+.a00-banner-item {
+  position: relative;
+}
+
+.a00-banner-mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 32rpx 40rpx;
+  background: linear-gradient(transparent, rgba(15, 15, 26, 0.85));
+}
+
+.a00-banner-title {
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+}
+
+/* === 搜索栏 === */
+.a00-toolbar {
+  display: flex;
+  align-items: center;
+  margin: -48rpx 24rpx 0;
+  padding: 16rpx 20rpx;
+  background: rgba(26, 26, 46, 0.92);
+  border-radius: 999rpx;
+  border: 1rpx solid rgba(201, 169, 110, 0.2);
+  position: relative;
+  z-index: 4;
+}
+
+.a00-search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 0 8rpx;
+}
+
+.a00-search-text {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 26rpx;
+}
+
+.a00-phone {
+  width: 72rpx;
+  height: 72rpx;
+  margin-left: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #c9a96e, #b8975a);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* === 老师横滑 === */
+.a00-teacher-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.a00-teacher-list {
+  display: inline-flex;
+  gap: 20rpx;
+  padding-bottom: 8rpx;
+}
+
+.a00-teacher-card {
+  display: inline-block;
+  width: 240rpx;
+  background: rgba(26, 26, 46, 0.6);
+  border-radius: 16rpx;
+  overflow: hidden;
+  border: 1rpx solid rgba(201, 169, 110, 0.1);
+}
+
+.a00-teacher-cover {
+  width: 240rpx;
+  height: 160rpx;
+  display: block;
+}
+
+.a00-teacher-name {
+  padding: 16rpx 16rpx 4rpx;
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+.a00-teacher-spec {
+  padding: 0 16rpx 16rpx;
+  font-size: 22rpx;
+  color: rgba(201, 169, 110, 0.75);
+}
+
+/* === 照片墙 === */
+.a00-photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.a00-photo-item {
+  width: calc(50% - 8rpx);
+  position: relative;
+  border-radius: 16rpx;
+  overflow: hidden;
+  border: 1rpx solid rgba(201, 169, 110, 0.08);
+}
+
+.a00-photo-item image {
+  width: 100%;
+  height: 220rpx;
+  display: block;
+}
+
+.a00-photo-cap {
+  padding: 12rpx 16rpx;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.65);
+  background: rgba(26, 26, 46, 0.85);
+}
+
+.a00-home {
+  padding-bottom: 120rpx;
+}

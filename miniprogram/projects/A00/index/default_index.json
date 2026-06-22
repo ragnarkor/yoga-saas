@@ -1,7 +1,10 @@
 {
-	"usingComponents": { 
-	},  
-	"enablePullDownRefresh": true, 
+	"usingComponents": {
+		"cmpt-tenant-switch": "/cmpts/biz/tenant_switch/tenant_switch_cmpt",
+		"van-loading": "@vant/weapp/loading/index",
+		"van-icon": "@vant/weapp/icon/index"
+	},
+	"enablePullDownRefresh": true,
 	"navigationStyle": "custom",
 	"navigationBarTitleText": "首页"
 }

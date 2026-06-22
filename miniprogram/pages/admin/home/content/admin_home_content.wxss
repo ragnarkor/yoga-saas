@@ -1,0 +1,11 @@
+.admin-home-content {
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+.tip {
+  padding: 24rpx;
+  font-size: 24rpx;
+  color: #888;
+  line-height: 1.6;
+}

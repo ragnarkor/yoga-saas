@@ -2,5 +2,7 @@
 	"usingComponents": {  
 	},
 	"enablePullDownRefresh": true, 
-	"navigationBarTitleText": "活动/预约详情"
+	"navigationBarTitleText": "课程详情",
+	"navigationBarBackgroundColor": "#5b8a72",
+	"navigationBarTextStyle": "white"
 }

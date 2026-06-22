@@ -1,5 +1,6 @@
 const { createPage } = require("../../../../helper/create_page.js");
 
 createPage({
-  behaviorKey: "my_edit_bh",
+  behaviorKey: "teacher_detail_bh",
+  isLoadSkin: true,
 });

@@ -23,7 +23,7 @@ module.exports = Behavior({
       let type = options.type;
       let returnUrl = options.returnUrl;
 
-      let cacheName = "SERACH_HIS_" + type;
+      let cacheName = "SERACH_HIS_" + (type || 'home');
 
       let hisKeys = SearchBiz.getHistory(cacheName);
       if (hisKeys)
@@ -67,10 +67,18 @@ module.exports = Behavior({
      *  点击确认搜索
      */
     bindSearchConfirm: function (e) {
-      if (!this.data.type) return;
-
       let search = this.data.search.trim();
       if (!search) return;
+
+      if (this.data.type === 'home') {
+        SearchBiz.addHistory(this.data.cacheName || 'SERACH_HIS_home', search);
+        wx.navigateTo({
+          url: '/pages/default/search/home_result?keyword=' + encodeURIComponent(search),
+        });
+        return;
+      }
+
+      if (!this.data.type) return;
 
       // 历史记录
       let hisKeys = SearchBiz.addHistory(this.data.cacheName, search);

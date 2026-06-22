@@ -22,8 +22,9 @@ function createPage(options) {
   }
 
   const skin = pageHelper.getSkin();
+  const behaviorData = behavior.data || {};
   Page({
-    data: { skin },
+    data: Object.assign({}, behaviorData, { skin }),
     behaviors: [behavior],
     onReady() {
       PassportBiz.initPage({

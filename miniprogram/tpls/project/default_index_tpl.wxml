@@ -1,12 +1,98 @@
 <!-- [AI_START TIMESTAMP=2025-01-24 13:00:00] -->
 <template name="defaultIndexTpl">
-	<view class="main">
-		<view class="up">
+	<cmpt-tenant-switch title="首页" />
+
+	<view class="home-page">
+		<!-- 1. 顶部横幅 -->
+		<view class="home-banner" wx:if="{{banners.length > 0}}">
+			<swiper class="banner-swiper" indicator-dots autoplay circular interval="4000" duration="500">
+				<swiper-item wx:for="{{banners}}" wx:key="_id">
+					<view class="banner-item" bindtap="bindBannerTap" data-url="{{item.linkUrl}}">
+						<video wx:if="{{item.type === 'video' && item.video}}" class="banner-media" src="{{item.video}}" poster="{{item.pic}}" object-fit="cover" show-center-play-btn="{{false}}" controls="{{false}}"></video>
+						<image wx:else class="banner-media" mode="aspectFill" src="{{item.pic || skin.IMG_DEFAULT_INDEX_BG}}" />
+						<view class="banner-mask" wx:if="{{item.title}}">
+							<text class="banner-title">{{item.title}}</text>
+						</view>
+					</view>
+				</swiper-item>
+			</swiper>
+		</view>
+		<view class="home-banner home-banner-fallback" wx:else>
 			<image mode="aspectFill" src="{{skin.IMG_DEFAULT_INDEX_BG}}" />
 		</view>
-		<view class="down">
-			<view class="menu card-project shadow-project">
-				<!-- 资讯分类入口 -->
+
+		<!-- 2. 搜索栏 + 电话 -->
+		<view class="home-toolbar card-project shadow-project">
+			<view class="home-search" bindtap="bindSearchTap">
+				<van-icon name="search" size="32rpx" color="#8ba399" />
+				<text class="home-search-placeholder">搜索课程、老师、活动</text>
+			</view>
+			<view class="home-phone" bindtap="bindPhoneTap">
+				<van-icon name="phone-o" size="40rpx" color="#5b8a72" />
+			</view>
+		</view>
+
+		<!-- 3. 公告区 -->
+		<view class="home-section card-project shadow-project">
+			<view class="section-head">
+				<text class="section-title">公告</text>
+			</view>
+			<view wx:if="{{announcements.length === 0}}" class="section-empty">暂无公告</view>
+			<view wx:else>
+				<view class="announce-item" wx:for="{{announcements}}" wx:key="_id" bindtap="bindAnnounceTap" data-id="{{item._id}}">
+					<van-icon name="volume-o" size="28rpx" color="#5b8a72" custom-class="announce-icon" />
+					<view class="announce-body">
+						<view class="announce-title text-cut">{{item.title}}</view>
+						<view class="announce-desc text-cut" wx:if="{{item.desc}}">{{item.desc}}</view>
+					</view>
+					<van-icon name="arrow" size="24rpx" color="#b0c4b8" />
+				</view>
+			</view>
+		</view>
+
+		<!-- 4. 金牌老师 -->
+		<view class="home-section" wx:if="{{teachers.length > 0}}">
+			<view class="section-head">
+				<text class="section-title">金牌老师</text>
+			</view>
+			<scroll-view class="teacher-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+				<view class="teacher-list">
+					<view class="teacher-card card-project shadow-project" wx:for="{{teachers}}" wx:key="_id" bindtap="bindTeacherTap" data-id="{{item._id}}">
+						<image class="teacher-cover" mode="aspectFill" src="{{item.cover || item.avatar}}" />
+						<view class="teacher-info">
+							<view class="teacher-name">{{item.name}}</view>
+							<view class="teacher-specialty text-cut">{{item.specialty}}</view>
+						</view>
+					</view>
+				</view>
+			</scroll-view>
+		</view>
+
+		<!-- 5. 照片墙 -->
+		<view class="home-section" wx:if="{{photos.length > 0}}">
+			<view class="section-head">
+				<text class="section-title">照片墙</text>
+			</view>
+			<view class="photo-grid">
+				<view class="photo-item" wx:for="{{photos}}" wx:key="_id" bindtap="bindPhotoTap" data-index="{{index}}">
+					<image mode="aspectFill" src="{{item.pic}}" />
+					<view class="photo-caption text-cut" wx:if="{{item.title}}">{{item.title}}</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 快捷入口 -->
+		<view class="home-section card-project shadow-project">
+			<view class="section-head">
+				<text class="section-title">快捷入口</text>
+			</view>
+			<view class="menu">
+				<view bindtap="url" data-type="switch" data-url="/pages/default/calendar/index/calendar_index" class="item">
+					<view class="item-inner">
+						<view class="img"><image src="/pages/default/skin/images/tabbar/day.png" /></view>
+						<view class="title">约课</view>
+					</view>
+				</view>
 				<view bindtap="url" data-url="/pages/default/news/index/news_index?id={{item.val}}" class="item" wx:for="{{skin.newsCateArr}}" wx:key="key">
 					<view class="item-inner">
 						<view class="img"><image src="/pages/default/skin/images/menu/news_{{item.val}}.png" /></view>
@@ -14,21 +100,14 @@
 					</view>
 				</view>
 			</view>
-
-			<!-- List Begin -->
-				<view wx:if="{{!dataList}}" class="loading-wrap">
-					<van-loading size="48rpx" color="#5b8a72" type="spinner" />
-				</view>
-				<import src="../../tpls/public/base_list_tpl.wxml" />
-				<template is="baseListTpl" data="{{dataList,listMode}}" />
-				<!-- List END -->
 		</view>
+
+		<view class="home-safe-bottom"></view>
 	</view>
 
 	<block wx:if="{{skin.IS_SUB}}">
 		<import src="../../tpls/public/menu_tpl.wxml" />
 		<template is="menuTpl" data="{{skin,curMenu:'home_index',returnHome}}" />
 	</block>
-
 </template>
 <!-- [AI_END LINES=33 TIMESTAMP=2025-01-24 13:00:00] -->

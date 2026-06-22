@@ -6,13 +6,18 @@
 		<view class="upside upside-shadow">
 			<image mode="aspectFill" lazy-load class="upImg loading" src="{{skin.IMG_UPIMG}}" />
 			<view class="user-bar">
-				<view class="avatar">
-					<image mode="aspectFit" src="/pages/default/skin/images/tabbar/my_cur.png" />
+				<view class="avatar-wrap">
+					<image wx:if="{{showAvatarImg}}" class="avatar-img" mode="aspectFill" src="{{avatarSrc}}" />
+					<view wx:else class="avatar-placeholder">
+						<text class="icon-peoplefill"></text>
+					</view>
+					<button class="avatar-choose-btn" open-type="chooseAvatar" bindchooseavatar="bindChooseAvatar"></button>
 				</view>
-				<view class="detail" bindtap="url" data-url="../edit/my_edit">
-					<view class="name text-cut">{{user?user.USER_NAME:'欢迎回来~~~'}}</view>
+				<view class="detail">
+					<input type="nickname" class="name-input" placeholder="点击填写微信昵称" value="{{userNameInput}}" bindinput="bindNicknameInput" bindblur="bindNicknameBlur" bindnicknamereview="bindNicknameReview" />
 					<view class="desc">
-						<view class="text-cut">{{user?'修改个人资料':'马上注册，使用更多功能'}}</view>
+						<button wx:if="{{!user || !user.USER_MOBILE}}" open-type="getPhoneNumber" bindgetphonenumber="bindGetPhone" class="phone-auth-btn">绑定手机号（可选）</button>
+						<text wx:elif="{{user.USER_MOBILE}}" class="phone-text">{{user.USER_MOBILE}}</text>
 					</view>
 				</view>
 			</view>
@@ -51,7 +56,6 @@
 			<!-- VANT 菜单列表 -->
 			<van-cell-group inset custom-class="menu-group">
 				<van-cell title="我的所有{{skin.MEET_NAME}}" is-link link-type="navigateTo" url="../join/my_join" icon="records" label="查看所有预约记录" />
-				<van-cell title="修改我的个人资料" is-link link-type="navigateTo" url="../edit/my_edit" icon="edit" label="姓名、手机、城市等" />
 			</van-cell-group>
 
 			<van-cell-group inset custom-class="menu-group">

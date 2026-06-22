@@ -16,6 +16,7 @@ const config = require("../../config/config.js");
 const PassportService = require("../service/passport_service.js");
 const cloudBase = require("../../framework/cloud/cloud_base.js");
 const UserModel = require("../model/user_model.js");
+const AdminModel = require("../model/admin_model.js");
 
 class MeetService extends BaseService {
   constructor() {
@@ -397,6 +398,18 @@ class MeetService extends BaseService {
     ret.MEET_IS_SHOW_LIMIT = meet.MEET_IS_SHOW_LIMIT;
     ret.MEET_TITLE = meet.MEET_TITLE;
     ret.MEET_CONTENT = meet.MEET_CONTENT;
+    ret.MEET_TYPE_NAME = meet.MEET_TYPE_NAME || "";
+    ret.MEET_STYLE_SET = meet.MEET_STYLE_SET || {};
+
+    let coachName = "";
+    if (meet.MEET_ADMIN_ID) {
+      let admin = await AdminModel.getOne(
+        { _id: meet.MEET_ADMIN_ID },
+        "ADMIN_NAME",
+      );
+      if (admin) coachName = admin.ADMIN_NAME;
+    }
+    ret.coachName = coachName;
 
     return ret;
   }
@@ -543,7 +556,7 @@ class MeetService extends BaseService {
     };
 
     let fields =
-      "MEET_TITLE,MEET_DAYS_SET,MEET_STYLE_SET,MEET_TYPE_ID,MEET_TYPE_NAME,MEET_IS_SHOW_LIMIT";
+      "MEET_TITLE,MEET_DAYS_SET,MEET_STYLE_SET,MEET_TYPE_ID,MEET_TYPE_NAME,MEET_IS_SHOW_LIMIT,MEET_ADMIN_ID";
 
     let list = await MeetModel.getAll(where, fields, orderBy);
 
@@ -562,12 +575,15 @@ class MeetService extends BaseService {
           : firstTime.start;
       node.timeStart = firstTime.start;
       node.timeEnd = firstTime.end;
+      node.timeMark = firstTime.mark;
       node.title = list[k].MEET_TITLE;
       node.pic = list[k].MEET_STYLE_SET.pic;
       node.desc = list[k].MEET_STYLE_SET.desc || "";
       node._id = list[k]._id;
       node.typeId = list[k].MEET_TYPE_ID;
       node.typeName = list[k].MEET_TYPE_NAME;
+      node.level =
+        (list[k].MEET_STYLE_SET && list[k].MEET_STYLE_SET.level) || "";
       node.isShowLimit = list[k].MEET_IS_SHOW_LIMIT;
       node.limit = firstTime.limit || 0;
       node.stat = firstTime.stat || {
@@ -576,6 +592,17 @@ class MeetService extends BaseService {
         adminCancelCnt: 0,
       };
       node.timeSlotCnt = usefulTimes.length;
+
+      let coachName = "";
+      if (list[k].MEET_ADMIN_ID) {
+        let admin = await AdminModel.getOne(
+          { _id: list[k].MEET_ADMIN_ID },
+          "ADMIN_NAME",
+        );
+        if (admin) coachName = admin.ADMIN_NAME;
+      }
+      node.coachName = coachName;
+
       retList.push(node);
     }
     return retList;

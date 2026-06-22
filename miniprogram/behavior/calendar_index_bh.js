@@ -145,11 +145,11 @@ module.exports = Behavior({
       }
     },
 
-    _transformCourseData: function (rawList) {
+    _transformCourseData: function (rawList, activeTab = this.data.activeTab) {
       if (!rawList) return [];
 
-      let activeTabId = this.data.tabs[this.data.activeTab]
-        ? this.data.tabs[this.data.activeTab].id
+      let activeTabId = this.data.tabs[activeTab]
+        ? this.data.tabs[activeTab].id
         : "0";
 
       let result = rawList.map((item) => {
@@ -188,6 +188,7 @@ module.exports = Behavior({
           typeId: item.typeId || "",
           timeStart,
           timeEnd,
+          timeMark: item.timeMark || "",
           duration,
           coachName: item.coachName || "专业教练",
           coachAvatar: pageHelper.fmtImgUrl(item.coachAvatar || item.pic) || defaultCover,
@@ -277,7 +278,7 @@ module.exports = Behavior({
 
     bindTabChange: function (e) {
       const activeTab = e.detail.index;
-      const courseList = this._transformCourseData(this.data.list);
+      const courseList = this._transformCourseData(this.data.list, activeTab);
       this.setData({ activeTab, courseList });
     },
 

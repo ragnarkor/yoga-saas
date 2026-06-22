@@ -113,6 +113,13 @@
 					<text class="text-black">功能开关设置</text>
 				</view>
 			</van-cell>
+
+			<van-cell is-link bind:click="url" data-url="../../home/content/admin_home_content">
+				<view slot="title">
+					<text class="icon-homefill text-green margin-right-s"></text>
+					<text class="text-black">首页内容管理</text>
+				</view>
+			</van-cell>
 			<!-- [AI_END LINES=7 TIMESTAMP=2025-01-25 12:00:00] -->
 		</van-cell-group>
 

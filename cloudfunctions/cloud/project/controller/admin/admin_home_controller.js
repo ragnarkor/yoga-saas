@@ -1,48 +1,156 @@
 /**
- * Notes: 后台登录与首页模块
- * Date: 2021-03-15 19:20:00
+ * Notes: 首页内容后台管理控制器
  */
 
 const BaseAdminController = require("./base_admin_controller.js");
 const AdminHomeService = require("../../service/admin/admin_home_service.js");
 
 class AdminHomeController extends BaseAdminController {
-  // 管理首页
-  async adminHome() {
+  async getBannerList() {
     await this.isAdmin();
-
-    // 数据校验
-    let rules = {};
-
-    // 取得数据
-    let input = this.validateData(rules);
-
     let service = new AdminHomeService();
-    // [AI_START TIMESTAMP=2025-01-25 17:30:00]
-    // 传入管理员类型，超级管理员将返回馆列表
-    return await service.adminHome(this._adminType);
-    // [AI_END LINES=2 TIMESTAMP=2025-01-25 17:30:00]
+    return { list: await service.getBannerList() };
   }
 
-  // 清除缓存
-  async clearCache() {
-    let service = new AdminHomeService();
-    await service.clearCache();
-  }
-
-  // 管理员登录
-  async adminLogin() {
-    // 数据校验
+  async insertBanner() {
+    await this.isAdmin();
     let rules = {
-      phone: "required|string|min:5|max:30|name=手机号",
-      pwd: "required|string|min:5|max:30|name=密码",
+      title: "string",
+      type: "string|default=image",
+      pic: "string",
+      video: "string",
+      linkType: "string|default=none",
+      linkId: "string",
+      order: "int|default=9999",
     };
-
-    // 取得数据
     let input = this.validateData(rules);
-
     let service = new AdminHomeService();
-    return await service.adminLogin(input.phone, input.pwd);
+    let id = await service.insertBanner({
+      BANNER_TITLE: input.title,
+      BANNER_TYPE: input.type,
+      BANNER_PIC: input.pic,
+      BANNER_VIDEO: input.video,
+      BANNER_LINK_TYPE: input.linkType,
+      BANNER_LINK_ID: input.linkId,
+      BANNER_ORDER: input.order,
+    });
+    return { id };
+  }
+
+  async delBanner() {
+    await this.isAdmin();
+    let rules = { id: "must|id" };
+    let input = this.validateData(rules);
+    let service = new AdminHomeService();
+    await service.delBanner(input.id);
+  }
+
+  async getAnnounceList() {
+    await this.isAdmin();
+    let service = new AdminHomeService();
+    return { list: await service.getAnnounceList() };
+  }
+
+  async insertAnnounce() {
+    await this.isAdmin();
+    let rules = {
+      title: "must|string",
+      desc: "string",
+      order: "int|default=9999",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminHomeService();
+    let id = await service.insertAnnounce({
+      ANNOUNCE_TITLE: input.title,
+      ANNOUNCE_DESC: input.desc,
+      ANNOUNCE_ORDER: input.order,
+      ANNOUNCE_CONTENT: [{ type: "text", val: input.desc || input.title }],
+    });
+    return { id };
+  }
+
+  async delAnnounce() {
+    await this.isAdmin();
+    let rules = { id: "must|id" };
+    let input = this.validateData(rules);
+    let service = new AdminHomeService();
+    await service.delAnnounce(input.id);
+  }
+
+  async getTeacherList() {
+    await this.isAdmin();
+    let service = new AdminHomeService();
+    return { list: await service.getTeacherList() };
+  }
+
+  async insertTeacher() {
+    await this.isAdmin();
+    let rules = {
+      name: "must|string",
+      avatar: "string",
+      specialty: "string",
+      desc: "string",
+      pics: "array",
+      home: "int|default=1",
+      order: "int|default=9999",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminHomeService();
+    let id = await service.insertTeacher({
+      TEACHER_NAME: input.name,
+      TEACHER_AVATAR: input.avatar,
+      TEACHER_SPECIALTY: input.specialty,
+      TEACHER_DESC: input.desc,
+      TEACHER_PIC: input.pics || [],
+      TEACHER_HOME: input.home,
+      TEACHER_ORDER: input.order,
+    });
+    return { id };
+  }
+
+  async delTeacher() {
+    await this.isAdmin();
+    let rules = { id: "must|id" };
+    let input = this.validateData(rules);
+    let service = new AdminHomeService();
+    await service.delTeacher(input.id);
+  }
+
+  async getPhotoList() {
+    await this.isAdmin();
+    let service = new AdminHomeService();
+    return { list: await service.getPhotoList() };
+  }
+
+  async insertPhoto() {
+    await this.isAdmin();
+    let rules = {
+      title: "string",
+      desc: "string",
+      pic: "must|string",
+      linkType: "string|default=none",
+      linkId: "string",
+      order: "int|default=9999",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminHomeService();
+    let id = await service.insertPhoto({
+      PHOTO_TITLE: input.title,
+      PHOTO_DESC: input.desc,
+      PHOTO_PIC: input.pic,
+      PHOTO_LINK_TYPE: input.linkType,
+      PHOTO_LINK_ID: input.linkId,
+      PHOTO_ORDER: input.order,
+    });
+    return { id };
+  }
+
+  async delPhoto() {
+    await this.isAdmin();
+    let rules = { id: "must|id" };
+    let input = this.validateData(rules);
+    let service = new AdminHomeService();
+    await service.delPhoto(input.id);
   }
 }
 

@@ -1,73 +1,119 @@
-<!-- [AI_START TIMESTAMP=2025-01-26 11:00:00] -->
-<!-- A00 定制首页 - 健心瑜伽馆高端定制版（与 default 标准模板完全区分） -->
+<!-- A00 定制首页 - 健心瑜伽馆（深色 + 金色主题） -->
+<cmpt-tenant-switch title="首页" navBg="#1a1a2e" />
+
 <view class="a00-home">
-
-	<!-- Hero 品牌区 -->
+	<!-- 顶部横幅 / 品牌 Hero -->
 	<view class="a00-hero">
-		<view class="a00-hero-bg"></view>
-		<view class="a00-hero-inner">
-			<view class="a00-hero-tag">✦ PREMIUM YOGA ✦</view>
-			<view class="a00-hero-brand">健心瑜伽馆</view>
-			<view class="a00-hero-slogan">高端定制瑜伽体验中心</view>
-			<view class="a00-hero-btn" bindtap="url" data-url="../../../../pages/default/calendar/index/calendar_index">
-				<text>立即约课</text>
-				<text class="a00-hero-arrow">→</text>
-			</view>
-		</view>
-	</view>
-
-	<!-- 功能入口卡片 -->
-	<view class="a00-features">
-		<view class="a00-feat-card" bindtap="url" data-url="../../../../pages/default/calendar/index/calendar_index">
-			<view class="a00-feat-icon a00-icon-1">🧘</view>
-			<view class="a00-feat-name">课程预约</view>
-		</view>
-		<view class="a00-feat-card" bindtap="url" data-url="../../../../pages/default/news/index/news_index?id=1">
-			<view class="a00-feat-icon a00-icon-2">📋</view>
-			<view class="a00-feat-name">馆内动态</view>
-		</view>
-		<view class="a00-feat-card" bindtap="url" data-url="../../../../pages/default/news/index/news_index?id=2">
-			<view class="a00-feat-icon a00-icon-3">💡</view>
-			<view class="a00-feat-name">瑜伽常识</view>
-		</view>
-		<view class="a00-feat-card" bindtap="url" data-url="../../../../pages/default/about/index/about_index">
-			<view class="a00-feat-icon a00-icon-4">🏠</view>
-			<view class="a00-feat-name">关于我们</view>
-		</view>
-	</view>
-
-	<!-- 动态资讯区 -->
-	<view class="a00-section">
-		<view class="a00-sec-header">
-			<view class="a00-sec-line"></view>
-			<view class="a00-sec-title">馆内动态</view>
-			<view class="a00-sec-line"></view>
-		</view>
-
-		<view wx:if="{{!dataList}}" class="a00-loading">
-			<van-loading size="36rpx" color="#C9A96E" type="spinner" />
-		</view>
-
-		<block wx:for="{{dataList}}" wx:key="key">
-			<view class="a00-news-card" bindtap="url" data-url="../../../../pages/default/news/detail/news_detail?id={{item._id}}">
-				<view class="a00-news-body">
-					<view class="a00-news-cate">{{item.NEWS_CATE_NAME}}</view>
-					<view class="a00-news-title">{{item.NEWS_TITLE}}</view>
-					<view class="a00-news-desc">{{item.NEWS_DESC}}</view>
-				</view>
-				<view class="a00-news-pic" wx:if="{{item.NEWS_PIC[0]}}">
-					<image mode="aspectFill" src="{{item.NEWS_PIC[0]}}" />
+		<block wx:if="{{banners.length > 0}}">
+			<swiper class="a00-banner-swiper" indicator-dots indicator-color="rgba(255,255,255,0.35)" indicator-active-color="#c9a96e" autoplay circular interval="4500" duration="500">
+				<swiper-item wx:for="{{banners}}" wx:key="_id">
+					<view class="a00-banner-item" bindtap="bindBannerTap" data-url="{{item.linkUrl}}">
+						<image class="a00-banner-img" mode="aspectFill" src="{{item.pic || skin.IMG_DEFAULT_INDEX_BG}}" />
+						<view class="a00-banner-mask" wx:if="{{item.title}}">
+							<text class="a00-banner-title">{{item.title}}</text>
+						</view>
+					</view>
+				</swiper-item>
+			</swiper>
+		</block>
+		<block wx:else>
+			<view class="a00-hero-bg"></view>
+			<view class="a00-hero-inner">
+				<view class="a00-hero-tag">✦ PREMIUM YOGA ✦</view>
+				<view class="a00-hero-brand">{{tenantName}}</view>
+				<view class="a00-hero-slogan">{{tenantDesc || '高端定制瑜伽体验中心'}}</view>
+				<view class="a00-hero-btn" bindtap="url" data-type="switch" data-url="/pages/default/calendar/index/calendar_index">
+					<text>立即约课</text>
+					<text class="a00-hero-arrow">→</text>
 				</view>
 			</view>
 		</block>
 	</view>
 
-	<!-- 底部品牌 -->
-	<view class="a00-footer">
-		<view class="a00-footer-line"></view>
-		<view class="a00-footer-text">健心瑜伽馆 · 尊享定制</view>
-		<view class="a00-footer-line"></view>
+	<!-- 搜索 + 电话 -->
+	<view class="a00-toolbar">
+		<view class="a00-search" bindtap="bindSearchTap">
+			<van-icon name="search" size="30rpx" color="#c9a96e" />
+			<text class="a00-search-text">搜索课程、老师、活动</text>
+		</view>
+		<view class="a00-phone" bindtap="bindPhoneTap">
+			<van-icon name="phone-o" size="36rpx" color="#1a1a2e" />
+		</view>
 	</view>
 
+	<!-- 功能入口 -->
+	<view class="a00-features">
+		<view class="a00-feat-card" bindtap="url" data-type="switch" data-url="/pages/default/calendar/index/calendar_index">
+			<view class="a00-feat-icon a00-icon-1">🧘</view>
+			<view class="a00-feat-name">课程预约</view>
+		</view>
+		<view class="a00-feat-card" bindtap="url" data-url="/pages/default/news/index/news_index?id=1">
+			<view class="a00-feat-icon a00-icon-2">📋</view>
+			<view class="a00-feat-name">馆内动态</view>
+		</view>
+		<view class="a00-feat-card" bindtap="url" data-url="/pages/default/news/index/news_index?id=2">
+			<view class="a00-feat-icon a00-icon-3">💡</view>
+			<view class="a00-feat-name">瑜伽常识</view>
+		</view>
+		<view class="a00-feat-card" bindtap="url" data-url="/pages/default/about/index/about_index">
+			<view class="a00-feat-icon a00-icon-4">🏠</view>
+			<view class="a00-feat-name">关于我们</view>
+		</view>
+	</view>
+
+	<!-- 公告 -->
+	<view class="a00-section" wx:if="{{announcements.length > 0}}">
+		<view class="a00-sec-header">
+			<view class="a00-sec-line"></view>
+			<view class="a00-sec-title">公告</view>
+			<view class="a00-sec-line"></view>
+		</view>
+		<view class="a00-news-card" wx:for="{{announcements}}" wx:key="_id" bindtap="bindAnnounceTap" data-id="{{item._id}}">
+			<view class="a00-news-body">
+				<view class="a00-news-cate">NOTICE</view>
+				<view class="a00-news-title text-cut">{{item.title}}</view>
+				<view class="a00-news-desc text-cut" wx:if="{{item.desc}}">{{item.desc}}</view>
+			</view>
+			<van-icon name="arrow" size="24rpx" color="rgba(201,169,110,0.6)" />
+		</view>
+	</view>
+
+	<!-- 金牌老师 -->
+	<view class="a00-section" wx:if="{{teachers.length > 0}}">
+		<view class="a00-sec-header">
+			<view class="a00-sec-line"></view>
+			<view class="a00-sec-title">金牌老师</view>
+			<view class="a00-sec-line"></view>
+		</view>
+		<scroll-view class="a00-teacher-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+			<view class="a00-teacher-list">
+				<view class="a00-teacher-card" wx:for="{{teachers}}" wx:key="_id" bindtap="bindTeacherTap" data-id="{{item._id}}">
+					<image class="a00-teacher-cover" mode="aspectFill" src="{{item.cover || item.avatar}}" />
+					<view class="a00-teacher-name text-cut">{{item.name}}</view>
+					<view class="a00-teacher-spec text-cut">{{item.specialty}}</view>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+
+	<!-- 照片墙 -->
+	<view class="a00-section" wx:if="{{photos.length > 0}}">
+		<view class="a00-sec-header">
+			<view class="a00-sec-line"></view>
+			<view class="a00-sec-title">照片墙</view>
+			<view class="a00-sec-line"></view>
+		</view>
+		<view class="a00-photo-grid">
+			<view class="a00-photo-item" wx:for="{{photos}}" wx:key="_id" bindtap="bindPhotoTap" data-index="{{index}}">
+				<image mode="aspectFill" src="{{item.pic}}" />
+				<view class="a00-photo-cap text-cut" wx:if="{{item.title}}">{{item.title}}</view>
+			</view>
+		</view>
+	</view>
+
+	<view class="a00-footer">
+		<view class="a00-footer-line"></view>
+		<view class="a00-footer-text">{{tenantName}} · 尊享定制</view>
+		<view class="a00-footer-line"></view>
+	</view>
 </view>
-<!-- [AI_END LINES=58 TIMESTAMP=2025-01-26 11:00:00] -->

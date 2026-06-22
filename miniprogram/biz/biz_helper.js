@@ -6,26 +6,29 @@
 
 const cacheHelper = require('../helper/cache_helper.js');
 const setting = require('../setting/setting.js');  
+const pageHelper = require('../helper/page_helper.js');
   
+function getListCacheKey(key) {
+	key = key.toUpperCase();
+	const pid = pageHelper.getPID() || 'ONE';
+	return pid + '_' + key + '_LIST';
+}
 
 function isCacheList(key) {
-	key = key.toUpperCase();
 	if (setting.CACHE_IS_LIST)
-		return cacheHelper.get(key + '_LIST');
+		return cacheHelper.get(getListCacheKey(key));
 	else
 		return false;
 }
 
 function removeCacheList(key) {
-	key = key.toUpperCase();
 	if (setting.CACHE_IS_LIST)
-		cacheHelper.remove(key + '_LIST');
+		cacheHelper.remove(getListCacheKey(key));
 }
 
 function setCacheList(key, time = setting.CACHE_LIST_TIME) {
-	key = key.toUpperCase();
 	if (setting.CACHE_IS_LIST)
-		cacheHelper.set(key + '_LIST', 'TRUE', time);
+		cacheHelper.set(getListCacheKey(key), 'TRUE', time);
 }
 
 

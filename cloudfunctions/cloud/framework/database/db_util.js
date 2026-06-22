@@ -359,6 +359,7 @@ async function min(collectionName, where, field) {
  * @param {*} where 
  */
 async function clear(collectionName) {
+	if (!(await isExistCollection(collectionName))) return;
 	await db.collection(collectionName).where({
 		_id: dbCmd.neq(1)
 	}).remove().then(res => {

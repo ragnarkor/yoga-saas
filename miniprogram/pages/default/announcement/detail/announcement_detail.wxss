@@ -1,0 +1,25 @@
+.announce-detail {
+  padding: 32rpx;
+  background: #fff;
+  min-height: 100vh;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #2d332e;
+  line-height: 1.5;
+}
+
+.desc {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: #8ba399;
+}
+
+.content {
+  margin-top: 32rpx;
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: #475569;
+}

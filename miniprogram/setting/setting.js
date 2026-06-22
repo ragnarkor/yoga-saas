@@ -16,6 +16,7 @@ module.exports = {
   // #### 预约相关
   MEET_CAN_NULL_TIME: false, // 是否允许有无时段的日期保存和展示
   MEET_PIC_PATH: "meet/pic/",
+  USER_PIC_PATH: "user/pic/",
 
   // ### 内容安全（与 cloud/config.js 保持一致）
   CLIENT_CHECK_CONTENT: false,

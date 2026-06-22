@@ -1,0 +1,64 @@
+.teacher-detail {
+  padding: 24rpx;
+  padding-bottom: 60rpx;
+}
+
+.hero {
+  text-align: center;
+  padding: 40rpx 24rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.hero-avatar {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.hero-name {
+  margin-top: 24rpx;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #2d332e;
+}
+
+.hero-specialty {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #5b8a72;
+}
+
+.card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #2d332e;
+  margin-bottom: 16rpx;
+}
+
+.card-text {
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: #475569;
+}
+
+.pic-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.pic-grid image {
+  width: calc(50% - 8rpx);
+  height: 200rpx;
+  border-radius: 16rpx;
+}

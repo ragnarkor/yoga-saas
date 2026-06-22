@@ -10,9 +10,14 @@ module.exports = {
   "tenant/detail": "tenant_controller@getTenantDetail",
 
   "home/setup_all": "home_controller@getSetupAll", //获取全局配置(所有)
+  "home/index": "home_controller@getHomeIndex",
+  "home/search": "home_controller@searchHome",
+  "home/teacher_detail": "home_controller@getTeacherDetail",
+  "home/announce_detail": "home_controller@getAnnounceDetail",
 
   "passport/phone": "passport_controller@getPhone",
   "passport/my_detail": "passport_controller@getMyDetail",
+  "passport/sync_profile": "passport_controller@syncProfile",
   "passport/edit_base": "passport_controller@editBase",
 
   "news/list": "news_controller@getNewsList",
@@ -49,6 +54,19 @@ module.exports = {
   "admin/setup_feature": "admin/admin_setup_controller@setupFeature#noDemo",
   "admin/setup_feature_get": "admin/admin_setup_controller@getFeature",
   // [AI_END LINES=2 TIMESTAMP=2025-01-25 12:00:00]
+
+  "admin/home_banner_list": "admin/admin_home_controller@getBannerList",
+  "admin/home_banner_insert": "admin/admin_home_controller@insertBanner#noDemo",
+  "admin/home_banner_del": "admin/admin_home_controller@delBanner#noDemo",
+  "admin/home_announce_list": "admin/admin_home_controller@getAnnounceList",
+  "admin/home_announce_insert": "admin/admin_home_controller@insertAnnounce#noDemo",
+  "admin/home_announce_del": "admin/admin_home_controller@delAnnounce#noDemo",
+  "admin/home_teacher_list": "admin/admin_home_controller@getTeacherList",
+  "admin/home_teacher_insert": "admin/admin_home_controller@insertTeacher#noDemo",
+  "admin/home_teacher_del": "admin/admin_home_controller@delTeacher#noDemo",
+  "admin/home_photo_list": "admin/admin_home_controller@getPhotoList",
+  "admin/home_photo_insert": "admin/admin_home_controller@insertPhoto#noDemo",
+  "admin/home_photo_del": "admin/admin_home_controller@delPhoto#noDemo",
 
   "admin/news_list": "admin/admin_news_controller@getNewsList",
   "admin/news_insert": "admin/admin_news_controller@insertNews#noDemo",

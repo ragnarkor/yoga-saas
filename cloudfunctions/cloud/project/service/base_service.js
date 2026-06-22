@@ -16,6 +16,10 @@ const JoinModel = require("../model/join_model.js");
 // [AI_START TIMESTAMP=2025-01-25 14:45:00]
 const TenantModel = require("../model/tenant_model.js");
 const UserModel = require("../model/user_model.js");
+const BannerModel = require("../model/banner_model.js");
+const AnnouncementModel = require("../model/announcement_model.js");
+const TeacherModel = require("../model/teacher_model.js");
+const PhotoModel = require("../model/photo_model.js");
 // [AI_END LINES=3 TIMESTAMP=2025-01-25 14:45:00]
 const config = require("../../config/config.js");
 
@@ -39,11 +43,161 @@ class BaseService {
     else return "unknow";
   }
 
+  /**
+   * 确保 config.COLLECTION_NAME 中的集合均已创建
+   */
+  async _ensureCollections() {
+    let arr = config.COLLECTION_NAME.split("|");
+    for (let k in arr) {
+      if (!(await dbUtil.isExistCollection(arr[k]))) {
+        await dbUtil.createCollection(arr[k]);
+      }
+    }
+  }
+
+  /**
+   * 写入首页演示数据（云数据库 ax_banner / ax_announcement / ax_teacher / ax_photo）
+   * @param {string} tenantName 租户/馆名
+   * @param {object} links 可选跳转：meetId、newsId、teachers[]
+   */
+  async seedHomeContent(tenantName, links = {}) {
+    const pic = "/images/default_cover_pic.gif";
+    const name = tenantName || "瑜伽馆";
+    const meetId = links.meetId || "";
+    const newsId = links.newsId || "";
+    let stats = { banners: 0, announces: 0, teachers: 0, photos: 0 };
+
+    await BannerModel.insert({
+      BANNER_TITLE: "欢迎来到" + name,
+      BANNER_TYPE: "image",
+      BANNER_PIC: pic,
+      BANNER_LINK_TYPE: "about",
+      BANNER_ORDER: 1,
+      BANNER_STATUS: 1,
+    });
+    stats.banners++;
+
+    await BannerModel.insert({
+      BANNER_TITLE: "夏季团课优惠进行中",
+      BANNER_TYPE: "image",
+      BANNER_PIC: pic,
+      BANNER_LINK_TYPE: newsId ? "news" : "none",
+      BANNER_LINK_ID: newsId,
+      BANNER_ORDER: 2,
+      BANNER_STATUS: 1,
+    });
+    stats.banners++;
+
+    await BannerModel.insert({
+      BANNER_TITLE: "热门课程 · 立即预约",
+      BANNER_TYPE: "image",
+      BANNER_PIC: pic,
+      BANNER_LINK_TYPE: meetId ? "meet" : "none",
+      BANNER_LINK_ID: meetId,
+      BANNER_ORDER: 3,
+      BANNER_STATUS: 1,
+    });
+    stats.banners++;
+
+    let announceList = [
+      {
+        ANNOUNCE_TITLE: "新会员体验课开放预约",
+        ANNOUNCE_DESC: "首次到店可预约体验课，名额有限",
+        ANNOUNCE_CONTENT: [
+          { type: "text", val: "欢迎新会员预约体验课，详情请咨询前台或致电客服。" },
+        ],
+        ANNOUNCE_ORDER: 1,
+      },
+      {
+        ANNOUNCE_TITLE: name + "日常消毒通知",
+        ANNOUNCE_DESC: "每日开课前完成场地清洁与通风",
+        ANNOUNCE_CONTENT: [
+          { type: "text", val: "为保障练习安全，本馆每日开课前完成场地清洁、器械消毒与通风。" },
+        ],
+        ANNOUNCE_ORDER: 2,
+      },
+      {
+        ANNOUNCE_TITLE: "节假日营业时间调整",
+        ANNOUNCE_DESC: "请关注最新营业安排",
+        ANNOUNCE_CONTENT: [
+          { type: "text", val: "如遇法定节假日，营业时间可能调整，请以馆内公告或电话通知为准。" },
+        ],
+        ANNOUNCE_ORDER: 3,
+      },
+    ];
+    for (let item of announceList) {
+      item.ANNOUNCE_STATUS = 1;
+      await AnnouncementModel.insert(item);
+      stats.announces++;
+    }
+
+    let teacherList = links.teachers || [
+      {
+        name: "教练小王",
+        specialty: "哈他瑜伽 · 流瑜伽",
+        desc: "10年教学经验，擅长基础与进阶课程",
+      },
+      {
+        name: "教练小李",
+        specialty: "阴瑜伽 · 普拉提",
+        desc: "注重呼吸与体式细节，适合初学者",
+      },
+      {
+        name: "教练小陈",
+        specialty: "空中瑜伽 · 核心训练",
+        desc: "国家认证教练，课程节奏清晰有趣",
+      },
+    ];
+    for (let i in teacherList) {
+      let t = teacherList[i];
+      await TeacherModel.insert({
+        TEACHER_NAME: t.name,
+        TEACHER_AVATAR: pic,
+        TEACHER_PIC: [pic, pic],
+        TEACHER_SPECIALTY: t.specialty,
+        TEACHER_DESC: t.desc,
+        TEACHER_HOME: 1,
+        TEACHER_ORDER: Number(i) + 1,
+        TEACHER_STATUS: 1,
+      });
+      stats.teachers++;
+    }
+
+    let photoList = [
+      { title: "馆舍环境", desc: "明亮舒适的练习空间" },
+      { title: "团课现场", desc: "小班教学，动作纠正更细致" },
+      { title: "私教专区", desc: "一对一定制训练方案" },
+      { title: "休息区", desc: "课后放松与茶歇" },
+      { title: "活动合影", desc: "周末主题瑜伽活动" },
+      { title: "学员分享", desc: "坚持练习，遇见更好的自己" },
+    ];
+    for (let i in photoList) {
+      let p = photoList[i];
+      await PhotoModel.insert({
+        PHOTO_TITLE: p.title,
+        PHOTO_DESC: p.desc,
+        PHOTO_PIC: pic,
+        PHOTO_LINK_TYPE: i === "1" && meetId ? "meet" : "none",
+        PHOTO_LINK_ID: i === "1" ? meetId : "",
+        PHOTO_ORDER: Number(i) + 1,
+        PHOTO_STATUS: 1,
+      });
+      stats.photos++;
+    }
+
+    return stats;
+  }
+
   async initSetup() {
+    if (globalThis.__INIT_SETUP_DONE) return;
+
     if (await dbUtil.isExistCollection("ax_setup")) {
       // mustPID=false: 跨租户全局判断是否已初始化（否则 count 会带 _pid='ONE' 过滤，导致已 seed 的多租户被误判为空）
       let setupCnt = await SetupModel.count({}, false);
-      if (setupCnt > 0) return;
+      if (setupCnt > 0) {
+        globalThis.__INIT_SETUP_DONE = true;
+        return;
+      }
     }
 
     console.log("### initSetup...");
@@ -182,8 +336,8 @@ class BaseService {
             {
               type: "line",
               title: "手机",
-              desc: "请填写您的手机号码",
-              must: true,
+              desc: "选填，便于馆里联系您",
+              must: false,
               len: 50,
               onlySet: {
                 mode: "all",
@@ -238,10 +392,11 @@ class BaseService {
       if (setupCnt == 0) {
         let data = {};
         data.SETUP_ABOUT = "关于我们";
+        data.SETUP_PHONE = "400-888-0001";
         data.SETUP_FEATURES = {
           booking: true,
           payment: false,
-          teacherManage: false,
+          teacherManage: true,
           checkin: true,
           news: true,
           selfCheckin: true,
@@ -264,17 +419,32 @@ class BaseService {
       }
     }
     // [AI_END LINES=11 TIMESTAMP=2025-01-25 14:45:00]
+
+    if (await dbUtil.isExistCollection("ax_banner")) {
+      if ((await BannerModel.count({})) == 0) {
+        await this.seedHomeContent("静心瑜伽馆");
+      }
+    }
+
+    globalThis.__INIT_SETUP_DONE = true;
   }
 
   // [AI_START TIMESTAMP=2025-01-26 10:00:00]
   async seedDemo() {
-    let result = { tenants: [], accounts: [], courses: 0, days: 0 };
+    let result = { tenants: [], accounts: [], courses: 0, days: 0, home: [] };
+
+    // ===== Step 0: 确保所有集合存在（含 ax_banner 等新增集合） =====
+    await this._ensureCollections();
 
     // ===== Step 1: 清理旧数据（全量重置，使用 clear 避免 del 空 where 报错） =====
     await JoinModel.clear();
     await DayModel.clear();
     await MeetModel.clear();
     await NewsModel.clear();
+    await BannerModel.clear();
+    await AnnouncementModel.clear();
+    await TeacherModel.clear();
+    await PhotoModel.clear();
     await SetupModel.clear();
     await UserModel.clear();
     await AdminModel.clear();
@@ -397,6 +567,7 @@ class BaseService {
       }
 
       // --- 创建新闻 ---
+      let firstNewsId = "";
       for (let j in newsArr) {
         let title = newsArr[j].split("=")[1];
         let cateId = newsArr[j].split("=")[0];
@@ -408,10 +579,12 @@ class BaseService {
         data.NEWS_ADMIN_ID = ownerId || "1";
         data.NEWS_CONTENT = [{ type: "text", val: title + "内容1" }];
         data.NEWS_PIC = ["/images/default_cover_pic.gif"];
-        await NewsModel.insert(data);
+        let newsId = await NewsModel.insert(data);
+        if (!firstNewsId) firstNewsId = newsId;
       }
 
       // --- 创建课程 + 排课 ---
+      let firstMeetId = "";
       for (let j in meetArr) {
         let title = meetArr[j].split("=")[1];
         let typeId = meetArr[j].split("=")[0];
@@ -452,8 +625,8 @@ class BaseService {
           {
             type: "line",
             title: "手机",
-            desc: "请填写您的手机号码",
-            must: true,
+            desc: "选填，便于馆里联系您",
+            must: false,
             len: 50,
             onlySet: { mode: "all", cnt: -1 },
             selectOptions: ["", ""],
@@ -463,6 +636,7 @@ class BaseService {
         ];
 
         let meetId = await MeetModel.insert(data);
+        if (!firstMeetId) firstMeetId = meetId;
         result.courses++;
 
         for (let d = 0; d < daysArr.length; d++) {
@@ -494,15 +668,38 @@ class BaseService {
       // --- 创建系统配置 ---
       let setupData = {};
       setupData.SETUP_ABOUT = "关于我们 - " + tc.name;
+      setupData.SETUP_PHONE = "400-888-0001";
       setupData.SETUP_FEATURES = {
         booking: true,
         payment: false,
-        teacherManage: false,
+        teacherManage: true,
         checkin: true,
         news: true,
         selfCheckin: true,
       };
       await SetupModel.insert(setupData);
+
+      let seedTeachers = [];
+      for (let i in tc.admins) {
+        if (tc.admins[i].type === AdminModel.TYPE.TEACHER) {
+          seedTeachers.push({
+            name: tc.admins[i].name,
+            specialty:
+              tc.admins[i].name.indexOf("张") >= 0
+                ? "空中瑜伽 · 塑形训练"
+                : tc.admins[i].name.indexOf("李") >= 0
+                  ? "阴瑜伽 · 普拉提"
+                  : "哈他瑜伽 · 流瑜伽",
+            desc: tc.name + "签约教练，欢迎预约体验课",
+          });
+        }
+      }
+      let homeStats = await this.seedHomeContent(tc.name, {
+        meetId: firstMeetId,
+        newsId: firstNewsId,
+        teachers: seedTeachers.length ? seedTeachers : undefined,
+      });
+      result.home.push({ tenant: tc.name, pid: tenantId, ...homeStats });
 
       result.tenants.push({
         name: tc.name,

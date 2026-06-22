@@ -46,7 +46,7 @@ class MeetController extends BaseController {
 		// 取得数据
 		let input = this.validateData(rules);
 
-		let cacheKey = CACHE_CALENDAR_INDEX + '_' + input.day;
+		let cacheKey = CACHE_CALENDAR_INDEX + '_' + globalThis.PID + '_' + input.day;
 		let list = await cacheUtil.get(cacheKey);
 		if (list) {
 			return list;
@@ -71,7 +71,7 @@ class MeetController extends BaseController {
 		let input = this.validateData(rules);
 
 
-		let cacheKey = CACHE_CALENDAR_HAS_DAY + '_' + input.day;
+		let cacheKey = CACHE_CALENDAR_HAS_DAY + '_' + globalThis.PID + '_' + input.day;
 		let list = await cacheUtil.get(cacheKey);
 		if (list) {
 			return list;

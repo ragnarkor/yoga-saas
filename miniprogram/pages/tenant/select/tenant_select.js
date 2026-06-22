@@ -10,9 +10,14 @@ Page({
   onLoad: function (options) {
     let pid = pageHelper.getPID();
     if (pid && !options.switch) {
-      wx.redirectTo({
-        url: pageHelper.fmtURLByPID("/pages/index/default_index"),
-      });
+      const template = pageHelper.getTemplate();
+      if (template === "default") {
+        wx.switchTab({ url: "/pages/default/index/default_index" });
+      } else {
+        wx.reLaunch({
+          url: pageHelper.fmtURLByPID("/pages/index/default_index"),
+        });
+      }
       return;
     }
     this._loadList();
@@ -41,12 +46,18 @@ Page({
     wx.showToast({
       title: "已选择「" + item.TENANT_NAME + "」",
       icon: "success",
-      duration: 1200,
+      duration: 800,
     });
+
     setTimeout(() => {
-      wx.reLaunch({
-        url: pageHelper.fmtURLByPID("/pages/index/default_index"),
-      });
-    }, 1200);
+      const template = item.TENANT_TEMPLATE || "default";
+      if (template === "default") {
+        wx.switchTab({ url: "/pages/default/index/default_index" });
+      } else {
+        wx.reLaunch({
+          url: pageHelper.fmtURLByPID("/pages/index/default_index"),
+        });
+      }
+    }, 800);
   },
 });

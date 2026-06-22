@@ -4,5 +4,6 @@
     "van-tab": "@vant/weapp/tab/index"
   },
   "enablePullDownRefresh": true,
+  "navigationStyle": "custom",
   "navigationBarTitleText": "约课"
 }

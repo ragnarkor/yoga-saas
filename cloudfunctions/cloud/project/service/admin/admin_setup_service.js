@@ -77,7 +77,18 @@ class AdminSetupService extends BaseAdminService {
   /** 获取功能开关配置 */
   async getFeature() {
     let setup = await SetupModel.getOne({}, "SETUP_FEATURES");
-    return (setup && setup.SETUP_FEATURES) || {};
+    return Object.assign(
+      {},
+      {
+        booking: true,
+        payment: false,
+        teacherManage: true,
+        checkin: true,
+        news: true,
+        selfCheckin: true,
+      },
+      (setup && setup.SETUP_FEATURES) || {},
+    );
   }
 }
 

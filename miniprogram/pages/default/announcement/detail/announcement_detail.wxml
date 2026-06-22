@@ -1,0 +1,15 @@
+<view wx:if="{{!isLoad}}" class="loading-wrap">
+  <van-loading size="48rpx" color="#5b8a72" />
+</view>
+
+<view wx:elif="{{!detail}}" class="loading-wrap">
+  <van-empty description="公告不存在" />
+</view>
+
+<view class="announce-detail" wx:else>
+  <view class="title">{{detail.title}}</view>
+  <view class="desc" wx:if="{{detail.desc}}">{{detail.desc}}</view>
+  <view class="content" wx:for="{{detail.content}}" wx:key="index">
+    <text wx:if="{{item.type=='text'}}">{{item.val}}</text>
+  </view>
+</view>

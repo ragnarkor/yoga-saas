@@ -1,96 +1,117 @@
-<!-- [AI_START TIMESTAMP=2025-01-25 14:55:00] -->
 <template name="meetDetailTpl">
-	<!-- 加载中 -->
 	<view wx:if="{{isLoad===false}}" class="loading-wrap">
 		<van-loading size="48rpx" color="#5b8a72" type="spinner" />
 	</view>
-	<!-- 不存在 -->
 	<van-empty wx:if="{{isLoad===null}}" description="课程不存在" />
 
-	<view wx:if="{{isLoad}}" class="main">
-
-		<view class="top-area">
-			<view class="top-title text-cut">{{meet.MEET_TITLE}}</view>
-			<view class="top-menu">
-				<view bindtap="bindShowMindTap" class="item {{showMind?'cur text-project':''}}"><text class="icon-friend margin-right-xxs"></text>{{skin.MEET_NAME}}须知</view>
-				<view bindtap="bindShowTimeTap" class="item {{showTime?'cur text-project':''}}"><text class="icon-remind margin-right-xxs"></text>可预约时段</view>
+	<view wx:if="{{isLoad}}" class="md-page">
+		<!-- 课程概要 -->
+		<view class="md-summary card-project shadow-project">
+			<image class="md-cover" src="{{coverPic}}" mode="aspectFill" />
+			<view class="md-summary-body">
+				<view class="md-title-row">
+					<text class="md-title">{{meet.MEET_TITLE}}</text>
+					<text class="md-limit-tag">{{limitHint}}</text>
+				</view>
+				<view class="md-seat-row">
+					<view class="md-progress-track">
+						<view class="md-progress-bar" style="width: {{seatPercent}}%;"></view>
+					</view>
+					<text class="md-seat-text">{{seatText}}</text>
+				</view>
+				<view class="md-level-row">
+					<text class="md-meta-label">难度/级别</text>
+					<view class="md-stars">
+						<text wx:for="{{levelStars}}" wx:key="index" class="md-star {{item ? 'on' : ''}}">★</text>
+					</view>
+				</view>
 			</view>
 		</view>
 
-		<view class="big-box">
-			<block wx:if="{{showMind}}">
-				<view class="article-box padding-project">
+		<!-- 上课信息 -->
+		<view class="md-info card-project shadow-project">
+			<view class="md-info-item">
+				<text class="md-info-label">上课时间</text>
+				<text class="md-info-value">{{classTimeText}}</text>
+			</view>
+			<view class="md-info-item">
+				<text class="md-info-label">上课地点</text>
+				<text class="md-info-value">{{locationText}}</text>
+			</view>
+			<view class="md-info-item">
+				<text class="md-info-label">授课老师</text>
+				<text class="md-info-value">{{coachName}}</text>
+			</view>
+		</view>
 
-					<view class="article card-project shadow-project margin-top" wx:if="{{meet.MEET_CONTENT && meet.MEET_CONTENT.length>0}}">
-						<block wx:for="{{meet.MEET_CONTENT}}" wx:key="key">
-							<view class="content" wx:if="{{item.type=='text'}}">
-								<text user-select="{{true}}">{{item.val}}</text>
-							</view>
-
-							<view class="pics" wx:if="{{item.type=='img'}}">
-								<image bindtap="url" data-type='img' data-url="{{item.val}}" show-menu-by-longpress="{{true}}" class="loading" mode='widthFix' lazy-load="true" src="{{item.val}}">
-								</image>
-							</view>
-						</block>
+		<!-- 时段选择 -->
+		<view class="md-times card-project shadow-project" wx:if="{{meet.MEET_DAYS_SET && meet.MEET_DAYS_SET.length > 0}}">
+			<view class="md-section-title">选择时段</view>
+			<scroll-view wx:if="{{meet.MEET_DAYS_SET.length > 1}}" class="md-day-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+				<view class="md-day-list">
+					<view wx:for="{{meet.MEET_DAYS_SET}}" wx:key="day"
+						class="md-day-chip {{selectedDayIdx === index ? 'active' : ''}}"
+						bindtap="bindSelectDayTap" data-dayidx="{{index}}">
+						{{item.dayDesc || item.day}}
 					</view>
 				</view>
-			</block>
-
-			<block wx:if="{{showTime}}">
-				<van-empty wx:if="{{!meet.MEET_DAYS_SET || meet.MEET_DAYS_SET.length == 0}}" description="暂无可预约时段，请选择其他" />
-
-				<view wx:if="{{meet.MEET_DAYS_SET && meet.MEET_DAYS_SET.length > 0}}" class="vertical-box">
-					<!-- left begin -->
-					<scroll-view class="vertical-nav nav" scroll-y scroll-with-animation scroll-top="{{verticalNavTop}}" style="height:calc(100vh - 193rpx);">
-						<view class="item text-cut  {{index==tabCur?'cur text-project':''}}" wx:for="{{meet.MEET_DAYS_SET}}" wx:key="key" bindtap='bindTabSelectTap' data-idx="{{index}}" wx:if="{{item.times.length>0||canNullTime}}">
-							{{item.day}}
-						</view>
-					</scroll-view>
-					<!-- left END -->
-
-					<!-- right begin -->
-					<scroll-view class="vertical-main" scroll-y scroll-with-animation style="height:calc(100vh - 193rpx)" scroll-into-view="main-{{mainCur}}" bindscroll="bindVerticalMainScroll">
-
-						<view class="vertical-main-box" wx:for="{{meet.MEET_DAYS_SET}}" wx:if="{{item.times.length>0||canNullTime}}" wx:key="key" id="main-{{index}}">
-
-							<view class="bar solid-bottom bg-white righ-tab-bar">
-								<view class="action right-tab-tilte text-black">
-									{{item.dayDesc}}
-								</view>
-							</view>
-
-							<!-- 时段列表 begin -->
-							<view class="text-list">
-								<view class="item text-grey" wx:if="{{item.times.length==0&&canNullTime}}">暂无可预约时段</view>
-
-								<view class="item" bindtap="bindJoinTap" data-dayidx="{{index}}" data-timeidx="{{idx}}" wx:for="{{item.times}}" wx:key="key" wx:for-item="itm" wx:for-index="idx">
-									<view class="time-text limit {{itm.error?'error':''}}">
-										<text>{{itm.start}}～{{itm.end}}</text>
-										<block wx:if="{{!itm.error}}">
-											<text wx:if="{{meet.MEET_IS_SHOW_LIMIT==1&&itm.isLimit}}" class="limit-text">({{itm.stat.succCnt}}<text style="margin:0 5rpx">/</text>{{itm.limit}})</text>
-											<text wx:if="{{meet.MEET_IS_SHOW_LIMIT==1&&!itm.isLimit}}" class='limit-text'>(人数不限)</text>
-											<text wx:if="{{meet.MEET_IS_SHOW_LIMIT==0}}" class='limit-text'>(可预约)</text>
-										</block>
-										<block wx:else><text class="limit-text">({{itm.error}})</text></block>
-									</view>
-
-								</view>
-							</view>
-							<!-- 时段列表 END -->
-
-						</view>
-
-					</scroll-view>
-					<!-- right END -->
+			</scroll-view>
+			<view class="md-time-grid">
+				<view wx:for="{{currentDayTimes}}" wx:key="mark"
+					class="md-time-chip {{selectedTimeIdx === index ? 'active' : ''}} {{item.error ? 'disabled' : ''}}"
+					bindtap="bindSelectTimeTap" data-timeidx="{{index}}">
+					<text class="md-time-range">{{item.start}}–{{item.end}}</text>
+					<text wx:if="{{item.isLimit && meet.MEET_IS_SHOW_LIMIT==1}}" class="md-time-limit">
+						{{item.stat.succCnt || 0}}/{{item.limit}}
+					</text>
+					<text wx:elif="{{item.error}}" class="md-time-limit">{{item.error}}</text>
 				</view>
+			</view>
+		</view>
+
+		<!-- 注意事项 -->
+		<view class="md-notes">
+			<view class="md-notes-title">注意事项</view>
+			<view wx:for="{{bookNotes}}" wx:key="index" class="md-note-item">
+				<text class="md-note-num">{{index + 1}}.</text>
+				<text class="md-note-text">{{item}}</text>
+			</view>
+		</view>
+
+		<!-- 课程介绍 -->
+		<view class="md-intro card-project shadow-project">
+			<view class="md-intro-head">
+				<text class="md-intro-line"></text>
+				<text class="md-intro-title">课程介绍</text>
+				<text class="md-intro-line"></text>
+			</view>
+			<swiper wx:if="{{introPics.length > 0}}" class="md-intro-swiper" indicator-dots circular autoplay interval="4000">
+				<swiper-item wx:for="{{introPics}}" wx:key="index">
+					<image class="md-intro-img" src="{{item}}" mode="aspectFill"
+						bindtap="url" data-type="img" data-url="{{item}}" show-menu-by-longpress="{{true}}" />
+				</swiper-item>
+			</swiper>
+			<view wx:if="{{introText}}" class="md-intro-text">{{introText}}</view>
+			<block wx:if="{{meet.MEET_CONTENT && meet.MEET_CONTENT.length > 0}}">
+				<block wx:for="{{meet.MEET_CONTENT}}" wx:key="key">
+					<view wx:if="{{item.type=='text'}}" class="md-intro-text">{{item.val}}</view>
+					<image wx:if="{{item.type=='img'}}" class="md-intro-img-block"
+						bindtap="url" data-type="img" data-url="{{item.val}}"
+						mode="widthFix" lazy-load src="{{item.val}}" show-menu-by-longpress="{{true}}" />
+				</block>
 			</block>
 		</view>
 
+		<view class="md-bottom-spacer"></view>
+
+		<!-- 底部预约 -->
+		<view class="md-footer">
+			<button
+				class="md-book-btn {{bookDisabled || submitting ? 'disabled' : ''}}"
+				bindtap="bindBookTap"
+				disabled="{{bookDisabled || submitting}}">
+				{{submitting ? '预约中...' : bookBtnText}}
+			</button>
+		</view>
 	</view>
-
-	<!-- top begin -->
-	<van-button wx:if="{{topShow}}" custom-class="btn-top-fixed" bindtap="bindTopTap" icon="arrow-up" size="small" round />
-	<!-- top END. -->
-
 </template>
-<!-- [AI_END LINES=96 TIMESTAMP=2025-01-25 14:55:00] -->

@@ -7,11 +7,9 @@
     "pages/default/about/contact/about_contact",
     "pages/default/calendar/index/calendar_index",
     "pages/default/meet/index/meet_index",
-    "pages/default/meet/join/meet_join",
     "pages/default/meet/detail/meet_detail",
     "pages/default/meet/self/meet_self",
     "pages/default/my/index/my_index",
-    "pages/default/my/edit/my_edit",
     "pages/default/my/join/my_join",
     "pages/default/my/join_detail/my_join_detail",
     "pages/default/news/index/news_index",
@@ -19,6 +17,9 @@
     "pages/default/news/cate1/news_cate1",
     "pages/default/news/cate2/news_cate2",
     "pages/default/search/search",
+    "pages/default/search/home_result",
+    "pages/default/teacher/detail/teacher_detail",
+    "pages/default/announcement/detail/announcement_detail",
 
     "projects/A00/index/default_index",
 
@@ -28,6 +29,7 @@
     "cmpts/public/form/form_set/field/form_set_field",
     "pages/admin/index/tenant/admin_tenant",
     "pages/admin/index/home/admin_home",
+    "pages/admin/home/content/admin_home_content",
     "pages/admin/index/login/admin_login",
     "pages/admin/content/admin_content",
     "pages/admin/meet/content/admin_meet_content",
@@ -89,6 +91,7 @@
     "weui": true
   },
   "usingComponents": {
+    "cmpt-tenant-switch": "/cmpts/biz/tenant_switch/tenant_switch_cmpt",
     "cmpt-comm-list": "/cmpts/public/list/comm_list_cmpt",
     "cmpt-picker": "/cmpts/public/picker/picker_cmpt",
     "cmpt-modal": "/cmpts/public/modal/modal_cmpt",

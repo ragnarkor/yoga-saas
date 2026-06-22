@@ -31,8 +31,8 @@ module.exports = {
     {
       type: "line",
       title: "手机",
-      desc: "请填写您的手机号码",
-      must: true,
+      desc: "选填，便于馆里联系您",
+      must: false,
       len: 50,
       onlySet: { mode: "all", cnt: -1 },
       selectOptions: ["", ""],

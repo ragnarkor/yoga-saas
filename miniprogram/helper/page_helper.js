@@ -10,6 +10,7 @@ const cacheHelper = require("./cache_helper.js");
 const picHelper = require("./pic_helper.js");
 const CACHE_SKIN = "SKIN_PID";
 const CACHE_TENANT = "CACHE_TENANT";
+const CACHE_TENANT_INFO = "CACHE_TENANT_INFO";
 const CACHE_TEMPLATE = "CACHE_TENANT_TEMPLATE";
 const tenantPages = require("../projects/page_registry.js");
 const skinDefault = require("../pages/default/skin/skin.js");
@@ -33,12 +34,19 @@ function getSkin() {
 
 /** 设置租户上下文（PID + 模板） */
 function setTenant(pid, template) {
+  let tenantInfo = null;
   if (typeof pid === "object" && pid !== null) {
+    tenantInfo = pid;
     template = pid.TENANT_TEMPLATE || pid.template || "default";
     pid = pid._pid || pid.pid;
   }
   cacheHelper.set(CACHE_TENANT, pid, 86400 * 365);
   cacheHelper.set(CACHE_TEMPLATE, template || "default", 86400 * 365);
+  cacheHelper.set(
+    CACHE_TENANT_INFO,
+    tenantInfo || { _pid: pid, TENANT_TEMPLATE: template || "default" },
+    86400 * 365,
+  );
 }
 
 /** 设置当前选中的租户PID（多租户模式） */
@@ -49,6 +57,7 @@ function setPID(pid, template) {
 /** 清除当前租户上下文 */
 function clearPID() {
   cacheHelper.remove(CACHE_TENANT);
+  cacheHelper.remove(CACHE_TENANT_INFO);
   cacheHelper.remove(CACHE_TEMPLATE);
 }
 
@@ -59,6 +68,17 @@ function getPID() {
   if (tenantPid) return tenantPid;
 
   return "";
+}
+
+function getTenantInfo() {
+  return cacheHelper.get(CACHE_TENANT_INFO) || null;
+}
+
+function getTenantName() {
+  const tenant = getTenantInfo();
+  if (tenant?.TENANT_NAME) return tenant.TENANT_NAME;
+  const pid = getPID();
+  return pid || "选择瑜伽馆";
 }
 
 /** 标准化页面相对路径，如 index/default_index */
@@ -685,6 +705,7 @@ function url(e, that) {
     }
     case "redirect": {
       if (!url) return;
+      url = fmtURLByPID(url);
       wx.redirectTo({
         url,
       });
@@ -693,6 +714,7 @@ function url(e, that) {
     case "reLaunch":
     case "relaunch": {
       if (!url) return;
+      url = fmtURLByPID(url);
       wx.reLaunch({
         url,
       });
@@ -791,6 +813,7 @@ function url(e, that) {
     }
     default:
       if (!url) return;
+      url = fmtURLByPID(url);
       wx.navigateTo({
         url,
       });
@@ -924,6 +947,8 @@ module.exports = {
   setPID,
   clearPID,
   getPID,
+  getTenantInfo,
+  getTenantName,
   fmtImgUrl,
   fmtURLByPID,
 

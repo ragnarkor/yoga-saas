@@ -23,19 +23,43 @@ class PassportController extends BaseController {
 
 		// 数据校验
 		let rules = {
-			cloudID: 'must|string|min:1|max:200|name=cloudID',
+			cloudID: 'string|max:200|name=cloudID',
+			code: 'string|max:200|name=code',
 		};
 
 		// 取得数据
 		let input = this.validateData(rules);
 
+		if (!input.cloudID && !input.code) {
+			this.AppError('缺少手机号授权凭证');
+		}
 
 		let service = new PassportService();
-		return await service.getPhone(input.cloudID);
+		return await service.getPhone(input.cloudID, input.code);
 	}
 
 
 
+
+	/** 同步微信资料（昵称 / 头像 / 手机号） */
+	async syncProfile() {
+		let rules = {
+			name: 'string|max:30|name=昵称',
+			mobile: 'string|max:20|name=手机',
+			pic: 'string|max:5000|name=头像',
+			cloudID: 'string|max:200|name=cloudID',
+			code: 'string|max:200|name=code',
+		};
+
+		let input = this.validateData(rules);
+
+		if (input.name) {
+			await contentCheck.checkTextMultiClient({ name: input.name });
+		}
+
+		let service = new PassportService();
+		return await service.syncProfile(this._userId, input);
+	}
 
 	/** 修改用户资料 */
 	async editBase() {

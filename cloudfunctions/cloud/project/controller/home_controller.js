@@ -1,30 +1,50 @@
 /**
  * Notes: 全局或者主页模块控制器
- * Date: 2020-11-05 10:20:00
  */
 
 const BaseController = require("./base_controller.js");
 const HomeService = require("../service/home_service.js");
-const timeUtil = require("../../framework/utils/time_util.js");
-const config = require("../../config/config.js");
 
 class HomeController extends BaseController {
-  /** 获取所有配置 */
   async getSetupAll() {
-    // 数据校验
     let rules = {};
-
-    // 取得数据
-    let input = this.validateData(rules);
+    this.validateData(rules);
 
     let service = new HomeService();
-    // [AI_START TIMESTAMP=2025-01-25 12:00:00]
     let result = await service.getSetup(
       "SETUP_ABOUT,SETUP_ABOUT_PIC,SETUP_ADDRESS,SETUP_OFFICE_PIC,SETUP_PHONE,SETUP_SERVICE_PIC,SETUP_FEATURES",
     );
-    // [AI_END LINES=1 TIMESTAMP=2025-01-25 12:00:00]
-
     return result;
+  }
+
+  async getHomeIndex() {
+    let rules = {};
+    this.validateData(rules);
+    let service = new HomeService();
+    return await service.getHomeIndex();
+  }
+
+  async searchHome() {
+    let rules = {
+      keyword: "must|string|min:1|max:30|name=搜索关键词",
+    };
+    let input = this.validateData(rules);
+    let service = new HomeService();
+    return await service.searchHome(input.keyword);
+  }
+
+  async getTeacherDetail() {
+    let rules = { id: "must|id" };
+    let input = this.validateData(rules);
+    let service = new HomeService();
+    return await service.getTeacherDetail(input.id);
+  }
+
+  async getAnnounceDetail() {
+    let rules = { id: "must|id" };
+    let input = this.validateData(rules);
+    let service = new HomeService();
+    return await service.getAnnounceDetail(input.id);
   }
 }
 
