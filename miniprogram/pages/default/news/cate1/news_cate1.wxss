@@ -1,4 +1,2 @@
-@import "../../../../style/project/base/appt.wxss";
-@import "../../skin/skin.wxss"; 
-@import "../../../../style/project/news_index_base.wxss";  
- 
+@import "../../skin/skin.wxss";
+@import "./my_course.wxss";

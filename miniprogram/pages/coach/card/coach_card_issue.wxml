@@ -1,0 +1,36 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page issue-page">
+  <coach-tenant-switch
+    title="发卡"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+  />
+
+  <view class="issue-form">
+    <van-cell-group>
+      <van-field label="卡名称" value="{{form.name}}" placeholder="如：一次卡" bind:change="bindFieldChange" data-field="name" />
+      <van-cell title="卡类型" value="{{form.typeLabel}}" />
+      <van-cell title="新增方式" value="发新卡" />
+      <van-field label="有效期(天)" type="number" value="{{form.days}}" bind:change="bindFieldChange" data-field="days" />
+      <van-field label="售价(元)" type="number" value="{{form.price}}" bind:change="bindFieldChange" data-field="price" />
+      <van-field wx:if="{{form.type === 'times'}}" label="额度(次)" type="number" value="{{form.quota}}" bind:change="bindFieldChange" data-field="quota" />
+      <van-cell title="激活方式" is-link value="{{form.activateLabel}}" bind:click="bindActivateTap" />
+      <van-cell title="归属教练" is-link value="{{form.coachName || '请选择'}}" bind:click="bindCoachTap" />
+      <van-field
+        label="备注"
+        type="textarea"
+        value="{{form.memo}}"
+        placeholder="选填（最多50字）"
+        maxlength="50"
+        autosize
+        bind:change="bindFieldChange"
+        data-field="memo"
+      />
+    </van-cell-group>
+  </view>
+
+  <view class="issue-footer">
+    <van-button block round color="{{themeColor}}" bind:click="bindSubmitTap">确定发卡</van-button>
+  </view>
+</view>

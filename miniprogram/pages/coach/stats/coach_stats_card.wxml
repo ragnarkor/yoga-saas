@@ -1,0 +1,45 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page stats-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view wx:if="{{loading}}" class="stats-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <view class="stats-section">
+      <view class="stats-section-title">整体数据</view>
+      <view class="stats-table-head">
+        <view class="stats-col-name"></view>
+        <view class="stats-col-num">总数量</view>
+        <view class="stats-col-amt">总额度</view>
+      </view>
+      <view class="stats-table-row" wx:for="{{summary}}" wx:key="key">
+        <view class="stats-col-name">{{item.label}}</view>
+        <view class="stats-col-num">{{item.count}}张</view>
+        <view class="stats-col-amt">{{item.amountText}}</view>
+      </view>
+    </view>
+
+    <view class="stats-section">
+      <view class="stats-section-title">细分数据</view>
+      <view class="stats-table-head">
+        <view class="stats-col-name">名称</view>
+        <view class="stats-col-num">数量</view>
+        <view class="stats-col-amt">额度</view>
+      </view>
+      <view wx:if="{{detail.length === 0}}" class="stats-empty">暂无数据</view>
+      <view class="stats-table-row" wx:for="{{detail}}" wx:key="name">
+        <view class="stats-col-name text-cut">{{item.name}}</view>
+        <view class="stats-col-num">{{item.count}}张</view>
+        <view class="stats-col-amt">{{item.amountText}}</view>
+      </view>
+    </view>
+  </block>
+</view>

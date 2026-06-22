@@ -15,7 +15,7 @@
   justify-content: space-between;
   padding-left: 28rpx;
   padding-right: 190rpx;
-  background: #5b8a72;
+  background: var(--projectColor, #5b8a72);
   color: #fff;
   box-shadow: 0 6rpx 18rpx rgba(45, 85, 64, 0.12);
 }

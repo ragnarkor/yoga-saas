@@ -134,7 +134,7 @@ class AdminWxService extends BaseAdminService {
         _pid: ["in", pidList],
         TENANT_STATUS: TenantModel.STATUS.OPEN,
       },
-      "_pid,TENANT_ID,TENANT_NAME,TENANT_LOGO,TENANT_TEMPLATE",
+      "_pid,TENANT_ID,TENANT_NAME,TENANT_LOGO,TENANT_TEMPLATE,TENANT_MEET_TYPE,TENANT_MEET_NAME,TENANT_THEME_COLOR",
       { TENANT_ADD_TIME: "asc" },
       100,
       false,
@@ -261,7 +261,7 @@ class AdminWxService extends BaseAdminService {
 
     let tenant = await TenantModel.getOne(
       { _pid: admin._pid },
-      "_pid,TENANT_NAME,TENANT_TEMPLATE",
+      "_pid,TENANT_NAME,TENANT_TEMPLATE,TENANT_THEME_COLOR",
       {},
       false,
     );

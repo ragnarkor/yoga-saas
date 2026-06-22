@@ -1,0 +1,112 @@
+.panel {
+  padding: 32rpx 24rpx calc(32rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.panel-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.panel-close {
+  padding: 8rpx;
+}
+
+.panel-loading {
+  padding: 80rpx 0;
+  display: flex;
+  justify-content: center;
+}
+
+.invite-poster {
+  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 45%);
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+
+.invite-poster-head {
+  padding: 32rpx 32rpx 12rpx;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #6366f1;
+}
+
+.invite-poster-body {
+  display: flex;
+  justify-content: center;
+  padding: 12rpx 32rpx 8rpx;
+}
+
+.invite-qr {
+  width: 320rpx;
+  height: 320rpx;
+  background: #fff;
+  border-radius: 16rpx;
+}
+
+.invite-qr-placeholder {
+  width: 320rpx;
+  height: 320rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.invite-poster-hint {
+  text-align: center;
+  font-size: 24rpx;
+  color: #666;
+  padding: 8rpx 32rpx 20rpx;
+}
+
+.invite-poster-foot {
+  background: #6366f1;
+  color: #fff;
+  text-align: center;
+  font-size: 28rpx;
+  padding: 18rpx 32rpx;
+}
+
+.invite-actions {
+  display: flex;
+  justify-content: center;
+  gap: 80rpx;
+  padding: 28rpx 0 12rpx;
+}
+
+.invite-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 24rpx;
+  color: #666;
+  background: transparent;
+  border: none;
+  padding: 0;
+  line-height: 1.2;
+}
+
+.invite-action-btn::after {
+  border: none;
+}
+
+.invite-tip {
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+  padding-bottom: 8rpx;
+}

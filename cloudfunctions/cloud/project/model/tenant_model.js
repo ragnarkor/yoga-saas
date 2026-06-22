@@ -17,6 +17,11 @@ TenantModel.DB_STRUCTURE = {
   TENANT_DESC: "string|false|comment=简介",
   TENANT_TEMPLATE: "string|true|default=default|comment=页面模板ID，如 default/A00",
   TENANT_STATUS: "int|true|default=1|comment=0=关闭 1=开放",
+  TENANT_MEET_TYPE:
+    "string|false|comment=课程分类配置，格式 1=特色课程|leftbig3,2=精品课|leftbig2",
+  TENANT_MEET_NAME: "string|false|default=约课|comment=预约功能名称",
+  TENANT_THEME_COLOR:
+    "string|false|comment=品牌主题色，如 #5B8A72，会员端与教练端共用",
 
   TENANT_ADD_TIME: "int|true",
   TENANT_EDIT_TIME: "int|true",

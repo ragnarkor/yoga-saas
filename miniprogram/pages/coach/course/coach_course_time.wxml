@@ -1,0 +1,30 @@
+<page-meta page-style="{{themeStyle}}" />
+<import src="../../../tpls/project/meet_time_vant_tpl.wxml" />
+<view class="coach-page">
+  <coach-tenant-switch title="预约时间" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
+  <template
+    is="meetTimeVantTpl"
+    data="{{
+      themeCoach,
+      calendarColor,
+      minDate,
+      calendarDefaultDate,
+      lastHasDays,
+      days,
+      curTimeLimitModalShow,
+      curTimeIsLimit,
+      curTimeLimit,
+      saveTempModalShow,
+      formTempName,
+      cancelModalShow,
+      formReason,
+      timePickerShow,
+      timePickerValue,
+      dayActionShow,
+      dayActions,
+      timeSetActionShow,
+      timeSetActions,
+      topShow
+    }}"
+  />
+</view>

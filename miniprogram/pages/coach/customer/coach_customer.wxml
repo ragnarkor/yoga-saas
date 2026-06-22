@@ -1,13 +1,19 @@
+<page-meta page-style="{{themeStyle}}" />
 <view class="coach-page">
-  <coach-tenant-switch title="客户" bind:change="bindCoachTenantChange" />
+  <coach-tenant-switch title="客户" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" bind:change="bindCoachTenantChange" />
 
-  <view class="coach-header coach-header-compact"></view>
+  <view class="coach-customer-wrap">
+    <view class="coach-welcome">
+      <text class="coach-welcome-title">客户洞察</text>
+      <text class="coach-welcome-sub">会员与持卡情况一览</text>
+    </view>
 
-  <view class="coach-customer-grid">
-    <view class="coach-customer-card" wx:for="{{cards}}" wx:key="label" bindtap="onCardTap">
-      <van-icon name="{{item.icon}}" color="#c4b5fd" size="40rpx" />
-      <view class="coach-customer-num">{{item.num}}</view>
-      <view class="coach-customer-label">{{item.label}}</view>
+    <view class="coach-customer-grid">
+      <view class="coach-customer-card" wx:for="{{cards}}" wx:key="label" bindtap="onCardTap" data-key="{{item.key}}">
+        <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
+        <view class="coach-customer-num">{{item.num}}</view>
+        <view class="coach-customer-label">{{item.label}}</view>
+      </view>
     </view>
   </view>
 

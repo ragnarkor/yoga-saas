@@ -1,0 +1,58 @@
+.meet-time-page {
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+}
+
+.meet-time-page--coach {
+  background: #f5f3f8;
+  min-height: 100vh;
+}
+
+.meet-time-slot-del {
+  padding: 8rpx 32rpx 16rpx;
+}
+
+.meet-time-bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
+}
+
+.meet-time-bottom van-button {
+  flex: 1;
+}
+
+.meet-time-popup {
+  padding: 32rpx;
+}
+
+.meet-time-popup-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24rpx;
+  color: #333;
+}
+
+.meet-time-popup-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 16rpx;
+}
+
+.meet-time-popup-actions van-button {
+  flex: 1;
+}
+
+.meet-time-top-btn {
+  position: fixed !important;
+  right: 32rpx;
+  bottom: calc(160rpx + env(safe-area-inset-bottom));
+  z-index: 99;
+}

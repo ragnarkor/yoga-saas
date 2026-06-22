@@ -116,7 +116,8 @@ Page({
 		let temps = this.data.temps[curIdx].TEMP_TIMES;
 		let name = this.data.temps[curIdx].TEMP_NAME;
 
-		let parent = pageHelper.getPrevPage(2);
+		let parent = pageHelper.getPrevPage(1);
+		if (!parent || !parent.data.days) parent = pageHelper.getPrevPage(2);
 		if (!parent) return;
 		let days = parent.data.days;
 		let day = days[parent.data.curIdx].day;

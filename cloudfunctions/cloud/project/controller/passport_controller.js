@@ -82,6 +82,17 @@ class PassportController extends BaseController {
 		return await service.editBase(this._userId, input);
 	}
 
+	/** 用户接受邀请，加入瑜伽馆 */
+	async joinTenant() {
+		let rules = {
+			code: 'must|string|min:8|max:32|name=邀请码',
+		};
+		let input = this.validateData(rules);
+		const MemberInviteService = require('../service/member_invite_service.js');
+		let service = new MemberInviteService();
+		return await service.joinTenant(this._userId, input.code);
+	}
+
 }
 
 module.exports = PassportController;

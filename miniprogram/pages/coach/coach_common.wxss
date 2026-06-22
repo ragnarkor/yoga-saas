@@ -1,78 +1,106 @@
-/** 教练版公共样式 */
+/** 教练版公共样式：主题色仅用于顶栏、选中态与图标点缀 */
 .coach-page {
   min-height: 100vh;
-  background: #f5f3f8;
+  background: var(--neutralBg, #f5f6f8);
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
-.coach-header {
-  position: relative;
-  padding: 24rpx 32rpx 120rpx;
-  background: linear-gradient(160deg, #c4b5fd 0%, #ddd6fe 40%, #f5d0fe 100%);
+/* ==================== 首页 ==================== */
+.coach-home-body {
+  padding: 24rpx 24rpx 0;
 }
 
-.coach-header-title {
-  text-align: center;
-  font-size: 34rpx;
-  font-weight: 600;
-  color: #fff;
-  padding-top: 8rpx;
+.coach-welcome {
+  padding: 8rpx 8rpx 20rpx;
 }
 
-.coach-header-compact {
-  padding: 16rpx 32rpx 72rpx;
+.coach-welcome-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--neutralText, #1f2329);
+  line-height: 1.35;
 }
 
-.coach-header-sub {
-  text-align: center;
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.85);
+.coach-welcome-sub {
+  display: block;
   margin-top: 8rpx;
+  font-size: 26rpx;
+  color: var(--neutralTextTertiary, #8f959e);
 }
 
 .coach-stats-card {
-  margin: -80rpx 24rpx 24rpx;
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 32rpx 16rpx;
+  background: var(--neutralSurface, #fff);
+  border-radius: 20rpx;
+  padding: 28rpx 0;
   display: flex;
-  box-shadow: 0 8rpx 32rpx rgba(155, 111, 212, 0.12);
+  margin-bottom: 20rpx;
+  border: 1rpx solid var(--neutralBorder, #e8e9eb);
+  box-shadow: 0 4rpx 24rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
 }
 
 .coach-stat-item {
   flex: 1;
   text-align: center;
+  position: relative;
+}
+
+.coach-stat-item + .coach-stat-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 18%;
+  height: 64%;
+  width: 1rpx;
+  background: var(--neutralBorder, #e8e9eb);
 }
 
 .coach-stat-num {
   font-size: 44rpx;
   font-weight: 700;
-  color: #333;
+  color: var(--themeColor, #5b8a72);
+  line-height: 1.2;
 }
 
 .coach-stat-label {
   font-size: 24rpx;
-  color: #888;
+  color: var(--neutralTextTertiary, #8f959e);
   margin-top: 8rpx;
 }
 
 .coach-section {
-  margin: 0 24rpx 24rpx;
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 24rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+  margin-bottom: 20rpx;
+  background: var(--neutralSurface, #fff);
+  border-radius: 20rpx;
+  padding: 24rpx 20rpx 12rpx;
+  border: 1rpx solid var(--neutralBorder, #e8e9eb);
+  box-shadow: 0 4rpx 24rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
+}
+
+.coach-section-head {
+  padding: 0 8rpx 16rpx;
+}
+
+.coach-section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--neutralText, #1f2329);
+}
+
+.coach-section-desc {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--neutralTextTertiary, #8f959e);
 }
 
 .coach-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20rpx;
 }
 
 .coach-grid-3 .coach-grid-item {
-  width: calc(33.33% - 14rpx);
+  width: 33.33%;
 }
 
 .coach-grid-item {
@@ -81,117 +109,162 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24rpx 8rpx;
-  border-radius: 20rpx;
-  background: #faf8fc;
+  padding: 20rpx 8rpx 24rpx;
+  border-radius: 16rpx;
+  transition: background 0.15s ease;
+}
+
+.coach-grid-item:active {
+  background: var(--neutralIconBg, #f2f3f5);
 }
 
 .coach-grid-icon {
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 20rpx;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 22rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 12rpx;
+  background: var(--neutralIconBg, #f2f3f5);
 }
 
 .coach-grid-text {
   font-size: 24rpx;
-  color: #333;
+  color: var(--neutralTextSecondary, #646a73);
   text-align: center;
+  line-height: 1.35;
+}
+
+/* ==================== 兼容旧页头（客户/营销等） ==================== */
+.coach-header {
+  display: none;
+}
+
+.coach-header-title {
+  text-align: center;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #fff;
+}
+
+.coach-header-compact {
+  display: none;
 }
 
 .coach-notice {
-  margin: 0 24rpx 24rpx;
-  background: #fff;
+  margin-bottom: 20rpx;
+  background: var(--neutralSurface, #fff);
   border-radius: 16rpx;
   padding: 20rpx 24rpx;
   display: flex;
   align-items: center;
   gap: 16rpx;
   font-size: 26rpx;
-  color: #666;
+  color: var(--neutralTextSecondary, #646a73);
+  border: 1rpx solid var(--neutralBorder, #e8e9eb);
 }
 
 .coach-notice-time {
   margin-left: auto;
   font-size: 22rpx;
-  color: #aaa;
+  color: var(--neutralTextTertiary, #8f959e);
   flex-shrink: 0;
+}
+
+/* ==================== 客户页 ==================== */
+.coach-customer-wrap {
+  padding: 24rpx;
 }
 
 .coach-customer-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20rpx;
-  padding: 24rpx;
+  gap: 16rpx;
 }
 
 .coach-customer-card {
-  width: calc(33.33% - 14rpx);
+  width: calc(33.33% - 11rpx);
   box-sizing: border-box;
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 24rpx 16rpx;
-  position: relative;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  background: var(--neutralSurface, #fff);
+  border-radius: 16rpx;
+  padding: 24rpx 12rpx;
+  border: 1rpx solid var(--neutralBorder, #e8e9eb);
+  box-shadow: 0 2rpx 12rpx var(--neutralShadow, rgba(31, 35, 41, 0.04));
+  transition: background 0.15s ease;
+}
+
+.coach-customer-card:active {
+  background: var(--neutralIconBg, #f2f3f5);
 }
 
 .coach-customer-num {
   font-size: 40rpx;
   font-weight: 700;
-  color: #333;
-  margin-top: 16rpx;
+  color: var(--themeColor, #5b8a72);
+  margin-top: 12rpx;
 }
 
 .coach-customer-label {
   font-size: 22rpx;
-  color: #888;
+  color: var(--neutralTextTertiary, #8f959e);
   margin-top: 8rpx;
   line-height: 1.4;
 }
 
+/* ==================== 营销页 ==================== */
 .coach-revenue-card {
-  margin: -60rpx 24rpx 24rpx;
-  background: #fff;
-  border-radius: 24rpx;
+  margin: 24rpx;
+  background: var(--neutralSurface, #fff);
+  border-radius: 20rpx;
   padding: 40rpx 24rpx;
   text-align: center;
-  box-shadow: 0 8rpx 32rpx rgba(155, 111, 212, 0.12);
+  border: 1rpx solid var(--neutralBorder, #e8e9eb);
+  box-shadow: 0 4rpx 24rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
 }
 
 .coach-revenue-sub {
   font-size: 26rpx;
-  color: #999;
+  color: var(--neutralTextTertiary, #8f959e);
 }
 
 .coach-revenue-num {
   font-size: 64rpx;
   font-weight: 700;
-  color: #e6a23c;
+  color: var(--themeColor, #5b8a72);
   margin: 16rpx 0;
 }
 
 .coach-revenue-link {
   font-size: 28rpx;
-  color: #9b6fd4;
+  color: var(--themeColor, #5b8a72);
 }
 
-.coach-profile-header {
-  padding: 40rpx 32rpx 100rpx;
-  background: linear-gradient(160deg, #c4b5fd 0%, #ddd6fe 100%);
+/* ==================== 我的页 ==================== */
+.coach-profile-card {
+  margin: 24rpx 24rpx 20rpx;
+  padding: 32rpx 28rpx;
+  background: var(--neutralSurface, #fff);
+  border-radius: 20rpx;
   display: flex;
   align-items: center;
   gap: 24rpx;
+  border: 1rpx solid var(--neutralBorder, #e8e9eb);
+  box-shadow: 0 4rpx 24rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
+}
+
+.coach-profile-header {
+  display: none;
 }
 
 .coach-profile-avatar {
-  width: 120rpx;
-  height: 120rpx;
+  width: 112rpx;
+  height: 112rpx;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--neutralIconBg, #f2f3f5);
   overflow: hidden;
+  flex-shrink: 0;
+  border: 3rpx solid var(--neutralBorder, #e8e9eb);
 }
 
 .coach-profile-avatar image {
@@ -200,43 +273,53 @@
 }
 
 .coach-profile-name {
-  font-size: 36rpx;
+  font-size: 34rpx;
   font-weight: 600;
-  color: #fff;
+  color: var(--neutralText, #1f2329);
 }
 
 .coach-profile-tag {
   display: inline-block;
-  margin-top: 8rpx;
-  padding: 4rpx 16rpx;
-  background: rgba(255, 255, 255, 0.25);
+  margin-top: 10rpx;
+  padding: 4rpx 14rpx;
+  background: var(--neutralIconBg, #f2f3f5);
   border-radius: 8rpx;
   font-size: 22rpx;
-  color: #fff;
+  color: var(--neutralTextSecondary, #646a73);
 }
 
 .coach-menu-group {
-  margin: -60rpx 24rpx 24rpx;
-  background: #fff;
-  border-radius: 24rpx;
+  margin: 0 24rpx 20rpx;
+  background: var(--neutralSurface, #fff);
+  border-radius: 20rpx;
   overflow: hidden;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+  border: 1rpx solid var(--neutralBorder, #e8e9eb);
+  box-shadow: 0 4rpx 24rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
 }
 
 .coach-menu-item {
   display: flex;
   align-items: center;
   padding: 28rpx 32rpx;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 1rpx solid var(--neutralBorder, #e8e9eb);
   font-size: 30rpx;
-  color: #333;
+  color: var(--neutralText, #1f2329);
 }
 
 .coach-menu-item:last-child {
   border-bottom: none;
 }
 
+.coach-menu-item:active {
+  background: var(--neutralIconBg, #f2f3f5);
+}
+
 .coach-menu-item .arrow {
   margin-left: auto;
-  color: #ccc;
+  color: var(--neutralTextTertiary, #c8c9cc);
+  font-size: 28rpx;
+}
+
+.coach-theme-text {
+  color: var(--themeColor, #5b8a72);
 }

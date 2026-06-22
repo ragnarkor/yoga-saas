@@ -1,7 +1,13 @@
 <view class="tenant-top-spacer" style="height: {{customBar}}px;"></view>
-<view class="tenant-top" style="height: {{customBar}}px; padding-top: {{statusBar}}px; background: {{navBg}};">
-  <view class="tenant-title">{{title}}</view>
-  <view class="tenant-action" bindtap="bindSwitchTap">
+<view
+  class="tenant-top {{showBack ? 'tenant-top--sub' : ''}} {{showBack || !effectiveShowSwitch ? 'tenant-top--no-switch' : ''}}"
+  style="height: {{customBar}}px; padding-top: {{statusBar}}px; background: {{headerBg}};"
+>
+  <view wx:if="{{showBack}}" class="tenant-back" bindtap="bindBackTap">
+    <van-icon name="arrow-left" size="40rpx" color="#fff" />
+  </view>
+  <view class="tenant-title {{showBack ? 'tenant-title--sub' : ''}}">{{title}}</view>
+  <view wx:if="{{effectiveShowSwitch}}" class="tenant-action" bindtap="bindSwitchTap">
     <text class="tenant-name">{{tenantName}}</text>
     <text class="tenant-switch">切换</text>
   </view>

@@ -1,0 +1,234 @@
+<template name="meetTimeVantTpl">
+  <view class="meet-time-page {{themeCoach ? 'meet-time-page--coach' : ''}}">
+    <van-calendar
+      poppable="{{ false }}"
+      type="multiple"
+      show-confirm="{{ true }}"
+      color="{{calendarColor}}"
+      min-date="{{ minDate }}"
+      default-date="{{ calendarDefaultDate }}"
+      bind:confirm="bindCalendarConfirm"
+    />
+
+    <van-cell-group wx:if="{{lastHasDays.length}}" title="已过期日期（只读）">
+      <van-cell
+        wx:for="{{lastHasDays}}"
+        wx:key="day"
+        title="{{item.dayDesc}}"
+        label="{{item.times.length}} 个时段"
+      />
+    </van-cell-group>
+
+    <van-divider contentPosition="center">
+      时段设置
+      <text wx:if="{{days.length}}">（共 {{days.length + lastHasDays.length}} 天可约）</text>
+    </van-divider>
+
+    <van-empty wx:if="{{!days.length}}" description="请先在上方日历选择日期" />
+
+    <block wx:for="{{days}}" wx:key="day" wx:for-index="dayIdx">
+      <van-cell-group>
+        <van-cell
+          title="{{item.dayDesc}}"
+          is-link
+          value="日期操作"
+          bind:click="bindDaySetTap"
+          data-idx="{{dayIdx}}"
+        />
+
+        <van-cell
+          wx:if="{{!item.times.length}}"
+          title="尚未添加时段"
+          is-link
+          value="添加"
+          bind:click="bindTimeAddTap"
+          data-idx="{{dayIdx}}"
+        />
+
+        <block
+          wx:for="{{item.times}}"
+          wx:for-item="timesItem"
+          wx:for-index="timesIndex"
+          wx:key="mark"
+        >
+          <van-cell
+            wx:if="{{timesItem.stat.succCnt || timesItem.stat.waitCheckCnt}}"
+            title="时段 {{timesIndex + 1}}"
+            label="已有预约，部分操作受限"
+          >
+            <van-tag slot="right-icon" type="warning">已预约</van-tag>
+          </van-cell>
+
+          <van-cell
+            title="开始时间"
+            is-link
+            value="{{timesItem.start}}"
+            bind:click="bindOpenTimePicker"
+            data-idx="{{dayIdx}}"
+            data-timesidx="{{timesIndex}}"
+            data-type="start"
+          />
+          <van-cell
+            title="结束时间"
+            is-link
+            value="{{timesItem.end}}"
+            bind:click="bindOpenTimePicker"
+            data-idx="{{dayIdx}}"
+            data-timesidx="{{timesIndex}}"
+            data-type="end"
+          />
+          <van-cell
+            title="人数上限"
+            is-link
+            value="{{!timesItem.isLimit ? '不限' : timesItem.limit + '人'}}"
+            bind:click="bindShowTimeLimitModalTap"
+            data-idx="{{dayIdx}}"
+            data-timesidx="{{timesIndex}}"
+          />
+          <van-cell title="开放预约" center>
+            <van-switch
+              slot="right-icon"
+              checked="{{timesItem.status == 1}}"
+              size="24px"
+              active-color="{{calendarColor}}"
+              bind:change="bindTimeStatusSwitchChange"
+              data-idx="{{dayIdx}}"
+              data-timesidx="{{timesIndex}}"
+            />
+          </van-cell>
+          <view class="meet-time-slot-del">
+            <van-button
+              size="small"
+              type="danger"
+              plain
+              icon="delete-o"
+              bind:click="bindTimeDelTap"
+              data-idx="{{dayIdx}}"
+              data-timesidx="{{timesIndex}}"
+            >
+              删除时段
+            </van-button>
+          </view>
+        </block>
+
+        <van-cell title="添加时段" is-link icon="plus" bind:click="bindTimeAddTap" data-idx="{{dayIdx}}" />
+        <van-cell title="批量操作" is-link icon="orders-o" bind:click="bindTimeSetTap" data-idx="{{dayIdx}}" />
+      </van-cell-group>
+    </block>
+
+    <view class="meet-time-bottom">
+      <van-button plain bind:click="bindBackTap">不保存，返回</van-button>
+      <van-button type="primary" color="{{calendarColor}}" bind:click="bindSaveTap">
+        保存时间设置
+      </van-button>
+    </view>
+
+    <van-popup
+      show="{{ curTimeLimitModalShow }}"
+      round
+      position="bottom"
+      bind:close="bindCloseLimitPopup"
+    >
+      <view class="meet-time-popup">
+        <view class="meet-time-popup-title">时段人数上限</view>
+        <van-cell title="限制人数" center>
+          <van-switch
+            slot="right-icon"
+            checked="{{ curTimeIsLimit }}"
+            active-color="{{calendarColor}}"
+            bind:change="bindLimitSwitchChange"
+          />
+        </van-cell>
+        <van-field
+          wx:if="{{ curTimeIsLimit }}"
+          label="人数上限"
+          type="number"
+          value="{{ curTimeLimit }}"
+          placeholder="请输入人数"
+          bind:change="bindLimitInputChange"
+        />
+        <van-button block type="primary" color="{{calendarColor}}" bind:click="bindTimeLimitSetCmpt">
+          确定
+        </van-button>
+      </view>
+    </van-popup>
+
+    <van-popup
+      show="{{ saveTempModalShow }}"
+      round
+      position="bottom"
+      bind:close="bindCloseTempPopup"
+    >
+      <view class="meet-time-popup">
+        <view class="meet-time-popup-title">保存为模板</view>
+        <van-field
+          label="模板名称"
+          value="{{ formTempName }}"
+          placeholder="请输入模板名称"
+          maxlength="20"
+          bind:change="bindTempNameChange"
+        />
+        <van-button block type="primary" color="{{calendarColor}}" bind:click="bindSaveTempCmpt">
+          保存模板
+        </van-button>
+      </view>
+    </van-popup>
+
+    <van-popup
+      show="{{ cancelModalShow }}"
+      round
+      position="bottom"
+      bind:close="bindCloseCancelPopup"
+    >
+      <view class="meet-time-popup">
+        <view class="meet-time-popup-title">取消该时段所有预约</view>
+        <van-field
+          label="取消理由"
+          type="textarea"
+          value="{{ formReason }}"
+          placeholder="选填，将通知给用户"
+          maxlength="100"
+          autosize
+          bind:change="bindReasonChange"
+        />
+        <view class="meet-time-popup-actions">
+          <van-button block plain bind:click="bindCloseCancelPopup">返回</van-button>
+          <van-button block type="danger" bind:click="bindCancelMeetJoinCmpt">确定取消</van-button>
+        </view>
+      </view>
+    </van-popup>
+
+    <van-popup show="{{ timePickerShow }}" round position="bottom" bind:close="bindTimePickerClose">
+      <van-datetime-picker
+        type="time"
+        value="{{ timePickerValue }}"
+        bind:confirm="bindTimePickerConfirm"
+        bind:cancel="bindTimePickerClose"
+      />
+    </van-popup>
+
+    <van-action-sheet
+      show="{{ dayActionShow }}"
+      actions="{{ dayActions }}"
+      cancel-text="取消"
+      bind:select="bindDayActionSelect"
+      bind:close="bindDayActionClose"
+    />
+
+    <van-action-sheet
+      show="{{ timeSetActionShow }}"
+      actions="{{ timeSetActions }}"
+      cancel-text="取消"
+      bind:select="bindTimeSetActionSelect"
+      bind:close="bindTimeSetActionClose"
+    />
+
+    <van-button
+      wx:if="{{ topShow }}"
+      icon="arrow-up"
+      round
+      custom-class="meet-time-top-btn"
+      bind:click="bindTopTap"
+    />
+  </view>
+</template>

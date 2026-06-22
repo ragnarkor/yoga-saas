@@ -264,6 +264,16 @@ class AdminHomeController extends BaseAdminController {
     let service = new AdminWxService();
     return await service.listBindableAdmins(pid, operator, this._adminType);
   }
+
+  /** 生成会员邀请小程序码（教练/馆长） */
+  async genMemberInviteQr() {
+    await this.isAdmin();
+    let pid = global.PID || this.getParameter("pid") || "";
+    if (!pid) this.AppError("请先选择瑜伽馆");
+    const MemberInviteService = require("../../service/member_invite_service.js");
+    let service = new MemberInviteService();
+    return await service.genInviteQr(pid);
+  }
 }
 
 module.exports = AdminHomeController;

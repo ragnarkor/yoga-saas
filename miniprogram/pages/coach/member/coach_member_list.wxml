@@ -1,0 +1,67 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page member-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+  />
+
+  <view class="member-toolbar">
+    <view class="member-search">
+      <van-icon name="search" size="32rpx" color="{{themeColor}}" />
+      <input
+        class="member-search-input"
+        placeholder="搜索姓名或手机号"
+        value="{{keyword}}"
+        confirm-type="search"
+        bindinput="bindSearchInput"
+        bindconfirm="bindSearchConfirm"
+      />
+    </view>
+    <view class="member-add-btn" bindtap="bindAddTap">
+      <van-icon name="plus" size="28rpx" color="#fff" />
+      <text>新增</text>
+    </view>
+  </view>
+
+  <view class="member-filters">
+    <view
+      wx:for="{{filters}}"
+      wx:key="key"
+      class="member-filter-item {{activeFilter === item.key ? 'active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="bindFilterTap"
+    >{{item.label}}</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="member-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <view wx:elif="{{!memberList.length}}" class="member-empty">暂无会员</view>
+
+  <view wx:else class="member-list">
+    <view class="member-row" wx:for="{{memberList}}" wx:key="USER_MINI_OPENID">
+      <view class="member-avatar">
+        <image wx:if="{{item.avatarSrc}}" src="{{item.avatarSrc}}" mode="aspectFill" />
+        <view wx:else class="member-avatar-placeholder">
+          <van-icon name="user-o" size="48rpx" color="{{themeColor}}" />
+        </view>
+      </view>
+      <view class="member-info">
+        <view class="member-name">{{item.USER_NAME || '未命名会员'}}</view>
+        <view class="member-phone">{{item.USER_MOBILE || '未绑定手机'}}</view>
+      </view>
+      <view
+        class="member-issue-btn"
+        data-id="{{item.USER_MINI_OPENID}}"
+        data-name="{{item.USER_NAME}}"
+        bindtap="bindIssueTap"
+      >
+        <text>发卡</text>
+        <van-icon name="arrow" size="24rpx" color="#fff" />
+      </view>
+    </view>
+  </view>
+</view>

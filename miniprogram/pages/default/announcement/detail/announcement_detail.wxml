@@ -1,9 +1,10 @@
+<page-meta page-style="{{pageStyle}}" />
 <view wx:if="{{!isLoad}}" class="loading-wrap">
-  <van-loading size="48rpx" color="#5b8a72" />
+  <van-loading size="48rpx" color="{{themeColor}}" />
 </view>
 
 <view wx:elif="{{!detail}}" class="loading-wrap">
-  <van-empty description="公告不存在" />
+  <van-empty description="?????" />
 </view>
 
 <view class="announce-detail" wx:else>

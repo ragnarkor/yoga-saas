@@ -1,0 +1,47 @@
+@import "../coach_common.wxss";
+
+.course-edit-page {
+  padding-bottom: 48rpx;
+}
+
+.course-edit-loading {
+  padding: 120rpx 0;
+  display: flex;
+  justify-content: center;
+}
+
+.course-edit-group {
+  margin: 24rpx 0 !important;
+}
+
+.course-edit-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 16rpx 32rpx 24rpx;
+}
+
+.course-edit-color {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 12rpx;
+  border: 4rpx solid transparent;
+  box-sizing: border-box;
+}
+
+.course-edit-color.active {
+  border-color: var(--themeColor, #5b8a72);
+  transform: scale(1.08);
+}
+
+.course-edit-upload {
+  margin-top: 12rpx;
+}
+
+.course-edit-save {
+  margin: 32rpx;
+}
+
+.course-edit-del-wrap {
+  margin: 0 32rpx 32rpx;
+}

@@ -35,9 +35,15 @@ MeetModel.DB_STRUCTURE = {
 	MEET_IS_SHOW_LIMIT: 'int|true|default=1|comment=是否显示可预约人数',
 
 	MEET_STYLE_SET: 'object|true|default={}|comment=样式设置',
-	/*{ 
-		desc: 'string|false|comment=简介',
-		pic:' string|false|default=[]|comment=封面图cloudId]'
+	/*{
+		templateId/templateName=课程模板,
+		pic=缩略图cloudId,
+		desc=简介, notice=注意事项,
+		duration=时长(分钟), cardAmount=扣卡金额, cardTimes=扣卡次数,
+		teacherId/teacherName=授课老师,
+		color=课程颜色, carousel=轮播图cloudId[],
+		capacity=容纳人数, minJoin=最低开课人数,
+		difficulty/level=难度星级(1-5)
 	}
 	*/
 

@@ -7,26 +7,26 @@
 
 		<view class="tab-bar-border"></view>
 		<view class="tab-bar-item" bindtap="url" data-type="relaunch" data-url="/pages/default/index/default_index">
-			<van-icon name="home-o" size="44rpx" color="{{curMenu=='home_index' ? '#5B8A72' : '#999999'}}" />
+			<van-icon name="home-o" size="44rpx" color="{{curMenu=='home_index' ? themeColor : '#999999'}}" />
 			<view class="tab-text {{curMenu=='home_index'?'text-project':''}}">{{skin.MENU_ITEM[0]}}</view>
 		</view>
 
 		<view class="tab-bar-item" bindtap="url" data-type="relaunch" data-url="/pages/default/news/cate1/news_cate1">
-			<van-icon name="notes-o" size="44rpx" color="{{curMenu=='news_cate1' ? '#5B8A72' : '#999999'}}" />
+			<van-icon name="notes-o" size="44rpx" color="{{curMenu=='news_cate1' ? themeColor : '#999999'}}" />
 			<view class="tab-text {{curMenu=='news_cate1'?'text-project':''}}">{{skin.newsCateArr[0].label}}</view>
 		</view>
 
 		<view class="tab-bar-item" bindtap="url" data-type="relaunch" data-url="/pages/default/news/cate2/news_cate2">
-			<van-icon name="label-o" size="44rpx" color="{{curMenu=='news_cate2' ? '#5B8A72' : '#999999'}}" />
+			<van-icon name="label-o" size="44rpx" color="{{curMenu=='news_cate2' ? themeColor : '#999999'}}" />
 			<view class="tab-text {{curMenu=='news_cate2'?'text-project':''}}">{{skin.newsCateArr[1].label}}</view>
 		</view>
 		 
 		<view class="tab-bar-item" bindtap="url" data-type="relaunch" data-url="/pages/default/calendar/index/calendar_index">
-			<van-icon name="calendar-o" size="44rpx" color="{{curMenu=='calendar_index' ? '#5B8A72' : '#999999'}}" />
+			<van-icon name="calendar-o" size="44rpx" color="{{curMenu=='calendar_index' ? themeColor : '#999999'}}" />
 			<view class="tab-text {{curMenu=='calendar_index'?'text-project':''}}">{{skin.MENU_ITEM[1]}}</view>
 		</view>
 		<view class="tab-bar-item" bindtap="url" data-type="relaunch" data-url="/pages/default/my/index/my_index">
-			<van-icon name="smile-o" size="44rpx" color="{{curMenu=='my_index' ? '#5B8A72' : '#999999'}}" />
+			<van-icon name="smile-o" size="44rpx" color="{{curMenu=='my_index' ? themeColor : '#999999'}}" />
 			<view class="tab-text {{curMenu=='my_index'?'text-project':''}}">{{skin.MENU_ITEM[2]}}</view>
 		</view>
 

@@ -1,0 +1,49 @@
+.panel {
+  padding: 32rpx 24rpx calc(32rpx + env(safe-area-inset-bottom));
+  background: #fff;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.panel-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.panel-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.panel-close {
+  padding: 8rpx;
+}
+
+.tenant-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 16rpx 0 24rpx;
+}
+
+.tenant-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.login-form {
+  margin-bottom: 32rpx;
+}
+
+.submit-wrap {
+  padding: 0 16rpx 8rpx;
+}

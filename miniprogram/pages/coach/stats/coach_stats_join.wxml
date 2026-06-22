@@ -1,0 +1,44 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page stats-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view class="stats-search-bar">
+    <van-icon name="search" size="32rpx" color="{{themeColor}}" />
+    <input
+      class="stats-search-input"
+      placeholder="搜索课程名称"
+      value="{{keyword}}"
+      confirm-type="search"
+      bindinput="bindSearchInput"
+      bindconfirm="bindSearchConfirm"
+    />
+  </view>
+
+  <view class="stats-filter-bar">
+    <view
+      wx:for="{{filters}}"
+      wx:key="key"
+      class="stats-filter-item {{activeFilter === item.key ? 'active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="bindFilterTap"
+    >{{item.label}}</view>
+  </view>
+
+  <view wx:if="{{loading && list.length === 0}}" class="stats-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+  <view wx:elif="{{list.length === 0}}" class="stats-empty">暂无预约记录</view>
+  <view wx:else>
+    <view class="stats-list-row" wx:for="{{list}}" wx:key="_id">
+      <view class="stats-list-title">{{item.JOIN_MEET_TITLE}}</view>
+      <view class="stats-list-meta">{{item.JOIN_MEET_DAY}} {{item.JOIN_MEET_TIME_START}}-{{item.JOIN_MEET_TIME_END}}</view>
+      <view class="stats-list-tag">{{item.statusText}}</view>
+    </view>
+  </view>
+</view>

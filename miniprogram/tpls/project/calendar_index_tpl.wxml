@@ -2,7 +2,7 @@
 <template name="calendarIndexTpl">
 	<van-empty wx:if="{{isLoad===null}}" description="暂无课程数据" />
 	<view wx:if="{{isLoad===false}}" class="loading-wrap">
-		<van-loading size="48rpx" color="#5b8a72" type="spinner" />
+		<van-loading size="48rpx" color="{{themeColor}}" type="spinner" />
 	</view>
 
 	<view class="booking-main" wx:if="{{isLoad}}">
@@ -18,8 +18,8 @@
 
 		<!-- 课程分类标签（仅标题，内容区统一放下方） -->
 		<van-tabs active="{{activeTab}}" bind:change="bindTabChange"
-			color="#5b8a72"
-			title-active-color="#2d2d2d"
+			color="{{themeColor}}"
+			title-active-color="{{themeColor}}"
 			title-inactive-color="#999"
 			line-width="40rpx"
 			line-height="6rpx"

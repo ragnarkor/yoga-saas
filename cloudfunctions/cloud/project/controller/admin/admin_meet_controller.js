@@ -210,6 +210,26 @@ class AdminMeetController extends BaseAdminController {
     return result;
   }
 
+  /** 教练端周课表 */
+  async getScheduleWeek() {
+    await this.isAdmin();
+
+    let rules = {
+      startDay: "must|date|name=开始日期",
+      endDay: "must|date|name=结束日期",
+      typeId: "string",
+    };
+
+    let input = this.validateData(rules);
+
+    let service = new AdminMeetService();
+    return await service.getScheduleWeek(
+      input,
+      this._adminId,
+      this._adminType,
+    );
+  }
+
   /** 预约名单列表 */
   async getJoinList() {
     await this.isAdmin();

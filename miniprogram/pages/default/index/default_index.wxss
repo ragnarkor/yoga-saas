@@ -31,7 +31,7 @@
   right: 0;
   bottom: 0;
   padding: 24rpx 32rpx;
-  background: linear-gradient(transparent, rgba(45, 85, 64, 0.55));
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.45));
 }
 
 .banner-title {
@@ -47,6 +47,10 @@
   padding: 16rpx 20rpx;
   position: relative;
   z-index: 2;
+  background: #fff;
+  border-radius: 20rpx;
+  border: 1rpx solid var(--neutralBorder, #e8e9eb);
+  box-shadow: 0 4rpx 20rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
 }
 
 .home-search {
@@ -56,12 +60,12 @@
   gap: 12rpx;
   height: 72rpx;
   padding: 0 24rpx;
-  background: #f6f8f5;
+  background: var(--neutralIconBg, #f2f3f5);
   border-radius: 999rpx;
 }
 
 .home-search-placeholder {
-  color: #8ba399;
+  color: #999;
   font-size: 26rpx;
 }
 
@@ -72,15 +76,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e3efe8;
+  background: #f5f5f5;
   border-radius: 50%;
 }
 
 .home-section {
   margin: 0 24rpx 24rpx;
   padding: 24rpx;
-  border-radius: 24rpx;
+  border-radius: 20rpx;
   background: #fff;
+  border: 1rpx solid var(--neutralBorder, #e8e9eb);
+  box-shadow: 0 4rpx 20rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
 }
 
 .section-head {
@@ -94,7 +100,7 @@
 }
 
 .section-empty {
-  color: #8ba399;
+  color: #999;
   font-size: 26rpx;
   padding: 12rpx 0;
 }
@@ -103,7 +109,7 @@
   display: flex;
   align-items: center;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #eef2ee;
+  border-bottom: 1rpx solid #f0f0f0;
 }
 
 .announce-item:last-child {
@@ -118,14 +124,14 @@
 
 .announce-title {
   font-size: 28rpx;
-  color: #2d332e;
+  color: #333;
   font-weight: 500;
 }
 
 .announce-desc {
   margin-top: 6rpx;
   font-size: 24rpx;
-  color: #8ba399;
+  color: #999;
 }
 
 .teacher-scroll {
@@ -160,13 +166,13 @@
 .teacher-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #2d332e;
+  color: #333;
 }
 
 .teacher-specialty {
   margin-top: 8rpx;
   font-size: 22rpx;
-  color: #8ba399;
+  color: #999;
 }
 
 .photo-grid {
@@ -192,7 +198,7 @@
 .photo-caption {
   padding: 12rpx 16rpx;
   font-size: 24rpx;
-  color: #475569;
+  color: #666;
 }
 
 .home-safe-bottom {

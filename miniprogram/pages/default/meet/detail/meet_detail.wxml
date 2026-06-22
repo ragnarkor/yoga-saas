@@ -1,2 +1,3 @@
+<page-meta page-style="{{pageStyle}}" />
 <import src="../../../../tpls/project/meet_detail_tpl.wxml" />
 <template is="meetDetailTpl" data="{{id,isLoad,skin,meet,canNullTime,coverPic,shortDesc,level,levelStars,classTimeText,locationText,coachName,seatText,seatPercent,limitHint,introPics,introText,bookNotes,selectedDayIdx,selectedTimeIdx,currentDayTimes,bookDisabled,bookBtnText,submitting}}" />

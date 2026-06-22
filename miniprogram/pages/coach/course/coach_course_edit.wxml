@@ -1,0 +1,192 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page course-edit-page">
+  <coach-tenant-switch title="{{pageTitle}}" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
+
+  <view wx:if="{{loading}}" class="course-edit-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <van-cell-group title="基本信息" custom-class="course-edit-group">
+      <van-cell
+        title="课程模板"
+        is-link
+        value="{{formStyleSet.templateName || '选择模板'}}"
+        bind:click="bindTemplateTap"
+      />
+      <van-field
+        label="课程名称"
+        required
+        value="{{formTitle}}"
+        placeholder="请输入课程名称"
+        maxlength="50"
+        bind:change="bindTitleChange"
+      />
+      <van-cell
+        title="课程类型"
+        required
+        is-link
+        value="{{typeName || '请选择'}}"
+        bind:click="bindTypeTap"
+      />
+      <van-field
+        label="时长(分钟)"
+        required
+        type="number"
+        value="{{formStyleSet.duration}}"
+        placeholder="60"
+        data-field="duration"
+        bind:change="bindStyleFieldChange"
+      />
+      <van-field
+        label="扣卡金额"
+        type="digit"
+        value="{{formStyleSet.cardAmount}}"
+        placeholder="0"
+        data-field="cardAmount"
+        bind:change="bindStyleFieldChange"
+      />
+      <van-field
+        label="扣卡次数"
+        type="number"
+        value="{{formStyleSet.cardTimes}}"
+        placeholder="1"
+        data-field="cardTimes"
+        bind:change="bindStyleFieldChange"
+      />
+      <van-cell
+        title="授课老师"
+        is-link
+        value="{{formStyleSet.teacherName || '请选择'}}"
+        bind:click="bindTeacherTap"
+      />
+    </van-cell-group>
+
+    <van-cell-group title="课程颜色" custom-class="course-edit-group">
+      <view class="course-edit-colors">
+        <view
+          wx:for="{{colorOptions}}"
+          wx:key="*this"
+          class="course-edit-color {{formStyleSet.color === item ? 'active' : ''}}"
+          style="background: {{item}};"
+          data-color="{{item}}"
+          bindtap="bindColorTap"
+        />
+      </view>
+    </van-cell-group>
+
+    <van-cell-group title="图片" custom-class="course-edit-group">
+      <van-cell title="缩略图" required use-label-slot>
+        <view slot="label" class="course-edit-upload">
+          <van-uploader
+            file-list="{{thumbList}}"
+            max-count="{{1}}"
+            bind:after-read="bindThumbAfterRead"
+            bind:delete="bindThumbDelete"
+          />
+        </view>
+      </van-cell>
+      <van-cell title="轮播图" use-label-slot>
+        <view slot="label" class="course-edit-upload">
+          <van-uploader
+            file-list="{{carouselList}}"
+            max-count="{{6}}"
+            bind:after-read="bindCarouselAfterRead"
+            bind:delete="bindCarouselDelete"
+          />
+        </view>
+      </van-cell>
+    </van-cell-group>
+
+    <van-cell-group title="课程详情" custom-class="course-edit-group">
+      <van-field
+        label="简介"
+        type="textarea"
+        autosize
+        maxlength="500"
+        value="{{formStyleSet.desc}}"
+        placeholder="课程简介"
+        data-field="desc"
+        bind:change="bindStyleFieldChange"
+      />
+      <van-field
+        label="注意事项"
+        type="textarea"
+        autosize
+        maxlength="500"
+        value="{{formStyleSet.notice}}"
+        placeholder="上课须知、着装要求等"
+        data-field="notice"
+        bind:change="bindStyleFieldChange"
+      />
+    </van-cell-group>
+
+    <van-cell-group title="预约设置" custom-class="course-edit-group">
+      <van-field
+        label="容纳人数"
+        type="number"
+        value="{{formStyleSet.capacity}}"
+        data-field="capacity"
+        bind:change="bindStyleFieldChange"
+      />
+      <van-field
+        label="最低开课人数"
+        type="number"
+        value="{{formStyleSet.minJoin}}"
+        data-field="minJoin"
+        bind:change="bindStyleFieldChange"
+      />
+      <van-cell title="难度" center>
+        <van-rate
+          slot="right-icon"
+          value="{{formStyleSet.difficulty}}"
+          count="{{5}}"
+          color="#ffb74d"
+          void-color="#ddd"
+          bind:change="bindRateChange"
+        />
+      </van-cell>
+      <van-cell
+        wx:if="{{id}}"
+        title="排课时段"
+        is-link
+        value="{{formDaysSet.length ? formDaysSet.length + '天可约' : '去配置'}}"
+        bind:click="bindTimeTap"
+      />
+    </van-cell-group>
+
+    <view class="course-edit-save">
+      <van-button type="primary" block color="{{themeColor}}" bind:click="bindSaveTap">
+        {{id ? '保存课程' : '创建课程'}}
+      </van-button>
+    </view>
+
+    <view wx:if="{{id}}" class="course-edit-del-wrap">
+      <van-button type="danger" plain block bind:click="bindDeleteTap">删除课程</van-button>
+    </view>
+  </block>
+
+  <van-action-sheet
+    show="{{ templateSheetShow }}"
+    actions="{{ templateActions }}"
+    cancel-text="取消"
+    bind:select="bindTemplateSelect"
+    bind:close="bindCloseTemplateSheet"
+  />
+
+  <van-action-sheet
+    show="{{ typeSheetShow }}"
+    actions="{{ typeActions }}"
+    cancel-text="取消"
+    bind:select="bindTypeSelect"
+    bind:close="bindCloseTypeSheet"
+  />
+
+  <van-action-sheet
+    show="{{ teacherSheetShow }}"
+    actions="{{ teacherActions }}"
+    cancel-text="取消"
+    bind:select="bindTeacherSelect"
+    bind:close="bindCloseTeacherSheet"
+  />
+</view>

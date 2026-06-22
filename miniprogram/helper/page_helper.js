@@ -15,6 +15,7 @@ const CACHE_TEMPLATE = "CACHE_TENANT_TEMPLATE";
 const tenantPages = require("../projects/page_registry.js");
 const skinDefault = require("../pages/default/skin/skin.js");
 const skinA00 = require("../projects/A00/skin/skin.js");
+const themeHelper = require("./theme_helper.js");
 
 const SKIN_MAP = {
   default: skinDefault,
@@ -26,10 +27,23 @@ function getTemplate() {
   return cacheHelper.get(CACHE_TEMPLATE) || "default";
 }
 
-/** 获取当前皮肤配置 */
+/** 获取当前租户主题色（优先租户配置，否则皮肤默认） */
+function getThemeColor() {
+  const tenant = getTenantInfo();
+  if (tenant && tenant.TENANT_THEME_COLOR) {
+    return themeHelper.normalizeHex(tenant.TENANT_THEME_COLOR);
+  }
+  const template = getTemplate();
+  const skin = SKIN_MAP[template] || skinDefault;
+  return themeHelper.normalizeHex(skin.NAV_BG);
+}
+
+/** 获取当前皮肤配置（NAV_BG 已合并租户主题色） */
 function getSkin() {
   const template = getTemplate();
-  return SKIN_MAP[template] || skinDefault;
+  const base = SKIN_MAP[template] || skinDefault;
+  const themeColor = getThemeColor();
+  return Object.assign({}, base, { NAV_BG: themeColor });
 }
 
 /** 设置租户上下文（PID + 模板） */
@@ -40,13 +54,19 @@ function setTenant(pid, template) {
     template = pid.TENANT_TEMPLATE || pid.template || "default";
     pid = pid._pid || pid.pid;
   }
+  const prev = getTenantInfo() || {};
   cacheHelper.set(CACHE_TENANT, pid, 86400 * 365);
   cacheHelper.set(CACHE_TEMPLATE, template || "default", 86400 * 365);
   cacheHelper.set(
     CACHE_TENANT_INFO,
-    tenantInfo || { _pid: pid, TENANT_TEMPLATE: template || "default" },
+    tenantInfo ||
+      Object.assign({}, prev, {
+        _pid: pid,
+        TENANT_TEMPLATE: template || prev.TENANT_TEMPLATE || "default",
+      }),
     86400 * 365,
   );
+  themeHelper.applyMemberThemeGlobal();
 }
 
 /** 设置当前选中的租户PID（多租户模式） */
@@ -74,11 +94,39 @@ function getTenantInfo() {
   return cacheHelper.get(CACHE_TENANT_INFO) || null;
 }
 
+/** 合并租户信息到缓存（不触发全局主题刷新，供顶栏组件拉取详情用） */
+function mergeTenantInfo(tenantInfo) {
+  if (!tenantInfo || typeof tenantInfo !== "object") return;
+  const prev = getTenantInfo() || {};
+  if (tenantInfo._pid) {
+    cacheHelper.set(CACHE_TENANT, tenantInfo._pid, 86400 * 365);
+  }
+  if (tenantInfo.TENANT_TEMPLATE) {
+    cacheHelper.set(
+      CACHE_TEMPLATE,
+      tenantInfo.TENANT_TEMPLATE,
+      86400 * 365,
+    );
+  }
+  cacheHelper.set(
+    CACHE_TENANT_INFO,
+    Object.assign({}, prev, tenantInfo),
+    86400 * 365,
+  );
+}
+
 function getTenantName() {
   const tenant = getTenantInfo();
   if (tenant?.TENANT_NAME) return tenant.TENANT_NAME;
   const pid = getPID();
   return pid || "选择瑜伽馆";
+}
+
+/** 当前租户课程分类配置（优先门店配置，否则皮肤默认） */
+function getMeetTypeStr() {
+  const tenant = getTenantInfo();
+  if (tenant?.TENANT_MEET_TYPE) return tenant.TENANT_MEET_TYPE;
+  return getSkin().MEET_TYPE || "";
 }
 
 /** 标准化页面相对路径，如 index/default_index */
@@ -981,13 +1029,16 @@ function cacheListSet(key, time = setting.CACHE_LIST_TIME) {
 module.exports = {
   setSkin,
   getSkin,
+  getThemeColor,
   getTemplate,
   setTenant,
   setPID,
   clearPID,
   getPID,
   getTenantInfo,
+  mergeTenantInfo,
   getTenantName,
+  getMeetTypeStr,
   fmtImgUrl,
   fmtURLByPID,
 

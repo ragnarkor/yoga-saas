@@ -19,9 +19,9 @@
 			bindtap="bindSelectTap" data-item="{{item}}">
 
 			<view class="tenant-logo">
-				<image wx:if="{{item.TENANT_LOGO}}" src="{{item.TENANT_LOGO}}" mode="aspectFill" class="logo-img" />
-				 wx:else<van-icon name="home-o" size="56rpx" color="#0081ff" custom-class="text-xxxl text-blue"  />
-			</view>
+					<image wx:if="{{item.TENANT_LOGO}}" src="{{item.TENANT_LOGO}}" mode="aspectFill" class="logo-img" />
+					<van-icon wx:else name="home-o" size="56rpx" color="#0081ff" custom-class="text-xxxl text-blue" />
+				</view>
 
 			<view class="tenant-info">
 				<view class="tenant-name text-lg">{{item.TENANT_NAME}}</view>

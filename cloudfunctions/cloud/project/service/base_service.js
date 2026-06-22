@@ -189,6 +189,12 @@ class BaseService {
   }
 
   async initSetup() {
+    for (let cl of ["ax_card_tpl", "ax_user_card"]) {
+      if (!(await dbUtil.isExistCollection(cl))) {
+        await dbUtil.createCollection(cl);
+      }
+    }
+
     if (globalThis.__INIT_SETUP_DONE) return;
 
     if (await dbUtil.isExistCollection("ax_setup")) {
@@ -544,6 +550,8 @@ class BaseService {
       tenantData.TENANT_DESC = tc.desc;
       tenantData.TENANT_TEMPLATE = tc.template || "default";
       tenantData.TENANT_STATUS = TenantModel.STATUS.OPEN;
+      tenantData.TENANT_MEET_TYPE =
+        "1=特色课程|leftbig3,2=精品课|leftbig2,3=私教定制|leftbig2,4=核心床|leftbig3";
       await TenantModel.insert(tenantData, false);
 
       // --- 创建管理员 ---

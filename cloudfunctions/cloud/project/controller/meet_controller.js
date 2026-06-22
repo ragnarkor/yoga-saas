@@ -8,6 +8,8 @@ const BaseController = require('./base_controller.js');
 const MeetService = require('../service/meet_service.js');
 const timeUtil = require('../../framework/utils/time_util.js');
 const JoinModel = require('../model/join_model.js');
+const MeetModel = require('../model/meet_model.js');
+const TenantModel = require('../model/tenant_model.js');
 const cacheUtil = require('../../framework/utils/cache_util.js');
 const config = require('../../config/config.js');
 const FeatureGate = require('../utils/feature_gate.js');
@@ -156,10 +158,51 @@ class MeetController extends BaseController {
 			list[k].JOIN_ADD_TIME = timeUtil.timestamp2Time(list[k].JOIN_ADD_TIME, 'Y-M-D h:m');
 		}
 
+		list = await this._enrichMyJoinList(list);
+
 		result.list = list;
 
 		return result;
 
+	}
+
+	/** 我的预约列表：补充封面、馆名、地点 */
+	async _enrichMyJoinList(list) {
+		if (!list || !list.length) return list;
+
+		let meetIds = [...new Set(list.map((i) => i.JOIN_MEET_ID).filter(Boolean))];
+		let meetMap = {};
+		if (meetIds.length) {
+			let meets = await MeetModel.getAll(
+				{ _id: ['in', meetIds] },
+				'MEET_STYLE_SET',
+				{},
+				meetIds.length,
+			);
+			for (let m of meets || []) {
+				meetMap[m._id] = m;
+			}
+		}
+
+		let tenantName = '';
+		if (global.PID) {
+			let tenant = await TenantModel.getOne(
+				{ _pid: global.PID, TENANT_STATUS: TenantModel.STATUS.OPEN },
+				'TENANT_NAME',
+			);
+			if (tenant) tenantName = tenant.TENANT_NAME || '';
+		}
+
+		for (let k in list) {
+			let meet = meetMap[list[k].JOIN_MEET_ID];
+			let style = (meet && meet.MEET_STYLE_SET) || {};
+			list[k].coverPic = style.pic || '';
+			list[k].tenantName = tenantName;
+			let loc = style.location || style.room || '';
+			list[k].locationText = loc ? tenantName + loc : tenantName;
+		}
+
+		return list;
 	}
 
 	/** 我的某日预约列表 */

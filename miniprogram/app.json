@@ -25,11 +25,30 @@
     "pages/coach/customer/coach_customer",
     "pages/coach/marketing/coach_marketing",
     "pages/coach/my/coach_my",
+    "pages/coach/store/coach_store",
+    "pages/coach/course/coach_course_list",
+    "pages/coach/course/coach_course_edit",
+    "pages/coach/course/coach_course_time",
+    "pages/coach/schedule/coach_schedule",
+    "pages/coach/member/coach_member_list",
+    "pages/coach/card/coach_card_list",
+    "pages/coach/card/coach_card_edit",
+    "pages/coach/card/coach_card_issue",
+
+    "pages/coach/stats/coach_stats_index",
+    "pages/coach/stats/coach_stats_card",
+    "pages/coach/stats/coach_stats_class",
+    "pages/coach/stats/coach_stats_rank",
+    "pages/coach/stats/coach_stats_fund",
+    "pages/coach/stats/coach_stats_consume",
+    "pages/coach/stats/coach_stats_join",
+    "pages/coach/stats/coach_stats_schedule",
 
     "projects/A00/index/default_index",
 
     "pages/public/hint/hint",
     "pages/public/web_article/web_article",
+    "pages/public/member_invite/member_invite",
 
     "cmpts/public/form/form_set/field/form_set_field",
     "pages/admin/index/tenant/admin_tenant",
@@ -63,7 +82,7 @@
     "pages/admin/user/export/admin_user_export"
   ],
   "window": {
-    "backgroundColor": "#F6F7F5",
+    "backgroundColor": "#F5F6F8",
     "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#5B8A72",
     "navigationBarTitleText": "瑜伽馆预约",
@@ -113,7 +132,14 @@
     "van-icon": "@vant/weapp/icon/index",
     "van-image": "@vant/weapp/image/index",
     "van-card": "@vant/weapp/card/index",
-    "van-divider": "@vant/weapp/divider/index"
+    "van-divider": "@vant/weapp/divider/index",
+    "van-popup": "@vant/weapp/popup/index",
+    "van-calendar": "@vant/weapp/calendar/index",
+    "van-datetime-picker": "@vant/weapp/datetime-picker/index",
+    "van-uploader": "@vant/weapp/uploader/index",
+    "van-rate": "@vant/weapp/rate/index",
+    "van-switch": "@vant/weapp/switch/index",
+    "van-action-sheet": "@vant/weapp/action-sheet/index"
   },
   "sitemapLocation": "sitemap.json"
 }

@@ -12,7 +12,7 @@
 
 		<!--load begin-->
 		<import src="../public/list_load_tpl.wxml" />
-		<template is="listLoadTpl" data="{{skin:'load-project',dataList}}" />
+		<template is="listLoadTpl" data="{{themeColor,skin:'load-project',dataList}}" />
 		<!--load end-->
 	</cmpt-comm-list>
 

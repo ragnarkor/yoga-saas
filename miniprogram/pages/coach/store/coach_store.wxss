@@ -1,0 +1,159 @@
+@import "../coach_common.wxss";
+
+.store-page {
+  padding-bottom: 48rpx;
+}
+
+.store-loading {
+  padding: 120rpx 0;
+  display: flex;
+  justify-content: center;
+}
+
+.store-card {
+  margin: 24rpx 32rpx 0;
+  padding: 32rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.06);
+}
+
+.store-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  margin-top: 12rpx;
+}
+
+.store-desc {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #888;
+  line-height: 1.5;
+}
+
+.store-desc-input {
+  width: 100%;
+  min-height: 120rpx;
+  margin-top: 16rpx;
+  padding: 16rpx;
+  box-sizing: border-box;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+.store-section {
+  margin: 24rpx 32rpx 0;
+  padding: 28rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.store-section + .store-section {
+  margin-top: 24rpx;
+}
+
+.store-section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.store-section-tip {
+  font-size: 24rpx;
+  color: #999;
+  margin: 8rpx 0 24rpx;
+}
+
+.store-cate-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.store-cate-id {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 12rpx;
+  background: var(--projectColorLight, #e3efe8);
+  color: var(--themeColor, #5b8a72);
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.store-cate-input {
+  flex: 1;
+  height: 72rpx;
+  padding: 0 20rpx;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+
+.store-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 20rpx;
+  color: var(--themeColor, #5b8a72);
+  font-size: 28rpx;
+}
+
+.store-theme-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.store-theme-row--readonly {
+  opacity: 0.55;
+}
+
+.store-theme-readonly {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #bbb;
+}
+
+.store-theme-swatch {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4rpx solid transparent;
+  box-sizing: border-box;
+}
+
+.store-theme-swatch.active {
+  border-color: #333;
+  transform: scale(1.08);
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+}
+
+.store-theme-current {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #888;
+}
+
+.store-save-wrap {
+  margin: 32rpx 32rpx 48rpx;
+}
+
+.store-readonly-tip {
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+  padding: 24rpx;
+}

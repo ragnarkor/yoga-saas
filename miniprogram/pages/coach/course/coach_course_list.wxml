@@ -1,0 +1,56 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page course-page">
+  <coach-tenant-switch title="课程管理" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
+
+  <van-tabs
+    wx:if="{{tabs.length}}"
+    active="{{activeTab}}"
+    color="{{themeColor}}"
+    title-active-color="{{themeColor}}"
+    bind:change="bindTabChange"
+    custom-class="course-tabs"
+  >
+    <van-tab wx:for="{{tabs}}" wx:key="id" title="{{item.name}}" />
+  </van-tabs>
+
+  <view wx:if="{{loading}}" class="course-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <view wx:elif="{{!courseList.length}}" class="course-empty">
+    <van-empty description="该分类暂无课程">
+      <van-button round color="{{themeColor}}" size="small" bind:click="bindAddTap">添加课程</van-button>    </van-empty>
+  </view>
+
+  <view wx:else class="course-list">
+    <view
+      class="course-card"
+      wx:for="{{courseList}}"
+      wx:key="_id"
+      data-id="{{item._id}}"
+      bindtap="bindCourseTap"
+    >
+      <image
+        wx:if="{{item.cover}}"
+        class="course-cover"
+        src="{{item.cover}}"
+        mode="aspectFill"
+      />
+      <view wx:else class="course-cover course-cover-placeholder">
+        <van-icon name="photo-o" size="48rpx" color="#ccc" />
+      </view>
+      <view class="course-info">
+        <view class="course-title">{{item.MEET_TITLE}}</view>
+        <view class="course-duration">{{item.duration}}</view>
+      </view>
+      <view class="course-tag" style="background: {{item.color}}20; border-color: {{item.color}};">
+        <view class="course-tag-dot" style="background: {{item.color}};"></view>
+      </view>
+      <van-icon name="arrow" size="32rpx" color="#ccc" />
+    </view>
+  </view>
+
+  <view class="course-fab" bindtap="bindAddTap">
+    <van-icon name="add" size="48rpx" color="#fff" />
+  </view>
+</view>

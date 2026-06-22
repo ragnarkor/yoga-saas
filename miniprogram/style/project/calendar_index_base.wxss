@@ -1,6 +1,6 @@
 /* [AI_START TIMESTAMP=2025-01-24 12:40:00] */
 page {
-  background-color: var(--projectBgSoft, #fafbf9);
+  background-color: var(--neutralBg, #f5f6f8);
 }
 
 .booking-main {
@@ -21,12 +21,8 @@ page {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    135deg,
-    var(--projectColor, #5b8a72) 0%,
-    var(--projectColorDark, #4a7160) 100%
-  );
-  opacity: 0.08;
+  background: var(--neutralIconBg, #f2f3f5);
+  opacity: 1;
   border-radius: 0 0 48rpx 48rpx;
 }
 
@@ -39,13 +35,13 @@ page {
 .page-title {
   font-size: 40rpx;
   font-weight: 700;
-  color: var(--projectColorDark, #4a7160);
+  color: var(--neutralText, #1f2329);
   letter-spacing: 2rpx;
 }
 
 .page-subtitle {
   font-size: 24rpx;
-  color: #8ba399;
+  color: var(--neutralTextTertiary, #8f959e);
   margin-top: 8rpx;
   letter-spacing: 1rpx;
 }
@@ -126,7 +122,7 @@ page {
 
 .date-weekday {
   font-size: 22rpx;
-  color: #8ba399;
+  color: var(--calendarLightColor, #8ba399);
   font-weight: 500;
   margin-bottom: 4rpx;
 }
@@ -140,7 +136,7 @@ page {
 
 .date-month {
   font-size: 18rpx;
-  color: #b0c4b8;
+  color: var(--calendarLightColor, #b0c4b8);
   margin-top: 2rpx;
 }
 
@@ -199,23 +195,23 @@ page {
 .time-primary {
   font-size: 32rpx;
   font-weight: 700;
-  color: var(--projectColorDark, #4a7160);
+  color: var(--neutralText, #1f2329);
   line-height: 1.2;
 }
 
 .time-secondary {
   font-size: 22rpx;
-  color: #8ba399;
+  color: var(--calendarLightColor, #8ba399);
   margin-top: 4rpx;
   line-height: 1.2;
 }
 
 .time-duration {
   font-size: 18rpx;
-  color: #b0c4b8;
+  color: var(--calendarLightColor, #b0c4b8);
   margin-top: 8rpx;
   padding: 2rpx 12rpx;
-  background: rgba(91, 138, 114, 0.08);
+  background: var(--projectColorLight, #e3efe8);
   border-radius: 8rpx;
 }
 
@@ -232,7 +228,7 @@ page {
 .course-name {
   font-size: 30rpx;
   font-weight: 600;
-  color: #2d2d2d;
+  color: var(--neutralText, #1f2329);
   line-height: 1.4;
 }
 
@@ -299,7 +295,7 @@ page {
 
 .slots-label {
   font-size: 20rpx;
-  color: #b0c4b8;
+  color: var(--calendarLightColor, #b0c4b8);
   margin-top: 2rpx;
 }
 

@@ -116,10 +116,10 @@ Page({
 		if (!this.data.pic) return pageHelper.showModal('请上传封面图片');
 
 		parent.setData({
-			formStyleSet: {
+			formStyleSet: Object.assign({}, parent.data.formStyleSet || {}, {
 				desc: dataHelper.fmtText(this.data.desc),
-				pic: this.data.pic
-			}
+				pic: this.data.pic,
+			}),
 		});
 
 		wx.navigateBack({

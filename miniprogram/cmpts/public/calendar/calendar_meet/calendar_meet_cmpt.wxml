@@ -25,13 +25,15 @@
 		</view>
 
 		<view class="cal-title">
-			<view>一</view>
-			<view>二</view>
-			<view>三</view>
-			<view>四</view>
-			<view>五</view>
-			<view class="text-orange text-bold">六</view>
-			<view class="text-red text-bold">日</view>
+			<!-- [AI_START TIMESTAMP=2026-06-22 14:49:41] -->
+			<view class="cal-cell">一</view>
+			<view class="cal-cell">二</view>
+			<view class="cal-cell">三</view>
+			<view class="cal-cell">四</view>
+			<view class="cal-cell">五</view>
+			<view class="cal-cell text-orange text-bold">六</view>
+			<view class="cal-cell text-red text-bold">日</view>
+			<!-- [AI_END LINES=7 TIMESTAMP=2026-06-22 14:49:41] -->
 		</view>
 		<view class="cal-center {{!fold?'cur':''}}">
 			 

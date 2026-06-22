@@ -16,8 +16,10 @@
 			</view>
 		</view>
 		<view class="editor-add-wrapper" wx:if="{{!isView}}">
-			<view bindtap="bindAddTextTap" data-idx="{{index}}"><van-icon name="add-o" size="32rpx" custom-class="margin-right-xs"  />添加文本</view>
-			<view bindtap="bindAddImageTap" data-idx="{{index}}"><van-icon name="photo-o" size="32rpx" custom-class="margin-right-xs"  />添加图片</view>
+			<!-- [AI_START TIMESTAMP=2026-06-22 14:49:41] -->
+			<view class="editor-add-item" bindtap="bindAddTextTap" data-idx="{{index}}"><van-icon name="add-o" size="32rpx" custom-class="margin-right-xs"  />添加文本</view>
+			<view class="editor-add-item" bindtap="bindAddImageTap" data-idx="{{index}}"><van-icon name="photo-o" size="32rpx" custom-class="margin-right-xs"  />添加图片</view>
+			<!-- [AI_END LINES=2 TIMESTAMP=2026-06-22 14:49:41] -->
 		</view>
 	</block>
 </view>

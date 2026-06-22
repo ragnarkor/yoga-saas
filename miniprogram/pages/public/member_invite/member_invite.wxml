@@ -1,0 +1,19 @@
+<view class="invite-page">
+  <view wx:if="{{loading}}" class="invite-center">
+    <van-loading size="48rpx">正在加入瑜伽馆...</van-loading>
+  </view>
+
+  <view wx:elif="{{success}}" class="invite-center">
+    <view class="invite-icon">✓</view>
+    <view class="invite-title">{{isNew ? '欢迎加入' : '欢迎回来'}}</view>
+    <view class="invite-desc">您已成功加入</view>
+    <view class="invite-tenant">{{tenantName}}</view>
+    <van-button type="primary" block custom-class="invite-btn" bind:click="bindGoHome">进入首页约课</van-button>
+    <van-button plain block custom-class="invite-btn" bind:click="bindGoMy">前往我的</van-button>
+  </view>
+
+  <view wx:else class="invite-center">
+    <view class="invite-title fail">无法加入</view>
+    <view class="invite-desc">{{errMsg}}</view>
+  </view>
+</view>

@@ -1,0 +1,38 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page card-edit-page">
+  <coach-tenant-switch
+    title="{{pageTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+  />
+
+  <view wx:if="{{loading}}" class="card-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <van-cell-group>
+      <van-field label="卡名称" value="{{form.name}}" placeholder="如：空中瑜伽" bind:change="bindFieldChange" data-field="name" />
+      <van-cell title="卡类型" is-link value="{{form.typeLabel}}" bind:click="bindTypeTap" />
+      <van-field label="有效期(天)" type="number" value="{{form.days}}" bind:change="bindFieldChange" data-field="days" />
+      <van-field label="售价(元)" type="number" value="{{form.price}}" bind:change="bindFieldChange" data-field="price" />
+      <van-field wx:if="{{form.type === 'times'}}" label="额度(次)" type="number" value="{{form.quota}}" bind:change="bindFieldChange" data-field="quota" />
+    </van-cell-group>
+
+    <view class="color-picker-row">
+      <view
+        wx:for="{{colorOptions}}"
+        wx:key="*this"
+        class="color-dot {{form.color === item ? 'active' : ''}}"
+        style="background: {{item}};"
+        data-color="{{item}}"
+        bindtap="bindColorTap"
+      ></view>
+    </view>
+
+    <view class="card-edit-footer">
+      <van-button block round color="{{themeColor}}" bind:click="bindSaveTap">保存</van-button>
+    </view>
+  </block>
+</view>

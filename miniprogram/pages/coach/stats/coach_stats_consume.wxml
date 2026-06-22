@@ -1,0 +1,50 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page stats-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view wx:if="{{loading}}" class="stats-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <view class="stats-summary-card">
+      <view class="stats-summary-item">
+        <view class="stats-summary-num">{{totalConsumed}}次</view>
+        <view class="stats-summary-label">累计耗次</view>
+      </view>
+      <view class="stats-summary-item">
+        <view class="stats-summary-num">{{consumeRate}}%</view>
+        <view class="stats-summary-label">耗卡率</view>
+      </view>
+      <view class="stats-summary-item">
+        <view class="stats-summary-num">{{totalInit}}次</view>
+        <view class="stats-summary-label">发卡总次数</view>
+      </view>
+      <view class="stats-summary-item">
+        <view class="stats-summary-num">{{usedCardCnt}}</view>
+        <view class="stats-summary-label">已用完卡</view>
+      </view>
+    </view>
+
+    <view class="stats-section">
+      <view class="stats-section-title">按卡种细分</view>
+      <view class="stats-table-head">
+        <view class="stats-col-name">名称</view>
+        <view class="stats-col-num">已耗</view>
+        <view class="stats-col-amt">耗率</view>
+      </view>
+      <view wx:if="{{detail.length === 0}}" class="stats-empty">暂无数据</view>
+      <view class="stats-table-row" wx:for="{{detail}}" wx:key="name">
+        <view class="stats-col-name text-cut">{{item.name}}</view>
+        <view class="stats-col-num">{{item.consumed}}次</view>
+        <view class="stats-col-amt">{{item.rate}}%</view>
+      </view>
+    </view>
+  </block>
+</view>

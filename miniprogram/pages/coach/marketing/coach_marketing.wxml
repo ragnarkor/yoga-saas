@@ -1,22 +1,24 @@
+<page-meta page-style="{{themeStyle}}" />
 <view class="coach-page">
-  <coach-tenant-switch title="营销" bind:change="bindCoachTenantChange" />
-
-  <view class="coach-header coach-header-compact"></view>
+  <coach-tenant-switch title="营销" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" bind:change="bindCoachTenantChange" />
 
   <view class="coach-revenue-card">
-    <view class="coach-revenue-sub">今日收款{{todayCount}}笔</view>
+    <view class="coach-revenue-sub">今日收款 {{todayCount}} 笔</view>
     <view class="coach-revenue-num">¥{{todayAmount}}</view>
     <view class="coach-revenue-link">查看订单</view>
   </view>
 
-  <view class="coach-section">
+  <view class="coach-section" style="margin: 0 24rpx;">
+    <view class="coach-section-head">
+      <view class="coach-section-title">营销工具</view>
+    </view>
     <view class="coach-grid coach-grid-3">
       <view class="coach-grid-item" wx:for="{{malls}}" wx:key="name" bindtap="onMallTap">
-        <view class="coach-grid-icon" style="background: #f3e8ff;">
-          <van-icon name="{{item.icon}}" color="#9b6fd4" size="40rpx" />
+        <view class="coach-grid-icon" style="background: {{item.color}}20;">
+          <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
         </view>
         <text class="coach-grid-text">{{item.name}}</text>
-        <text class="coach-grid-text" style="font-size:20rpx;color:#999;" wx:if="{{item.sub}}">{{item.sub}}</text>
+        <text class="coach-grid-text" wx:if="{{item.sub}}" style="font-size:20rpx;margin-top:4rpx;">{{item.sub}}</text>
       </view>
     </view>
   </view>

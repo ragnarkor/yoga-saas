@@ -17,6 +17,8 @@ module.exports = Behavior({
     avatarSrc: "",
     userNameInput: "",
     avatarChoosing: false,
+    nicknameEditing: false,
+    adminLoginShow: false,
   },
 
   methods: {
@@ -60,6 +62,7 @@ module.exports = Behavior({
     _loadUser: async function () {
       try {
         const user = await UserProfileBiz.fetch();
+
         const admin = AdminBiz.getAdminToken();
         const fallbackName = admin && admin.name ? admin.name : "";
 
@@ -69,18 +72,24 @@ module.exports = Behavior({
           avatarSrc = await UserProfileBiz.resolveAvatarUrl(user.USER_PIC);
         }
 
+        const cloudName = (user && user.USER_NAME) || "";
+        // 保留本地未同步完成的昵称（防止切页面回来时被空云端数据覆盖）
+        const pending = (this._pendingNickname || "").trim();
+        const displayName = cloudName || pending || fallbackName || "";
+
         const nextData = {
           user,
           localAvatar: "",
           showAvatarImg: !!avatarSrc,
           avatarSrc,
-          userNameInput: (user && user.USER_NAME) || fallbackName || "",
+          userNameInput: displayName,
+          nicknameEditing: false,
         };
         this.setData(nextData);
-        this._pendingNickname = this.data.userNameInput;
-        this._lastSyncedNickname = (user && user.USER_NAME) || "";
+        this._pendingNickname = displayName;
+        this._lastSyncedNickname = cloudName;
       } catch (err) {
-        console.error(err);
+        console.error("[_loadUser]", err);
       }
     },
 
@@ -140,19 +149,30 @@ module.exports = Behavior({
     bindNicknameInput: function (e) {
       const val = e.detail.value || "";
       this._pendingNickname = val;
-      this.setData({ userNameInput: val });
+      // 不要在输入时 setData userNameInput，否则 wx:if/wx:else 会中途切换 DOM，导致输入框消失
       if (this._nicknameTimer) clearTimeout(this._nicknameTimer);
       this._nicknameTimer = setTimeout(() => {
         this._syncNickname(this._pendingNickname);
       }, 1200);
     },
 
+    bindNicknameEditTap: function () {
+      this.setData({ nicknameEditing: true });
+    },
+
     bindNicknameBlur: async function (e) {
-      await this._syncNickname(e.detail.value || this._pendingNickname);
+      const val = (e.detail.value || this._pendingNickname || "").trim();
+      // 编辑完成后立即更新视图显示
+      this.setData({ nicknameEditing: false, userNameInput: val });
+      this._pendingNickname = val;
+      await this._syncNickname(val);
     },
 
     bindNicknameReview: async function (e) {
-      await this._syncNickname(e.detail.value || this._pendingNickname);
+      const val = (e.detail.value || this._pendingNickname || "").trim();
+      this.setData({ nicknameEditing: false, userNameInput: val });
+      this._pendingNickname = val;
+      await this._syncNickname(val);
     },
 
     _syncNickname: async function (name) {
@@ -171,7 +191,7 @@ module.exports = Behavior({
           this._lastSyncedNickname = user.USER_NAME || val;
         }
       } catch (err) {
-        console.error(err);
+        console.error("[syncNickname error]", err);
       }
     },
 
@@ -208,6 +228,10 @@ module.exports = Behavior({
       this.setTap(e, this.data.skin);
     },
 
+    bindAdminLoginCloseTap: function () {
+      this.setData({ adminLoginShow: false });
+    },
+
     setTap: function (e, skin) {
       let itemList = ["清除缓存", "后台管理"];
       wx.showActionSheet({
@@ -223,10 +247,13 @@ module.exports = Behavior({
             pageHelper.setSkin(skin);
             if (setting.IS_SUB) {
               PassportBiz.adminLogin("admin", "123456", this);
-            } else {
-              wx.reLaunch({
-                url: "/pages/admin/index/login/admin_login",
+            } else if (!pageHelper.getPID()) {
+              wx.showToast({
+                title: "请先选择瑜伽馆",
+                icon: "none",
               });
+            } else {
+              this.setData({ adminLoginShow: true });
             }
           }
         },

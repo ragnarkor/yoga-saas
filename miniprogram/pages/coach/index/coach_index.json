@@ -1,11 +1,13 @@
 {
+  "enablePullDownRefresh": true,
   "navigationStyle": "custom",
   "navigationBarTitleText": "教练版",
-  "navigationBarBackgroundColor": "#c4b5fd",
+  "navigationBarBackgroundColor": "#5B8A72",
   "navigationBarTextStyle": "white",
   "usingComponents": {
     "coach-tab-bar": "/cmpts/biz/coach_tab_bar/coach_tab_bar_cmpt",
     "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt",
+    "member-invite-panel": "/cmpts/biz/member_invite_panel/member_invite_panel_cmpt",
     "van-icon": "@vant/weapp/icon/index"
   }
 }

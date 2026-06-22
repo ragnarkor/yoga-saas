@@ -24,7 +24,7 @@
 }
 
 .coach-tab-item.active {
-  color: #9b6fd4;
+  color: var(--themeColor, #5b8a72);
 }
 
 .coach-tab-text {

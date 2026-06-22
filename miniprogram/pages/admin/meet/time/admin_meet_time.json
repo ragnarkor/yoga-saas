@@ -1,9 +1,10 @@
 {
-	"usingComponents": { 
-		"cmpt-picker-multi": "../../../../cmpts/public/picker_multi/picker_multi_cmpt",
-		"cmpt-calendar": "../../../../cmpts/public/calendar/calendar_meet/calendar_meet_cmpt"
-	},
-	"navigationBarBackgroundColor": "#2499f2",
-	"navigationBarTextStyle": "white", 
-	"navigationBarTitleText": "时间设置"
+  "navigationBarBackgroundColor": "#2499f2",
+  "navigationBarTextStyle": "white",
+  "navigationBarTitleText": "预约时间设置",
+  "usingComponents": {
+    "van-calendar": "@vant/weapp/calendar/index",
+    "van-datetime-picker": "@vant/weapp/datetime-picker/index",
+    "van-action-sheet": "@vant/weapp/action-sheet/index"
+  }
 }

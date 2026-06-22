@@ -9,12 +9,18 @@
 				<view class="avatar-wrap">
 					<image wx:if="{{showAvatarImg}}" class="avatar-img" mode="aspectFill" src="{{avatarSrc}}" />
 					<view wx:else class="avatar-placeholder">
-						<van-icon name="user-o" size="68rpx" color="#5b8a72" />
+						<van-icon name="user-o" size="68rpx" color="{{themeColor}}" />
 					</view>
 					<button class="avatar-choose-btn" open-type="chooseAvatar" disabled="{{avatarChoosing}}" bindtap="bindAvatarTap" bindchooseavatar="bindChooseAvatar"></button>
 				</view>
 				<view class="detail">
-					<input type="nickname" class="name-input" placeholder="点击填写微信昵称" value="{{userNameInput}}" bindinput="bindNicknameInput" bindblur="bindNicknameBlur" bindnicknamereview="bindNicknameReview" />
+					<!-- 有昵称且非编辑态：用 view 显示（与教练版一致，可靠回显） -->
+					<view wx:if="{{userNameInput && !nicknameEditing}}" class="name-text" bindtap="bindNicknameEditTap">
+						<text>{{userNameInput}}</text>
+						<text class="name-edit-hint">修改</text>
+					</view>
+					<!-- 无昵称或编辑态：用 input type=nickname 引导选择微信昵称 -->
+					<input wx:else type="nickname" class="name-input" placeholder="点击填写微信昵称" value="{{userNameInput}}" bindinput="bindNicknameInput" bindblur="bindNicknameBlur" bindnicknamereview="bindNicknameReview" />
 					<view class="desc">
 						<button wx:if="{{!user || !user.USER_MOBILE}}" open-type="getPhoneNumber" bindgetphonenumber="bindGetPhone" class="phone-auth-btn">绑定手机号（可选）</button>
 						<text wx:elif="{{user.USER_MOBILE}}" class="phone-text">{{user.USER_MOBILE}}</text>
@@ -32,7 +38,7 @@
 					<view class="title">我的今日{{skin.MEET_NAME}}</view>
 					<view class="list">
 						<view class="item" wx:if="{{myTodayLoading}}">
-							<van-loading size="32rpx" color="#5b8a72" custom-class="today-loading" />
+							<van-loading size="32rpx" color="{{themeColor}}" custom-class="today-loading" />
 						</view>
 						<view wx:elif="{{!myTodayList || myTodayList.length==0}}" class="item">
 							<view class="text-normal text-grey" style="line-height:1!important">您今天没有{{skin.MEET_NAME}}哦~ </view>

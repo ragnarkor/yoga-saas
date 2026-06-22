@@ -26,6 +26,10 @@ Page({
 
 		this.setData(await AdminMeetBiz.initFormData()); // 初始化表单数据   
 
+		if (options.typeId && !options.id) {
+			this.setData({ formTypeId: options.typeId });
+		}
+
 		await this._loadDetail();
 
 		this._setContentDesc();

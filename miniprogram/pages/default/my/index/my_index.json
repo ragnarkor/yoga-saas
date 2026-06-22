@@ -1,6 +1,6 @@
 {
-	"usingComponents": { 
-	 
+	"usingComponents": {
+		"cmpt-admin-login-panel": "/cmpts/biz/admin_login_panel/admin_login_panel_cmpt"
 	},
 	"navigationStyle": "custom",
 	"enablePullDownRefresh": true,

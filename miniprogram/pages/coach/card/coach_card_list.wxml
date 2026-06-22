@@ -1,0 +1,48 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page card-page">
+  <coach-tenant-switch
+    title="会员卡列表"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+  />
+
+  <view wx:if="{{loading}}" class="card-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <view wx:elif="{{!cardList.length}}" class="card-empty">
+    <van-empty description="暂无会员卡">
+      <van-button round color="{{themeColor}}" size="small" bind:click="bindAddTap">添加会员卡</van-button>
+    </van-empty>
+  </view>
+
+  <view wx:else class="card-list">
+    <view class="card-item" wx:for="{{cardList}}" wx:key="CARD_TPL_ID">
+      <view class="card-preview" style="background: {{item.CARD_TPL_COLOR}};">
+        <text class="card-preview-label">VIP CARD</text>
+        <text class="card-preview-type">{{item.typeDesc}}</text>
+      </view>
+      <view class="card-body">
+        <view class="card-title">{{item.CARD_TPL_NAME}}</view>
+        <view class="card-meta">{{item.metaText}}</view>
+        <view class="card-actions">
+          <view
+            class="card-action-btn"
+            data-id="{{item.CARD_TPL_ID}}"
+            bindtap="bindEditTap"
+          >编辑</view>
+          <view
+            class="card-action-btn"
+            data-id="{{item.CARD_TPL_ID}}"
+            bindtap="bindManageTap"
+          >卡管理</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card-fab" bindtap="bindAddTap">
+    <van-icon name="coupon-o" size="48rpx" color="#fff" />
+  </view>
+</view>

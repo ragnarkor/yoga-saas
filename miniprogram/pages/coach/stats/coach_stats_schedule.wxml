@@ -1,0 +1,22 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page stats-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view wx:if="{{loading}}" class="stats-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+  <view wx:elif="{{list.length === 0}}" class="stats-empty">近7日暂无排课</view>
+  <view wx:else>
+    <view class="stats-list-row" wx:for="{{list}}" wx:key="index">
+      <view class="stats-list-title">{{item.title}}</view>
+      <view class="stats-list-meta">{{item.dayText}} {{item.timeStart}}-{{item.timeEnd}}</view>
+      <view class="stats-list-tag" wx:if="{{item.typeName}}">{{item.typeName}}</view>
+    </view>
+  </view>
+</view>

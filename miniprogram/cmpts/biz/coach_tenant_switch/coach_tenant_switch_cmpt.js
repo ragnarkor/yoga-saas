@@ -1,5 +1,6 @@
 const pageHelper = require('../../../helper/page_helper.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
+const themeHelper = require('../../../helper/theme_helper.js');
 
 Component({
   properties: {
@@ -7,9 +8,21 @@ Component({
       type: String,
       value: '教练版',
     },
+    themeColor: {
+      type: String,
+      value: '',
+    },
     navBg: {
       type: String,
-      value: '#5b8a72',
+      value: '',
+    },
+    showBack: {
+      type: Boolean,
+      value: false,
+    },
+    showSwitch: {
+      type: Boolean,
+      value: true,
     },
   },
 
@@ -19,6 +32,20 @@ Component({
     tenantList: [],
     statusBar: 20,
     customBar: 64,
+    effectiveShowSwitch: true,
+    headerBg: themeHelper.getNavBarBg(themeHelper.DEFAULT_THEME),
+  },
+
+  observers: {
+    themeColor(color) {
+      this._syncHeaderBg(color, this.properties.navBg);
+    },
+    navBg(val) {
+      this._syncHeaderBg(this.properties.themeColor, val);
+    },
+    'showBack, showSwitch'(showBack, showSwitch) {
+      this.setData({ effectiveShowSwitch: !showBack && showSwitch });
+    },
   },
 
   lifetimes: {
@@ -28,6 +55,8 @@ Component({
       this.setData({
         statusBar: globalData.statusBar || 20,
         customBar: globalData.customBar || 64,
+        effectiveShowSwitch:
+          !this.properties.showBack && this.properties.showSwitch,
       });
       this.refresh();
     },
@@ -40,14 +69,37 @@ Component({
   },
 
   methods: {
+    _syncHeaderBg(themeColor, navBg) {
+      let bg = navBg;
+      if (!bg && themeColor) {
+        bg = themeHelper.getNavBarBg(themeColor);
+      }
+      if (!bg) {
+        bg = themeHelper.getNavBarBg(pageHelper.getThemeColor());
+      }
+      this.setData({ headerBg: bg });
+    },
+
     async refresh() {
       const list = await AdminWxBiz.fetchTenantList();
       const pid = pageHelper.getPID();
       let current = list.find((t) => t._pid === pid) || list[0];
+      this._syncHeaderBg(
+        this.properties.themeColor,
+        this.properties.navBg,
+      );
       this.setData({
         tenantList: list,
         tenantName: current ? current.TENANT_NAME : pageHelper.getTenantName(),
         roleLabel: current ? current.roleLabel : '',
+      });
+    },
+
+    bindBackTap() {
+      wx.navigateBack({
+        fail: () => {
+          wx.redirectTo({ url: '/pages/coach/index/coach_index' });
+        },
       });
     },
 

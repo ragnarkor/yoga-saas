@@ -1,54 +1,71 @@
-<view class="coach-page">
-  <coach-tenant-switch title="工作台" bind:change="bindCoachTenantChange" />
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page coach-home">
+  <coach-tenant-switch title="工作台" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" bind:change="bindCoachTenantChange" />
 
-  <view class="coach-header">
-    <view class="coach-header-sub">教练版工作台</view>
-  </view>
+  <view class="coach-home-body">
+    <view class="coach-welcome">
+      <text class="coach-welcome-title">{{tenantName || '瑜伽馆'}}</text>
+      <text class="coach-welcome-sub">今日经营概览</text>
+    </view>
 
-  <view class="coach-stats-card">
-    <view class="coach-stat-item">
-      <view class="coach-stat-num">{{stats.todayJoin}}</view>
-      <view class="coach-stat-label">今日预约</view>
+    <view class="coach-stats-card">
+      <view class="coach-stat-item">
+        <view class="coach-stat-num">{{stats.todayJoin}}</view>
+        <view class="coach-stat-label">今日预约</view>
+      </view>
+      <view class="coach-stat-item">
+        <view class="coach-stat-num">{{stats.newCard}}</view>
+        <view class="coach-stat-label">新增会员卡</view>
+      </view>
+      <view class="coach-stat-item">
+        <view class="coach-stat-num">{{stats.newMember}}</view>
+        <view class="coach-stat-label">新增会员</view>
+      </view>
     </view>
-    <view class="coach-stat-item">
-      <view class="coach-stat-num">{{stats.newCard}}</view>
-      <view class="coach-stat-label">新增会员卡</view>
-    </view>
-    <view class="coach-stat-item">
-      <view class="coach-stat-num">{{stats.newMember}}</view>
-      <view class="coach-stat-label">新增会员</view>
-    </view>
-  </view>
 
-  <view class="coach-section" wx:if="{{noticeText}}">
-    <view class="coach-notice" style="margin:0">
-      <van-icon name="bell" color="#9b6fd4" size="36rpx" />
+    <view class="coach-notice" wx:if="{{noticeText}}">
+      <van-icon name="bell" color="{{themeColor}}" size="36rpx" />
       <text>{{noticeText}}</text>
       <text class="coach-notice-time">{{noticeTime}}</text>
     </view>
-  </view>
 
-  <view class="coach-section">
-    <view class="coach-grid coach-grid-3">
-      <view class="coach-grid-item" wx:for="{{quickTools}}" wx:key="name" bindtap="onMenuTap" data-url="{{item.url}}">
-        <view class="coach-grid-icon" style="background: {{item.color}}20;">
-          <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
+    <view class="coach-section">
+      <view class="coach-section-head">
+        <view class="coach-section-title">快捷工具</view>
+      </view>
+      <view class="coach-grid coach-grid-3">
+        <view class="coach-grid-item" wx:for="{{quickTools}}" wx:key="name" bindtap="onMenuTap" data-url="{{item.url}}" data-action="{{item.action}}">
+          <view class="coach-grid-icon" style="background: {{item.color}}20;">
+            <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
+          </view>
+          <text class="coach-grid-text">{{item.name}}</text>
         </view>
-        <text class="coach-grid-text">{{item.name}}</text>
+      </view>
+    </view>
+
+    <view class="coach-section">
+      <view class="coach-section-head">
+        <view class="coach-section-title">业务管理</view>
+        <view class="coach-section-desc">预约、会员与门店日常运营</view>
+      </view>
+      <view class="coach-grid coach-grid-3">
+        <view class="coach-grid-item" wx:for="{{menus}}" wx:key="name" bindtap="onMenuTap" data-url="{{item.url}}">
+          <view class="coach-grid-icon" style="background: {{item.color}}20;">
+            <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
+          </view>
+          <text class="coach-grid-text">{{item.name}}</text>
+        </view>
       </view>
     </view>
   </view>
 
-  <view class="coach-section">
-    <view class="coach-grid coach-grid-3">
-      <view class="coach-grid-item" wx:for="{{menus}}" wx:key="name" bindtap="onMenuTap" data-url="{{item.url}}">
-        <view class="coach-grid-icon" style="background: {{item.color}}20;">
-          <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
-        </view>
-        <text class="coach-grid-text">{{item.name}}</text>
-      </view>
-    </view>
-  </view>
+  <coach-tab-bar active="{{0}}" hidden="{{inviteShow}}" />
 
-  <coach-tab-bar active="{{0}}" />
+  <member-invite-panel
+    wx:if="{{inviteShow}}"
+    show="{{inviteShow}}"
+    theme-color="{{themeColor}}"
+    bind:close="bindInviteCloseTap"
+    bind:ready="bindInviteReadyTap"
+  />
 </view>

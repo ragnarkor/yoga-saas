@@ -813,9 +813,13 @@ class MeetService extends BaseService {
         }
         case "succ": {
           //预约成功
-          where.JOIN_STATUS = JoinModel.STATUS.COMM;
-          //where.JOIN_MEET_DAY = ['>=', timeUtil.time('Y-M-D')];
-          //where.JOIN_MEET_TIME_START = ['>=', timeUtil.time('h:m')];
+          where.JOIN_STATUS = JoinModel.STATUS.SUCC;
+          break;
+        }
+        case "checkin": {
+          //已签到
+          where.JOIN_STATUS = JoinModel.STATUS.SUCC;
+          where.JOIN_IS_CHECKIN = 1;
           break;
         }
         case "cancel": {

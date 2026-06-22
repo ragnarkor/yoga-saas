@@ -1,3 +1,7 @@
-<cmpt-tenant-switch title="我的" />
+<page-meta page-style="{{pageStyle}}" />
 <import src="../../../../tpls/project/my_index_tpl.wxml" />
-<template is="myIndexTpl" data="{{user,myTodayList,myTodayLoading,skin,showAvatarImg,avatarSrc,userNameInput,avatarChoosing,returnHome:false,footColor:''}}" />
+<view class="theme-scope" style="{{pageStyle}}">
+  <cmpt-tenant-switch title="我的" theme-color="{{themeColor}}" />
+  <template is="myIndexTpl" data="{{user,myTodayList,myTodayLoading,skin,themeColor,showAvatarImg,avatarSrc,userNameInput,nicknameEditing,avatarChoosing,returnHome:false,footColor:''}}" />
+</view>
+<cmpt-admin-login-panel show="{{adminLoginShow}}" bind:close="bindAdminLoginCloseTap" />

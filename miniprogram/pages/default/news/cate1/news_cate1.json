@@ -1,7 +1,9 @@
 {
-	"usingComponents": { 
-	}, 
-	"disableScroll": true,  
-	"navigationStyle": "custom",
-	"navigationBarTitleText": "资讯"
+  "usingComponents": {
+    "van-empty": "@vant/weapp/empty/index",
+    "van-loading": "@vant/weapp/loading/index"
+  },
+  "enablePullDownRefresh": true,
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "我的课程"
 }

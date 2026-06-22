@@ -31,9 +31,7 @@ class AdminMeetBiz extends BaseBiz {
 
 	/** 取得分类 */
 	static async getTypeList() {
-		let skin = pageHelper.getSkin();
-
-		let typeList = dataHelper.getSelectOptions(skin.MEET_TYPE);
+		let typeList = dataHelper.getSelectOptions(pageHelper.getMeetTypeStr());
 		let arr = [];
 		for (let k in typeList) {
 			arr.push({
@@ -47,8 +45,7 @@ class AdminMeetBiz extends BaseBiz {
 	}
 
 	static getTypeName(typeId) {
-		let skin = pageHelper.getSkin();
-		let typeList = dataHelper.getSelectOptions(skin.MEET_TYPE);
+		let typeList = dataHelper.getSelectOptions(pageHelper.getMeetTypeStr());
 
 		for (let k in typeList) {
 			if (typeList[k].val == typeId) return typeList[k].label;
@@ -410,10 +407,7 @@ class AdminMeetBiz extends BaseBiz {
 			formTypeId: '',
 			formContent: '',
 			formOrder: 9999,
-			formStyleSet: {
-				pic: '',
-				desc: ''
-			},
+			formStyleSet: AdminMeetBiz.defaultCourseStyleSet(),
 
 			formDaysSet: [], // 时间设置 
 
@@ -425,32 +419,98 @@ class AdminMeetBiz extends BaseBiz {
 
 	}
 
+	/** 教练版课程样式默认值 */
+	static defaultCourseStyleSet() {
+		return {
+			templateId: '',
+			templateName: '',
+			pic: '',
+			desc: '',
+			duration: 60,
+			cardAmount: 0,
+			cardTimes: 1,
+			teacherId: '',
+			teacherName: '',
+			color: '#e57373',
+			carousel: [],
+			notice: '',
+			capacity: 7,
+			minJoin: 2,
+			difficulty: 3,
+			level: 3,
+		};
+	}
+
+	static normalizeCourseStyleSet(raw = {}) {
+		const def = AdminMeetBiz.defaultCourseStyleSet();
+		const merged = Object.assign({}, def, raw || {});
+		merged.difficulty = Number(merged.difficulty || merged.level || 3);
+		merged.level = merged.difficulty;
+		merged.duration = Number(merged.duration || 60);
+		merged.cardAmount = Number(merged.cardAmount || 0);
+		merged.cardTimes = Number(merged.cardTimes || 1);
+		merged.capacity = Number(merged.capacity || 7);
+		merged.minJoin = Number(merged.minJoin || 2);
+		if (!Array.isArray(merged.carousel)) {
+			merged.carousel = merged.carousel ? [merged.carousel] : [];
+		}
+		return merged;
+	}
+
+	static async initCoachCourseFormData() {
+		const base = await AdminMeetBiz.initFormData();
+		base.formStyleSet = AdminMeetBiz.defaultCourseStyleSet();
+		return base;
+	}
+
 	/** 
 	 * 样式更新
 	 * @param {string} meetId 
 	 * @param {Array} content  富文本数组
 	 */
 	static async updateMeetStyleSet(meetId, styleSet, that) {
+		return AdminMeetBiz.updateCourseStyleSet(meetId, styleSet, that);
+	}
+
+	static async updateCourseStyleSet(meetId, styleSet, that) {
+		styleSet = AdminMeetBiz.normalizeCourseStyleSet(styleSet);
 		let pic = styleSet.pic;
 
-		// 图片上传到云空间
-		if (styleSet.pic)
-			pic = await cloudHelper.transTempPicOne(pic, setting.MEET_PIC_PATH, meetId, false);
-
+		if (
+			pic &&
+			(pic.includes('tmp') || pic.includes('temp') || pic.includes('wxfile'))
+		) {
+			pic = await cloudHelper.transTempPicOne(
+				pic,
+				setting.MEET_PIC_PATH,
+				meetId,
+				false,
+			);
+		}
 		styleSet.pic = pic;
 
-		// 更新本记录的图片信息
-		let params = {
-			meetId,
-			styleSet
+		let carousel = styleSet.carousel || [];
+		if (carousel.length) {
+			carousel = await cloudHelper.transTempPics(
+				carousel.slice(),
+				setting.MEET_PIC_PATH,
+				meetId + '/carousel',
+			);
+			styleSet.carousel = carousel;
 		}
 
+		let params = {
+			meetId,
+			styleSet,
+		};
+
 		try {
-			// 更新数据 从promise 里直接同步返回
 			await cloudHelper.callCloudSumbit('admin/meet_update_style', params);
-			that.setData({
-				formStyleSet: styleSet
-			});
+			if (that) {
+				that.setData({
+					formStyleSet: styleSet,
+				});
+			}
 		} catch (e) {
 			console.error(e);
 			return false;
@@ -515,6 +575,14 @@ AdminMeetBiz.CHECK_FORM = {
 	daysSet: 'formDaysSet|must|array|name=预约时间设置',
 	isShowLimit: 'formIsShowLimit|must|int|in:0,1|name=是否显示可预约人数',
 
+	formSet: 'formFormSet|must|array|name=用户资料设置',
+};
+
+AdminMeetBiz.CHECK_FORM_COACH = {
+	title: 'formTitle|must|string|min:2|max:50|name=课程名称',
+	typeId: 'formTypeId|must|id|name=课程类型',
+	order: 'formOrder|must|int|min:1|max:9999|name=排序号',
+	isShowLimit: 'formIsShowLimit|must|int|in:0,1|name=是否显示可预约人数',
 	formSet: 'formFormSet|must|array|name=用户资料设置',
 };
 

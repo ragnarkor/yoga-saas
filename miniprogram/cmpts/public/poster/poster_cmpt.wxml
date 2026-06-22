@@ -8,8 +8,10 @@
 			<view class="action plan-text text-l" bindtap="bindCloseTap">关闭</view>
 		</view>
 		<view class="poster-img">
+			<!-- [AI_START TIMESTAMP=2026-06-22 14:49:41] -->
 			<image bindtap="url" data-type="img" data-url="{{img}}" wx:if="{{isLoad}}" mode="widthFix" src="{{img}}"
-				class="shadow loading"></image>
+				class="shadow loading poster-main-img"></image>
+			<!-- [AI_END LINES=2 TIMESTAMP=2026-06-22 14:49:41] -->
 
 			<view wx:else class="load loading text-l"></view>
 
@@ -17,16 +19,24 @@
 		<view class="poster-share">
 			<button class="item item-share clearbtn" open-type="share" data-img="{{img}}">
 				<view class="pic">
-					<image src="images/wechat.png" />
+					<!-- [AI_START TIMESTAMP=2026-06-22 14:49:41] -->
+					<image class="pic-img" src="images/wechat.png" />
+					<!-- [AI_END LINES=1 TIMESTAMP=2026-06-22 14:49:41] -->
 				</view>
-				<text>分享给朋友</text>
+				<!-- [AI_START TIMESTAMP=2026-06-22 14:49:41] -->
+				<text class="item-text">分享给朋友</text>
+				<!-- [AI_END LINES=1 TIMESTAMP=2026-06-22 14:49:41] -->
 			</button>
 
 			<view class="item" bindtap="bindSaveTap">
 				<view class="pic">
-					<image class='friend' src="images/friend.png" />
+					<!-- [AI_START TIMESTAMP=2026-06-22 14:49:41] -->
+					<image class='friend pic-img' src="images/friend.png" />
+					<!-- [AI_END LINES=1 TIMESTAMP=2026-06-22 14:49:41] -->
 				</view>
-				<text>保存后发朋友圈</text>
+				<!-- [AI_START TIMESTAMP=2026-06-22 14:49:41] -->
+				<text class="item-text">保存后发朋友圈</text>
+				<!-- [AI_END LINES=1 TIMESTAMP=2026-06-22 14:49:41] -->
 			</view>
 		</view>
 

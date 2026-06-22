@@ -298,10 +298,20 @@ class AdminMeetService extends BaseAdminService {
     let meet = await MeetModel.getOne(where, "MEET_STYLE_SET");
     if (!meet) this.AppError("预约项目不存在");
 
-    let oldPic = (meet.MEET_STYLE_SET && meet.MEET_STYLE_SET.pic) || "";
+    let oldStyle = meet.MEET_STYLE_SET || {};
+    let oldPic = oldStyle.pic || "";
     let newPic = (styleSet && styleSet.pic) || "";
     if (oldPic && oldPic != newPic) {
       await cloudUtil.deleteFiles([oldPic]);
+    }
+
+    let oldCarousel = oldStyle.carousel || [];
+    let newCarousel = (styleSet && styleSet.carousel) || [];
+    if (!Array.isArray(oldCarousel)) oldCarousel = oldCarousel ? [oldCarousel] : [];
+    if (!Array.isArray(newCarousel)) newCarousel = newCarousel ? [newCarousel] : [];
+    let toDelete = oldCarousel.filter((p) => p && !newCarousel.includes(p));
+    if (toDelete.length) {
+      await cloudUtil.deleteFiles(toDelete);
     }
 
     await MeetModel.edit(where, { MEET_STYLE_SET: styleSet });
@@ -480,7 +490,7 @@ class AdminMeetService extends BaseAdminService {
       MEET_ADD_TIME: "desc",
     };
     let fields =
-      "MEET_TYPE,MEET_TYPE_NAME,MEET_TITLE,MEET_STATUS,MEET_DAYS,MEET_ADD_TIME,MEET_EDIT_TIME,MEET_ORDER";
+      "MEET_TYPE_ID,MEET_TYPE_NAME,MEET_TITLE,MEET_STATUS,MEET_DAYS,MEET_STYLE_SET,MEET_ADD_TIME,MEET_EDIT_TIME,MEET_ORDER";
 
     let where = {};
     if (adminType === AdminModel.TYPE.TEACHER) {
@@ -573,6 +583,70 @@ class AdminMeetService extends BaseAdminService {
   /**置顶排序设定 */
   async sortMeet(id, sort) {
     await MeetModel.edit({ _id: id }, { MEET_ORDER: sort });
+  }
+
+  /** 教练端周课表 */
+  async getScheduleWeek({ startDay, endDay, typeId }, adminId, adminType) {
+    let meetWhere = { MEET_STATUS: MeetModel.STATUS.COMM };
+    if (adminType === AdminModel.TYPE.TEACHER) {
+      meetWhere.MEET_ADMIN_ID = adminId;
+    }
+
+    let meets = await MeetModel.getAll(
+      meetWhere,
+      "MEET_TITLE,MEET_TYPE_ID,MEET_TYPE_NAME,MEET_STYLE_SET",
+      { MEET_ORDER: "asc", MEET_ADD_TIME: "desc" },
+    );
+
+    let meetMap = {};
+    for (let k in meets) {
+      meetMap[meets[k]._id] = meets[k];
+    }
+
+    let dayWhere = {
+      day: ["between", startDay, endDay],
+    };
+    let dayRecords = await DayModel.getAllBig(
+      dayWhere,
+      "day,times,DAY_MEET_ID",
+      { day: "asc" },
+      2000,
+    );
+
+    let slots = [];
+    let timeSet = new Set();
+
+    for (let k in dayRecords) {
+      let meet = meetMap[dayRecords[k].DAY_MEET_ID];
+      if (!meet) continue;
+      if (typeId && typeId !== "0" && meet.MEET_TYPE_ID != typeId) continue;
+
+      let style = meet.MEET_STYLE_SET || {};
+      let times = dayRecords[k].times || [];
+      for (let j in times) {
+        let t = times[j];
+        if (t.status != 1) continue;
+        timeSet.add(t.start);
+        slots.push({
+          day: dayRecords[k].day,
+          start: t.start,
+          end: t.end,
+          mark: t.mark,
+          meetId: dayRecords[k].DAY_MEET_ID,
+          title: meet.MEET_TITLE,
+          typeName: meet.MEET_TYPE_NAME,
+          typeId: meet.MEET_TYPE_ID,
+          teacherName: style.teacherName || "",
+          color: style.color || "#81c784",
+          duration: style.duration || 60,
+          difficulty: Number(style.difficulty || style.level || 3),
+        });
+      }
+    }
+
+    let timeRows = Array.from(timeSet).sort();
+
+    return { slots, timeRows, startDay, endDay };
   }
 }
 

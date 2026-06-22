@@ -1,0 +1,58 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page stats-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view wx:if="{{loading}}" class="stats-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <view class="stats-summary-card">
+      <view class="stats-summary-item">
+        <view class="stats-summary-num">{{stats.totalJoin || 0}}</view>
+        <view class="stats-summary-label">累计预约</view>
+      </view>
+      <view class="stats-summary-item">
+        <view class="stats-summary-num">{{stats.totalCheckin || 0}}</view>
+        <view class="stats-summary-label">累计签到</view>
+      </view>
+      <view class="stats-summary-item">
+        <view class="stats-summary-num">{{stats.todayJoin || 0}}</view>
+        <view class="stats-summary-label">今日预约</view>
+      </view>
+      <view class="stats-summary-item">
+        <view class="stats-summary-num">{{stats.monthJoin || 0}}</view>
+        <view class="stats-summary-label">本月预约</view>
+      </view>
+      <view class="stats-summary-item">
+        <view class="stats-summary-num">{{stats.monthCheckin || 0}}</view>
+        <view class="stats-summary-label">本月签到</view>
+      </view>
+      <view class="stats-summary-item">
+        <view class="stats-summary-num">{{stats.checkinRate || 0}}%</view>
+        <view class="stats-summary-label">签到率</view>
+      </view>
+    </view>
+
+    <view class="stats-section">
+      <view class="stats-section-title">近30日趋势</view>
+      <view class="stats-table-head">
+        <view class="stats-col-name">日期</view>
+        <view class="stats-col-num">预约</view>
+        <view class="stats-col-amt">签到</view>
+      </view>
+      <view wx:if="{{dailyTrend.length === 0}}" class="stats-empty">暂无数据</view>
+      <view class="stats-table-row" wx:for="{{dailyTrend}}" wx:key="day">
+        <view class="stats-col-name">{{item.day}}</view>
+        <view class="stats-col-num">{{item.joinCnt}}</view>
+        <view class="stats-col-amt">{{item.checkinCnt}}</view>
+      </view>
+    </view>
+  </block>
+</view>

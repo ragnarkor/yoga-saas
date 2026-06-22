@@ -1,9 +1,10 @@
+<page-meta page-style="{{pageStyle}}" />
 <view wx:if="{{!isLoad}}" class="loading-wrap">
-  <van-loading size="48rpx" color="#5b8a72" />
+  <van-loading size="48rpx" color="{{themeColor}}" />
 </view>
 
 <view wx:elif="{{!teacher}}" class="loading-wrap">
-  <van-empty description="老师信息不存在" />
+  <van-empty description="???????" />
 </view>
 
 <view class="teacher-detail" wx:else>
@@ -14,12 +15,12 @@
   </view>
 
   <view class="card" wx:if="{{teacher.desc}}">
-    <view class="card-title">简介</view>
+    <view class="card-title">??</view>
     <view class="card-text">{{teacher.desc}}</view>
   </view>
 
   <view class="card" wx:if="{{teacher.pics.length > 0}}">
-    <view class="card-title">教学照片</view>
+    <view class="card-title">????</view>
     <view class="pic-grid">
       <image wx:for="{{teacher.pics}}" wx:key="*this" mode="aspectFill" src="{{item}}" bindtap="bindPreviewPic" data-url="{{item}}" />
     </view>

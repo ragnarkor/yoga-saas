@@ -1,0 +1,34 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page stats-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view class="stats-summary-card">
+    <view class="stats-summary-item">
+      <view class="stats-summary-num">¥{{totalAmount}}</view>
+      <view class="stats-summary-label">累计发卡金额</view>
+    </view>
+    <view class="stats-summary-item">
+      <view class="stats-summary-num">¥{{monthAmount}}</view>
+      <view class="stats-summary-label">本月发卡金额</view>
+    </view>
+  </view>
+
+  <view class="stats-section">
+    <view class="stats-section-title">明细记录</view>
+    <view wx:if="{{loading && list.length === 0}}" class="stats-loading">
+      <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+    </view>
+    <view wx:elif="{{list.length === 0}}" class="stats-empty">暂无记录</view>
+    <view class="stats-list-row" wx:for="{{list}}" wx:key="index">
+      <view class="stats-list-title">{{item.cardName}}</view>
+      <view class="stats-list-meta">{{item.userName}} · {{item.date}}</view>
+      <view class="stats-list-meta">金额：<text style="color:var(--themeColor,#5b8a72);font-weight:600;">¥{{item.amount}}</text></view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,82 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page schedule-page">
+  <coach-tenant-switch title="排课" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
+
+  <van-tabs
+    active="{{activeTab}}"
+    color="{{themeColor}}"
+    title-active-color="{{themeColor}}"
+    bind:change="bindTabChange"
+    custom-class="schedule-tabs"
+  >
+    <van-tab wx:for="{{tabs}}" wx:key="id" title="{{item.name}}" />
+  </van-tabs>
+
+  <view class="schedule-week-bar">
+    <view class="schedule-week-btn" bindtap="bindPrevWeek">◀ 上周</view>
+    <view class="schedule-week-range">{{weekLabel}}</view>
+    <view class="schedule-week-btn" bindtap="bindNextWeek">下周 ▶</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="schedule-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <van-empty wx:elif="{{!gridRows.length}}" description="本周暂无排课">
+    <van-button round color="{{themeColor}}" size="small" bind:click="bindGoSchedule">去排课</van-button>  </van-empty>
+
+  <scroll-view wx:else scroll-x enhanced show-scrollbar="{{false}}" class="schedule-scroll">
+    <view class="schedule-grid">
+      <view class="schedule-row schedule-head">
+        <view class="schedule-time-col"></view>
+        <view class="schedule-day-col" wx:for="{{weekDays}}" wx:key="day">{{item.label}}</view>
+      </view>
+      <view class="schedule-row" wx:for="{{gridRows}}" wx:key="time">
+        <view class="schedule-time-col">{{item.time}}</view>
+        <view class="schedule-day-col" wx:for="{{item.cells}}" wx:for-item="cell" wx:key="index">
+          <view
+            wx:if="{{cell}}"
+            class="schedule-card"
+            style="background: {{cell.color}};"
+            data-meet-id="{{cell.meetId}}"
+            bindtap="bindCourseTap"
+          >
+            <text class="schedule-card-teacher">{{cell.teacherName || '教练'}}</text>
+            <text class="schedule-card-title">{{cell.title}}</text>
+            <text class="schedule-stars">{{cell.starText}}</text>
+            <text class="schedule-card-meta">{{cell.duration}}m [{{cell.typeName}}]</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="schedule-bottom">
+    <van-button icon="photo-o" color="{{themeColor}}" plain bind:click="bindSaveImageTap">保存图片</van-button>
+    <van-button icon="ellipsis" color="{{themeColor}}" plain bind:click="bindMoreTap">更多操作</van-button>
+    <van-button icon="plus" color="{{themeColor}}" bind:click="bindGoSchedule">排课</van-button>
+  </view>
+  <canvas
+    type="2d"
+    id="scheduleCanvas"
+    class="schedule-canvas-hidden"
+    style="height: {{canvasHeight}}px;"
+  />
+
+  <van-popup show="{{previewShow}}" round bind:close="bindClosePreview">
+    <view class="schedule-preview">
+      <image wx:if="{{previewUrl}}" class="schedule-preview-img" src="{{previewUrl}}" mode="widthFix" />
+      <view class="schedule-preview-actions">
+        <van-button block plain bind:click="bindClosePreview">关闭</van-button>
+        <van-button block color="{{themeColor}}" bind:click="bindConfirmSave">保存到相册</van-button>      </view>
+    </view>
+  </van-popup>
+
+  <van-action-sheet
+    show="{{moreShow}}"
+    actions="{{moreActions}}"
+    cancel-text="取消"
+    bind:select="bindMoreSelect"
+    bind:close="bindMoreClose"
+  />
+</view>

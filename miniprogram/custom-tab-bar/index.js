@@ -55,6 +55,7 @@ Component({
     color: "#999999",
     selectedColor: "#5B8A72",
     list: [],
+    hidden: false,
   },
 
   lifetimes: {

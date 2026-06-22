@@ -52,14 +52,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--projectColorLight, #e3efe8);
+  background-color: var(--neutralIconBg, #f2f3f5);
   border-radius: 50%;
   transition: all 0.25s ease;
 }
 
 .menu .item:active .item-inner .img {
   transform: scale(0.92);
-  background-color: var(--projectColor, #5b8a72);
+  background-color: var(--projectColorLight, #e3efe8);
 }
 
 .menu .item-inner .img image {

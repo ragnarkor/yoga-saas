@@ -1,0 +1,31 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page stats-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view wx:if="{{loading}}" class="stats-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <view wx:else class="stats-section">
+    <view class="stats-section-title">课程预约排行</view>
+    <view class="stats-table-head">
+      <view class="stats-rank-no">#</view>
+      <view class="stats-col-name">课程</view>
+      <view class="stats-col-num">预约</view>
+      <view class="stats-col-amt">签到</view>
+    </view>
+    <view wx:if="{{list.length === 0}}" class="stats-empty">暂无数据</view>
+    <view class="stats-table-row" wx:for="{{list}}" wx:key="title">
+      <view class="stats-rank-no {{item.rank <= 3 ? 'top' : ''}}">{{item.rank}}</view>
+      <view class="stats-col-name text-cut">{{item.title}}</view>
+      <view class="stats-col-num">{{item.count}}</view>
+      <view class="stats-col-amt">{{item.checkinCnt}}</view>
+    </view>
+  </view>
+</view>

@@ -2,7 +2,7 @@
 <template name="listLoadTpl">
 	<view wx:if="{{!dataList || (dataList && dataList.page < dataList.count)}}"
 		class="list-loading-wrap">
-		<van-loading size="32rpx" color="#5b8a72" custom-class="list-loading" />
+		<van-loading size="32rpx" color="{{themeColor || '#5b8a72'}}" custom-class="list-loading" />
 	</view>
 	<view wx:if="{{dataList && dataList.page > 1 && dataList.page == dataList.count }}"
 		class="load text-grey over {{skin}}"></view>

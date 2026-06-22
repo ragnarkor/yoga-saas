@@ -1,5 +1,6 @@
 const pageHelper = require("../../../helper/page_helper.js");
 const cloudHelper = require("../../../helper/cloud_helper.js");
+const themeHelper = require("../../../helper/theme_helper.js");
 
 Component({
   properties: {
@@ -7,9 +8,9 @@ Component({
       type: String,
       value: "瑜伽馆预约",
     },
-    navBg: {
+    themeColor: {
       type: String,
-      value: "#5b8a72",
+      value: "",
     },
   },
 
@@ -17,6 +18,13 @@ Component({
     tenantName: "",
     statusBar: 20,
     customBar: 64,
+    navBg: themeHelper.DEFAULT_THEME,
+  },
+
+  observers: {
+    themeColor(color) {
+      this._syncNavBg(color);
+    },
   },
 
   lifetimes: {
@@ -38,34 +46,39 @@ Component({
   },
 
   methods: {
+    _syncNavBg(color) {
+      this.setData({
+        navBg: themeHelper.normalizeHex(color || pageHelper.getThemeColor()),
+      });
+    },
+
     async refreshTenant() {
-      const tenant = pageHelper.getTenantInfo();
-      if (tenant?.TENANT_NAME) {
-        this.setData({ tenantName: tenant.TENANT_NAME });
-        return;
-      }
-
-      if (!pageHelper.getPID()) {
-        this.setData({ tenantName: pageHelper.getTenantName() });
-        return;
-      }
-
-      try {
-        const res = await cloudHelper.callCloudData(
-          "tenant/detail",
-          { pid: pageHelper.getPID() },
-          { hint: false, title: "bar" },
-        );
-        if (res?.tenant) {
-          pageHelper.setTenant(res.tenant);
+      const prevColor = pageHelper.getThemeColor();
+      const pid = pageHelper.getPID();
+      if (pid) {
+        try {
+          const res = await cloudHelper.callCloudData(
+            "tenant/detail",
+            { pid },
+            { hint: false, title: "bar" },
+          );
+          if (res?.tenant) {
+            pageHelper.mergeTenantInfo(res.tenant);
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
       }
 
+      const nextColor = pageHelper.getThemeColor();
+      this._syncNavBg(this.properties.themeColor || nextColor);
       this.setData({
         tenantName: pageHelper.getTenantName(),
       });
+
+      if (nextColor !== prevColor) {
+        themeHelper.applyMemberThemeGlobal();
+      }
     },
 
     bindSwitchTenantTap() {
