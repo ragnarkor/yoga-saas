@@ -6,14 +6,14 @@
 }
 
 .article-box .article {
-  background-color: #fff;
+  background-color: var(--neutralSurface, #fff);
   padding: 40rpx 36rpx;
-  border-radius: 24rpx;
+  border-radius: var(--radius-xl, 24rpx);
   display: flex;
   flex-direction: column;
   justify-content: center;
   position: relative;
-  box-shadow: 0 4rpx 20rpx rgba(91, 138, 114, 0.06);
+  box-shadow: var(--projectShadowSm, 0 2rpx 12rpx rgba(91, 138, 114, 0.08));
 }
 
 .article-box .article.join {
@@ -49,7 +49,7 @@
 .article-box .article .title {
   font-size: 38rpx;
   line-height: 1.5;
-  color: #2d332e;
+  color: var(--neutralText, #1f2329);
   font-weight: 600;
   z-index: 999;
   letter-spacing: 1rpx;
@@ -175,10 +175,11 @@
 
 .article-box .article .content {
   margin-top: 24rpx;
-  color: #101010;
+  color: var(--neutralText, #1f2329);
   font-size: 28rpx;
   text-align: justify;
-  line-height: 1.6;
+  line-height: 1.8;
+  letter-spacing: 0.5rpx;
 }
 
 .article-box .article .pics {

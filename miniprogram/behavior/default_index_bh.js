@@ -102,7 +102,7 @@ module.exports = Behavior({
         this.setData({
           phone: data.phone || '',
           banners: (data.banners || []).map(mapBanner),
-          announcements: data.announcements || [],
+          announcements: (data.announcements || []).map((item) => ({ ...item })),
           teachers: (data.teachers || []).map(mapTeacher),
           photos: (data.photos || []).map(mapPhoto),
         });

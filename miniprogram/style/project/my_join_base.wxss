@@ -1,8 +1,15 @@
+/* [AI_START TIMESTAMP=2025-01-26 10:40:00] */
 .text-pic-list-box .item {
-  padding: 20rpx 30rpx 20rpx 40rpx;
+  padding: 24rpx 30rpx 24rpx 40rpx;
   position: relative;
   overflow: hidden;
+  transition: background var(--transition-fast, 0.15s ease);
 }
+
+.text-pic-list-box .item:active {
+  background: var(--projectBgSoft, #fafbf9);
+}
+/* [AI_END LINES=2 TIMESTAMP=2025-01-26 10:40:00] */
 
 .text-pic-list-box .item .status {
   z-index: 9999;

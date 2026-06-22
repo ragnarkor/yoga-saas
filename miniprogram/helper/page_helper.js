@@ -69,6 +69,70 @@ function setTenant(pid, template) {
   themeHelper.applyMemberThemeGlobal();
 }
 
+/** 会员端 Tab 首页（须在 app.json tabBar 中注册） */
+const MEMBER_TAB_HOME = "/pages/default/index/default_index";
+
+function refreshMemberTabBar(selected = 0) {
+  syncMemberTabBar(selected);
+}
+
+/** 从当前 Tab 页获取 custom-tab-bar 实例 */
+function getMemberTabBar(page) {
+  if (page && typeof page.getTabBar === "function") {
+    const tabBar = page.getTabBar();
+    if (tabBar) return tabBar;
+  }
+  const pages = getCurrentPages();
+  const cur = pages.length ? pages[pages.length - 1] : null;
+  if (cur && typeof cur.getTabBar === "function") {
+    return cur.getTabBar() || null;
+  }
+  return null;
+}
+
+/** 会员 Tab 页显式同步底部栏选中索引 */
+function syncMemberTabBar(selected = 0, page) {
+  const index = Number(selected);
+  if (Number.isNaN(index) || index < 0) return;
+  try {
+    const tabBar = getMemberTabBar(page);
+    if (!tabBar) return;
+    tabBar.setData({ hidden: false, selected: index });
+    if (typeof tabBar.refreshTabs === "function") {
+      tabBar.refreshTabs(index);
+    }
+  } catch (e) {
+    console.warn("[syncMemberTabBar]", e);
+  }
+}
+
+/** 切换租户后回到会员 Tab 首页，并恢复底部栏 */
+function goMemberTabHome() {
+  wx.switchTab({
+    url: MEMBER_TAB_HOME,
+    success() {
+      wx.nextTick(() => {
+        const pages = getCurrentPages();
+        const page = pages.length ? pages[pages.length - 1] : null;
+        syncMemberTabBar(0, page);
+      });
+    },
+    fail(err) {
+      console.error("[goMemberTabHome] switchTab fail", err);
+      wx.reLaunch({
+        url: MEMBER_TAB_HOME,
+        success() {
+          wx.nextTick(() => {
+            const pages = getCurrentPages();
+            const page = pages.length ? pages[pages.length - 1] : null;
+            syncMemberTabBar(0, page);
+          });
+        },
+      });
+    },
+  });
+}
+
 /** 设置当前选中的租户PID（多租户模式） */
 function setPID(pid, template) {
   setTenant(pid, template);
@@ -124,9 +188,12 @@ function getTenantName() {
 
 /** 当前租户课程分类配置（优先门店配置，否则皮肤默认） */
 function getMeetTypeStr() {
-  const tenant = getTenantInfo();
-  if (tenant?.TENANT_MEET_TYPE) return tenant.TENANT_MEET_TYPE;
-  return getSkin().MEET_TYPE || "";
+  return require("./meet_category_helper.js").getMeetTypeStr();
+}
+
+/** 约课分类 Tab（会员端/教练端共用解析逻辑） */
+function getMeetCategories(allLabel = "全部课程") {
+  return require("./meet_category_helper.js").getMeetCategories(allLabel);
 }
 
 /** 标准化页面相对路径，如 index/default_index */
@@ -1038,7 +1105,11 @@ module.exports = {
   getTenantInfo,
   mergeTenantInfo,
   getTenantName,
+  goMemberTabHome,
+  refreshMemberTabBar,
+  syncMemberTabBar,
   getMeetTypeStr,
+  getMeetCategories,
   fmtImgUrl,
   fmtURLByPID,
 

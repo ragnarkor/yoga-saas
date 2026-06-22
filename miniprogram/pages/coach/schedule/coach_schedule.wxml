@@ -3,9 +3,14 @@
   <coach-tenant-switch title="排课" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
 
   <van-tabs
+    wx:if="{{tabsReady}}"
+    id="scheduleTabs"
     active="{{activeTab}}"
     color="{{themeColor}}"
     title-active-color="{{themeColor}}"
+    line-width="40rpx"
+    line-height="6rpx"
+    ellipsis="{{false}}"
     bind:change="bindTabChange"
     custom-class="schedule-tabs"
   >

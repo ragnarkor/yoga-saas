@@ -163,10 +163,16 @@ function applyMemberThemeGlobal() {
   }
 
   try {
-    if (typeof getTabBar === 'function') {
-      const tabBar = getTabBar();
-      if (tabBar && tabBar.refreshTabs) {
-        tabBar.refreshTabs();
+    const pages = getCurrentPages();
+    const page = pages.length ? pages[pages.length - 1] : null;
+    const tabBar = page && typeof page.getTabBar === "function"
+      ? page.getTabBar()
+      : null;
+    if (tabBar) {
+      tabBar.setData({ hidden: false });
+      if (tabBar.refreshTabs) {
+        const cur = Number(tabBar.data?.selected);
+        tabBar.refreshTabs(Number.isNaN(cur) ? undefined : cur);
       }
     }
   } catch (e) {

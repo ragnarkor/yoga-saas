@@ -1,4 +1,4 @@
-<view wx:if="{{!hidden}}" class="tab-bar">
+<view wx:if="{{!hidden}}" class="tab-bar" style="--tab-active-color: {{selectedColor}};">
   <view
     wx:for="{{list}}"
     wx:key="key"

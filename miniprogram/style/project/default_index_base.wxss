@@ -1,10 +1,26 @@
-/* [AI_START TIMESTAMP=2025-01-20 12:30:00] */
+/* [AI_START TIMESTAMP=2025-01-26 10:05:00] */
 .main {
   padding: 0rpx 0rpx 100rpx;
 }
 
 .up {
   width: 100%;
+  position: relative;
+}
+
+.up::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--ghostWhite, #f6f7f5)
+  );
+  pointer-events: none;
 }
 
 .up image {
@@ -18,6 +34,7 @@
   padding: 10rpx 30rpx;
   margin-top: -200rpx;
   z-index: 9999;
+  position: relative;
 }
 
 .menu {
@@ -26,8 +43,8 @@
   flex-wrap: wrap;
   background-color: var(--white, #fff);
   padding: 30rpx 10rpx;
-  border-radius: 24rpx;
-  box-shadow: 0 4rpx 24rpx rgba(91, 138, 114, 0.1);
+  border-radius: var(--radius-xl, 24rpx);
+  box-shadow: var(--projectShadow, 0 4rpx 20rpx rgba(91, 138, 114, 0.1));
 }
 
 .menu .item {
@@ -36,6 +53,12 @@
   align-items: center;
   justify-content: center;
   height: 180rpx;
+  transition: background var(--transition-fast, 0.15s ease);
+}
+
+.menu .item:active {
+  background: var(--projectColorLight, #e3efe8);
+  border-radius: var(--radius-md, 16rpx);
 }
 
 .menu .item .item-inner {
@@ -52,14 +75,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--neutralIconBg, #f2f3f5);
-  border-radius: 50%;
-  transition: all 0.25s ease;
+  background-color: var(--projectColorLight, #e3efe8);
+  border-radius: 28rpx;
+  transition: all var(--transition-base, 0.25s ease);
+  box-shadow: 0 4rpx 12rpx rgba(91, 138, 114, 0.1);
 }
 
 .menu .item:active .item-inner .img {
   transform: scale(0.92);
-  background-color: var(--projectColorLight, #e3efe8);
+  box-shadow: 0 2rpx 8rpx rgba(91, 138, 114, 0.08);
 }
 
 .menu .item-inner .img image {
@@ -70,7 +94,7 @@
 .menu .item-inner .title {
   margin-top: 20rpx;
   font-size: 26rpx;
-  color: #2d332e;
+  color: var(--neutralText, #1f2329);
   font-weight: 500;
 }
 
@@ -81,4 +105,4 @@
   overflow: unset;
   box-sizing: border-box;
 }
-/* [AI_END LINES=55 TIMESTAMP=2025-01-20 12:30:00] */
+/* [AI_END LINES=63 TIMESTAMP=2025-01-26 10:05:00] */

@@ -124,11 +124,11 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 30rpx 20rpx;
+  padding: 36rpx 20rpx;
   width: 100%;
   background-color: var(--white, #fff);
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 20rpx rgba(91, 138, 114, 0.08);
+  border-radius: var(--radius-xl, 24rpx);
+  box-shadow: var(--projectShadowSm, 0 2rpx 12rpx rgba(91, 138, 114, 0.08));
 }
 
 .main .down .data view {
@@ -138,29 +138,36 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  transition: transform var(--transition-fast, 0.15s ease);
+}
+
+.main .down .data view:active {
+  transform: scale(0.95);
 }
 
 .main .down .data view + view::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 10%;
-  height: 80%;
+  top: 15%;
+  height: 70%;
   width: 1rpx;
-  background-color: #eef0ed;
+  background-color: var(--neutralBorderLight, #f0f1f3);
 }
 
 .main .down .data view .num {
-  font-size: 36rpx;
+  font-size: 40rpx;
   font-weight: 700;
   color: var(--themeColor, #5b8a72);
-  line-height: 1.4;
+  line-height: 1.3;
+  letter-spacing: 1rpx;
 }
 
 .main .down .data view .txt {
   font-size: 24rpx;
-  color: #999;
-  margin-top: 6rpx;
+  color: var(--neutralTextTertiary, #8f959e);
+  margin-top: 8rpx;
+  letter-spacing: 1rpx;
 }
 
 .main .comm-list .item.arrow::before,
@@ -208,7 +215,12 @@
   align-items: flex-start;
   justify-content: center;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #f0f2ef;
+  border-bottom: 1rpx solid var(--neutralBorderLight, #f0f1f3);
+  transition: background var(--transition-fast, 0.15s ease);
+}
+
+.main .down .today .list .item:active {
+  background: var(--projectBgSoft, #fafbf9);
 }
 
 .main .down .today .list .item:last-child {

@@ -61,15 +61,15 @@
 
 			<!-- VANT 菜单列表 -->
 			<van-cell-group inset custom-class="menu-group">
-				<van-cell title="我的所有{{skin.MEET_NAME}}" is-link link-type="navigateTo" url="../join/my_join" icon="records" label="查看所有预约记录" />
-				<van-cell title="切换到教练版" is-link bindtap="bindSwitchCoachTap" icon="manager-o" label="馆主/教练工作台" />
+				<van-cell custom-class="mi-cell mi-records" title="我的所有{{skin.MEET_NAME}}" is-link link-type="navigateTo" url="../join/my_join" icon="records" label="查看所有预约记录" />
+				<van-cell custom-class="mi-cell mi-coach" title="切换到教练版" is-link bindtap="bindSwitchCoachTap" icon="manager-o" label="馆主/教练工作台" />
 			</van-cell-group>
 
 			<van-cell-group inset custom-class="menu-group">
-				<van-cell title="关于我们" is-link link-type="navigateTo" url="../../about/index/about_index" icon="info-o" />
-				<van-cell wx:if="{{!skin.IS_SUB}}" title="联系我们" is-link link-type="navigateTo" url="../../about/contact/about_contact" icon="phone-o" />
-				<van-cell wx:else title="联系作者了解更多详情" is-link link-type="navigateTo" url="../../../../pages/home/service/home_service" icon="phone-o" />
-				<van-cell title="{{skin.IS_SUB?'系统后台管理（可试用）':'设置'}}" is-link bindtap="bindSetTap" icon="setting-o" />
+				<van-cell custom-class="mi-cell mi-about" title="关于我们" is-link link-type="navigateTo" url="../../about/index/about_index" icon="info-o" />
+				<van-cell wx:if="{{!skin.IS_SUB}}" custom-class="mi-cell mi-contact" title="联系我们" is-link link-type="navigateTo" url="../../about/contact/about_contact" icon="phone-o" />
+				<van-cell wx:else custom-class="mi-cell mi-contact" title="联系作者了解更多详情" is-link link-type="navigateTo" url="../../../../pages/home/service/home_service" icon="phone-o" />
+				<van-cell custom-class="mi-cell mi-setting" title="{{skin.IS_SUB?'系统后台管理（可试用）':'设置'}}" is-link bindtap="bindSetTap" icon="setting-o" />
 			</van-cell-group>
 
 		</view>

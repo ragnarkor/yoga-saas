@@ -217,26 +217,61 @@ class AdminStatsService extends BaseAdminService {
     };
   }
 
-  /** 约课排名 */
+  /** 约课排名（按会员约课次数） */
   async getBookingRank({ limit = 20 } = {}) {
     limit = Math.min(Math.max(Number(limit) || 20, 5), 50);
     let rows = await JoinModel.getAll(
       { JOIN_STATUS: JoinModel.STATUS.SUCC },
-      "JOIN_MEET_TITLE,JOIN_IS_CHECKIN",
+      "JOIN_USER_ID,JOIN_IS_CHECKIN",
       {},
       10000,
     );
     let map = {};
     for (let r of rows || []) {
-      let title = r.JOIN_MEET_TITLE || "未命名课程";
-      if (!map[title]) map[title] = { title, count: 0, checkinCnt: 0 };
-      map[title].count++;
-      if (r.JOIN_IS_CHECKIN === 1) map[title].checkinCnt++;
+      let uid = r.JOIN_USER_ID;
+      if (!uid) continue;
+      if (!map[uid]) {
+        map[uid] = { userId: uid, count: 0, checkinCnt: 0 };
+      }
+      map[uid].count++;
+      if (r.JOIN_IS_CHECKIN === 1) map[uid].checkinCnt++;
     }
+
+    let userIds = Object.keys(map);
+    let userMap = {};
+    if (userIds.length) {
+      let users = await UserModel.getAll(
+        { USER_MINI_OPENID: ["in", userIds] },
+        "USER_MINI_OPENID,USER_NAME,USER_MOBILE,USER_PIC",
+        {},
+        userIds.length,
+      );
+      for (let u of users || []) {
+        userMap[u.USER_MINI_OPENID] = u;
+      }
+    }
+
     let list = Object.values(map)
+      .map((item) => {
+        let u = userMap[item.userId] || {};
+        let name = (u.USER_NAME || "").trim() || "会员";
+        let mobile = u.USER_MOBILE || "";
+        let subtitle = mobile
+          ? mobile.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2")
+          : "";
+        return {
+          userId: item.userId,
+          title: name,
+          subtitle,
+          avatar: u.USER_PIC || "",
+          count: item.count,
+          checkinCnt: item.checkinCnt,
+        };
+      })
       .sort((a, b) => b.count - a.count)
       .slice(0, limit)
       .map((item, idx) => ({ ...item, rank: idx + 1 }));
+
     return { list };
   }
 

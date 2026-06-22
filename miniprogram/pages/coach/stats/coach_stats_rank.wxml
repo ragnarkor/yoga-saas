@@ -1,5 +1,5 @@
 <page-meta page-style="{{themeStyle}}" />
-<view class="coach-page stats-page">
+<view class="coach-page stats-page rank-page">
   <coach-tenant-switch
     title="{{navTitle}}"
     show-back="{{true}}"
@@ -12,20 +12,63 @@
     <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
   </view>
 
-  <view wx:else class="stats-section">
-    <view class="stats-section-title">课程预约排行</view>
-    <view class="stats-table-head">
-      <view class="stats-rank-no">#</view>
-      <view class="stats-col-name">课程</view>
-      <view class="stats-col-num">预约</view>
-      <view class="stats-col-amt">签到</view>
-    </view>
-    <view wx:if="{{list.length === 0}}" class="stats-empty">暂无数据</view>
-    <view class="stats-table-row" wx:for="{{list}}" wx:key="title">
-      <view class="stats-rank-no {{item.rank <= 3 ? 'top' : ''}}">{{item.rank}}</view>
-      <view class="stats-col-name text-cut">{{item.title}}</view>
-      <view class="stats-col-num">{{item.count}}</view>
-      <view class="stats-col-amt">{{item.checkinCnt}}</view>
-    </view>
-  </view>
+  <block wx:else>
+    <view wx:if="{{list.length === 0}}" class="stats-empty">暂无约课排名数据</view>
+
+    <block wx:else>
+      <view class="rank-podium-card" wx:if="{{podium.length > 0}}">
+        <view class="rank-podium-title">TOP 3</view>
+        <view class="rank-podium">
+          <view
+            class="rank-podium-item rank-podium-item--{{item.rank}}"
+            wx:for="{{podium}}"
+            wx:key="userId"
+          >
+            <view class="rank-podium-head">
+              <view class="rank-podium-crown">👑</view>
+              <view class="rank-podium-avatar">
+                <image
+                  wx:if="{{item.avatarSrc}}"
+                  class="rank-podium-avatar-img"
+                  src="{{item.avatarSrc}}"
+                  mode="aspectFill"
+                />
+                <view wx:else class="rank-podium-avatar-ph">{{item.nameInitial}}</view>
+                <view class="rank-podium-rank-badge">{{item.rank}}</view>
+              </view>
+            </view>
+            <view class="rank-podium-bar">
+              <view class="rank-podium-name text-cut">{{item.title}}</view>
+              <view class="rank-podium-sub text-cut" wx:if="{{item.subtitle}}">{{item.subtitle}}</view>
+              <view class="rank-podium-count">{{item.count}}<text class="rank-podium-unit">次</text></view>
+              <view class="rank-podium-checkin">签到 {{item.checkinCnt}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="stats-section rank-table-section" wx:if="{{restList.length > 0}}">
+        <view class="stats-section-title">完整排名</view>
+        <view class="stats-table-head">
+          <view class="stats-rank-no">#</view>
+          <view class="stats-col-name">会员</view>
+          <view class="stats-col-num">约课</view>
+          <view class="stats-col-amt">签到</view>
+        </view>
+        <view class="stats-table-row" wx:for="{{restList}}" wx:key="userId">
+          <view class="stats-rank-no">{{item.rank}}</view>
+          <view class="stats-col-name stats-col-user">
+            <view class="text-cut">{{item.title}}</view>
+            <view class="stats-user-sub text-cut" wx:if="{{item.subtitle}}">{{item.subtitle}}</view>
+          </view>
+          <view class="stats-col-num">{{item.count}}</view>
+          <view class="stats-col-amt">{{item.checkinCnt}}</view>
+        </view>
+      </view>
+
+      <view class="rank-only-top-tip" wx:if="{{restList.length === 0 && podium.length > 0 && podium.length < 4}}">
+        当前仅 {{list.length}} 位会员有预约记录
+      </view>
+    </block>
+  </block>
 </view>

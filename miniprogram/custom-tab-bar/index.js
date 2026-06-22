@@ -1,4 +1,5 @@
 const pageHelper = require("../helper/page_helper.js");
+const iconColors = require("../helper/icon_colors.js");
 
 /** 与 app.json tabBar.list 顺序一致，switchTab 必须用注册路径 */
 const TAB_SWITCH_URLS = [
@@ -49,6 +50,15 @@ function getSelectedIndex(route) {
   return -1;
 }
 
+function resolveSelected(forcedSelected, currentSelected, route) {
+  if (typeof forcedSelected === "number" && forcedSelected >= 0) {
+    return forcedSelected;
+  }
+  const routeIndex = getSelectedIndex(route);
+  if (routeIndex >= 0) return routeIndex;
+  return Number(currentSelected) || 0;
+}
+
 Component({
   data: {
     selected: 0,
@@ -60,58 +70,51 @@ Component({
 
   lifetimes: {
     attached() {
-      this.refreshTabs();
-    },
-  },
-
-  pageLifetimes: {
-    show() {
-      wx.nextTick(() => this.refreshTabs());
+      const pages = getCurrentPages();
+      const page = pages.length ? pages[pages.length - 1] : null;
+      const route = page ? page.route : "";
+      const routeIndex = getSelectedIndex(route);
+      this.refreshTabs(routeIndex >= 0 ? routeIndex : undefined);
     },
   },
 
   methods: {
-    refreshTabs() {
-      const skin = pageHelper.getSkin();
+    refreshTabs(forcedSelected) {
+      const themeColor = pageHelper.getThemeColor();
       const pages = getCurrentPages();
       const route = pages.length ? pages[pages.length - 1].route : "";
-      const selected = getSelectedIndex(route);
+      const selected = resolveSelected(
+        forcedSelected,
+        this.data.selected,
+        route,
+      );
+
       const list = TAB_DEFS.map((item, index) => ({
         key: item.key,
         text: item.text,
         icon: item.icon,
-        pagePath:
-          index === 0
-            ? pageHelper.fmtURLByPID("/pages/index/default_index")
-            : TAB_SWITCH_URLS[index],
+        pagePath: TAB_SWITCH_URLS[index],
       }));
-      const patch = {
+
+      this.setData({
         list,
-        selectedColor: skin.NAV_BG || "#5B8A72",
-      };
-      if (selected >= 0) {
-        patch.selected = selected;
-      }
-      this.setData(patch);
+        hidden: false,
+        color: iconColors.getInactiveTabColor(),
+        selectedColor: iconColors.getActiveColor(themeColor),
+        selected,
+      });
     },
 
     switchTab(e) {
-      const index = e.currentTarget.dataset.index;
-      if (index === this.data.selected) return;
-
-      this.setData({ selected: index });
-
-      if (index === 0) {
-        wx.reLaunch({
-          url: pageHelper.fmtURLByPID("/pages/index/default_index"),
-        });
-        return;
-      }
+      const index = Number(e.currentTarget.dataset.index);
+      if (Number.isNaN(index)) return;
+      if (index === Number(this.data.selected)) return;
 
       const url = TAB_SWITCH_URLS[index];
-      if (url) {
-        wx.switchTab({ url });
-      }
+      if (!url) return;
+
+      this.setData({ selected: index, hidden: false });
+      wx.switchTab({ url });
     },
   },
 });

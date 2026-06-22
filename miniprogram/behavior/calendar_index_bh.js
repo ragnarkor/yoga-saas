@@ -1,5 +1,6 @@
 const cloudHelper = require("../helper/cloud_helper.js");
 const pageHelper = require("../helper/page_helper.js");
+const meetCategoryHelper = require("../helper/meet_category_helper.js");
 const setting = require("../setting/setting.js");
 const timeHelper = require("../helper/time_helper.js");
 
@@ -27,38 +28,52 @@ module.exports = Behavior({
     onLoad: async function (options) {
       if (setting.IS_SUB) wx.hideHomeButton();
 
-      this._initTabs();
+      this._skipShowRefresh = true;
       this._initDateList();
+      await this._syncTenantCategories();
+      this._initTabs();
+      this.setData({ isLoad: true });
       await this._loadHasList();
       await this._loadList();
     },
 
-    _initTabs: function () {
-      let skin = pageHelper.getSkin();
-      let meetTypeStr = skin.MEET_TYPE || "";
-      let tabs = [{ id: "0", name: "全部课程" }];
-      let parts = meetTypeStr.split(",");
-      for (let part of parts) {
-        let keyValue = part.split("|")[0];
-        let arr = keyValue.split("=");
-        if (arr.length >= 2) {
-          tabs.push({
-            id: arr[0].trim(),
-            name: arr[1].trim(),
-          });
+    _syncTenantCategories: async function () {
+      const pid = pageHelper.getPID();
+      if (!pid) return;
+      try {
+        const res = await cloudHelper.callCloudData(
+          "tenant/detail",
+          { pid },
+          { hint: false, title: "bar" },
+        );
+        if (res?.tenant) {
+          pageHelper.mergeTenantInfo(res.tenant);
         }
+      } catch (err) {
+        console.error(err);
       }
-      if (tabs.length === 1) {
-        tabs[0].name = "全部课程";
-      }
+    },
+
+    _initTabs: function () {
+      const tabs = meetCategoryHelper.getMeetCategories("全部课程");
 
       let now = new Date();
       let month = now.getMonth() + 1;
       let pageTitle = month + "月瑜伽·普拉提";
 
+      let activeTab = this.data.activeTab || 0;
+      const prevTabId =
+        this.data.tabs && this.data.tabs[activeTab]
+          ? this.data.tabs[activeTab].id
+          : "0";
+      const nextIdx = tabs.findIndex((t) => t.id === prevTabId);
+      if (nextIdx >= 0) activeTab = nextIdx;
+      else if (activeTab >= tabs.length) activeTab = 0;
+
       this.setData({
         tabs,
         pageTitle,
+        activeTab: Number(activeTab) || 0,
       });
     },
 
@@ -121,9 +136,6 @@ module.exports = Behavior({
         title: this.data.isLoad ? "bar" : "bar",
       };
       try {
-        this.setData({
-          courseList: null,
-        });
         const res = await cloudHelper.callCloudSumbit(
           "meet/list_by_day",
           params,
@@ -251,17 +263,32 @@ module.exports = Behavior({
     onReady: function () {},
 
     onShow: async function () {
-      const today = timeHelper.time("Y-M-D");
-      this.setData(
-        {
-          day: today,
-          selectedDate: today,
-        },
-        async () => {
-          await this._loadHasList();
-          await this._loadList();
-        },
-      );
+      if (this._skipShowRefresh) {
+        this._skipShowRefresh = false;
+        return;
+      }
+
+      await this._syncTenantCategories();
+      this._initTabs();
+      if (!this.data.dateList || !this.data.dateList.length) {
+        this._initDateList();
+      } else {
+        const today = timeHelper.time("Y-M-D");
+        this.setData({ day: today, selectedDate: today });
+      }
+
+      const prevTabId =
+        this.data.tabs && this.data.tabs[this.data.activeTab]
+          ? this.data.tabs[this.data.activeTab].id
+          : "0";
+      let activeTab = this.data.activeTab;
+      const idx = (this.data.tabs || []).findIndex((t) => t.id === prevTabId);
+      if (idx >= 0) activeTab = idx;
+
+      this.setData({ activeTab: Number(activeTab) || 0 }, async () => {
+        await this._loadHasList();
+        await this._loadList();
+      });
     },
 
     onHide: function () {},
@@ -278,6 +305,15 @@ module.exports = Behavior({
 
     bindTabChange: function (e) {
       const activeTab = e.detail.index;
+      const courseList = this._transformCourseData(this.data.list, activeTab);
+      this.setData({ activeTab, courseList });
+    },
+
+    bindCategoryTap: function (e) {
+      const activeTab = Number(e.currentTarget.dataset.index);
+      if (Number.isNaN(activeTab) || activeTab === Number(this.data.activeTab)) {
+        return;
+      }
       const courseList = this._transformCourseData(this.data.list, activeTab);
       this.setData({ activeTab, courseList });
     },

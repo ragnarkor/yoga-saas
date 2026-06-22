@@ -53,7 +53,8 @@ Page({
     startDay: '',
     endDay: '',
     weekDays: [],
-    tabs: [{ id: '0', name: '全部' }],
+    tabs: [],
+    tabsReady: false,
     activeTab: 0,
     activeTypeId: '0',
     gridRows: [],
@@ -73,7 +74,7 @@ Page({
 
   onShow() {
     this._coachOnShow();
-    this._loadPage();
+    this._loadPage().then(() => this._resizeScheduleTabs());
   },
 
   onPullDownRefresh() {
@@ -99,27 +100,43 @@ Page({
   },
 
   async _loadTabs() {
+    let tabs = [{ id: '0', name: '全部' }];
     try {
       const res = await cloudHelper.callCloudData(
         'admin/tenant_store',
         {},
         { hint: false },
       );
-      let tabs = [{ id: '0', name: '全部' }];
       const categories = (res && res.categories) || [];
       if (categories.length) {
         tabs = tabs.concat(categories);
       } else {
-        const skin = pageHelper.getSkin();
-        const opts = dataHelper.getSelectOptions(skin.MEET_TYPE || '');
+        const opts = dataHelper.getSelectOptions(pageHelper.getMeetTypeStr());
         tabs = tabs.concat(
           opts.map((o) => ({ id: o.val, name: o.label })),
         );
       }
-      this.setData({ tabs });
     } catch (e) {
       console.error(e);
     }
+    this.setData(
+      {
+        tabs,
+        tabsReady: true,
+        activeTab: 0,
+        activeTypeId: '0',
+      },
+      () => this._resizeScheduleTabs(),
+    );
+  },
+
+  _resizeScheduleTabs() {
+    wx.nextTick(() => {
+      const tabs = this.selectComponent('#scheduleTabs');
+      if (tabs && typeof tabs.resize === 'function') {
+        tabs.resize();
+      }
+    });
   },
 
   async _loadSchedule() {

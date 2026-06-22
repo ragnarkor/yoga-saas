@@ -3,6 +3,7 @@ const PassportBiz = require("../biz/passport_biz.js");
 const themeHelper = require("./theme_helper.js");
 const behaviors = require("./behaviors.js");
 const themeBh = require("../behavior/theme_bh.js");
+const { createMemberTabBarBh } = require("../behavior/member_tab_bar_bh.js");
 
 /**
  * 前台页面工厂：统一 behavior + skin
@@ -32,15 +33,14 @@ function createPage(options) {
   // _loadUser）永远不会被调用。这些生命周期方法全部由 behavior 提供，
   // 框架在 Page 未定义同名方法时会自动调用 behavior 的版本。
   //
-  // tab 栏选中状态由 custom-tab-bar 组件的 pageLifetimes.show → refreshTabs
-  // 根据当前页面路由自动管理，无需在此手动 setData。
+  // Tab 栏选中：各 Tab 页 onShow 通过 member_tab_bar_bh 显式同步 tabBarIndex
   Page({
     data: {
       skin,
       themeColor,
       pageStyle: themeHelper.getPageMetaStyle(themeColor),
     },
-    behaviors: [behavior, themeBh],
+    behaviors: [behavior, themeBh, createMemberTabBarBh(tabBarIndex)],
     onReady() {
       PassportBiz.initPage({
         skin: pageHelper.getSkin(),

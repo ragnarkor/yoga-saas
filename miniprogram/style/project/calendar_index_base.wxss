@@ -46,30 +46,54 @@ page {
   letter-spacing: 1rpx;
 }
 
-/* ==================== VANT Tabs 覆盖 ==================== */
-.booking-main .van-tabs {
-  background: transparent !important;
-}
-
-.booking-main .van-tabs__wrap {
-  background: #ffffff !important;
-  height: 88rpx !important;
+/* ==================== 课程分类 Tab ==================== */
+.category-tabs {
+  width: 100%;
+  background: #ffffff;
   box-shadow: 0 2rpx 12rpx rgba(91, 138, 114, 0.06);
+  white-space: nowrap;
 }
 
-.booking-main .van-tabs__nav {
-  background: #ffffff !important;
-  padding: 0 10rpx !important;
+.category-tabs-inner {
+  display: inline-flex;
+  align-items: center;
+  min-width: 100%;
+  padding: 0 8rpx;
+  box-sizing: border-box;
 }
 
-.booking-main .van-tab {
-  font-size: 28rpx !important;
-  padding: 0 16rpx !important;
-  font-weight: 500 !important;
+.category-tab {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 24rpx 28rpx 20rpx;
 }
 
-.booking-main .van-tabs__line {
-  border-radius: 6rpx !important;
+.category-tab-text {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--neutralTextTertiary, #8f959e);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.category-tab.active .category-tab-text {
+  color: var(--themeColor, var(--projectColor, #5b8a72));
+  font-weight: 600;
+}
+
+.category-tab-line {
+  position: absolute;
+  left: 50%;
+  bottom: 8rpx;
+  transform: translateX(-50%);
+  width: 40rpx;
+  height: 6rpx;
+  border-radius: 6rpx;
+  background: var(--themeColor, var(--projectColor, #5b8a72));
 }
 
 /* ==================== 日期选择条 ==================== */

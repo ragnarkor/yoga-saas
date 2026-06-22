@@ -108,8 +108,12 @@
   color: rgba(255, 255, 255, 0.92);
 }
 
-/* 菜单列表图标：中性灰，主题色留给顶栏与 Tab */
-.menu-group .van-cell__left-icon-wrap,
+/* 菜单列表图标：统一主题色，次要项略降透明度 */
 .menu-group .van-icon {
-  color: var(--neutralTextSecondary, #646a73) !important;
+  color: var(--themeColor, #5b8a72) !important;
+}
+
+.menu-group .mi-coach .van-icon,
+.menu-group .mi-setting .van-icon {
+  opacity: 0.82;
 }

@@ -37,6 +37,45 @@ page {
   --brownLight: #f0eae3;
   --greyLight: #eceeea;
 
+  /* [AI_START TIMESTAMP=2025-01-26 10:00:00] */
+  /* === 项目主题变量（与 theme_helper.js 同步，提供页面级 fallback） === */
+  --projectColor: #5b8a72;
+  --projectColorLight: #e3efe8;
+  --projectColorDark: #4a7160;
+  --projectBgSoft: #fafbf9;
+  --themeColor: #5b8a72;
+  --calendarMainColor: #5b8a72;
+
+  /* === 统一圆角尺度 === */
+  --radius-xs: 8rpx;
+  --radius-sm: 12rpx;
+  --radius-md: 16rpx;
+  --radius-lg: 20rpx;
+  --radius-xl: 24rpx;
+  --radius-pill: 5000rpx;
+
+  /* === 统一过渡动画 === */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-slow: 0.35s ease;
+
+  /* === 项目主题阴影 === */
+  --projectShadowSm: 0 2rpx 12rpx rgba(91, 138, 114, 0.08);
+  --projectShadow: 0 4rpx 20rpx rgba(91, 138, 114, 0.1);
+  --projectShadowLg: 0 8rpx 30rpx rgba(91, 138, 114, 0.14);
+
+  /* === 中性色（教练端与会员端共用） === */
+  --neutralBg: #f5f6f8;
+  --neutralSurface: #ffffff;
+  --neutralText: #1f2329;
+  --neutralTextSecondary: #646a73;
+  --neutralTextTertiary: #8f959e;
+  --neutralBorder: #e8e9eb;
+  --neutralBorderLight: #f0f1f3;
+  --neutralIconBg: #f2f3f5;
+  --neutralShadow: rgba(31, 35, 41, 0.06);
+  /* [AI_END LINES=32 TIMESTAMP=2025-01-26 10:00:00] */
+
   /* 阴影透明色 - Soft UI Evolution refined shadows */
   --ShadowSize: 0 4rpx 16rpx;
   --ShadowSizeSm: 0 2rpx 8rpx;

@@ -16,17 +16,27 @@
 			</view>
 		</view>
 
-		<!-- 课程分类标签（仅标题，内容区统一放下方） -->
-		<van-tabs active="{{activeTab}}" bind:change="bindTabChange"
-			color="{{themeColor}}"
-			title-active-color="{{themeColor}}"
-			title-inactive-color="#999"
-			line-width="40rpx"
-			line-height="6rpx"
-			ellipsis="{{false}}"
-			swipeable>
-			<van-tab wx:for="{{tabs}}" wx:key="id" title="{{item.name}}" />
-		</van-tabs>
+		<!-- 课程分类（自定义 Tab，避免 template 内 van-tabs 异步不刷新） -->
+		<scroll-view
+			wx:if="{{tabs.length}}"
+			class="category-tabs"
+			scroll-x
+			enhanced
+			show-scrollbar="{{false}}"
+		>
+			<view class="category-tabs-inner">
+				<view
+					class="category-tab {{activeTab === index ? 'active' : ''}}"
+					wx:for="{{tabs}}"
+					wx:key="id"
+					data-index="{{index}}"
+					bindtap="bindCategoryTap"
+				>
+					<text class="category-tab-text">{{item.name}}</text>
+					<view class="category-tab-line" wx:if="{{activeTab === index}}"></view>
+				</view>
+			</view>
+		</scroll-view>
 
 		<!-- 日期选择条 -->
 		<view class="date-selector">

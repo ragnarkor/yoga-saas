@@ -10,14 +10,7 @@ Page({
   onLoad: function (options) {
     let pid = pageHelper.getPID();
     if (pid && !options.switch) {
-      const template = pageHelper.getTemplate();
-      if (template === "default") {
-        wx.switchTab({ url: "/pages/default/index/default_index" });
-      } else {
-        wx.reLaunch({
-          url: pageHelper.fmtURLByPID("/pages/index/default_index"),
-        });
-      }
+      pageHelper.goMemberTabHome();
       return;
     }
     this._loadList();
@@ -50,14 +43,7 @@ Page({
     });
 
     setTimeout(() => {
-      const template = item.TENANT_TEMPLATE || "default";
-      if (template === "default") {
-        wx.switchTab({ url: "/pages/default/index/default_index" });
-      } else {
-        wx.reLaunch({
-          url: pageHelper.fmtURLByPID("/pages/index/default_index"),
-        });
-      }
+      pageHelper.goMemberTabHome();
     }, 800);
   },
 });

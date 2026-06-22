@@ -32,12 +32,11 @@
 
 .coach-stats-card {
   background: var(--neutralSurface, #fff);
-  border-radius: 20rpx;
-  padding: 28rpx 0;
+  border-radius: var(--radius-xl, 24rpx);
+  padding: 32rpx 0;
   display: flex;
   margin-bottom: 20rpx;
-  border: 1rpx solid var(--neutralBorder, #e8e9eb);
-  box-shadow: 0 4rpx 24rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
+  box-shadow: var(--projectShadowSm, 0 2rpx 12rpx rgba(91, 138, 114, 0.08));
 }
 
 .coach-stat-item {
@@ -72,10 +71,9 @@
 .coach-section {
   margin-bottom: 20rpx;
   background: var(--neutralSurface, #fff);
-  border-radius: 20rpx;
+  border-radius: var(--radius-xl, 24rpx);
   padding: 24rpx 20rpx 12rpx;
-  border: 1rpx solid var(--neutralBorder, #e8e9eb);
-  box-shadow: 0 4rpx 24rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
+  box-shadow: var(--projectShadowSm, 0 2rpx 12rpx rgba(91, 138, 114, 0.08));
 }
 
 .coach-section-head {
@@ -110,23 +108,31 @@
   align-items: center;
   justify-content: center;
   padding: 20rpx 8rpx 24rpx;
-  border-radius: 16rpx;
-  transition: background 0.15s ease;
+  border-radius: var(--radius-md, 16rpx);
+  transition:
+    background var(--transition-fast, 0.15s ease),
+    transform var(--transition-fast, 0.15s ease);
 }
 
 .coach-grid-item:active {
-  background: var(--neutralIconBg, #f2f3f5);
+  background: var(--projectColorLight, #e3efe8);
+  transform: scale(0.96);
 }
 
 .coach-grid-icon {
   width: 80rpx;
   height: 80rpx;
-  border-radius: 22rpx;
+  border-radius: var(--radius-lg, 22rpx);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 12rpx;
   background: var(--neutralIconBg, #f2f3f5);
+  transition: transform var(--transition-base, 0.25s ease);
+}
+
+.coach-grid-item:active .coach-grid-icon {
+  transform: scale(0.9);
 }
 
 .coach-grid-text {
@@ -154,15 +160,14 @@
 
 .coach-notice {
   margin-bottom: 20rpx;
-  background: var(--neutralSurface, #fff);
-  border-radius: 16rpx;
+  background: var(--projectColorLight, #e3efe8);
+  border-radius: var(--radius-md, 16rpx);
   padding: 20rpx 24rpx;
   display: flex;
   align-items: center;
   gap: 16rpx;
   font-size: 26rpx;
   color: var(--neutralTextSecondary, #646a73);
-  border: 1rpx solid var(--neutralBorder, #e8e9eb);
 }
 
 .coach-notice-time {
@@ -187,15 +192,14 @@
   width: calc(33.33% - 11rpx);
   box-sizing: border-box;
   background: var(--neutralSurface, #fff);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md, 16rpx);
   padding: 24rpx 12rpx;
-  border: 1rpx solid var(--neutralBorder, #e8e9eb);
-  box-shadow: 0 2rpx 12rpx var(--neutralShadow, rgba(31, 35, 41, 0.04));
-  transition: background 0.15s ease;
+  box-shadow: var(--projectShadowSm, 0 2rpx 12rpx rgba(91, 138, 114, 0.08));
+  transition: transform var(--transition-fast, 0.15s ease);
 }
 
 .coach-customer-card:active {
-  background: var(--neutralIconBg, #f2f3f5);
+  transform: scale(0.96);
 }
 
 .coach-customer-num {
@@ -215,12 +219,15 @@
 /* ==================== 营销页 ==================== */
 .coach-revenue-card {
   margin: 24rpx;
-  background: var(--neutralSurface, #fff);
-  border-radius: 20rpx;
-  padding: 40rpx 24rpx;
+  background: linear-gradient(
+    135deg,
+    var(--projectColorLight, #e3efe8) 0%,
+    var(--neutralSurface, #fff) 100%
+  );
+  border-radius: var(--radius-xl, 24rpx);
+  padding: 48rpx 24rpx;
   text-align: center;
-  border: 1rpx solid var(--neutralBorder, #e8e9eb);
-  box-shadow: 0 4rpx 24rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
+  box-shadow: var(--projectShadow, 0 4rpx 20rpx rgba(91, 138, 114, 0.1));
 }
 
 .coach-revenue-sub {
@@ -245,12 +252,11 @@
   margin: 24rpx 24rpx 20rpx;
   padding: 32rpx 28rpx;
   background: var(--neutralSurface, #fff);
-  border-radius: 20rpx;
+  border-radius: var(--radius-xl, 24rpx);
   display: flex;
   align-items: center;
   gap: 24rpx;
-  border: 1rpx solid var(--neutralBorder, #e8e9eb);
-  box-shadow: 0 4rpx 24rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
+  box-shadow: var(--projectShadowSm, 0 2rpx 12rpx rgba(91, 138, 114, 0.08));
 }
 
 .coach-profile-header {
@@ -264,7 +270,8 @@
   background: var(--neutralIconBg, #f2f3f5);
   overflow: hidden;
   flex-shrink: 0;
-  border: 3rpx solid var(--neutralBorder, #e8e9eb);
+  border: 4rpx solid var(--projectColorLight, #e3efe8);
+  box-shadow: 0 2rpx 12rpx rgba(91, 138, 114, 0.1);
 }
 
 .coach-profile-avatar image {
@@ -291,10 +298,9 @@
 .coach-menu-group {
   margin: 0 24rpx 20rpx;
   background: var(--neutralSurface, #fff);
-  border-radius: 20rpx;
+  border-radius: var(--radius-xl, 24rpx);
   overflow: hidden;
-  border: 1rpx solid var(--neutralBorder, #e8e9eb);
-  box-shadow: 0 4rpx 24rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
+  box-shadow: var(--projectShadowSm, 0 2rpx 12rpx rgba(91, 138, 114, 0.08));
 }
 
 .coach-menu-item {
