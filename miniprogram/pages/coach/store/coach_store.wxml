@@ -230,6 +230,55 @@
           <view class="store-theme-current">当前：{{themeColor}}</view>
           <view wx:if="{{!canEdit}}" class="store-theme-readonly">仅馆主可修改主题色</view>
         </view>
+
+        <view class="store-section">
+          <view class="store-section-title">私教预约规则</view>
+          <view class="store-section-tip store-section-tip--inner">会员自选时段时，仅可在营业时间内且不与教练已有课程冲突</view>
+          <van-cell-group custom-class="store-group store-group--inner">
+            <van-field
+              wx:if="{{canEdit}}"
+              label="营业开始"
+              input-align="right"
+              value="{{privateOpenTime}}"
+              placeholder="07:00"
+              data-field="privateOpenTime"
+              bind:change="bindFieldChange"
+            />
+            <van-cell wx:else title="营业开始" value="{{privateOpenTime}}" />
+            <van-field
+              wx:if="{{canEdit}}"
+              label="营业结束"
+              input-align="right"
+              value="{{privateCloseTime}}"
+              placeholder="22:00"
+              data-field="privateCloseTime"
+              bind:change="bindFieldChange"
+            />
+            <van-cell wx:else title="营业结束" value="{{privateCloseTime}}" />
+            <van-field
+              wx:if="{{canEdit}}"
+              label="提前(小时)"
+              type="number"
+              input-align="right"
+              value="{{privateAdvanceHours}}"
+              placeholder="2"
+              data-field="privateAdvanceHours"
+              bind:change="bindFieldChange"
+            />
+            <van-cell wx:else title="提前(小时)" value="{{privateAdvanceHours}}" />
+            <van-field
+              wx:if="{{canEdit}}"
+              label="最远(天)"
+              type="number"
+              input-align="right"
+              value="{{privateMaxBookDays}}"
+              placeholder="14"
+              data-field="privateMaxBookDays"
+              bind:change="bindFieldChange"
+            />
+            <van-cell wx:else title="最远(天)" value="{{privateMaxBookDays}}" />
+          </van-cell-group>
+        </view>
       </view>
     </scroll-view>
 

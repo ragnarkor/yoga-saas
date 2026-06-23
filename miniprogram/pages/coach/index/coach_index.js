@@ -25,7 +25,7 @@ Page({
       { name: '预约', icon: 'clock-o', color: '#f48fb1', url: '/pages/coach/booking/coach_booking' },
       { name: '排课', icon: 'calendar-o', color: '#64b5f6', url: '/pages/coach/schedule/coach_schedule' },
       { name: '课程管理', icon: 'apps-o', color: '#81c784', url: '/pages/coach/course/coach_course_list' },
-      { name: '私教', icon: 'exchange', color: '#b39ddb', url: '/pages/admin/meet/list/admin_meet_list' },
+      { name: '私教', icon: 'exchange', color: '#b39ddb', url: '/pages/coach/private/coach_private_list' },
       { name: '会员', icon: 'friends-o', color: '#4fc3f7', url: '/pages/coach/member/coach_member_list' },
       { name: '员工管理', icon: 'friends-o', color: '#9575cd', action: 'staff' },
       { name: '会员卡', icon: 'coupon-o', color: '#ffb74d', url: '/pages/coach/card/coach_card_list' },

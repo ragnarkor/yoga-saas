@@ -28,7 +28,7 @@ function mapBanner(item) {
     _id: item._id,
     type: item.type,
     title: item.title,
-    pic: pageHelper.fmtImgUrl(item.pic),
+    pic: pageHelper.fmtCoverUrl(item.pic, item._id),
     video: pageHelper.fmtImgUrl(item.video),
     linkType: item.linkType,
     linkId: item.linkId,
@@ -46,7 +46,7 @@ function mapTeacher(item) {
     desc: item.desc,
     avatar,
     pics,
-    cover: pageHelper.fmtImgUrl(item.cover) || pics[0] || avatar,
+    cover: pageHelper.fmtCoverUrl(item.cover, item._id) || pics[0] || avatar,
   };
 }
 
@@ -56,7 +56,7 @@ function mapPhoto(item) {
     title: item.title,
     desc: item.desc,
     album: item.album || item.desc || "馆舍风采",
-    pic: pageHelper.fmtImgUrl(item.pic),
+    pic: pageHelper.fmtCoverUrl(item.pic, item._id),
     linkType: item.linkType,
     linkId: item.linkId,
     linkUrl: buildLinkUrl(item.linkType, item.linkId),

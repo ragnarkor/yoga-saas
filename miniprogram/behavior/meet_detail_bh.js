@@ -6,6 +6,7 @@ const dataHelper = require('../helper/data_helper.js');
 const formSetHelper = require('../cmpts/public/form/form_set_helper.js');
 const UserProfileBiz = require('../biz/user_profile_biz.js');
 const setting = require('../setting/setting.js');
+const defaultCoverHelper = require('../helper/default_cover_helper.js');
 
 const BOOK_NOTES = [
 	'请提前 10–15 分钟到场签到，迟到可能影响入场。',
@@ -51,6 +52,7 @@ module.exports = Behavior({
 		cardSheetShow: false,
 		cardPickLoading: false,
 		joinCardOptions: [],
+		selectedCardId: '',
 	},
 
 	methods: {
@@ -77,6 +79,13 @@ module.exports = Behavior({
 			}
 
 			this._fmtMeetMedia(meet);
+
+			if (meet.coachAvatar) {
+				meet.coachAvatar =
+					(await UserProfileBiz.resolveAvatarUrl(meet.coachAvatar)) ||
+					pageHelper.fmtImgUrl(meet.coachAvatar) ||
+					"";
+			}
 
 			wx.setNavigationBarTitle({ title: meet.MEET_TITLE || '课程详情' });
 
@@ -123,16 +132,12 @@ module.exports = Behavior({
 		},
 
 		_fmtMeetMedia: function (meet) {
-			const skin = pageHelper.getSkin();
-			const defaultCover = skin.IMG_DEFAULT_COVER || '/images/default_cover_pic.gif';
-			const defaultAvatar = skin.USER_DEFAULT_AVATAR || defaultCover;
-
 			if (meet.MEET_STYLE_SET && meet.MEET_STYLE_SET.pic) {
-				meet.MEET_STYLE_SET.pic = pageHelper.fmtImgUrl(meet.MEET_STYLE_SET.pic) || defaultCover;
+				meet.MEET_STYLE_SET.pic = pageHelper.fmtCoverUrl(meet.MEET_STYLE_SET.pic, meet._id);
 			}
 
 			if (meet.coachAvatar) {
-				meet.coachAvatar = pageHelper.fmtImgUrl(meet.coachAvatar) || defaultAvatar;
+				meet.coachAvatar = pageHelper.fmtImgUrl(meet.coachAvatar) || "";
 			}
 
 			if (meet.MEET_CONTENT && meet.MEET_CONTENT.length) {
@@ -159,8 +164,7 @@ module.exports = Behavior({
 				const skin = pageHelper.getSkin();
 				const defaultAvatar =
 					skin.USER_DEFAULT_AVATAR ||
-					skin.IMG_DEFAULT_COVER ||
-					'/images/default_cover_pic.gif';
+					defaultCoverHelper.pickDefaultCover(meetId);
 				const joinRoster = await Promise.all(
 					rawList.map(async (item) => {
 						let avatarSrc = defaultAvatar;
@@ -205,8 +209,7 @@ module.exports = Behavior({
 			}
 
 			const styleSet = meet.MEET_STYLE_SET || {};
-			const skin = pageHelper.getSkin();
-			const defaultCover = skin.IMG_DEFAULT_COVER || '/images/default_cover_pic.gif';
+			const defaultCover = defaultCoverHelper.pickDefaultCover(meet._id);
 
 			let introPics = [];
 			if (styleSet.pic) introPics.push(styleSet.pic);
@@ -221,21 +224,17 @@ module.exports = Behavior({
 
 			const level = Number(styleSet.level) || 3;
 			const levelStars = [0, 0, 0, 0, 0].map((_, i) => (i < level ? 1 : 0));
-			const defaultAvatar =
-				skin.USER_DEFAULT_AVATAR ||
-				skin.IMG_DEFAULT_COVER ||
-				'/images/default_cover_pic.gif';
 
 			this.setData({
 				selectedDayIdx: dayIdx,
 				selectedTimeIdx: timeIdx,
-				coverPic: styleSet.pic || introPics[0] || defaultCover,
+				coverPic: pageHelper.fmtCoverUrl(styleSet.pic, meet._id) || defaultCover,
 				shortDesc: styleSet.desc || meet.MEET_TYPE_NAME || '',
 				level,
 				levelStars,
 				introPics,
 				introText,
-				coachAvatar: meet.coachAvatar || defaultAvatar,
+				coachAvatar: meet.coachAvatar || "",
 				currentDayTimes: daysSet[dayIdx] ? daysSet[dayIdx].times : [],
 			}, () => {
 				this._updateSlotDisplay(dayIdx, timeIdx);
@@ -357,7 +356,12 @@ module.exports = Behavior({
 			const meetId = this.data.id;
 			if (!meetId) return;
 
-			this.setData({ cardSheetShow: true, cardPickLoading: true, joinCardOptions: [] });
+			this.setData({
+				cardSheetShow: true,
+				cardPickLoading: true,
+				joinCardOptions: [],
+				selectedCardId: '',
+			});
 
 			try {
 				const res = await cloudHelper.callCloudData(
@@ -381,16 +385,11 @@ module.exports = Behavior({
 					return;
 				}
 
-				if (list.length === 1) {
-					this.setData({ cardSheetShow: false, cardPickLoading: false, joinCardOptions: list });
-					this._confirmJoinWithCard(list[0].id);
-					return;
-				}
-
 				this.setData({
 					joinCardOptions: list,
 					cardNeedTimes: (res && res.needTimes) || this.data.cardNeedTimes || 1,
 					cardPickLoading: false,
+					selectedCardId: list.length === 1 ? list[0].id : '',
 				});
 			} catch (e) {
 				console.error(e);
@@ -399,13 +398,22 @@ module.exports = Behavior({
 		},
 
 		bindCloseCardSheet: function () {
-			this.setData({ cardSheetShow: false, cardPickLoading: false });
+			this.setData({ cardSheetShow: false, cardPickLoading: false, selectedCardId: '' });
 		},
 
 		bindCardPick: function (e) {
 			const cardId = pageHelper.dataset(e, 'id');
 			if (!cardId) return;
-			this.setData({ cardSheetShow: false });
+			this.setData({ selectedCardId: cardId });
+		},
+
+		bindConfirmCardJoin: function () {
+			const cardId = this.data.selectedCardId;
+			if (!cardId) {
+				pageHelper.showNoneToast('请先选择会员卡');
+				return;
+			}
+			this.setData({ cardSheetShow: false, selectedCardId: '' });
 			this._confirmJoinWithCard(cardId);
 		},
 

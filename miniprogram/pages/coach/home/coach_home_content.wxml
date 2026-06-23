@@ -1,0 +1,186 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page hc-page">
+  <coach-tenant-switch
+    title="首页内容"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view wx:if="{{!isLoad}}" class="coach-page-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <view class="hc-tip">
+      <van-icon name="info-o" size="28rpx" color="{{themeColor}}" />
+      <text class="hc-tip-text">管理会员端首页的横幅、公告与照片墙。金牌老师由员工绑定微信后自动展示。</text>
+    </view>
+
+    <scroll-view scroll-x class="hc-tab-scroll" enhanced show-scrollbar="{{false}}">
+      <view class="hc-tab-bar">
+        <view
+          wx:for="{{tabs}}"
+          wx:key="id"
+          class="hc-tab-item {{activeTab === index ? 'hc-tab-item--active' : ''}}"
+          style="{{activeTab === index ? 'color:' + themeColor + ';border-color:' + themeColor : ''}}"
+          data-index="{{index}}"
+          bindtap="bindTabTap"
+        >
+          <van-icon name="{{item.icon}}" size="28rpx" color="{{activeTab === index ? themeColor : '#969799'}}" />
+          <text>{{item.name}}</text>
+          <text class="hc-tab-count" wx:if="{{index === 0}}">{{banners.length}}</text>
+          <text class="hc-tab-count" wx:elif="{{index === 1}}">{{announces.length}}</text>
+          <text class="hc-tab-count" wx:else>{{photos.length}}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <scroll-view scroll-y class="hc-body" enhanced show-scrollbar="{{false}}">
+      <!-- 横幅 -->
+      <block wx:if="{{activeTab === 0}}">
+        <view class="hc-add-btn" data-type="banner" bindtap="bindAddTap">
+          <van-icon name="plus" size="32rpx" color="{{themeColor}}" />
+          <text style="color: {{themeColor}}">新增横幅</text>
+        </view>
+        <van-empty wx:if="{{!banners.length}}" description="暂无横幅，会员端将显示默认封面" />
+        <view class="hc-banner-card" wx:for="{{banners}}" wx:key="_id">
+          <image
+            wx:if="{{item.BANNER_PIC}}"
+            class="hc-banner-img"
+            src="{{item.BANNER_PIC}}"
+            mode="aspectFill"
+          />
+          <view wx:else class="hc-banner-img hc-banner-img--placeholder">
+            <van-icon name="photo-o" size="48rpx" color="#c8c9cc" />
+          </view>
+          <view class="hc-banner-meta">
+            <text class="hc-card-title">{{item.BANNER_TITLE || '未命名横幅'}}</text>
+            <text class="hc-card-desc">排序 {{item.BANNER_ORDER || 0}}</text>
+            <view class="hc-card-actions">
+              <view class="hc-action-btn" data-type="banner" data-id="{{item._id}}" catchtap="bindEditTap">
+                <van-icon name="edit" size="32rpx" color="{{themeColor}}" />
+              </view>
+              <view class="hc-action-btn hc-action-btn--danger" data-type="banner" data-id="{{item._id}}" catchtap="bindDelTap">
+                <van-icon name="delete-o" size="32rpx" color="#ee0a24" />
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 公告 -->
+      <block wx:elif="{{activeTab === 1}}">
+        <view class="hc-add-btn" data-type="announce" bindtap="bindAddTap">
+          <van-icon name="plus" size="32rpx" color="{{themeColor}}" />
+          <text style="color: {{themeColor}}">新增公告</text>
+        </view>
+        <van-empty wx:if="{{!announces.length}}" description="暂无公告" />
+        <view class="hc-list-card" wx:for="{{announces}}" wx:key="_id">
+          <view class="hc-list-icon" style="background: {{themeColor}}18;">
+            <van-icon name="volume-o" size="36rpx" color="{{themeColor}}" />
+          </view>
+          <view class="hc-list-body">
+            <text class="hc-card-title">{{item.ANNOUNCE_TITLE}}</text>
+            <text class="hc-card-desc">{{item.ANNOUNCE_DESC || '无描述'}}</text>
+          </view>
+          <view class="hc-card-actions">
+            <view class="hc-action-btn" data-type="announce" data-id="{{item._id}}" catchtap="bindEditTap">
+              <van-icon name="edit" size="32rpx" color="{{themeColor}}" />
+            </view>
+            <view class="hc-action-btn hc-action-btn--danger" data-type="announce" data-id="{{item._id}}" catchtap="bindDelTap">
+              <van-icon name="delete-o" size="32rpx" color="#ee0a24" />
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 照片墙 -->
+      <block wx:else>
+        <view class="hc-photo-hint">
+          <van-icon name="question-o" size="24rpx" color="#969799" />
+          <text>「描述」填相册名称，相同名称的照片会归为一组</text>
+        </view>
+        <view class="hc-add-btn" data-type="photo" bindtap="bindAddTap">
+          <van-icon name="plus" size="32rpx" color="{{themeColor}}" />
+          <text style="color: {{themeColor}}">新增照片</text>
+        </view>
+        <van-empty wx:if="{{!photos.length}}" description="暂无照片" />
+        <view class="hc-photo-grid">
+          <view class="hc-photo-card" wx:for="{{photos}}" wx:key="_id">
+            <image
+              wx:if="{{item.PHOTO_PIC}}"
+              class="hc-photo-img"
+              src="{{item.PHOTO_PIC}}"
+              mode="aspectFill"
+            />
+            <view wx:else class="hc-photo-img hc-photo-img--placeholder">
+              <van-icon name="photo-o" size="40rpx" color="#c8c9cc" />
+            </view>
+            <view class="hc-photo-info">
+              <text class="hc-photo-title">{{item.PHOTO_TITLE || '照片'}}</text>
+              <text class="hc-photo-album">{{item.PHOTO_DESC || '默认相册'}}</text>
+            </view>
+            <view class="hc-photo-actions">
+              <view class="hc-action-btn hc-action-btn--sm" data-type="photo" data-id="{{item._id}}" catchtap="bindEditTap">
+                <van-icon name="edit" size="28rpx" color="{{themeColor}}" />
+              </view>
+              <view class="hc-action-btn hc-action-btn--sm hc-action-btn--danger" data-type="photo" data-id="{{item._id}}" catchtap="bindDelTap">
+                <van-icon name="delete-o" size="28rpx" color="#ee0a24" />
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </scroll-view>
+  </block>
+
+  <van-popup show="{{popupShow}}" position="bottom" round bind:close="bindPopupClose" custom-class="hc-popup">
+    <view class="hc-popup-head">
+      <text class="hc-popup-title">{{popupTitle}}</text>
+      <view class="hc-popup-close" bindtap="bindPopupClose">
+        <van-icon name="cross" size="36rpx" color="#969799" />
+      </view>
+    </view>
+    <view class="hc-popup-form">
+      <van-field
+        value="{{form.title}}"
+        data-field="title"
+        bind:input="bindFormInput"
+        label="标题"
+        placeholder="请输入标题"
+        border="{{ false }}"
+      />
+      <van-field
+        wx:if="{{popupType == 'announce' || popupType == 'photo'}}"
+        value="{{form.desc}}"
+        data-field="desc"
+        bind:input="bindFormInput"
+        label="描述"
+        type="textarea"
+        placeholder="{{popupType == 'photo' ? '相册名称（相同名称归组）' : '请输入描述'}}"
+        autosize="{{ {maxHeight: 200} }}"
+        border="{{ false }}"
+      />
+      <view wx:if="{{popupType == 'banner' || popupType == 'photo'}}" class="hc-upload">
+        <text class="hc-upload-label">图片</text>
+        <view wx:if="{{imgList.length}}" class="hc-upload-preview">
+          <image src="{{imgList[0]}}" mode="aspectFill" class="hc-upload-img" />
+          <view class="hc-upload-del" catchtap="bindDelImg">
+            <van-icon name="cross" size="28rpx" color="#fff" />
+          </view>
+        </view>
+        <view wx:else class="hc-upload-placeholder" bindtap="bindChooseImg">
+          <van-icon name="photograph" size="48rpx" color="#c8c9cc" />
+          <text>选择图片</text>
+        </view>
+      </view>
+    </view>
+    <view class="hc-popup-foot">
+      <van-button block round color="{{themeColor}}" loading="{{submitting}}" bind:click="bindSubmitTap">
+        {{submitBtnText}}
+      </van-button>
+    </view>
+  </van-popup>
+</view>

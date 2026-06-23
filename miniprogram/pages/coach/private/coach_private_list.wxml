@@ -1,0 +1,52 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page private-list-page">
+  <coach-tenant-switch title="私教" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
+
+  <view class="schedule-week-bar">
+    <view class="schedule-week-btn" bindtap="bindPrevWeek">◀ 上周</view>
+    <view class="schedule-week-range">{{weekLabel}}</view>
+    <view class="schedule-week-btn" bindtap="bindNextWeek">下周 ▶</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="coach-page-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <van-empty wx:elif="{{!sessionList.length}}" description="本周暂无私教预约">
+    <van-button round color="{{themeColor}}" bind:click="bindBookTap">代约私教</van-button>
+  </van-empty>
+
+  <view wx:else class="private-session-list">
+    <view
+      class="private-session-row"
+      wx:for="{{sessionList}}"
+      wx:key="mark"
+      data-meet-id="{{item.meetId}}"
+      data-mark="{{item.mark}}"
+      data-day="{{item.day}}"
+      data-title="{{item.title}}"
+      data-start="{{item.start}}"
+      data-end="{{item.end}}"
+      data-teacher-name="{{item.teacherName}}"
+      data-type-name="{{item.typeName}}"
+      data-booked="{{item.booked}}"
+      bindtap="bindSessionTap"
+    >
+      <view class="private-session-time">
+        <text class="private-session-day">{{item.day}}</text>
+        <text class="private-session-range">{{item.start}}–{{item.end}}</text>
+      </view>
+      <view class="private-session-body">
+        <view class="private-session-title">{{item.title}}</view>
+        <view class="private-session-meta">{{item.teacherName || '教练'}} · 已约 {{item.booked}}/{{item.limit || 1}}</view>
+        <view class="private-session-buffer">缓冲 {{item.bufferBefore}}+/{{item.bufferAfter}}− · 占用 {{item.blockStart}}–{{item.blockEnd}}</view>
+      </view>
+      <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+    </view>
+  </view>
+
+  <view class="private-list-fab" bindtap="bindBookTap">
+    <van-icon name="plus" size="40rpx" color="#fff" />
+    <text>代约</text>
+  </view>
+</view>

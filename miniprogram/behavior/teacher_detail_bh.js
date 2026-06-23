@@ -41,7 +41,7 @@ module.exports = Behavior({
         let teacher = data.teacher || null;
 
         if (teacher) {
-          teacher.avatar = pageHelper.fmtImgUrl(teacher.avatar);
+          teacher.avatar = pageHelper.fmtCoverUrl(teacher.avatar, teacher._id || this._teacherId);
           teacher.pics = (teacher.pics || []).map((p) =>
             pageHelper.fmtImgUrl(p),
           );
@@ -54,7 +54,7 @@ module.exports = Behavior({
         const sessions = (data.sessions || []).map((item) => ({
           ...item,
           sessionKey: `${item.meetId}_${item.timeMark}`,
-          pic: pageHelper.fmtImgUrl(item.pic) || '/images/default_cover_pic.gif',
+          pic: pageHelper.fmtCoverUrl(item.pic, item.meetId || item.timeMark),
         }));
 
         wx.setNavigationBarTitle({
@@ -121,6 +121,16 @@ module.exports = Behavior({
       const url = e.currentTarget.dataset.url;
       const urls = (this.data.teacher && this.data.teacher.pics) || [];
       if (urls.length) wx.previewImage({ current: url, urls });
+    },
+
+    bindPrivateBookTap: function () {
+      const teacher = this.data.teacher;
+      if (!teacher || !teacher._id) return;
+      wx.navigateTo({
+        url:
+          '/pages/default/private/book/private_book?teacherId=' +
+          encodeURIComponent(teacher._id),
+      });
     },
   },
 });

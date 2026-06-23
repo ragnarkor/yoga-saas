@@ -139,10 +139,10 @@ Page({
 
       const styleSet = AdminMeetBiz.normalizeCourseStyleSet(meet.MEET_STYLE_SET);
       const pic = styleSet.pic
-        ? pageHelper.fmtImgUrl(styleSet.pic) || styleSet.pic
+        ? pageHelper.fmtCoverUrl(styleSet.pic, meet._id)
         : '';
       const carousel = (styleSet.carousel || []).map(
-        (p) => pageHelper.fmtImgUrl(p) || p,
+        (p) => pageHelper.fmtCoverUrl(p, meet._id) || pageHelper.fmtImgUrl(p) || p,
       );
 
       this.setData({
@@ -353,9 +353,6 @@ Page({
     if (!data.formTypeId) {
       return wx.showToast({ title: '请选择课程类型', icon: 'none' });
     }
-    if (!data.formStyleSet.pic) {
-      return wx.showToast({ title: '请上传缩略图', icon: 'none' });
-    }
 
     const payload = validate.check(data, AdminMeetBiz.CHECK_FORM_COACH, this);
     if (!payload) return;
@@ -364,7 +361,7 @@ Page({
 
     const styleSet = AdminMeetBiz.normalizeCourseStyleSet(data.formStyleSet);
     styleSet.level = styleSet.difficulty;
-    styleSet.pic = data.thumbList[0] ? data.thumbList[0].url : styleSet.pic;
+    styleSet.pic = data.thumbList[0] ? data.thumbList[0].url : (styleSet.pic || '');
     styleSet.carousel = data.carouselList.map((f) => f.url);
 
     wx.showLoading({ title: '保存中...', mask: true });

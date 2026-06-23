@@ -4,6 +4,7 @@ const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
 const dataHelper = require('../../../helper/data_helper.js');
 const schedulePoster = require('../../../helper/schedule_poster_helper.js');
 const scheduleSlotHelper = require('../../../helper/schedule_slot_helper.js');
+const bookingWeekHelper = require('../../../helper/booking_week_helper.js');
 
 const WEEK_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
@@ -153,6 +154,7 @@ Page({
             startDay,
             endDay,
             typeId: activeTypeId === '0' ? '' : activeTypeId,
+            excludePrivate: 1,
           },
           { hint: false, title: 'bar' },
         ),
@@ -182,14 +184,13 @@ Page({
 
       const gridRows = timeRows.map((time) => ({
         time,
-        cells: weekDays.map((d) => {
-          const hit = slots.find(
-            (s) => s.start === time && s.day === d.day,
-          );
-          return hit
-            ? scheduleSlotHelper.formatScheduleSlot(hit, meetMetaMap[hit.meetId])
-            : null;
-        }),
+        cells: bookingWeekHelper.buildGridCellsForRow(
+          weekDays,
+          time,
+          slots,
+          (hit) =>
+            scheduleSlotHelper.formatScheduleSlot(hit, meetMetaMap[hit.meetId]),
+        ),
       }));
 
       this.setData({ loading: false, gridRows });
@@ -222,39 +223,69 @@ Page({
     return row.cells[colIdx] || null;
   },
 
+  _slotFromEvent(e) {
+    const cell = this._cellFromEvent(e);
+    if (!cell) return null;
+    return bookingWeekHelper.getCellSlot(cell, e.currentTarget.dataset.itemIdx);
+  },
+
   bindCellTap(e) {
     const ds = e.currentTarget.dataset;
-    const cell = this._cellFromEvent(e);
-    if (cell) {
-      this._openScheduleForm({
-        meetId: cell.meetId,
-        day: cell.day,
-        mark: cell.mark,
-        start: cell.start,
-        end: cell.end,
-        teacherName: cell.teacherName || '',
-      });
-      return;
-    }
     this._openScheduleForm({
       day: ds.day,
       time: ds.time,
     });
   },
 
-  bindCellLongPress(e) {
+  bindSlotTap(e) {
+    const slot = this._slotFromEvent(e);
+    if (!slot) return;
+    this._openScheduleForm({
+      meetId: slot.meetId,
+      day: slot.day,
+      mark: slot.mark,
+      start: slot.start,
+      end: slot.end,
+      teacherName: slot.teacherName || '',
+    });
+  },
+
+  bindOverflowTap(e) {
     const cell = this._cellFromEvent(e);
-    if (!cell || !cell.mark) return;
+    if (!cell || !cell.overflow) return;
+    const hidden = (cell.allItems || []).slice(cell.items.length);
+    wx.showActionSheet({
+      itemList: hidden.map(
+        (slot) => (slot.title || '课程') + ' · ' + (slot.teacherName || '教练'),
+      ),
+      success: (res) => {
+        const slot = hidden[res.tapIndex];
+        if (!slot) return;
+        this._openScheduleForm({
+          meetId: slot.meetId,
+          day: slot.day,
+          mark: slot.mark,
+          start: slot.start,
+          end: slot.end,
+          teacherName: slot.teacherName || '',
+        });
+      },
+    });
+  },
+
+  bindSlotLongPress(e) {
+    const slot = this._slotFromEvent(e);
+    if (!slot || !slot.mark) return;
     wx.vibrateShort({ type: 'light' });
     this.setData({
       activeSlot: {
-        meetId: cell.meetId,
-        day: cell.day,
-        mark: String(cell.mark),
-        start: cell.start,
-        end: cell.end,
-        title: cell.title || '',
-        teacherName: cell.teacherName || '',
+        meetId: slot.meetId,
+        day: slot.day,
+        mark: String(slot.mark),
+        start: slot.start,
+        end: slot.end,
+        title: slot.title || '',
+        teacherName: slot.teacherName || '',
       },
       slotActionShow: true,
     });

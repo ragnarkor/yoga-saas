@@ -12,6 +12,10 @@ Component({
       type: String,
       value: "",
     },
+    showBack: {
+      type: Boolean,
+      value: false,
+    },
   },
 
   data: {
@@ -84,6 +88,14 @@ Component({
     bindSwitchTenantTap() {
       wx.navigateTo({
         url: "/pages/tenant/select/tenant_select?switch=1",
+      });
+    },
+
+    bindBackTap() {
+      wx.navigateBack({
+        fail: () => {
+          wx.switchTab({ url: "/pages/default/index/default_index" });
+        },
       });
     },
   },

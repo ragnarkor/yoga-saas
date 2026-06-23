@@ -1,0 +1,78 @@
+@import "../schedule/coach_schedule.wxss";
+
+.private-list-page {
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+}
+
+.private-session-list {
+  padding: 16rpx 24rpx;
+}
+
+.private-session-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.private-session-time {
+  flex-shrink: 0;
+  width: 168rpx;
+}
+
+.private-session-day {
+  display: block;
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.private-session-range {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--themeColor, #5b8a72);
+}
+
+.private-session-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.private-session-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2329;
+}
+
+.private-session-meta {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #646566;
+}
+
+.private-session-buffer {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #969799;
+}
+
+.private-list-fab {
+  position: fixed;
+  right: 32rpx;
+  bottom: calc(48rpx + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 0 32rpx;
+  height: 88rpx;
+  border-radius: 999rpx;
+  background: var(--themeColor, #5b8a72);
+  color: #fff;
+  font-size: 28rpx;
+  box-shadow: 0 8rpx 24rpx rgba(91, 138, 114, 0.35);
+}

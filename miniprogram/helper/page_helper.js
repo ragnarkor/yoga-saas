@@ -8,6 +8,7 @@ const helper = require("./helper.js");
 const setting = require("../setting/setting.js");
 const cacheHelper = require("./cache_helper.js");
 const picHelper = require("./pic_helper.js");
+const defaultCoverHelper = require("./default_cover_helper.js");
 const CACHE_SKIN = "SKIN_PID";
 const CACHE_TENANT = "CACHE_TENANT";
 const CACHE_TENANT_INFO = "CACHE_TENANT_INFO";
@@ -238,10 +239,22 @@ function fmtImgUrl(url) {
   ) {
     return url;
   }
+  if (/default_cover_pic\.gif/i.test(url)) {
+    return defaultCoverHelper.pickDefaultCover();
+  }
+  if (/default_cover_pic\.png/i.test(url)) {
+    return defaultCoverHelper.pickDefaultCover();
+  }
   if (url.startsWith("/")) return url;
   const imgIdx = url.indexOf("images/");
   if (imgIdx >= 0) return "/" + url.slice(imgIdx);
   return url;
+}
+
+/** 课程/封面图：空值或历史占位路径 → 按 seed 分配本地占位图 */
+function fmtCoverUrl(url, seed) {
+  const formatted = fmtImgUrl(url);
+  return defaultCoverHelper.resolveCoverUrl(formatted, seed);
 }
 
 /** 将 ../../xxx 相对路径解析为以 / 开头的绝对小程序路径 */
@@ -722,6 +735,17 @@ function setPageData(that, data) {
  * 配合搜索列表响应监听
  * @param {*} that
  */
+function normalizeListPics(dataList) {
+  if (!dataList || !Array.isArray(dataList.list)) return dataList;
+  dataList.list = dataList.list.map((item) => {
+    const seed = item._id || item.JOIN_MEET_ID;
+    if (item.pic) item.pic = fmtCoverUrl(item.pic, seed);
+    if (item.coverPic) item.coverPic = fmtCoverUrl(item.coverPic, seed);
+    return item;
+  });
+  return dataList;
+}
+
 function commListListener(that, e) {
   if (helper.isDefined(e.detail.search))
     that.setData({
@@ -730,7 +754,7 @@ function commListListener(that, e) {
     });
   else {
     that.setData({
-      dataList: e.detail.dataList,
+      dataList: normalizeListPics(e.detail.dataList),
     });
     if (e.detail.sortType)
       that.setData({
@@ -1111,6 +1135,7 @@ module.exports = {
   getMeetTypeStr,
   getMeetCategories,
   fmtImgUrl,
+  fmtCoverUrl,
   fmtURLByPID,
 
   //### form

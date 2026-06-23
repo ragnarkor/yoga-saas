@@ -32,14 +32,10 @@
       bindtap="bindCourseTap"
     >
       <image
-        wx:if="{{item.cover}}"
         class="course-cover"
         src="{{item.cover}}"
         mode="aspectFill"
       />
-      <view wx:else class="course-cover course-cover-placeholder">
-        <van-icon name="photo-o" size="48rpx" color="#ccc" />
-      </view>
       <view class="course-info">
         <view class="course-title">{{item.MEET_TITLE}}</view>
         <view class="course-duration">{{item.duration}}</view>

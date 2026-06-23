@@ -18,6 +18,9 @@ const TeacherModel = require("../../model/teacher_model.js");
 const AdminModel = require("../../model/admin_model.js");
 const JoinModel = require("../../model/join_model.js");
 const DayModel = require("../../model/day_model.js");
+const UserModel = require("../../model/user_model.js");
+const bufferUtil = require("../../utils/schedule_buffer_util.js");
+const privateMeetUtil = require("../../utils/private_meet_util.js");
 const config = require("../../../config/config.js");
 
 class AdminMeetService extends BaseAdminService {
@@ -77,7 +80,30 @@ class AdminMeetService extends BaseAdminService {
       }
       t.status = t.status ? 1 : 0;
       t.isLimit = t.isLimit ? 1 : 0;
-      if (!t.limit) t.limit = 50;
+      if (t.slotType === "private") {
+        t.isLimit = 1;
+        t.limit = 1;
+      } else if (!t.limit) {
+        t.limit = 50;
+      }
+      if (t.bufferBefore != null && t.bufferBefore !== "") {
+        t.bufferBefore = Math.max(0, Number(t.bufferBefore) || 0);
+      }
+      if (t.bufferAfter != null && t.bufferAfter !== "") {
+        t.bufferAfter = Math.max(0, Number(t.bufferAfter) || 0);
+      }
+      if (t.start && t.end && (t.bufferBefore != null || t.bufferAfter != null)) {
+        const kind = t.slotType === "private" ? "private" : "group";
+        const buf = bufferUtil.resolveBufferForSlot(t, kind, {});
+        const block = bufferUtil.computeBlock(
+          t.start,
+          t.end,
+          buf.bufferBefore,
+          buf.bufferAfter,
+        );
+        t.blockStart = block.blockStart;
+        t.blockEnd = block.blockEnd;
+      }
       ret.push(t);
     }
     return ret;
@@ -166,6 +192,38 @@ class AdminMeetService extends BaseAdminService {
       this.AppError("只有预约成功状态可以签到核销");
 
     await JoinModel.edit(where, { JOIN_IS_CHECKIN: Number(flag) });
+    if (Number(flag) === 1 && join._id) {
+      let cardService = new UserCardService();
+      await cardService.tryActivateForJoinCheckin(join._id, join.JOIN_USER_ID);
+    }
+  }
+
+  /** 本节批量签到/取消签到 */
+  async checkinJoinBatch(meetId, timeMark, flag) {
+    flag = Number(flag);
+    let where = {
+      JOIN_MEET_ID: meetId,
+      JOIN_MEET_TIME_MARK: timeMark,
+      JOIN_STATUS: JoinModel.STATUS.SUCC,
+      JOIN_IS_CHECKIN: flag === 1 ? 0 : 1,
+    };
+    let joins = await JoinModel.getAll(
+      where,
+      "_id,JOIN_USER_ID",
+      { JOIN_ADD_TIME: "asc" },
+      200,
+    );
+    if (!joins.length) return { count: 0 };
+
+    let cardService = new UserCardService();
+    for (let k in joins) {
+      let join = joins[k];
+      await JoinModel.edit({ _id: join._id }, { JOIN_IS_CHECKIN: flag });
+      if (flag === 1) {
+        await cardService.tryActivateForJoinCheckin(join._id, join.JOIN_USER_ID);
+      }
+    }
+    return { count: joins.length };
   }
 
   /** 管理员扫码核销 */
@@ -180,6 +238,10 @@ class AdminMeetService extends BaseAdminService {
     if (!join) this.AppError("未找到可核销的预约记录");
 
     await JoinModel.edit(where, { JOIN_IS_CHECKIN: 1 });
+    if (join._id) {
+      let cardService = new UserCardService();
+      await cardService.tryActivateForJoinCheckin(join._id, join.JOIN_USER_ID);
+    }
   }
 
   checkHasJoinCnt(times) {
@@ -492,7 +554,89 @@ class AdminMeetService extends BaseAdminService {
       size,
       isTotal,
       oldTotal,
-    );
+    ).then(async (result) => {
+      if (result && result.list && result.list.length) {
+        await this._enrichJoinListMeta(result.list);
+      }
+      return result;
+    });
+  }
+
+  /** 预约名单补充会员卡、会员资料 */
+  async _enrichJoinListMeta(list) {
+    const UserCardLogModel = require("../../model/user_card_log_model.js");
+    const UserCardModel = require("../../model/user_card_model.js");
+    const UserModel = require("../../model/user_model.js");
+
+    const joinIds = [];
+    const userIds = [];
+    for (const item of list) {
+      if (item._id) joinIds.push(item._id);
+      if (item.JOIN_USER_ID) userIds.push(item.JOIN_USER_ID);
+    }
+
+    const joinCardMap = {};
+    if (joinIds.length) {
+      const logs = await UserCardLogModel.getAll(
+        {
+          CARD_LOG_JOIN_ID: ["in", joinIds],
+          CARD_LOG_STATUS: UserCardLogModel.STATUS.VALID,
+        },
+        "CARD_LOG_JOIN_ID,CARD_LOG_USER_CARD_ID,CARD_LOG_TIMES,CARD_LOG_ACTION",
+        {},
+        joinIds.length * 2,
+      );
+      const cardIds = [];
+      for (const log of logs || []) {
+        if (log.CARD_LOG_ACTION !== UserCardLogModel.ACTION.DEDUCT) continue;
+        if (joinCardMap[log.CARD_LOG_JOIN_ID]) continue;
+        joinCardMap[log.CARD_LOG_JOIN_ID] = {
+          cardId: log.CARD_LOG_USER_CARD_ID,
+          times: log.CARD_LOG_TIMES,
+        };
+        if (log.CARD_LOG_USER_CARD_ID) cardIds.push(log.CARD_LOG_USER_CARD_ID);
+      }
+      let cardNameMap = {};
+      if (cardIds.length) {
+        const cards = await UserCardModel.getAll(
+          { _id: ["in", cardIds] },
+          "USER_CARD_NAME",
+          {},
+          cardIds.length,
+        );
+        for (const c of cards || []) {
+          cardNameMap[c._id] = c.USER_CARD_NAME || "";
+        }
+      }
+      for (const item of list) {
+        const hit = joinCardMap[item._id];
+        if (hit) {
+          item.cardName = cardNameMap[hit.cardId] || "";
+          item.cardTimes = hit.times || 1;
+        }
+      }
+    }
+
+    if (userIds.length) {
+      const uniqIds = [...new Set(userIds)];
+      const users = await UserModel.getAll(
+        { USER_MINI_OPENID: ["in", uniqIds] },
+        "USER_MINI_OPENID,USER_NAME,USER_MOBILE,USER_PIC",
+        {},
+        uniqIds.length,
+      );
+      const userMap = {};
+      for (const u of users || []) {
+        userMap[u.USER_MINI_OPENID] = u;
+      }
+      for (const item of list) {
+        const u = userMap[item.JOIN_USER_ID];
+        if (!u) continue;
+        if (u.USER_NAME) item.memberName = u.USER_NAME;
+        if (u.USER_MOBILE) item.memberMobile = u.USER_MOBILE;
+        if (u.USER_PIC) item.memberPic = u.USER_PIC;
+      }
+    }
   }
 
   /**预约项目分页列表 */
@@ -640,15 +784,32 @@ class AdminMeetService extends BaseAdminService {
   }
 
   /** 教练端周课表 */
-  async getScheduleWeek({ startDay, endDay, typeId, includeInactive }, adminId, adminType) {
+  async getScheduleWeek(
+    { startDay, endDay, typeId, includeInactive, excludePrivate, onlyMine },
+    adminId,
+    adminType,
+    admin,
+  ) {
     let meetWhere = { MEET_STATUS: MeetModel.STATUS.COMM };
-    if (adminType === AdminModel.TYPE.TEACHER) {
+    if (adminType === AdminModel.TYPE.TEACHER && !onlyMine) {
       meetWhere.MEET_ADMIN_ID = adminId;
+    }
+
+    const adminMongoId = (admin && admin._id) || "";
+    let myTeacherId = "";
+    if (onlyMine && adminMongoId) {
+      let teacher = await TeacherModel.getOne(
+        { TEACHER_ADMIN_ID: adminMongoId },
+        "_id",
+        {},
+        false,
+      );
+      myTeacherId = teacher ? teacher._id : "";
     }
 
     let meets = await MeetModel.getAll(
       meetWhere,
-      "MEET_TITLE,MEET_TYPE_ID,MEET_TYPE_NAME,MEET_STYLE_SET",
+      "MEET_TITLE,MEET_TYPE_ID,MEET_TYPE_NAME,MEET_STYLE_SET,MEET_ADMIN_ID",
       { MEET_ORDER: "asc", MEET_ADD_TIME: "desc" },
     );
 
@@ -674,6 +835,7 @@ class AdminMeetService extends BaseAdminService {
       let meetEntry = meetMap[dayRecords[k].DAY_MEET_ID];
       let meet = meetEntry ? meetEntry.meet : null;
       if (!meet) continue;
+      if (excludePrivate && privateMeetUtil.isPrivateMeet(meet, null)) continue;
       if (typeId && typeId !== "0" && meet.MEET_TYPE_ID != typeId) continue;
 
       let style = meet.MEET_STYLE_SET || {};
@@ -681,7 +843,25 @@ class AdminMeetService extends BaseAdminService {
       for (let j in times) {
         let t = times[j];
         if (t.status != 1 && !includeInactive) continue;
+
+        const slotTeacherId = t.teacherId || style.teacherId || "";
+        if (onlyMine) {
+          const teacherMatch =
+            myTeacherId && String(slotTeacherId) === String(myTeacherId);
+          const meetOwnedByAdmin =
+            adminType === AdminModel.TYPE.OWNER &&
+            String(meet.MEET_ADMIN_ID || "") === String(adminId);
+          let visible = !!teacherMatch;
+          if (!visible && meetOwnedByAdmin && !myTeacherId) {
+            // 馆长未关联老师资料：可查看自己创建课程下的时段
+            visible = true;
+          }
+          if (!visible) continue;
+        }
+
         if (t.status == 1) timeSet.add(t.start);
+        const isPrivate =
+          t.slotType === "private" || privateMeetUtil.isPrivateMeet(meet, null);
         slots.push({
           day: dayRecords[k].day,
           start: t.start,
@@ -692,7 +872,9 @@ class AdminMeetService extends BaseAdminService {
           typeName: meet.MEET_TYPE_NAME,
           typeId: meet.MEET_TYPE_ID,
           teacherName: t.teacherName || style.teacherName || "",
-          teacherId: t.teacherId || style.teacherId || "",
+          teacherId: slotTeacherId,
+          isPrivate,
+          slotType: t.slotType || (isPrivate ? "private" : "group"),
           color: this._resolveCourseColor(
             style,
             meet.MEET_TYPE_ID,
@@ -816,6 +998,94 @@ class AdminMeetService extends BaseAdminService {
 
     await this._syncMeetDaysAfterChange(meetId);
     return { ok: true, mark: String(timeNode.mark) };
+  }
+
+  async _buildJoinFormsForUser(userId, meet, memo) {
+    const user = await UserModel.getOne(
+      { USER_MINI_OPENID: userId },
+      "USER_NAME,USER_MOBILE",
+    );
+    const formSet = meet.MEET_FORM_SET || [];
+    let forms;
+    if (formSet.length) {
+      forms = formSet.map((f) => {
+        const item = dataUtil.deepClone(f);
+        if (item.mark === "name" || item.title === "姓名") {
+          item.val = (user && user.USER_NAME) || "";
+        }
+        if (item.type === "mobile" || item.title === "手机") {
+          item.val = (user && user.USER_MOBILE) || "";
+        }
+        return item;
+      });
+    } else {
+      forms = [
+        {
+          mark: "name",
+          title: "姓名",
+          type: "text",
+          val: (user && user.USER_NAME) || "",
+        },
+        {
+          mark: "mobile",
+          title: "手机",
+          type: "mobile",
+          val: (user && user.USER_MOBILE) || "",
+        },
+      ];
+    }
+    if (memo) {
+      forms.push({
+        mark: "memo",
+        title: "备注",
+        type: "text",
+        val: String(memo).slice(0, 50),
+      });
+    }
+    return forms;
+  }
+
+  /** 团课代预约（已有排期时段） */
+  async bookGroupJoin({ meetId, timeMark, userId, cardId, memo }) {
+    if (!meetId || !timeMark || !userId) {
+      this.AppError("请完善代约信息");
+    }
+
+    const meet = await MeetModel.getOne({ _id: meetId });
+    if (!meet) this.AppError("课程不存在");
+    if (privateMeetUtil.isPrivateMeet(meet, null)) {
+      this.AppError("私教课请使用「私教」代约");
+    }
+
+    const user = await UserModel.getOne(
+      { USER_MINI_OPENID: userId },
+      "USER_NAME",
+    );
+    if (!user) this.AppError("会员不存在");
+
+    const forms = await this._buildJoinFormsForUser(userId, meet, memo);
+
+    if (cardId) {
+      const cardService = new UserCardService();
+      await cardService.checkCardForJoin(userId, meetId, cardId);
+    }
+
+    const meetService = new MeetService();
+    const result = await meetService.join(
+      userId,
+      meetId,
+      timeMark,
+      forms,
+      cardId || "",
+      { skipEndCheck: true, isAdmin: true },
+    );
+
+    return {
+      meetId,
+      timeMark,
+      joinId: result.joinId,
+      userId,
+    };
   }
 }
 

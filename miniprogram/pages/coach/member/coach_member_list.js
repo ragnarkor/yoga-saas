@@ -20,10 +20,15 @@ Page({
     memberList: [],
     total: 0,
     loading: true,
+    pickMode: false,
   },
 
-  onLoad() {
+  onLoad(options) {
     this._applyCoachTheme();
+    this.setData({
+      pickMode: options.pick === '1',
+      navTitle: options.pick === '1' ? '选择会员' : '会员',
+    });
     this._loadMembers();
   },
 
@@ -100,5 +105,35 @@ Page({
     wx.navigateTo({
       url: `/pages/coach/card/coach_card_issue?userId=${userId}&userName=${encodeURIComponent(userName)}`,
     });
+  },
+
+  bindCardsTap(e) {
+    const userId = e.currentTarget.dataset.id;
+    const userName = e.currentTarget.dataset.name || '';
+    if (!userId) return;
+    wx.navigateTo({
+      url: `/pages/coach/card/coach_user_card_list?userId=${userId}&userName=${encodeURIComponent(userName)}`,
+    });
+  },
+
+  bindMemberRowTap(e) {
+    if (!this.data.pickMode) return;
+    const userId = e.currentTarget.dataset.id;
+    const userName = e.currentTarget.dataset.name || '';
+    if (!userId) return;
+    const pages = getCurrentPages();
+    const prev = pages.length > 1 ? pages[pages.length - 2] : null;
+    if (prev && typeof prev.setData === 'function') {
+      prev.setData({
+        userId,
+        userName,
+        bookUserId: userId,
+        bookUserName: userName,
+      });
+      if (typeof prev._loadMemberCards === 'function') {
+        prev._loadMemberCards();
+      }
+    }
+    wx.navigateBack();
   },
 });

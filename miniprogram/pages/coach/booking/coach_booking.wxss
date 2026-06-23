@@ -4,6 +4,17 @@
   padding-bottom: calc(200rpx + env(safe-area-inset-bottom));
 }
 
+.schedule-card-tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 18rpx;
+  line-height: 1.2;
+  padding: 2rpx 8rpx;
+  border-radius: 6rpx;
+  background: rgba(255, 255, 255, 0.35);
+  margin-bottom: 4rpx;
+}
+
 .schedule-empty-hint--readonly {
   border-style: solid;
   border-color: #eef0f2;

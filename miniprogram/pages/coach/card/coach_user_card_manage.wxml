@@ -1,0 +1,133 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page ucm-page">
+  <coach-tenant-switch
+    title="会员卡管理"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+  />
+
+  <view wx:if="{{loading}}" class="coach-page-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <van-empty wx:elif="{{!card}}" description="会员卡不存在" />
+
+  <block wx:else>
+    <!-- 卡片视觉 -->
+    <view class="ucm-card" style="background: {{card.color}};">
+      <view class="ucm-card-type">{{card.typeLabel}}</view>
+      <view class="ucm-card-name">{{card.name}}</view>
+      <view class="ucm-card-info">
+        <view class="ucm-card-balance">{{card.balanceText}}</view>
+        <view class="ucm-card-chip">{{card.statusLabel}}</view>
+      </view>
+      <view class="ucm-card-meta">
+        <view class="ucm-card-meta-row">
+          <van-icon name="apps-o" size="24rpx" color="rgba(255,255,255,0.7)" />
+          <text>适用：{{card.scopeDesc || '全馆课程'}}</text>
+        </view>
+        <view class="ucm-card-meta-row">
+          <van-icon name="underway-o" size="24rpx" color="rgba(255,255,255,0.7)" />
+          <text>到期：{{card.endTimeDesc}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="ucm-actions" wx:if="{{card.type !== 'period'}}">
+      <view class="ucm-action" data-action="add" bindtap="bindAdjustTap">
+        <view class="ucm-action-icon ucm-action-icon--add">
+          <van-icon name="plus" size="36rpx" color="#fff" />
+        </view>
+        <text class="ucm-action-label">加次</text>
+      </view>
+      <view class="ucm-action" data-action="deduct" bindtap="bindAdjustTap">
+        <view class="ucm-action-icon ucm-action-icon--deduct">
+          <van-icon name="minus" size="36rpx" color="#fff" />
+        </view>
+        <text class="ucm-action-label">消次</text>
+      </view>
+      <view class="ucm-action" wx:if="{{card.status === 1}}" data-action="stop" bindtap="bindAdjustTap">
+        <view class="ucm-action-icon ucm-action-icon--stop">
+          <van-icon name="pause" size="36rpx" color="#fff" />
+        </view>
+        <text class="ucm-action-label">停卡</text>
+      </view>
+      <view class="ucm-action" wx:else data-action="resume" bindtap="bindAdjustTap">
+        <view class="ucm-action-icon ucm-action-icon--resume">
+          <van-icon name="play" size="36rpx" color="#fff" />
+        </view>
+        <text class="ucm-action-label">恢复</text>
+      </view>
+    </view>
+
+    <view class="ucm-actions ucm-actions--period" wx:else>
+      <view class="ucm-action" wx:if="{{card.status === 1}}" data-action="stop" bindtap="bindAdjustTap">
+        <view class="ucm-action-icon ucm-action-icon--stop">
+          <van-icon name="pause" size="36rpx" color="#fff" />
+        </view>
+        <text class="ucm-action-label">停卡</text>
+      </view>
+      <view class="ucm-action" wx:else data-action="resume" bindtap="bindAdjustTap">
+        <view class="ucm-action-icon ucm-action-icon--resume">
+          <van-icon name="play" size="36rpx" color="#fff" />
+        </view>
+        <text class="ucm-action-label">恢复</text>
+      </view>
+    </view>
+
+    <!-- 变动记录 -->
+    <view class="ucm-section-head">
+      <text class="ucm-section-title">变动记录</text>
+      <text class="ucm-section-count" wx:if="{{usageList.length}}">{{usageList.length}}条</text>
+    </view>
+
+    <van-empty wx:if="{{!usageList.length}}" description="暂无记录" />
+
+    <view wx:else class="ucm-log-list">
+      <view class="ucm-log" wx:for="{{usageList}}" wx:key="id">
+        <view class="ucm-log-dot {{item.isManual ? 'ucm-log-dot--manual' : ''}}"></view>
+        <view class="ucm-log-body">
+          <view class="ucm-log-top">
+            <text class="ucm-log-title">{{item.meetTitle}}</text>
+            <text class="ucm-log-tag {{item.isManual ? 'ucm-log-tag--manual' : ''}}">{{item.statusLabel}}</text>
+          </view>
+          <view class="ucm-log-sub">{{item.deductText}} · {{item.meetTypeName}}</view>
+          <view class="ucm-log-sub">{{item.scheduleText}}</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 调整弹窗 -->
+  <van-popup
+    show="{{adjustShow}}"
+    position="bottom"
+    round
+    bind:close="bindCloseAdjust"
+    custom-class="ucm-popup"
+  >
+    <view class="ucm-sheet">
+      <view class="ucm-sheet-handle"></view>
+      <view class="ucm-sheet-icon">
+        <van-icon name="edit" size="56rpx" color="{{themeColor}}" />
+      </view>
+      <text class="ucm-sheet-title">{{adjustTitle}}</text>
+      <view class="ucm-sheet-form">
+        <view class="ucm-field" wx:if="{{adjustAction === 'add' || adjustAction === 'deduct'}}">
+          <text class="ucm-field-label">次数</text>
+          <input class="ucm-field-input" type="number" value="{{adjustTimes}}" placeholder="请输入次数" bindinput="bindAdjustTimesInput" />
+        </view>
+        <view class="ucm-field">
+          <text class="ucm-field-label">备注</text>
+          <textarea class="ucm-field-textarea" value="{{adjustMemo}}" placeholder="必填，如：活动赠送、前台补录" maxlength="50" bindinput="bindAdjustMemoInput" />
+        </view>
+        <view class="ucm-sheet-btns">
+          <view class="ucm-sheet-btn ucm-sheet-btn--ghost" bindtap="bindCloseAdjust">取消</view>
+          <view class="ucm-sheet-btn ucm-sheet-btn--primary" bindtap="bindConfirmAdjust">确认</view>
+        </view>
+      </view>
+    </view>
+  </van-popup>
+</view>

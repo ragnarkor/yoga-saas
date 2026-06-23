@@ -1,0 +1,263 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page bd-page">
+  <coach-tenant-switch
+    title="本节详情"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+  />
+
+  <!-- 渐变信息头 -->
+  <view class="bd-hero">
+    <view class="bd-hero-top">
+      <view class="bd-hero-title">{{session.title || '课程'}}</view>
+      <view class="bd-hero-status">{{sessionStatus}}</view>
+    </view>
+    <view class="bd-hero-tags">
+      <text wx:if="{{session.typeName}}" class="bd-hero-tag">{{session.typeName}}</text>
+      <text wx:if="{{starText}}" class="bd-hero-stars">{{starText}}</text>
+    </view>
+    <view class="bd-hero-meta">
+      <view class="bd-hero-meta-row">
+        <van-icon name="clock-o" size="28rpx" color="rgba(255,255,255,0.85)" />
+        <text>{{session.day}} {{session.start}}–{{session.end}} · {{session.duration}}分钟</text>
+      </view>
+      <view class="bd-hero-meta-row" wx:if="{{session.teacherName}}">
+        <van-icon name="manager-o" size="28rpx" color="rgba(255,255,255,0.85)" />
+        <text>{{session.teacherName}}</text>
+      </view>
+    </view>
+    <view class="bd-hero-capacity">
+      <view class="bd-hero-capacity-row">
+        <text class="bd-hero-capacity-text">{{capacityText}}</text>
+        <text class="bd-hero-capacity-sub">未签到 {{counts.pending}} · 已签到 {{counts.checked}}</text>
+      </view>
+      <view class="bd-hero-progress-track" wx:if="{{session.limit > 0}}">
+        <view class="bd-hero-progress-bar" style="width: {{seatPercent}}%;"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索 + 分段筛选 -->
+  <view class="bd-toolbar">
+    <view class="member-search bd-search">
+      <van-icon name="search" size="32rpx" color="{{themeColor}}" />
+      <input
+        class="member-search-input"
+        placeholder="搜索姓名或手机号"
+        value="{{keyword}}"
+        confirm-type="search"
+        bindinput="bindSearchInput"
+        bindconfirm="bindSearchConfirm"
+      />
+    </view>
+    <view class="bd-segments">
+      <view
+        wx:for="{{filters}}"
+        wx:key="key"
+        class="bd-segment {{activeFilter === item.key ? 'active' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="bindFilterTap"
+      >
+        {{item.label}}
+        <text wx:if="{{item.key === 'pending' && counts.pending}}" class="bd-segment-num">{{counts.pending}}</text>
+        <text wx:elif="{{item.key === 'checked' && counts.checked}}" class="bd-segment-num">{{counts.checked}}</text>
+        <text wx:elif="{{item.key === 'cancelled' && counts.cancelled}}" class="bd-segment-num">{{counts.cancelled}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="coach-page-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <van-empty wx:elif="{{!counts.total}}" description="本节暂无预约记录" />
+
+  <view wx:else class="bd-body">
+    <block wx:if="{{activeFilter === 'all'}}">
+      <view class="bd-section" wx:for="{{sections}}" wx:key="key" wx:for-item="section">
+        <view class="bd-section-head">
+          <text class="bd-section-title">{{section.title}}</text>
+          <text class="bd-section-count">{{section.list.length}}人</text>
+        </view>
+        <view class="bd-card bd-card--{{member.groupKey}}" wx:for="{{section.list}}" wx:for-item="member" wx:key="id">
+          <view class="bd-card-inner">
+            <view class="bd-avatar">
+              <image wx:if="{{member.avatarSrc}}" src="{{member.avatarSrc}}" mode="aspectFill" />
+              <view wx:else class="bd-avatar-ph">
+                <van-icon name="user-o" size="40rpx" color="{{themeColor}}" />
+              </view>
+            </view>
+            <view class="bd-card-main">
+              <view class="bd-name-row">
+                <text class="bd-name">{{member.name}}</text>
+                <text class="bd-status-chip bd-status-chip--{{member.groupKey}}">{{member.statusLabel}}</text>
+              </view>
+              <view wx:if="{{member.mobile}}" class="bd-phone" data-phone="{{member.mobile}}" bindtap="bindPhoneTap">
+                {{member.mobile}}
+                <van-icon name="phone-o" size="24rpx" color="{{themeColor}}" />
+              </view>
+              <view wx:if="{{member.cardText}}" class="bd-sub">{{member.cardText}}</view>
+              <view wx:if="{{member.joinTime}}" class="bd-sub">预约于 {{member.joinTime}}</view>
+              <view wx:if="{{member.cancelReason && member.groupKey === 'cancelled'}}" class="bd-reason">原因：{{member.cancelReason}}</view>
+              <view class="bd-actions">
+                <block wx:if="{{member.status === 1 && !member.checkin}}">
+                  <view class="bd-act bd-act--primary" data-id="{{member.id}}" data-flag="1" bindtap="bindCheckinTap">签到</view>
+                  <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap">取消预约</view>
+                </block>
+                <block wx:elif="{{member.status === 1 && member.checkin}}">
+                  <view class="bd-act" data-id="{{member.id}}" data-flag="0" bindtap="bindCheckinTap">取消签到</view>
+                  <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap">取消预约</view>
+                </block>
+                <block wx:else>
+                  <view class="bd-act bd-act--primary" data-id="{{member.id}}" bindtap="bindRestoreTap">恢复预约</view>
+                </block>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view class="bd-card bd-card--{{member.groupKey}}" wx:for="{{displayList}}" wx:for-item="member" wx:key="id">
+        <view class="bd-card-inner">
+          <view class="bd-avatar">
+            <image wx:if="{{member.avatarSrc}}" src="{{member.avatarSrc}}" mode="aspectFill" />
+            <view wx:else class="bd-avatar-ph">
+              <van-icon name="user-o" size="40rpx" color="{{themeColor}}" />
+            </view>
+          </view>
+          <view class="bd-card-main">
+            <view class="bd-name-row">
+              <text class="bd-name">{{member.name}}</text>
+              <text class="bd-status-chip bd-status-chip--{{member.groupKey}}">{{member.statusLabel}}</text>
+            </view>
+            <view wx:if="{{member.mobile}}" class="bd-phone" data-phone="{{member.mobile}}" bindtap="bindPhoneTap">
+              {{member.mobile}}
+              <van-icon name="phone-o" size="24rpx" color="{{themeColor}}" />
+            </view>
+            <view wx:if="{{member.cardText}}" class="bd-sub">{{member.cardText}}</view>
+            <view wx:if="{{member.joinTime}}" class="bd-sub">预约于 {{member.joinTime}}</view>
+            <view wx:if="{{member.cancelReason && member.groupKey === 'cancelled'}}" class="bd-reason">原因：{{member.cancelReason}}</view>
+            <view class="bd-actions">
+              <block wx:if="{{member.status === 1 && !member.checkin}}">
+                <view class="bd-act bd-act--primary" data-id="{{member.id}}" data-flag="1" bindtap="bindCheckinTap">签到</view>
+                <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap">取消预约</view>
+              </block>
+              <block wx:elif="{{member.status === 1 && member.checkin}}">
+                <view class="bd-act" data-id="{{member.id}}" data-flag="0" bindtap="bindCheckinTap">取消签到</view>
+                <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap">取消预约</view>
+              </block>
+              <block wx:else>
+                <view class="bd-act bd-act--primary" data-id="{{member.id}}" bindtap="bindRestoreTap">恢复预约</view>
+              </block>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="bd-footer">
+    <van-button
+      round
+      color="{{themeColor}}"
+      custom-class="bd-footer-btn bd-footer-btn--primary"
+      bind:click="bindBookTap"
+    >代预约</van-button>
+    <van-button
+      wx:if="{{counts.pending > 0}}"
+      round
+      color="{{themeColor}}"
+      loading="{{batchCheckinLoading}}"
+      disabled="{{batchCheckinLoading}}"
+      custom-class="bd-footer-btn bd-footer-btn--primary"
+      bind:click="bindCheckinAllTap"
+    >一键签到({{counts.pending}})</van-button>
+    <van-button plain round color="{{themeColor}}" custom-class="bd-footer-btn" bind:click="bindQrTap">签到码</van-button>
+    <van-button plain round color="#969799" custom-class="bd-footer-btn" bind:click="bindCancelAllTap">取消本节</van-button>
+  </view>
+
+  <!-- 取消单个预约弹窗 -->
+  <van-popup show="{{cancelOneShow}}" position="bottom" round bind:close="bindCloseCancelOne" custom-class="bd-popup">
+    <view class="bd-sheet">
+      <view class="bd-sheet-handle"></view>
+      <view class="bd-sheet-icon bd-sheet-icon--cancel">
+        <van-icon name="warning-o" size="56rpx" color="#e06c5e" />
+      </view>
+      <text class="bd-sheet-title">取消预约</text>
+      <text class="bd-sheet-desc">取消后用户将收到通知</text>
+      <view class="bd-sheet-body">
+        <textarea class="bd-sheet-textarea" placeholder="取消理由（选填）" maxlength="100" value="{{cancelReason}}" bindinput="bindCancelReasonInput" />
+        <view class="bd-sheet-btns">
+          <view class="bd-sheet-btn bd-sheet-btn--ghost" bindtap="bindCloseCancelOne">再想想</view>
+          <view class="bd-sheet-btn bd-sheet-btn--danger" bindtap="bindConfirmCancelOne">确认取消</view>
+        </view>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 取消本节全部预约弹窗 -->
+  <van-popup show="{{cancelAllShow}}" position="bottom" round bind:close="bindCloseCancelAll" custom-class="bd-popup">
+    <view class="bd-sheet">
+      <view class="bd-sheet-handle"></view>
+      <view class="bd-sheet-icon bd-sheet-icon--cancel">
+        <van-icon name="warning-o" size="56rpx" color="#e06c5e" />
+      </view>
+      <text class="bd-sheet-title">取消本节全部预约</text>
+      <text class="bd-sheet-desc">已约 {{counts.pending + counts.checked}} 人将全部取消</text>
+      <view class="bd-sheet-body">
+        <textarea class="bd-sheet-textarea" placeholder="取消理由（选填）" maxlength="100" value="{{cancelReason}}" bindinput="bindCancelReasonInput" />
+        <view class="bd-sheet-btns">
+          <view class="bd-sheet-btn bd-sheet-btn--ghost" bindtap="bindCloseCancelAll">再想想</view>
+          <view class="bd-sheet-btn bd-sheet-btn--danger" bindtap="bindConfirmCancelAll">确认取消本节</view>
+        </view>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 团课代预约 -->
+  <van-popup show="{{bookSheetShow}}" position="bottom" round bind:close="bindCloseBookSheet" custom-class="bd-popup">
+    <view class="bd-sheet bd-sheet--book">
+      <view class="bd-sheet-handle"></view>
+      <text class="bd-sheet-title">代预约</text>
+      <text class="bd-sheet-desc">{{session.title}} · {{session.day}} {{session.start}}–{{session.end}}</text>
+      <view class="bd-book-fields">
+        <view class="bd-book-field" bindtap="bindPickMemberTap">
+          <text class="bd-book-label">会员</text>
+          <view class="bd-book-value-row">
+            <text class="bd-book-value">{{bookUserName || '请选择会员'}}</text>
+            <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+          </view>
+        </view>
+        <view class="bd-book-field" bindtap="bindCardTap">
+          <text class="bd-book-label">会员卡</text>
+          <view class="bd-book-value-row">
+            <text class="bd-book-value">{{bookCardName || '可选'}}</text>
+            <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+          </view>
+        </view>
+        <view class="bd-book-memo">
+          <textarea class="bd-sheet-textarea bd-book-memo-input" placeholder="备注（选填）" maxlength="50" value="{{bookMemo}}" bindinput="bindBookMemoInput" />
+        </view>
+      </view>
+      <view class="bd-sheet-btns bd-sheet-btns--book">
+        <view class="bd-sheet-btn bd-sheet-btn--ghost" bindtap="bindCloseBookSheet">取消</view>
+        <view class="bd-sheet-btn bd-sheet-btn--primary" bindtap="bindConfirmBookTap">{{bookSubmitting ? '提交中…' : '确认代约'}}</view>
+      </view>
+    </view>
+  </van-popup>
+
+  <van-popup show="{{cardSheetShow}}" position="bottom" round bind:close="bindCloseCardSheet" custom-class="bd-popup">
+    <view class="bd-sheet bd-sheet--book">
+      <text class="bd-sheet-title">选择会员卡</text>
+      <view class="bd-card-list">
+        <view class="bd-card-item" wx:for="{{bookCards}}" wx:key="id" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="bindCardPick">
+          <text>{{item.name}}</text>
+          <text class="bd-card-item-sub">{{item.balanceText}}</text>
+        </view>
+      </view>
+    </view>
+  </van-popup>
+</view>

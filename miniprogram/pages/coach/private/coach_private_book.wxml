@@ -1,0 +1,151 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page private-book-page">
+  <coach-tenant-switch title="私教代约" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
+
+  <view wx:if="{{loading}}" class="coach-page-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <view class="private-book-section">
+      <view class="private-book-field" bindtap="bindPickMemberTap">
+        <text class="private-book-label">会员</text>
+        <view class="private-book-value-row">
+          <text class="private-book-value">{{userName || '请选择会员'}}</text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
+      <view class="private-book-field" bindtap="bindCourseTap">
+        <text class="private-book-label">私教课程</text>
+        <view class="private-book-value-row">
+          <text class="private-book-value">{{form.courseName || '请选择'}}</text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
+      <view class="private-book-field" bindtap="bindTeacherTap">
+        <text class="private-book-label">授课教练</text>
+        <view class="private-book-value-row">
+          <text class="private-book-value">{{form.teacherName || '请选择'}}</text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
+      <view class="private-book-field" bindtap="bindDayTap">
+        <text class="private-book-label">上课日期</text>
+        <view class="private-book-value-row">
+          <text class="private-book-value">{{form.dayDisplay || '请选择'}}</text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
+      <view class="private-book-field" bindtap="bindStartTap">
+        <text class="private-book-label">开始时间</text>
+        <view class="private-book-value-row">
+          <text class="private-book-value">{{form.start || '请选择'}}</text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
+      <view class="private-book-field" bindtap="bindEndTap">
+        <text class="private-book-label">结束时间</text>
+        <view class="private-book-value-row">
+          <text class="private-book-value">{{form.end || '请选择'}}</text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
+      <view class="private-book-field" bindtap="bindCardTap">
+        <text class="private-book-label">会员卡</text>
+        <view class="private-book-value-row">
+          <text class="private-book-value">{{form.cardName || '可选'}}</text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+    </view>
+
+    <view class="private-book-section">
+      <view class="private-book-section-title">缓冲时间</view>
+      <view class="private-book-buffer-presets">
+        <view
+          wx:for="{{bufferPresets}}"
+          wx:key="key"
+          class="member-filter-item {{form.bufferPreset === item.key ? 'active' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="bindBufferPresetTap"
+        >{{item.label}}</view>
+      </view>
+      <view wx:if="{{form.bufferPreset === 'custom'}}" class="private-book-buffer-custom">
+        <van-field label="课前" type="number" value="{{form.bufferBefore}}" bind:change="bindBufferBeforeChange" />
+        <van-field label="课后" type="number" value="{{form.bufferAfter}}" bind:change="bindBufferAfterChange" />
+      </view>
+      <view class="private-book-hint" wx:if="{{blockText}}">{{blockText}}</view>
+      <view class="private-book-hint {{slotHasConflict ? 'is-warn' : (slotOk ? 'is-ok' : '')}}" wx:if="{{conflictText}}">{{conflictText}}</view>
+    </view>
+
+    <view class="private-book-section">
+      <van-field label="备注" type="textarea" value="{{form.memo}}" placeholder="选填" maxlength="50" autosize bind:change="bindMemoChange" />
+    </view>
+
+    <view class="private-book-footer">
+      <van-button block round color="{{themeColor}}" loading="{{submitting}}" bind:click="bindSubmitTap">确认代约</van-button>
+    </view>
+  </block>
+
+  <van-popup show="{{courseSheetShow}}" position="bottom" round bind:close="bindCloseCourseSheet">
+    <view class="course-edit-sheet">
+      <view class="course-edit-sheet-head"><text class="course-edit-sheet-title">选择私教课程</text></view>
+      <view class="card-scope-list">
+        <view class="card-scope-item" wx:for="{{coursePicker}}" wx:key="_id" data-id="{{item._id}}" bindtap="bindCoursePick">
+          <text>{{item.title}}</text>
+          <text class="private-book-course-sub">{{item.duration}}分钟</text>
+        </view>
+      </view>
+    </view>
+  </van-popup>
+
+  <van-action-sheet show="{{teacherSheetShow}}" actions="{{teacherActions}}" bind:close="bindCloseTeacherSheet" bind:select="bindTeacherSelect" />
+
+  <van-popup show="{{cardSheetShow}}" position="bottom" round bind:close="bindCloseCardSheet">
+    <view class="course-edit-sheet">
+      <view class="course-edit-sheet-head"><text class="course-edit-sheet-title">选择会员卡</text></view>
+      <view class="card-scope-list">
+        <view class="card-scope-item" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="bindCardPick">
+          <text>{{item.name}}</text>
+          <text class="private-book-course-sub">{{item.balanceText}}</text>
+        </view>
+      </view>
+    </view>
+  </van-popup>
+
+  <van-popup
+    show="{{datePickerShow}}"
+    position="bottom"
+    round
+    bind:close="bindDateClose"
+    custom-class="private-book-calendar-popup"
+  >
+    <view class="private-book-calendar-wrap">
+      <view class="private-book-calendar-head">选择上课日期</view>
+      <van-calendar
+        poppable="{{ false }}"
+        type="single"
+        show-confirm="{{ false }}"
+        color="{{themeColor}}"
+        min-date="{{datePickerMin}}"
+        default-date="{{calendarDefaultDate}}"
+        bind:confirm="bindCalendarConfirm"
+      />
+    </view>
+  </van-popup>
+
+  <van-popup show="{{timePickerShow}}" position="bottom" round bind:close="bindTimeClose">
+    <van-datetime-picker
+      type="time"
+      value="{{timePickerField === 'end' ? form.end : form.start}}"
+      bind:confirm="bindTimeConfirm"
+      bind:cancel="bindTimeClose"
+    />
+  </van-popup>
+</view>

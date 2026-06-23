@@ -8,6 +8,7 @@ const appCode = require("../../framework/core/app_code.js");
 const timeUtil = require("../../framework/utils/time_util.js");
 const dbUtil = require("../../framework/database/db_util.js");
 const SetupModel = require("../model/setup_model.js");
+const coverUtil = require("../utils/cover_util.js");
 const AdminModel = require("../model/admin_model.js");
 const NewsModel = require("../model/news_model.js");
 const MeetModel = require("../model/meet_model.js");
@@ -43,6 +44,25 @@ class BaseService {
     else return "unknow";
   }
 
+  /** 数据库 getAll 安全封装：复合排序缺索引时降级为单字段排序 */
+  async _safeGetAll(model, where, fields, orderBy, size = 100) {
+    try {
+      return await model.getAll(where, fields, orderBy, size);
+    } catch (err) {
+      const keys = orderBy ? Object.keys(orderBy) : [];
+      if (keys.length > 1) {
+        try {
+          const fallback = { [keys[0]]: orderBy[keys[0]] };
+          return await model.getAll(where, fields, fallback, size);
+        } catch (err2) {
+          console.error("[_safeGetAll fallback]", model.CL, err2.message);
+        }
+      }
+      console.error("[_safeGetAll]", model.CL, err.message);
+      return [];
+    }
+  }
+
   /**
    * 确保 config.COLLECTION_NAME 中的集合均已创建
    */
@@ -61,7 +81,7 @@ class BaseService {
    * @param {object} links 可选跳转：meetId、newsId、teachers[]
    */
   async seedHomeContent(tenantName, links = {}) {
-    const pic = "/images/default_cover_pic.gif";
+    const pickPic = (i) => coverUtil.DEFAULT_COVERS[i % coverUtil.DEFAULT_COVERS.length];
     const name = tenantName || "瑜伽馆";
     const meetId = links.meetId || "";
     const newsId = links.newsId || "";
@@ -70,7 +90,7 @@ class BaseService {
     await BannerModel.insert({
       BANNER_TITLE: "欢迎来到" + name,
       BANNER_TYPE: "image",
-      BANNER_PIC: pic,
+      BANNER_PIC: pickPic(0),
       BANNER_LINK_TYPE: "about",
       BANNER_ORDER: 1,
       BANNER_STATUS: 1,
@@ -80,7 +100,7 @@ class BaseService {
     await BannerModel.insert({
       BANNER_TITLE: "夏季团课优惠进行中",
       BANNER_TYPE: "image",
-      BANNER_PIC: pic,
+      BANNER_PIC: pickPic(1),
       BANNER_LINK_TYPE: newsId ? "news" : "none",
       BANNER_LINK_ID: newsId,
       BANNER_ORDER: 2,
@@ -91,7 +111,7 @@ class BaseService {
     await BannerModel.insert({
       BANNER_TITLE: "热门课程 · 立即预约",
       BANNER_TYPE: "image",
-      BANNER_PIC: pic,
+      BANNER_PIC: pickPic(2),
       BANNER_LINK_TYPE: meetId ? "meet" : "none",
       BANNER_LINK_ID: meetId,
       BANNER_ORDER: 3,
@@ -139,8 +159,8 @@ class BaseService {
         await TeacherModel.insert({
           TEACHER_ADMIN_ID: t.adminId,
           TEACHER_NAME: t.name,
-          TEACHER_AVATAR: pic,
-          TEACHER_PIC: [pic, pic],
+          TEACHER_AVATAR: pickPic(Number(i)),
+          TEACHER_PIC: [pickPic(Number(i)), pickPic(Number(i) + 1)],
           TEACHER_SPECIALTY: t.specialty,
           TEACHER_DESC: t.desc,
           TEACHER_HOME: 1,
@@ -164,7 +184,7 @@ class BaseService {
       await PhotoModel.insert({
         PHOTO_TITLE: p.title,
         PHOTO_DESC: p.desc,
-        PHOTO_PIC: pic,
+        PHOTO_PIC: pickPic(Number(i)),
         PHOTO_LINK_TYPE: i === "1" && meetId ? "meet" : "none",
         PHOTO_LINK_ID: i === "1" ? meetId : "",
         PHOTO_ORDER: Number(i) + 1,
@@ -256,7 +276,7 @@ class BaseService {
               val: title + "内容1",
             },
           ];
-          data.NEWS_PIC = ["/images/default_cover_pic.gif"];
+          data.NEWS_PIC = [coverUtil.pickDefaultCover(cateId + j)];
 
           await NewsModel.insert(data);
         }
@@ -277,7 +297,7 @@ class BaseService {
           data.MEET_TITLE = title;
           data.MEET_STYLE_SET = {
             desc: title + " - 欢迎预约体验",
-            pic: "/images/default_cover_pic.gif",
+            pic: coverUtil.pickDefaultCover(typeId + j),
           };
           data.MEET_TYPE_ID = typeId;
           data.MEET_TYPE_NAME = title;
@@ -574,7 +594,7 @@ class BaseService {
         data.NEWS_CATE_NAME = title;
         data.NEWS_ADMIN_ID = ownerId || "1";
         data.NEWS_CONTENT = [{ type: "text", val: title + "内容1" }];
-        data.NEWS_PIC = ["/images/default_cover_pic.gif"];
+        data.NEWS_PIC = [coverUtil.pickDefaultCover(cateId + j)];
         let newsId = await NewsModel.insert(data);
         if (!firstNewsId) firstNewsId = newsId;
       }
@@ -589,7 +609,7 @@ class BaseService {
         data.MEET_TITLE = title;
         data.MEET_STYLE_SET = {
           desc: title + " - 欢迎预约体验",
-          pic: "/images/default_cover_pic.gif",
+          pic: coverUtil.pickDefaultCover(typeId + j),
         };
         data.MEET_TYPE_ID = typeId;
         data.MEET_TYPE_NAME = title;

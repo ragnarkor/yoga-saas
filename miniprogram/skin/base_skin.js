@@ -5,7 +5,14 @@ module.exports = {
   IMG_ROOT: "/pages/default/skin/images",
   IMG_DEFAULT_INDEX_BG: "/pages/default/skin/images/default_index_bg.jpg",
   IMG_UPIMG: "/pages/default/skin/images/upimg.jpg",
-  IMG_DEFAULT_COVER: "/images/default_cover_pic.gif",
+  IMG_DEFAULT_COVER: "/images/default_cover_1.png",
+  IMG_DEFAULT_COVERS: [
+    "/images/default_cover_1.png",
+    "/images/default_cover_2.png",
+    "/images/default_cover_3.png",
+    "/images/default_cover_4.png",
+    "/images/default_cover_5.png",
+  ],
   NAV_COLOR: "#ffffff",
   NAV_BG: "#5B8A72",
 

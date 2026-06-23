@@ -7,7 +7,10 @@
   </view>
 
   <block wx:else>
-    <van-cell-group title="基本信息" custom-class="course-edit-group">
+    <!-- [AI_START TIMESTAMP=2025-01-25 17:30:00] -->
+    <view class="course-edit-section">基本信息</view>
+    <!-- [AI_END LINES=1 TIMESTAMP=2025-01-25 17:30:00] -->
+    <van-cell-group custom-class="course-edit-group">
       <view class="course-edit-field" bindtap="bindTemplateTap">
         <view class="course-edit-field-label">课程模板</view>
         <view wx:if="{{selectedTemplatePreview}}" class="course-edit-field-selected">
@@ -35,18 +38,16 @@
         bind:change="bindTitleChange"
       />
 
-      <view class="course-edit-field" bindtap="bindTypeTap">
-        <view class="course-edit-field-label">
-          <text>课程类型</text>
-          <text class="course-edit-required">*</text>
-        </view>
-        <view class="course-edit-field-row">
-          <text class="{{typeName ? 'course-edit-field-value' : 'course-edit-field-placeholder-text'}}">
-            {{typeName || '请选择课程类型'}}
-          </text>
-          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-      </view>
+      <van-cell
+        custom-class="course-edit-picker-cell"
+        title-class="course-edit-cell-title"
+        title="课程类型"
+        required
+        is-link
+        value="{{typeName || '请选择'}}"
+        value-class="{{typeName ? 'course-edit-cell-value' : 'course-edit-cell-placeholder'}}"
+        bind:click="bindTypeTap"
+      />
       <van-field
         label="时长(分钟)"
         required
@@ -74,11 +75,13 @@
       />
 
       <view class="course-edit-field course-edit-field--inline" bindtap="bindColorFieldTap">
-        <text class="course-edit-field-label-inline">课程颜色</text>
+        <!-- [AI_START TIMESTAMP=2025-01-25 17:45:00] -->
+        <view class="course-edit-field-label-inline">课程颜色</view>
+        <!-- [AI_END LINES=1 TIMESTAMP=2025-01-25 17:45:00] -->
         <view class="course-edit-field-row course-edit-field-row--inline">
           <view class="course-edit-color-inline">
             <view
-              class="course-edit-color-swatch course-edit-color-swatch--sm"
+              class="course-color-dot course-color-dot--md"
               style="background: {{formStyleSet.color}};"
             ></view>
             <text class="course-edit-field-value">{{selectedColorLabel}}</text>
@@ -88,9 +91,13 @@
       </view>
     </van-cell-group>
 
-    <van-cell-group title="图片" custom-class="course-edit-group">
-      <van-cell title="缩略图" required use-label-slot>
+    <!-- [AI_START TIMESTAMP=2025-01-25 17:30:00] -->
+    <view class="course-edit-section">图片</view>
+    <!-- [AI_END LINES=1 TIMESTAMP=2025-01-25 17:30:00] -->
+    <van-cell-group custom-class="course-edit-group">
+      <van-cell title="缩略图" use-label-slot>
         <view slot="label" class="course-edit-upload">
+          <view class="course-edit-upload-hint">选填，未上传时将随机使用默认封面</view>
           <van-uploader
             file-list="{{thumbList}}"
             max-count="{{1}}"
@@ -111,7 +118,10 @@
       </van-cell>
     </van-cell-group>
 
-    <van-cell-group title="课程详情" custom-class="course-edit-group">
+    <!-- [AI_START TIMESTAMP=2025-01-25 17:30:00] -->
+    <view class="course-edit-section">课程详情</view>
+    <!-- [AI_END LINES=1 TIMESTAMP=2025-01-25 17:30:00] -->
+    <van-cell-group custom-class="course-edit-group">
       <van-field
         label="简介"
         type="textarea"
@@ -134,7 +144,10 @@
       />
     </van-cell-group>
 
-    <van-cell-group title="课程设置" custom-class="course-edit-group">
+    <!-- [AI_START TIMESTAMP=2025-01-25 17:30:00] -->
+    <view class="course-edit-section">课程设置</view>
+    <!-- [AI_END LINES=1 TIMESTAMP=2025-01-25 17:30:00] -->
+    <van-cell-group custom-class="course-edit-group">
       <van-field
         label="容纳人数"
         type="number"
@@ -191,8 +204,8 @@
           wx:key="_id"
           data-id="{{item._id}}"
           bindtap="bindTemplatePick"
-          style="border-left-color: {{item.color}};"
         >
+          <view class="course-color-dot course-color-dot--md" style="background: {{item.color}};"></view>
           <image class="course-edit-option-cover" src="{{item.cover}}" mode="aspectFill" />
           <view class="course-edit-option-body">
             <view class="course-edit-option-title">{{item.title}}</view>
@@ -221,8 +234,10 @@
     custom-class="course-edit-popup"
   >
     <view class="course-edit-sheet">
+      <!-- [AI_START TIMESTAMP=2025-01-25 17:30:00] -->
       <view class="course-edit-sheet-head">
         <text class="course-edit-sheet-title">选择课程类型</text>
+        <text class="course-edit-sheet-sub">课程类型用于排课分类与筛选</text>
       </view>
       <view class="course-edit-type-list">
         <view
@@ -232,15 +247,14 @@
           data-id="{{item.id}}"
           bindtap="bindTypePick"
         >
-          <text>{{item.name}}</text>
-          <van-icon
-            wx:if="{{formTypeId === item.id}}"
-            name="success"
-            size="36rpx"
-            color="{{themeColor}}"
-          />
+          <view class="course-edit-type-dot"></view>
+          <text class="course-edit-type-name">{{item.name}}</text>
+          <view class="course-edit-type-check" wx:if="{{formTypeId === item.id}}">
+            <van-icon name="success" size="32rpx" color="{{themeColor}}" />
+          </view>
         </view>
       </view>
+      <!-- [AI_END LINES=20 TIMESTAMP=2025-01-25 17:30:00] -->
     </view>
   </van-popup>
 

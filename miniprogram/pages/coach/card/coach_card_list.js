@@ -38,7 +38,7 @@ Page({
         { hint: false, title: 'bar' },
       );
       this.setData({
-        cardList: (res && res.list) || [],
+        cardList: ((res && res.list) || []).map((item) => this._formatCardItem(item)),
         loading: false,
       });
     } catch (e) {
@@ -51,15 +51,32 @@ Page({
     wx.navigateTo({ url: '/pages/coach/card/coach_card_edit' });
   },
 
-  bindEditTap(e) {
+  _formatCardItem(item) {
+    const metaTags = [];
+    if (item.CARD_TPL_DAYS) {
+      metaTags.push({ key: 'days', label: '有效期', value: `${item.CARD_TPL_DAYS}天` });
+    }
+    if (item.CARD_TPL_TYPE === 'times' && item.CARD_TPL_QUOTA) {
+      metaTags.push({ key: 'quota', label: '额度', value: `${item.CARD_TPL_QUOTA}次` });
+    }
+    if (item.CARD_TPL_PRICE != null && item.CARD_TPL_PRICE !== '') {
+      metaTags.push({
+        key: 'price',
+        label: '售价',
+        value: `¥${item.CARD_TPL_PRICE}`,
+        highlight: true,
+      });
+    }
+    const scopeDesc = item.scopeDesc || '全馆课程';
+    if (scopeDesc && scopeDesc !== '全馆课程') {
+      metaTags.push({ key: 'scope', label: '适用', value: scopeDesc });
+    }
+    return { ...item, metaTags };
+  },
+
+  bindCardTap(e) {
     const id = e.currentTarget.dataset.id;
     if (!id) return;
     wx.navigateTo({ url: `/pages/coach/card/coach_card_edit?id=${id}` });
-  },
-
-  bindManageTap(e) {
-    const id = e.currentTarget.dataset.id;
-    if (!id) return;
-    wx.navigateTo({ url: `/pages/coach/card/coach_card_edit?id=${id}&mode=manage` });
   },
 });

@@ -331,7 +331,7 @@
   */
  async function transTempPicOne(img, dir, id, isCheck = true) {
 
- 	if (isCheck) {
+ 	if (isCheck && setting.CLIENT_CHECK_CONTENT) {
  		wx.showLoading({
  			title: '图片校验中',
  			mask: true

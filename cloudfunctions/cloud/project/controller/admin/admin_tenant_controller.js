@@ -29,6 +29,7 @@ class AdminTenantController extends BaseAdminController {
       contactAddress: "string|max:200|name=门店地址",
       contactLatitude: "string|false|name=纬度",
       contactLongitude: "string|false|name=经度",
+      privateSchedule: "object|false|name=私教预约规则",
     };
     let input = this.validateData(rules);
     let pid = global.PID || this.getParameter("pid") || "";
@@ -47,6 +48,7 @@ class AdminTenantController extends BaseAdminController {
       input.contactAddress,
       input.contactLatitude,
       input.contactLongitude,
+      input.privateSchedule,
     );
   }
 

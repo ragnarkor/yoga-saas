@@ -39,6 +39,33 @@ class AdminHomeController extends BaseAdminController {
     return { id };
   }
 
+  // [AI_START TIMESTAMP=2025-01-27 15:00:00]
+  async editBanner() {
+    await this.isAdmin();
+    let rules = {
+      id: "must|id",
+      title: "string",
+      type: "string|default=image",
+      pic: "string",
+      video: "string",
+      linkType: "string|default=none",
+      linkId: "string",
+      order: "int|default=9999",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminHomeService();
+    await service.editBanner(input.id, {
+      BANNER_TITLE: input.title,
+      BANNER_TYPE: input.type,
+      BANNER_PIC: input.pic,
+      BANNER_VIDEO: input.video,
+      BANNER_LINK_TYPE: input.linkType,
+      BANNER_LINK_ID: input.linkId,
+      BANNER_ORDER: input.order,
+    });
+  }
+  // [AI_END LINES=23 TIMESTAMP=2025-01-27 15:00:00]
+
   async delBanner() {
     await this.isAdmin();
     let rules = { id: "must|id" };
@@ -70,6 +97,26 @@ class AdminHomeController extends BaseAdminController {
     });
     return { id };
   }
+
+  // [AI_START TIMESTAMP=2025-01-27 15:00:00]
+  async editAnnounce() {
+    await this.isAdmin();
+    let rules = {
+      id: "must|id",
+      title: "must|string",
+      desc: "string",
+      order: "int|default=9999",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminHomeService();
+    await service.editAnnounce(input.id, {
+      ANNOUNCE_TITLE: input.title,
+      ANNOUNCE_DESC: input.desc,
+      ANNOUNCE_ORDER: input.order,
+      ANNOUNCE_CONTENT: [{ type: "text", val: input.desc || input.title }],
+    });
+  }
+  // [AI_END LINES=20 TIMESTAMP=2025-01-27 15:00:00]
 
   async delAnnounce() {
     await this.isAdmin();
@@ -146,6 +193,31 @@ class AdminHomeController extends BaseAdminController {
     });
     return { id };
   }
+
+  // [AI_START TIMESTAMP=2025-01-27 15:00:00]
+  async editPhoto() {
+    await this.isAdmin();
+    let rules = {
+      id: "must|id",
+      title: "string",
+      desc: "string",
+      pic: "must|string",
+      linkType: "string|default=none",
+      linkId: "string",
+      order: "int|default=9999",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminHomeService();
+    await service.editPhoto(input.id, {
+      PHOTO_TITLE: input.title,
+      PHOTO_DESC: input.desc,
+      PHOTO_PIC: input.pic,
+      PHOTO_LINK_TYPE: input.linkType,
+      PHOTO_LINK_ID: input.linkId,
+      PHOTO_ORDER: input.order,
+    });
+  }
+  // [AI_END LINES=23 TIMESTAMP=2025-01-27 15:00:00]
 
   async delPhoto() {
     await this.isAdmin();

@@ -4,8 +4,12 @@ const UserProfileBiz = require("../../../biz/user_profile_biz.js");
 
 const BASE_MENUS = [
   { name: "我的门店", url: "/pages/coach/store/coach_store" },
-  { name: "首页内容", url: "/pages/admin/home/content/admin_home_content" },
 ];
+
+const HOME_CONTENT_MENU = {
+  name: "首页内容",
+  url: "/pages/coach/home/coach_home_content",
+};
 
 Page({
   behaviors: [require("../../../behavior/coach_page_bh.js")],
@@ -54,6 +58,9 @@ Page({
   _buildMenus(admin) {
     const staffUrl = "/pages/coach/staff/coach_staff";
     let menus = BASE_MENUS.slice();
+    if (admin && admin.type === "owner") {
+      menus.push(HOME_CONTENT_MENU);
+    }
     if (admin && (admin.type === "owner" || admin.type === "teacher")) {
       menus.splice(1, 0, {
         name: "我的主页",
@@ -74,7 +81,7 @@ Page({
 
     if (isSuperAdmin) {
       this.setData({
-        menus: BASE_MENUS.slice(),
+        menus: BASE_MENUS.concat([HOME_CONTENT_MENU]),
         isSuperAdmin: true,
         roleTag: "超级管理员",
         userName: admin.name || "超级管理员",

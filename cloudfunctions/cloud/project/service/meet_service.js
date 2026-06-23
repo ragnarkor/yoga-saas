@@ -13,12 +13,12 @@ const LogUtil = require("../../framework/utils/log_util.js");
 const timeUtil = require("../../framework/utils/time_util.js");
 const dataUtil = require("../../framework/utils/data_util.js");
 const config = require("../../config/config.js");
+const UserCardService = require("./user_card_service.js");
 const PassportService = require("../service/passport_service.js");
 const cloudBase = require("../../framework/cloud/cloud_base.js");
 const UserModel = require("../model/user_model.js");
 const AdminModel = require("../model/admin_model.js");
 const TeacherModel = require("../model/teacher_model.js");
-const UserCardService = require("./user_card_service.js");
 
 class MeetService extends BaseService {
   constructor() {
@@ -118,7 +118,7 @@ class MeetService extends BaseService {
   }
 
   // 预约逻辑
-  async join(userId, meetId, timeMark, forms, cardId) {
+  async join(userId, meetId, timeMark, forms, cardId, options = {}) {
     // 预约时段是否存在
     let meetWhere = {
       _id: meetId,
@@ -137,7 +137,7 @@ class MeetService extends BaseService {
     if (!timeSet) this.AppError("预约时段选择错误3，请重新选择");
 
     // 规则校验
-    await this.checkMeetRules(userId, meetId, timeMark);
+    await this.checkMeetRules(userId, meetId, timeMark, cardId, options);
 
     let data = {};
 
@@ -158,6 +158,7 @@ class MeetService extends BaseService {
 
     data.JOIN_STATUS = JoinModel.STATUS.SUCC;
     data.JOIN_CODE = dataUtil.genRandomIntString(15);
+    if (options.isAdmin) data.JOIN_IS_ADMIN = 1;
 
     // 入库
     let joinId = await JoinModel.insert(data);
@@ -175,16 +176,30 @@ class MeetService extends BaseService {
       }
     }
 
-    // 统计
-    this.statJoinCnt(meetId, timeMark);
+    // 统计（失败不影响预约结果）
+    try {
+      await this.statJoinCnt(meetId, timeMark);
+    } catch (err) {
+      console.error("[meet/join] statJoinCnt failed:", err.message);
+    }
 
-    // 扣减会员卡次数
-    let cardService = new UserCardService();
-    await cardService.consumeForJoin(userId, meetId, joinId, cardId);
+    // 扣减会员卡次数（预约已入库，扣卡失败不撤销预约，返回提示供前端展示）
+    let cardWarning = "";
+    if (cardId) {
+      let cardService = new UserCardService();
+      try {
+        await cardService.consumeForJoin(userId, meetId, joinId, cardId);
+      } catch (err) {
+        console.error("[meet/join] consumeForJoin failed:", err.message);
+        cardWarning =
+          (err && err.message) || "会员卡划扣异常，请联系馆方核对";
+      }
+    }
 
     return {
       result: "ok",
       joinId,
+      cardWarning,
     };
   }
 
@@ -267,7 +282,7 @@ class MeetService extends BaseService {
   }
 
   /** 报名规则校验 */
-  async checkMeetRules(userId, meetId, timeMark) {
+  async checkMeetRules(userId, meetId, timeMark, cardId, options = {}) {
     // 预约时段是否存在
     let meetWhere = {
       _id: meetId,
@@ -282,14 +297,18 @@ class MeetService extends BaseService {
     await this.checkMeetTimeControll(meet, timeMark);
 
     // 截止规则
-    await this.checkMeetEndSet(meet, timeMark);
+    if (!options.skipEndCheck) {
+      await this.checkMeetEndSet(meet, timeMark);
+    }
 
     // 针对用户的次数限制
     await this.checkMeetLimitSet(userId, meet, timeMark);
 
-    // 会员卡次数/期限校验
-    let cardService = new UserCardService();
-    await cardService.checkCardForJoin(userId, meetId, cardId);
+    // 会员卡次数/期限校验（提交预约时传入 cardId）
+    if (cardId) {
+      let cardService = new UserCardService();
+      await cardService.checkCardForJoin(userId, meetId, cardId);
+    }
   }
 
   // 预约次数限制校验
@@ -464,10 +483,15 @@ class MeetService extends BaseService {
         JOIN_IS_CHECKIN: 0,
         JOIN_STATUS: JoinModel.STATUS.SUCC,
       };
+      let join = await JoinModel.getOne(where);
       let data = {
         JOIN_IS_CHECKIN: 1,
       };
       await JoinModel.edit(where, data);
+      if (join && join._id) {
+        let cardService = new UserCardService();
+        await cardService.tryActivateForJoinCheckin(join._id, userId);
+      }
       ret = "签到成功，请在「个人中心」查看详情~";
     }
     return {

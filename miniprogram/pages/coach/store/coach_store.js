@@ -74,6 +74,10 @@ Page({
     themePickIndex: 0,
     themeDirty: false,
     presetColors: themeHelper.PRESET_THEME_COLORS,
+    privateOpenTime: '07:00',
+    privateCloseTime: '22:00',
+    privateAdvanceHours: '2',
+    privateMaxBookDays: '14',
   },
 
   onLoad() {
@@ -138,6 +142,11 @@ Page({
         categories: (res && res.categories) || [],
         canEdit,
       };
+      const ps = (res && res.privateSchedule) || {};
+      patch.privateOpenTime = ps.openTime || '07:00';
+      patch.privateCloseTime = ps.closeTime || '22:00';
+      patch.privateAdvanceHours = String(ps.advanceHours != null ? ps.advanceHours : 2);
+      patch.privateMaxBookDays = String(ps.maxBookDays != null ? ps.maxBookDays : 14);
       if (!this.data.themeDirty) {
         patch.themeColor = themeColor;
         patch.themePickIndex = findThemePickIndex(
@@ -353,6 +362,12 @@ Page({
           contactAddress: this.data.contactAddress,
           contactLatitude: this.data.contactLatitude,
           contactLongitude: this.data.contactLongitude,
+          privateSchedule: {
+            openTime: (this.data.privateOpenTime || '07:00').trim(),
+            closeTime: (this.data.privateCloseTime || '22:00').trim(),
+            advanceHours: Number(this.data.privateAdvanceHours) || 0,
+            maxBookDays: Number(this.data.privateMaxBookDays) || 14,
+          },
         },
         { title: '保存中' },
       );

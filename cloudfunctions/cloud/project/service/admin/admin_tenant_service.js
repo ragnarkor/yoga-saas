@@ -11,6 +11,7 @@ const AdminModel = require("../../model/admin_model.js");
 const cloudUtil = require("../../../framework/cloud/cloud_util.js");
 const timeUtil = require("../../../framework/utils/time_util.js");
 const tenantSetupHelper = require("../tenant_setup_helper.js");
+const bufferUtil = require("../../utils/schedule_buffer_util.js");
 
 const DEFAULT_MEET_TYPE =
   "1=特色课程|leftbig3,2=精品课|leftbig2,3=私教定制|leftbig2,4=核心床|leftbig3";
@@ -18,6 +19,64 @@ const DEFAULT_MEET_TYPE =
 class AdminTenantService extends BaseAdminService {
   _defaultMeetType() {
     return DEFAULT_MEET_TYPE;
+  }
+
+  _parseTimeHm(value, fallback, label) {
+    const raw = String(value != null ? value : fallback || "").trim();
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(raw)) {
+      this.AppError(label + "格式应为 HH:mm");
+    }
+    return raw;
+  }
+
+  _normalizePrivateSchedule(input, prev) {
+    const base = prev || {};
+    const merged = Object.assign({}, base, input || {});
+    const openTime = this._parseTimeHm(
+      merged.openTime,
+      base.openTime || "07:00",
+      "营业开始时间",
+    );
+    const closeTime = this._parseTimeHm(
+      merged.closeTime,
+      base.closeTime || "22:00",
+      "营业结束时间",
+    );
+    if (bufferUtil.timeToMinutes(openTime) >= bufferUtil.timeToMinutes(closeTime)) {
+      this.AppError("营业结束时间须晚于开始时间");
+    }
+    return {
+      openTime,
+      closeTime,
+      advanceHours: Math.max(
+        0,
+        Number(
+          merged.advanceHours != null ? merged.advanceHours : base.advanceHours,
+        ) || 0,
+      ),
+      maxBookDays: Math.max(
+        1,
+        Number(
+          merged.maxBookDays != null ? merged.maxBookDays : base.maxBookDays,
+        ) || 14,
+      ),
+      slotStepMinutes: Math.max(
+        5,
+        Number(
+          merged.slotStepMinutes != null
+            ? merged.slotStepMinutes
+            : base.slotStepMinutes,
+        ) || 15,
+      ),
+      defaultBufferBefore:
+        merged.defaultBufferBefore != null
+          ? Math.max(0, Number(merged.defaultBufferBefore) || 0)
+          : base.defaultBufferBefore,
+      defaultBufferAfter:
+        merged.defaultBufferAfter != null
+          ? Math.max(0, Number(merged.defaultBufferAfter) || 0)
+          : base.defaultBufferAfter,
+    };
   }
 
   _parseCategories(meetTypeStr) {
@@ -32,7 +91,7 @@ class AdminTenantService extends BaseAdminService {
       const id = seg.slice(0, eq).trim();
       const rest = seg.slice(eq + 1).trim();
       const name = rest.split("|")[0].trim();
-      if (id && name) list.push({ id, name });
+      if (id && name) list.push({ id, name, isPrivate: name.indexOf("私教") >= 0 });
     }
     return list;
   }
@@ -83,6 +142,7 @@ class AdminTenantService extends BaseAdminService {
     return {
       tenant: mergedTenant,
       categories: this._parseCategories(meetTypeStr),
+      privateSchedule: (setup && setup.SETUP_FEATURES && setup.SETUP_FEATURES.privateSchedule) || null,
       about: (setup && setup.SETUP_ABOUT) || "",
       aboutPics: (setup && setup.SETUP_ABOUT_PIC) || [],
       contact: {
@@ -108,6 +168,7 @@ class AdminTenantService extends BaseAdminService {
     contactAddress,
     contactLatitude,
     contactLongitude,
+    privateSchedule,
   ) {
     if (!pid) this.AppError("请先选择瑜伽馆");
     if (
@@ -191,6 +252,21 @@ class AdminTenantService extends BaseAdminService {
         this.AppError("经度格式不正确");
       }
       setupData.SETUP_LONGITUDE = lng === "" ? "" : lng;
+    }
+
+    if (privateSchedule !== undefined && privateSchedule !== null) {
+      let existingSetup = await tenantSetupHelper.getSetupForPid(
+        pid,
+        "SETUP_FEATURES",
+      );
+      let features = (existingSetup && existingSetup.SETUP_FEATURES) || {};
+      setupData.SETUP_FEATURES = {
+        ...features,
+        privateSchedule: this._normalizePrivateSchedule(
+          privateSchedule,
+          features.privateSchedule || {},
+        ),
+      };
     }
 
     await this._saveSetupForPid(pid, setupData);

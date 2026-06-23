@@ -13,6 +13,8 @@ CardTplModel.DB_STRUCTURE = {
   CARD_TPL_PRICE: "int|true|default=0|comment=售价(元)",
   CARD_TPL_QUOTA: "int|true|default=1|comment=额度(次)",
   CARD_TPL_COLOR: "string|false|default=#F5A623|comment=卡片预览色",
+  CARD_TPL_SCOPE:
+    "object|false|default={}|comment=适用课程范围 mode=all|categories categoryIds=[]",
   CARD_TPL_ORDER: "int|true|default=9999",
   CARD_TPL_STATUS: "int|true|default=1|comment=1=在售 0=停售",
   CARD_TPL_ADD_TIME: "int|true",

@@ -5,9 +5,7 @@
 }
 
 .platform-loading {
-  display: flex;
-  justify-content: center;
-  padding: 120rpx 0;
+  /* 见 coach_common.wxss */
 }
 
 .platform-hero {

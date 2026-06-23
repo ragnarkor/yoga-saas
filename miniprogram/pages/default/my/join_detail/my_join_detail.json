@@ -1,6 +1,11 @@
 {
-	"usingComponents": { 
-	},  
-	"enablePullDownRefresh": true, 
-	"navigationBarTitleText": "我的活动/预约详情"
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-icon": "@vant/weapp/icon/index"
+  },
+  "enablePullDownRefresh": true,
+  "navigationBarTitleText": "预约详情",
+  "navigationBarBackgroundColor": "#5b8a72",
+  "navigationBarTextStyle": "white"
 }

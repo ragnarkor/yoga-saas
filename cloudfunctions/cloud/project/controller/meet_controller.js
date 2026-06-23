@@ -14,6 +14,7 @@ const TenantModel = require('../model/tenant_model.js');
 const cacheUtil = require('../../framework/utils/cache_util.js');
 const config = require('../../config/config.js');
 const FeatureGate = require('../utils/feature_gate.js');
+const coverUtil = require('../utils/cover_util.js');
 
 const CACHE_CALENDAR_INDEX = 'cache_calendar_index';
 const CACHE_CALENDAR_HAS_DAY = 'cache_calendar_has_day';
@@ -31,7 +32,7 @@ class MeetController extends BaseController {
 			node.title = list[k].MEET_TITLE;
 			node.desc = list[k].MEET_STYLE_SET.desc;
 			node.ext = list[k].openRule;
-			node.pic = list[k].MEET_STYLE_SET.pic;
+			node.pic = coverUtil.resolveCoverUrl(list[k].MEET_STYLE_SET.pic, list[k]._id);
 			ret.push(node);
 		}
 		return ret;
@@ -222,7 +223,7 @@ class MeetController extends BaseController {
 		for (let k in list) {
 			let meet = meetMap[list[k].JOIN_MEET_ID];
 			let style = (meet && meet.MEET_STYLE_SET) || {};
-			list[k].coverPic = style.pic || '';
+			list[k].coverPic = coverUtil.resolveCoverUrl(style.pic, list[k].JOIN_MEET_ID);
 			list[k].tenantName = tenantName;
 			let loc = style.location || style.room || '';
 			list[k].locationText = loc ? tenantName + loc : tenantName;

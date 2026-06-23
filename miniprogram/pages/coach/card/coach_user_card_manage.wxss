@@ -1,0 +1,394 @@
+@import "../coach_common.wxss";
+
+/* [AI_START TIMESTAMP=2025-01-25 17:00:00] */
+
+/* ==================== 页面容器 ==================== */
+.ucm-page {
+  padding-bottom: calc(80rpx + env(safe-area-inset-bottom));
+}
+
+/* ==================== 卡片视觉 ==================== */
+.ucm-card {
+  margin: 24rpx 32rpx 0;
+  padding: 36rpx 32rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 装饰圆增强层次感 */
+.ucm-card::after {
+  content: "";
+  position: absolute;
+  right: -40rpx;
+  top: -40rpx;
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ucm-card::before {
+  content: "";
+  position: absolute;
+  right: 20rpx;
+  bottom: -60rpx;
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ucm-card-type {
+  position: relative;
+  z-index: 1;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 2rpx;
+}
+
+.ucm-card-name {
+  position: relative;
+  z-index: 1;
+  margin-top: 6rpx;
+  font-size: 40rpx;
+  font-weight: 700;
+  line-height: 1.3;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.ucm-card-info {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.ucm-card-balance {
+  font-size: 56rpx;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ucm-card-chip {
+  padding: 6rpx 20rpx;
+  border-radius: 100rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(4rpx);
+}
+
+.ucm-card-meta {
+  position: relative;
+  z-index: 1;
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx solid rgba(255, 255, 255, 0.15);
+}
+
+.ucm-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.7;
+}
+
+/* ==================== 操作按钮 ==================== */
+.ucm-actions {
+  display: flex;
+  justify-content: space-around;
+  margin: 24rpx 32rpx 0;
+  padding: 28rpx 16rpx;
+  background: var(--neutralSurface, #fff);
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(31, 35, 41, 0.04);
+}
+
+.ucm-actions--period {
+  justify-content: center;
+  gap: 80rpx;
+}
+
+.ucm-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  transition: opacity 0.2s ease;
+}
+
+.ucm-action:active {
+  opacity: 0.7;
+}
+
+.ucm-action-icon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* [AI_START TIMESTAMP=2025-01-25 17:10:00] */
+.ucm-action-icon--add {
+  background: linear-gradient(135deg, #8ab8a6, #7aaa98);
+  box-shadow: 0 4rpx 12rpx rgba(122, 170, 152, 0.18);
+}
+
+.ucm-action-icon--deduct {
+  background: linear-gradient(135deg, #cea6a3, #c29894);
+  box-shadow: 0 4rpx 12rpx rgba(194, 152, 148, 0.18);
+}
+
+.ucm-action-icon--stop {
+  background: linear-gradient(135deg, #d4be94, #c8b183);
+  box-shadow: 0 4rpx 12rpx rgba(200, 177, 131, 0.18);
+}
+
+.ucm-action-icon--resume {
+  background: linear-gradient(135deg, #8eaba0, #7e9b90);
+  box-shadow: 0 4rpx 12rpx rgba(126, 155, 144, 0.18);
+}
+/* [AI_END LINES=23 TIMESTAMP=2025-01-25 17:10:00] */
+
+.ucm-action-label {
+  font-size: 24rpx;
+  color: var(--neutralTextSecondary, #646a73);
+  font-weight: 500;
+}
+
+/* ==================== 区域标题 ==================== */
+.ucm-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 16rpx;
+}
+
+.ucm-section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--neutralText, #1f2329);
+}
+
+.ucm-section-count {
+  font-size: 24rpx;
+  color: var(--neutralTextTertiary, #8f959e);
+}
+
+/* ==================== 时间线变动记录 ==================== */
+.ucm-log-list {
+  margin: 0 32rpx;
+  padding: 28rpx 24rpx;
+  background: var(--neutralSurface, #fff);
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(31, 35, 41, 0.04);
+}
+
+.ucm-log {
+  display: flex;
+  gap: 20rpx;
+  padding-bottom: 28rpx;
+  position: relative;
+}
+
+.ucm-log:last-child {
+  padding-bottom: 0;
+}
+
+/* 时间线竖线 */
+.ucm-log:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 11rpx;
+  top: 28rpx;
+  bottom: 0;
+  width: 2rpx;
+  background: var(--neutralBorder, #ebedf0);
+}
+
+.ucm-log-dot {
+  flex-shrink: 0;
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  margin-top: 6rpx;
+  background: var(--themeColor, #5b8a72);
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 0 6rpx rgba(91, 138, 114, 0.12);
+}
+
+.ucm-log-dot--manual {
+  background: #ffa940;
+  box-shadow: 0 0 0 6rpx rgba(250, 169, 64, 0.12);
+}
+
+.ucm-log-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ucm-log-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.ucm-log-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--neutralText, #1f2329);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ucm-log-tag {
+  flex-shrink: 0;
+  padding: 4rpx 14rpx;
+  border-radius: 100rpx;
+  font-size: 20rpx;
+  font-weight: 500;
+  color: var(--themeColor, #5b8a72);
+  background: var(--projectColorLight, #e3efe8);
+}
+
+.ucm-log-tag--manual {
+  color: #fa8c16;
+  background: #fff7e6;
+}
+
+.ucm-log-sub {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--neutralTextTertiary, #8f959e);
+  line-height: 1.5;
+}
+
+/* ==================== 底部弹窗 ==================== */
+.ucm-popup {
+  border-radius: 32rpx 32rpx 0 0 !important;
+  overflow: hidden;
+}
+
+.ucm-sheet {
+  padding: 16rpx 40rpx calc(40rpx + env(safe-area-inset-bottom));
+}
+
+.ucm-sheet-handle {
+  width: 64rpx;
+  height: 8rpx;
+  border-radius: 100rpx;
+  background: #e0e0e0;
+  margin: 0 auto 28rpx;
+}
+
+.ucm-sheet-icon {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20rpx;
+  background: var(--projectColorLight, #e3efe8);
+}
+
+.ucm-sheet-title {
+  display: block;
+  text-align: center;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--neutralText, #1f2329);
+  margin-bottom: 36rpx;
+}
+
+/* ==================== 表单字段 ==================== */
+.ucm-field {
+  margin-bottom: 28rpx;
+}
+
+.ucm-field-label {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: var(--neutralTextSecondary, #646a73);
+  margin-bottom: 12rpx;
+}
+
+.ucm-field-input {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+  font-size: 30rpx;
+  color: var(--neutralText, #1f2329);
+  background: var(--neutralBg, #f5f6f8);
+  border-radius: 16rpx;
+  border: 2rpx solid var(--neutralBorder, #ebedf0);
+}
+
+.ucm-field-textarea {
+  width: 100%;
+  height: 160rpx;
+  padding: 20rpx 24rpx;
+  box-sizing: border-box;
+  font-size: 30rpx;
+  color: var(--neutralText, #1f2329);
+  background: var(--neutralBg, #f5f6f8);
+  border-radius: 16rpx;
+  border: 2rpx solid var(--neutralBorder, #ebedf0);
+}
+
+/* ==================== 弹窗按钮 ==================== */
+.ucm-sheet-btns {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 40rpx;
+}
+
+.ucm-sheet-btn {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.ucm-sheet-btn:active {
+  opacity: 0.8;
+}
+
+.ucm-sheet-btn--ghost {
+  color: var(--neutralTextSecondary, #646a73);
+  background: var(--neutralBg, #f2f3f5);
+}
+
+.ucm-sheet-btn--primary {
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    var(--themeColor, #5b8a72),
+    var(--themeColorDark, #4a7860)
+  );
+  box-shadow: 0 4rpx 16rpx rgba(91, 138, 114, 0.25);
+}
+/* [AI_END LINES=274 TIMESTAMP=2025-01-25 17:00:00] */

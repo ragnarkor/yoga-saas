@@ -1,6 +1,8 @@
 const cloudHelper = require("../helper/cloud_helper.js");
 const pageHelper = require("../helper/page_helper.js");
 const meetCategoryHelper = require("../helper/meet_category_helper.js");
+const defaultCoverHelper = require("../helper/default_cover_helper.js");
+const UserProfileBiz = require("../biz/user_profile_biz.js");
 const setting = require("../setting/setting.js");
 const timeHelper = require("../helper/time_helper.js");
 
@@ -142,7 +144,7 @@ module.exports = Behavior({
           opts,
         );
         const rawList = (res && res.data) ? res.data : [];
-        const courseList = this._transformCourseData(rawList);
+        const courseList = await this._transformCourseData(rawList);
         this.setData({
           list: rawList,
           courseList,
@@ -157,14 +159,15 @@ module.exports = Behavior({
       }
     },
 
-    _transformCourseData: function (rawList, activeTab = this.data.activeTab) {
+    _transformCourseData: async function (rawList, activeTab = this.data.activeTab) {
       if (!rawList) return [];
 
       let activeTabId = this.data.tabs[activeTab]
         ? this.data.tabs[activeTab].id
         : "0";
 
-      let result = rawList.map((item) => {
+      let result = await Promise.all(
+        rawList.map(async (item) => {
         // 后端已返回 timeStart / timeEnd，直接使用
         let timeStart = item.timeStart || "";
         let timeEnd = item.timeEnd || "";
@@ -195,9 +198,15 @@ module.exports = Behavior({
         );
         const levelStars = [0, 0, 0, 0, 0].map((_, i) => (i < levelNum ? 1 : 0));
 
-        const skin = pageHelper.getSkin();
-        const defaultCover =
-          skin.IMG_DEFAULT_COVER || "/images/default_cover_pic.gif";
+        const defaultCover = defaultCoverHelper.pickDefaultCover(item._id);
+
+        let coachAvatar = "";
+        if (item.coachAvatar) {
+          coachAvatar =
+            (await UserProfileBiz.resolveAvatarUrl(item.coachAvatar)) ||
+            pageHelper.fmtImgUrl(item.coachAvatar) ||
+            "";
+        }
 
         return {
           _id: item._id,
@@ -210,15 +219,16 @@ module.exports = Behavior({
           timeMark: item.timeMark || "",
           duration,
           coachName: item.coachName || "专业教练",
-          coachAvatar: pageHelper.fmtImgUrl(item.coachAvatar || item.pic) || defaultCover,
+          coachAvatar,
           slots: slots === 99 ? "不限" : slots,
           status,
           level: levelNum,
           levelNum,
           levelStars,
-          pic: pageHelper.fmtImgUrl(item.pic),
+          pic: pageHelper.fmtCoverUrl(item.pic, item._id) || defaultCover,
         };
-      });
+        }),
+      );
 
       if (activeTabId !== "0") {
         result = result.filter(
@@ -312,18 +322,18 @@ module.exports = Behavior({
 
     onShareAppMessage: function () {},
 
-    bindTabChange: function (e) {
+    bindTabChange: async function (e) {
       const activeTab = e.detail.index;
-      const courseList = this._transformCourseData(this.data.list, activeTab);
+      const courseList = await this._transformCourseData(this.data.list, activeTab);
       this.setData({ activeTab, courseList });
     },
 
-    bindCategoryTap: function (e) {
+    bindCategoryTap: async function (e) {
       const activeTab = Number(e.currentTarget.dataset.index);
       if (Number.isNaN(activeTab) || activeTab === Number(this.data.activeTab)) {
         return;
       }
-      const courseList = this._transformCourseData(this.data.list, activeTab);
+      const courseList = await this._transformCourseData(this.data.list, activeTab);
       this.setData({ activeTab, courseList });
     },
 

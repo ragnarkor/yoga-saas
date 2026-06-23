@@ -113,17 +113,33 @@ function formatWeekCourse(item, dayStr, options = {}) {
     timeMark;
 
   if (options.coachMode) {
-    const title = encodeURIComponent(item.title || '');
-    const time = encodeURIComponent(dayStr + ' ' + timeStart + '-' + timeEnd);
     detailUrl =
-      '/pages/admin/meet/join/admin_meet_join?meetId=' +
+      '/pages/coach/booking/coach_booking_detail?meetId=' +
       meetId +
       '&mark=' +
-      timeMark +
+      encodeURIComponent(timeMark) +
+      '&day=' +
+      dayStr +
       '&title=' +
-      title +
-      '&time=' +
-      time;
+      encodeURIComponent(item.title || '') +
+      '&start=' +
+      encodeURIComponent(timeStart) +
+      '&end=' +
+      encodeURIComponent(timeEnd) +
+      '&teacherName=' +
+      encodeURIComponent(coachName) +
+      '&typeName=' +
+      encodeURIComponent(item.typeName || '') +
+      '&duration=' +
+      (Number(item.duration) || 60) +
+      '&limit=' +
+      limit +
+      '&booked=' +
+      booked +
+      '&difficulty=' +
+      (Number(item.difficulty) || 3) +
+      '&slotStatus=' +
+      (item.slotStatus != null ? item.slotStatus : 1);
   }
 
   return {
@@ -202,6 +218,9 @@ function slotsToListItems(slots) {
     limit: s.limit,
     isLimit: s.isLimit,
     slotStatus: s.slotStatus,
+    duration: s.duration,
+    difficulty: s.difficulty,
+    isPrivate: !!s.isPrivate,
   }));
 }
 
@@ -236,6 +255,9 @@ function formatBookingGridCell(slot, options = {}) {
     limit: slot.limit,
     isLimit: slot.isLimit,
     slotStatus: slot.slotStatus,
+    duration: slot.duration,
+    difficulty: slot.difficulty,
+    isPrivate: !!slot.isPrivate,
   };
   const course = formatWeekCourse(listItem, slot.day, options);
   const borderPart = course.cardBorder ? `border:2rpx solid ${course.cardBorder};` : '';
@@ -249,8 +271,57 @@ function formatBookingGridCell(slot, options = {}) {
     teacherName: slot.teacherName || '教练',
     starText: buildStarText(slot.difficulty),
     duration: slot.duration || 60,
+    isPrivate: !!slot.isPrivate,
     cardStyle: `background-color:${course.cardBg};color:${course.textColor};${borderPart}`,
   };
+}
+
+const MAX_SLOTS_PER_CELL = 2;
+
+function sortSlotsForCell(slots) {
+  return (slots || []).slice().sort((a, b) => {
+    const titleCmp = String(a.title || '').localeCompare(String(b.title || ''), 'zh');
+    if (titleCmp !== 0) return titleCmp;
+    return String(a.meetId || '').localeCompare(String(b.meetId || ''));
+  });
+}
+
+function packGridCell(formattedItems, maxVisible = MAX_SLOTS_PER_CELL) {
+  if (!formattedItems || !formattedItems.length) return null;
+  if (formattedItems.length === 1) {
+    return {
+      mode: 'single',
+      items: formattedItems,
+      overflow: 0,
+      allItems: formattedItems,
+      ...formattedItems[0],
+    };
+  }
+  return {
+    mode: 'multi',
+    items: formattedItems.slice(0, maxVisible),
+    overflow: Math.max(0, formattedItems.length - maxVisible),
+    allItems: formattedItems,
+  };
+}
+
+function buildGridCellsForRow(weekDays, time, slots, formatFn, maxVisible = MAX_SLOTS_PER_CELL) {
+  return weekDays.map((d) => {
+    const hits = sortSlotsForCell(
+      (slots || []).filter((s) => s.start === time && s.day === d.day),
+    );
+    if (!hits.length) return null;
+    return packGridCell(hits.map(formatFn), maxVisible);
+  });
+}
+
+function getCellSlot(cell, itemIdx) {
+  if (!cell) return null;
+  if (cell.items && cell.items.length) {
+    const idx = itemIdx != null ? Number(itemIdx) : 0;
+    return cell.items[idx] || null;
+  }
+  return cell.meetId ? cell : null;
 }
 
 function buildBookingGrid(weekDays, slots, activeTabId, options = {}) {
@@ -267,10 +338,9 @@ function buildBookingGrid(weekDays, slots, activeTabId, options = {}) {
 
   const gridRows = timeRows.map((time) => ({
     time,
-    cells: weekDays.map((d) => {
-      const hit = filtered.find((s) => s.start === time && s.day === d.day);
-      return hit ? formatBookingGridCell(hit, options) : null;
-    }),
+    cells: buildGridCellsForRow(weekDays, time, filtered, (s) =>
+      formatBookingGridCell(s, options),
+    ),
   }));
 
   return {
@@ -284,6 +354,10 @@ module.exports = {
   buildWeekColumns,
   buildWeekColumnsFromSlots,
   buildBookingGrid,
+  buildGridCellsForRow,
+  packGridCell,
+  getCellSlot,
   getStatusLegend,
   resolveSlotStatus,
+  MAX_SLOTS_PER_CELL,
 };

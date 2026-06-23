@@ -7,15 +7,47 @@
     nav-bg="{{themeNavBg}}"
   />
 
-  <view class="issue-form">
-    <van-cell-group>
-      <van-field label="卡名称" value="{{form.name}}" placeholder="如：一次卡" bind:change="bindFieldChange" data-field="name" />
-      <van-cell title="卡类型" value="{{form.typeLabel}}" />
-      <van-cell title="新增方式" value="发新卡" />
-      <van-field label="有效期(天)" type="number" value="{{form.days}}" bind:change="bindFieldChange" data-field="days" />
-      <van-field label="售价(元)" type="number" value="{{form.price}}" bind:change="bindFieldChange" data-field="price" />
-      <van-field wx:if="{{form.type === 'times'}}" label="额度(次)" type="number" value="{{form.quota}}" bind:change="bindFieldChange" data-field="quota" />
-      <van-cell title="激活方式" is-link value="{{form.activateLabel}}" bind:click="bindActivateTap" />
+  <view wx:if="{{pageLoading}}" class="issue-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <van-cell-group custom-class="course-edit-group">
+      <van-cell title="会员" value="{{userName || '—'}}" />
+
+      <view class="course-edit-field course-edit-field--inline" bindtap="bindTplFieldTap">
+        <text class="course-edit-field-label-inline">会员卡<text class="course-edit-required">*</text></text>
+        <view class="course-edit-field-row course-edit-field-row--inline">
+          <text class="course-edit-field-value {{selectedTpl ? '' : 'course-edit-field-value--placeholder'}}">
+            {{selectedTpl ? selectedTpl.CARD_TPL_NAME : '请选择会员卡'}}
+          </text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
+      <view wx:if="{{selectedTpl}}" class="issue-tpl-preview">
+        <view class="issue-tpl-chip" style="background: {{selectedTpl.CARD_TPL_COLOR}};">
+          <text>{{selectedTpl.typeDesc}}</text>
+        </view>
+        <view class="issue-tpl-meta-row">
+          <view class="issue-tpl-meta-tag" wx:for="{{selectedTpl.metaTags}}" wx:key="key">
+            <text class="issue-tpl-meta-label">{{item.label}}</text>
+            <text class="issue-tpl-meta-value">{{item.value}}</text>
+          </view>
+        </view>
+        <view wx:if="{{selectedTpl.scopeDesc && selectedTpl.scopeDesc !== '全馆课程'}}" class="issue-tpl-scope">
+          适用：{{selectedTpl.scopeDesc}}
+        </view>
+      </view>
+
+      <view class="course-edit-field course-edit-field--inline" bindtap="bindActivateFieldTap">
+        <text class="course-edit-field-label-inline">激活方式</text>
+        <view class="course-edit-field-row course-edit-field-row--inline">
+          <text class="course-edit-field-value">{{form.activateLabel}}</text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
       <van-cell title="归属教练" is-link value="{{form.coachName || '请选择'}}" bind:click="bindCoachTap" />
       <van-field
         label="备注"
@@ -28,9 +60,89 @@
         data-field="memo"
       />
     </van-cell-group>
-  </view>
+  </block>
 
   <view class="issue-footer">
     <van-button block round color="{{themeColor}}" bind:click="bindSubmitTap">确定发卡</van-button>
   </view>
+
+  <van-popup
+    show="{{tplSheetShow}}"
+    position="bottom"
+    round
+    bind:close="bindCloseTplSheet"
+    custom-class="course-edit-popup"
+  >
+    <view class="course-edit-sheet">
+      <view class="course-edit-sheet-head">
+        <text class="course-edit-sheet-title">选择会员卡</text>
+        <text class="course-edit-sheet-sub">基于已有卡模板发卡，规格与模板一致</text>
+      </view>
+      <scroll-view scroll-y class="course-edit-sheet-scroll" enhanced show-scrollbar="{{false}}">
+        <view
+          class="issue-tpl-option {{selectedTplId === item.CARD_TPL_ID ? 'is-active' : ''}}"
+          wx:for="{{tplList}}"
+          wx:key="CARD_TPL_ID"
+          data-id="{{item.CARD_TPL_ID}}"
+          bindtap="bindTplPick"
+        >
+          <view class="issue-tpl-chip issue-tpl-chip--sm" style="background: {{item.CARD_TPL_COLOR}};">
+            <text>{{item.typeDesc}}</text>
+          </view>
+          <view class="issue-tpl-option-body">
+            <view class="issue-tpl-option-title">{{item.CARD_TPL_NAME}}</view>
+            <view class="issue-tpl-meta-row issue-tpl-meta-row--compact">
+              <view class="issue-tpl-meta-tag" wx:for="{{item.metaTags}}" wx:for-item="tag" wx:key="key">
+                <text class="issue-tpl-meta-label">{{tag.label}}</text>
+                <text class="issue-tpl-meta-value">{{tag.value}}</text>
+              </view>
+            </view>
+          </view>
+          <van-icon
+            wx:if="{{selectedTplId === item.CARD_TPL_ID}}"
+            name="success"
+            size="40rpx"
+            color="{{themeColor}}"
+          />
+        </view>
+        <van-empty wx:if="{{!tplList.length}}" description="暂无会员卡模板，请先添加" />
+      </scroll-view>
+    </view>
+  </van-popup>
+
+  <van-popup
+    show="{{activateSheetShow}}"
+    position="bottom"
+    round
+    bind:close="bindCloseActivateSheet"
+    custom-class="course-edit-popup"
+  >
+    <view class="course-edit-sheet">
+      <view class="course-edit-sheet-head">
+        <text class="course-edit-sheet-title">选择激活方式</text>
+        <text class="course-edit-sheet-sub">决定会员卡有效期从何时开始计算</text>
+      </view>
+      <view class="issue-activate-list">
+        <view
+          class="issue-activate-item {{form.activate === item.value ? 'is-active' : ''}}"
+          wx:for="{{activateOptions}}"
+          wx:key="value"
+          data-value="{{item.value}}"
+          data-label="{{item.label}}"
+          bindtap="bindActivatePick"
+        >
+          <view class="issue-activate-info">
+            <text class="issue-activate-label">{{item.label}}</text>
+            <text class="issue-activate-desc">{{item.desc}}</text>
+          </view>
+          <van-icon
+            wx:if="{{form.activate === item.value}}"
+            name="success"
+            size="36rpx"
+            color="{{themeColor}}"
+          />
+        </view>
+      </view>
+    </view>
+  </van-popup>
 </view>

@@ -105,7 +105,45 @@ function drawSchedule(ctx, opts) {
       const pad = 6;
       const cw = dayColW - pad * 2;
       const ch = ROW_H - pad * 2;
-      ctx.fillStyle = cell.color || "#81c784";
+      const items =
+        cell.mode === "multi" && cell.items && cell.items.length
+          ? cell.items
+          : [cell];
+
+      if (items.length >= 2) {
+        const gap = 4;
+        const miniH = (ch - gap) / 2;
+        items.slice(0, 2).forEach((item, ii) => {
+          const yOff = y + pad + ii * (miniH + gap);
+          ctx.fillStyle = item.color || "#81c784";
+          _roundRect(ctx, x + pad, yOff, cw, miniH, 6);
+          ctx.fill();
+          ctx.textAlign = "left";
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "16px sans-serif";
+          ctx.fillText(
+            _truncate(ctx, item.teacherName || "教练", cw - 12),
+            x + pad + 6,
+            yOff + 20,
+          );
+          ctx.font = "bold 17px sans-serif";
+          ctx.fillText(
+            _truncate(ctx, item.title || "课程", cw - 12),
+            x + pad + 6,
+            yOff + miniH - 8,
+          );
+        });
+        if (cell.overflow > 0) {
+          ctx.fillStyle = "rgba(0,0,0,0.35)";
+          ctx.font = "14px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("+" + cell.overflow, x + pad + cw / 2, y + pad + ch - 4);
+        }
+        return;
+      }
+
+      const slot = items[0];
+      ctx.fillStyle = slot.color || "#81c784";
       _roundRect(ctx, x + pad, y + pad, cw, ch, 8);
       ctx.fill();
 
@@ -113,19 +151,19 @@ function drawSchedule(ctx, opts) {
       ctx.fillStyle = "#ffffff";
       ctx.font = "18px sans-serif";
       ctx.fillText(
-        _truncate(ctx, cell.teacherName || "教练", cw - 12),
+        _truncate(ctx, slot.teacherName || "教练", cw - 12),
         x + pad + 8,
         y + pad + 24,
       );
       ctx.font = "bold 20px sans-serif";
       ctx.fillText(
-        _truncate(ctx, cell.title || "课程", cw - 12),
+        _truncate(ctx, slot.title || "课程", cw - 12),
         x + pad + 8,
         y + pad + 50,
       );
-      _drawStars(ctx, x + pad + 8, y + pad + 74, cell.difficulty || 3, 5);
+      _drawStars(ctx, x + pad + 8, y + pad + 74, slot.difficulty || 3, 5);
       ctx.font = "16px sans-serif";
-      const tag = (cell.duration || 60) + "m [" + (cell.typeName || "") + "]";
+      const tag = (slot.duration || 60) + "m [" + (slot.typeName || "") + "]";
       ctx.fillText(_truncate(ctx, tag, cw - 12), x + pad + 8, y + pad + 96);
     });
   });

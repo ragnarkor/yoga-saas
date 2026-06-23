@@ -109,32 +109,97 @@
 <!-- [AI_END LINES=70 TIMESTAMP=2025-01-27 11:10:00] -->
   </block>
 
-  <!-- 馆长/教师：传统后台 -->
+  <!-- [AI_START TIMESTAMP=2025-01-27 14:00:00] -->
+  <!-- 馆长/教师：现代管理后台 -->
   <block wx:else>
-    <view class="admin-info bg-admin">
-      <view class="pic"><van-icon name="user-o" size="32rpx" /></view>
-      <view class="right">
-        <view class="name">
-          <text class="text-xl">{{admin.name}}</text>
-          <van-tag wx:if="{{admin.type=='owner'}}" type="warning" size="medium" custom-class="margin-left-s">馆长</van-tag>
-          <van-tag wx:if="{{admin.type=='teacher'}}" type="success" size="medium" custom-class="margin-left-s">教师</van-tag>
+    <!-- Hero 渐变头 -->
+    <view class="platform-hero">
+      <view class="platform-hero-top">
+        <view class="platform-hero-info">
+          <view class="platform-hero-title">{{admin.name}}</view>
+          <view class="platform-hero-sub ah-hero-sub">
+            <van-tag wx:if="{{admin.type=='owner'}}" round color="rgba(255,255,255,0.2)" text-color="#fff" size="small">馆长</van-tag>
+            <van-tag wx:if="{{admin.type=='teacher'}}" round color="rgba(255,255,255,0.2)" text-color="#fff" size="small">教师</van-tag>
+            <text wx:if="{{currentTenantName}}">{{currentTenantName}}</text>
+          </view>
         </view>
-        <view class="desc text-s">共登录{{admin.cnt}}次</view>
+        <view class="platform-hero-logout" bindtap="bindExitTap">
+          <van-icon name="revoke" size="28rpx" />
+          <text>退出</text>
+        </view>
       </view>
-      <view class="exit-admin" bindtap="bindExitTap"><van-icon name="revoke" size="32rpx" /></view>
+      <view class="platform-hero-stats">
+        <view class="platform-hero-stat" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">
+          <text class="platform-hero-stat-num">{{data.meetCnt || 0}}</text>
+          <text class="platform-hero-stat-label">预约活动</text>
+        </view>
+        <view class="platform-hero-divider"></view>
+        <view class="platform-hero-stat" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">
+          <text class="platform-hero-stat-num">{{data.joinCnt || 0}}</text>
+          <text class="platform-hero-stat-label">预约数</text>
+        </view>
+        <view class="platform-hero-divider"></view>
+        <view class="platform-hero-stat" bindtap="url" data-url="/pages/admin/user/list/admin_user_list">
+          <text class="platform-hero-stat-num">{{data.userCnt || 0}}</text>
+          <text class="platform-hero-stat-label">用户</text>
+        </view>
+        <block wx:if="{{admin.type=='owner'}}">
+          <view class="platform-hero-divider"></view>
+          <view class="platform-hero-stat" bindtap="url" data-url="/pages/admin/news/list/admin_news_list">
+            <text class="platform-hero-stat-num">{{data.newsCnt || 0}}</text>
+            <text class="platform-hero-stat-label">文章</text>
+          </view>
+        </block>
+      </view>
     </view>
 
-    <view class="comm-list grid col-4">
-      <view class="item" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">{{data.meetCnt||'0'}}<text class="text-black">预约活动</text></view>
-      <view class="item" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">{{data.joinCnt||'0'}}<text class="text-black">预约数</text></view>
-      <view class="item" bindtap="url" data-url="/pages/admin/user/list/admin_user_list">{{data.userCnt||'0'}}<text class="text-black">用户</text></view>
-      <view class="item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/admin/news/list/admin_news_list">{{data.newsCnt||'0'}}<text class="text-black">文章</text></view>
+    <!-- 快捷操作 -->
+    <view class="platform-section">
+      <view class="platform-section-head">
+        <text class="platform-section-title">快捷操作</text>
+      </view>
+      <view class="platform-action-grid">
+        <view class="platform-action-item" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">
+          <view class="platform-action-icon"><van-icon name="calendar-o" size="40rpx" color="#4a7c8c" /></view>
+          <text class="platform-action-text">预约管理</text>
+        </view>
+        <view class="platform-action-item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/coach/home/coach_home_content">
+          <view class="platform-action-icon"><van-icon name="photo-o" size="40rpx" color="#4a7c8c" /></view>
+          <text class="platform-action-text">首页内容</text>
+        </view>
+        <view class="platform-action-item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/admin/news/list/admin_news_list">
+          <view class="platform-action-icon"><van-icon name="newspaper-o" size="40rpx" color="#4a7c8c" /></view>
+          <text class="platform-action-text">文章管理</text>
+        </view>
+        <view class="platform-action-item" bindtap="url" data-url="/pages/admin/user/list/admin_user_list">
+          <view class="platform-action-icon"><van-icon name="friends-o" size="40rpx" color="#4a7c8c" /></view>
+          <text class="platform-action-text">用户管理</text>
+        </view>
+        <view class="platform-action-item" bindtap="bindEnterCoachTap">
+          <view class="platform-action-icon"><van-icon name="apps-o" size="40rpx" color="#4a7c8c" /></view>
+          <text class="platform-action-text">教练端</text>
+        </view>
+      </view>
     </view>
 
-    <van-cell-group custom-class="menu-group" wx:if="{{admin.type=='owner'}}">
-      <van-cell is-link url="/pages/admin/mgr/log/admin_log_list" title="操作日志" />
-    </van-cell-group>
+    <!-- 系统 -->
+    <view class="platform-section platform-section--footer">
+      <view class="platform-section-head">
+        <text class="platform-section-title">系统</text>
+      </view>
+      <view class="platform-menu-item" bindtap="url" data-url="/pages/admin/mgr/log/admin_log_list">
+        <van-icon name="description" size="32rpx" color="#4a7c8c" />
+        <text class="platform-menu-text">操作日志</text>
+        <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
+      </view>
+      <view class="platform-menu-item" bindtap="bindSettingTap">
+        <van-icon name="delete-o" size="32rpx" color="#4a7c8c" />
+        <text class="platform-menu-text">清除缓存</text>
+        <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
+      </view>
+    </view>
   </block>
+  <!-- [AI_END LINES=78 TIMESTAMP=2025-01-27 14:00:00] -->
 
 </view>
 

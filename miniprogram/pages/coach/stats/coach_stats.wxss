@@ -136,10 +136,7 @@
 
 .stats-loading,
 .stats-empty {
-  padding: 80rpx 0;
-  text-align: center;
-  color: var(--neutralTextTertiary, #8f959e);
-  font-size: 28rpx;
+  /* 见 coach_common.wxss */
 }
 
 .stats-rank-no {

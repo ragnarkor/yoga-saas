@@ -1,0 +1,43 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page ucard-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+  />
+
+  <view wx:if="{{loading}}" class="coach-page-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <view wx:elif="{{!cardList.length}}" class="coach-page-empty">
+    <van-empty description="该会员暂无会员卡">
+      <van-button round color="{{themeColor}}" size="small" bind:click="bindIssueTap">去发卡</van-button>
+    </van-empty>
+  </view>
+
+  <view wx:else class="ucard-list">
+    <view
+      class="ucard-row"
+      wx:for="{{cardList}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="bindCardTap"
+    >
+      <view class="ucard-chip" style="background: {{item.color}};">
+        <text>{{item.typeLabel}}</text>
+      </view>
+      <view class="ucard-info">
+        <view class="ucard-name">{{item.name}}</view>
+        <view class="ucard-meta">{{item.balanceText}} · {{item.statusLabel}}</view>
+        <view class="ucard-scope">{{item.scopeDesc || '全馆课程'}}</view>
+      </view>
+      <van-icon name="arrow" size="32rpx" color="#ccc" />
+    </view>
+  </view>
+
+  <view class="ucard-footer" wx:if="{{userId}}">
+    <van-button block round color="{{themeColor}}" bind:click="bindIssueTap">发新卡</van-button>
+  </view>
+</view>

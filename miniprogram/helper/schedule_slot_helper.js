@@ -1,6 +1,7 @@
 const AdminMeetBiz = require('../biz/admin_meet_biz.js');
 const pageHelper = require('./page_helper.js');
 const timeHelper = require('./time_helper.js');
+const defaultCoverHelper = require('./default_cover_helper.js');
 
 const COURSE_COLOR_PALETTE = [
   '#e57373',
@@ -49,13 +50,12 @@ function formatCoursePickerItem(meet, index = 0) {
   const style = AdminMeetBiz.normalizeCourseStyleSet(styleSet);
   let cover = '';
   if (typeof style.pic === 'string' && style.pic) {
-    cover = pageHelper.fmtImgUrl(style.pic) || style.pic;
+    cover = pageHelper.fmtCoverUrl(style.pic, meet._id) || style.pic;
   } else if (Array.isArray(style.pic) && style.pic.length) {
-    cover = pageHelper.fmtImgUrl(style.pic[0]) || style.pic[0];
+    cover = pageHelper.fmtCoverUrl(style.pic[0], meet._id) || style.pic[0];
   }
   if (!cover) {
-    const skin = pageHelper.getSkin();
-    cover = pageHelper.fmtImgUrl(skin.IMG_DEFAULT_COVER) || '/images/default_cover_pic.gif';
+    cover = defaultCoverHelper.pickDefaultCover(meet._id);
   }
   const duration = Number(style.duration) || 60;
   const desc = (style.desc || '').trim();
@@ -106,6 +106,7 @@ function formatScheduleSlot(slot, meetMeta) {
     cardStyle: 'background-color:' + color + ';',
     starText,
     duration: slot.duration || 60,
+    cardId: slot.day + '_' + slot.mark,
   };
 }
 

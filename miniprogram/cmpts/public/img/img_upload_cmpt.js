@@ -100,7 +100,7 @@ Component({
 
 						//console.log('imgData size=' + imgData.length);
 
-						if (this.data.isCheck) {
+						if (this.data.isCheck && setting.CLIENT_CHECK_CONTENT) {
 							let check = await contentCheckHelper.imgCheck(path);
 							if (!check) {
 								wx.hideLoading();

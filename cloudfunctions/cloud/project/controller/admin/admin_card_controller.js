@@ -77,6 +77,36 @@ class AdminCardController extends BaseAdminController {
     let service = new AdminCardService();
     return await service.issueUserCard(input);
   }
+
+  async getUserCardList() {
+    await this.isAdmin();
+    let rules = { userId: "required|string" };
+    let input = this.validateData(rules);
+    let service = new AdminCardService();
+    return await service.getUserCardList(input.userId);
+  }
+
+  async getUserCardDetail() {
+    await this.isAdmin();
+    let rules = { cardId: "required|string" };
+    let input = this.validateData(rules);
+    let service = new AdminCardService();
+    return await service.getUserCardDetail(input.cardId);
+  }
+
+  async adjustUserCard() {
+    await this.isAdmin();
+    let rules = {
+      cardId: "required|string",
+      action: "required|string",
+      times: "int",
+      memo: "required|string|max:50",
+      operatorName: "string",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminCardService();
+    return await service.adjustUserCard(input);
+  }
 }
 
 module.exports = AdminCardController;

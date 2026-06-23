@@ -100,17 +100,14 @@ module.exports = Behavior({
     },
 
     _fmtList: function (rawList) {
-      const skin = pageHelper.getSkin();
-      const defaultCover =
-        skin.IMG_DEFAULT_COVER || "/images/default_cover_pic.gif";
       const tenantFallback = pageHelper.getTenantName() || "本馆";
-
       return (rawList || []).map((item) => {
         let tenantName = item.tenantName || tenantFallback;
         let locationText = item.locationText || tenantName;
+        const seed = item.JOIN_MEET_ID || item._id;
         return {
           ...item,
-          coverPic: pageHelper.fmtImgUrl(item.coverPic) || defaultCover,
+          coverPic: pageHelper.fmtCoverUrl(item.coverPic, seed),
           tenantName,
           locationText,
           scheduleText:

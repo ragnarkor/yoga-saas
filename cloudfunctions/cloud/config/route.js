@@ -39,6 +39,10 @@ module.exports = {
   "meet/before_join": "meet_controller@beforeJoin",
   "meet/join": "meet_controller@join",
 
+  "private/meta": "private_controller@getMeta",
+  "private/available_slots": "private_controller@getAvailableSlots",
+  "private/book": "private_controller@bookSession",
+
   "my/my_join_list": "meet_controller@getMyJoinList",
   "my/my_join_cancel": "meet_controller@cancelMyJoin",
   "my/my_join_detail": "meet_controller@getMyJoinDetail",
@@ -63,9 +67,11 @@ module.exports = {
   "admin/bind_admin_list": "admin/admin_home_controller@listBindableAdmins",
   "admin/member_invite_qr": "admin/admin_home_controller@genMemberInviteQr",
   "admin/tenant_store": "admin/admin_tenant_controller@getStore",
-  "admin/tenant_store_save": "admin/admin_tenant_controller@saveMeetCategories#noDemo",
+  "admin/tenant_store_save":
+    "admin/admin_tenant_controller@saveMeetCategories#noDemo",
   "admin/member_stats": "admin/admin_tenant_controller@getMemberStats",
-  "admin/platform_overview": "admin/admin_tenant_controller@getPlatformOverview",
+  "admin/platform_overview":
+    "admin/admin_tenant_controller@getPlatformOverview",
   "admin/platform_staff_list": "admin/admin_home_controller@listPlatformStaff",
   "admin/tenant_insert": "admin/admin_tenant_controller@insertTenant#noDemo",
   "admin/mgr_list": "admin/admin_mgr_controller@getAdminList",
@@ -79,6 +85,13 @@ module.exports = {
   "admin/card_tpl_del": "admin/admin_card_controller@delCardTpl#noDemo",
   "admin/coach_member_list": "admin/admin_card_controller@getCoachMemberList",
   "admin/user_card_issue": "admin/admin_card_controller@issueUserCard#noDemo",
+  "admin/user_card_list": "admin/admin_card_controller@getUserCardList",
+  "admin/user_card_detail": "admin/admin_card_controller@getUserCardDetail",
+  "admin/user_card_adjust": "admin/admin_card_controller@adjustUserCard#noDemo",
+  "admin/private_meta": "admin/admin_private_controller@getMeta",
+  "admin/private_list": "admin/admin_private_controller@listSessions",
+  "admin/private_check": "admin/admin_private_controller@checkSlot",
+  "admin/private_book": "admin/admin_private_controller@bookSession#noDemo",
   "admin/stats_card_analysis": "admin/admin_stats_controller@getCardAnalysis",
   "admin/stats_class": "admin/admin_stats_controller@getClassStats",
   "admin/stats_rank": "admin/admin_stats_controller@getBookingRank",
@@ -98,18 +111,23 @@ module.exports = {
 
   "admin/home_banner_list": "admin/admin_home_controller@getBannerList",
   "admin/home_banner_insert": "admin/admin_home_controller@insertBanner#noDemo",
+  "admin/home_banner_edit": "admin/admin_home_controller@editBanner#noDemo",
   "admin/home_banner_del": "admin/admin_home_controller@delBanner#noDemo",
   "admin/home_announce_list": "admin/admin_home_controller@getAnnounceList",
-  "admin/home_announce_insert": "admin/admin_home_controller@insertAnnounce#noDemo",
+  "admin/home_announce_insert":
+    "admin/admin_home_controller@insertAnnounce#noDemo",
+  "admin/home_announce_edit": "admin/admin_home_controller@editAnnounce#noDemo",
   "admin/home_announce_del": "admin/admin_home_controller@delAnnounce#noDemo",
   "admin/home_teacher_list": "admin/admin_home_controller@getTeacherList",
-  "admin/home_teacher_insert": "admin/admin_home_controller@insertTeacher#noDemo",
+  "admin/home_teacher_insert":
+    "admin/admin_home_controller@insertTeacher#noDemo",
   "admin/home_teacher_del": "admin/admin_home_controller@delTeacher#noDemo",
   "admin/my_teacher_profile": "admin/admin_home_controller@getMyTeacherProfile",
   "admin/my_teacher_profile_save":
     "admin/admin_home_controller@saveMyTeacherProfile#noDemo",
   "admin/home_photo_list": "admin/admin_home_controller@getPhotoList",
   "admin/home_photo_insert": "admin/admin_home_controller@insertPhoto#noDemo",
+  "admin/home_photo_edit": "admin/admin_home_controller@editPhoto#noDemo",
   "admin/home_photo_del": "admin/admin_home_controller@delPhoto#noDemo",
 
   "admin/news_list": "admin/admin_news_controller@getNewsList",
@@ -144,6 +162,9 @@ module.exports = {
     "admin/admin_meet_controller@cancelJoinByTimeMark#noDemo",
   "admin/join_scan": "admin/admin_meet_controller@scanJoin#noDemo",
   "admin/join_checkin": "admin/admin_meet_controller@checkinJoin#noDemo",
+  "admin/join_checkin_batch":
+    "admin/admin_meet_controller@checkinJoinBatch#noDemo",
+  "admin/group_book": "admin/admin_meet_controller@bookGroupJoin#noDemo",
   "admin/self_checkin_qr": "admin/admin_meet_controller@genSelfCheckinQr",
   "admin/meet_day_list": "admin/admin_meet_controller@getDayList",
 

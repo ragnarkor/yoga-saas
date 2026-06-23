@@ -10,6 +10,8 @@ const CardTplModel = require("../../model/card_tpl_model.js");
 const UserCardModel = require("../../model/user_card_model.js");
 const UserModel = require("../../model/user_model.js");
 const AdminModel = require("../../model/admin_model.js");
+const UserCardService = require("../user_card_service.js");
+const cardScopeUtil = require("../../utils/card_scope_util.js");
 
 const DEFAULT_TPL_COLORS = ["#F5A623", "#4A90A4", "#E57373", "#81C784"];
 const CARD_COLLECTIONS = ["ax_card_tpl", "ax_user_card", "ax_user_card_log"];
@@ -60,10 +62,13 @@ class AdminCardService extends BaseAdminService {
   }
 
   _formatTpl(item) {
+    const scope = cardScopeUtil.normalizeScope(item.CARD_TPL_SCOPE);
     return {
       ...item,
       typeDesc: this._typeDesc(item.CARD_TPL_TYPE),
       metaText: this._buildTplMeta(item),
+      scope,
+      scopeDesc: cardScopeUtil.buildScopeDesc(scope, {}),
     };
   }
 
@@ -118,6 +123,10 @@ class AdminCardService extends BaseAdminService {
       input.color && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(input.color)
         ? input.color
         : DEFAULT_TPL_COLORS[0];
+    let scope = cardScopeUtil.normalizeScope(input.scope);
+    if (scope.mode === "categories" && !scope.categoryIds.length) {
+      this.AppError("请选择适用课程分类");
+    }
 
     let data = {
       CARD_TPL_NAME: name,
@@ -126,6 +135,7 @@ class AdminCardService extends BaseAdminService {
       CARD_TPL_PRICE: price,
       CARD_TPL_QUOTA: quota,
       CARD_TPL_COLOR: color,
+      CARD_TPL_SCOPE: scope,
       CARD_TPL_EDIT_TIME: timeUtil.time(),
     };
 
@@ -253,47 +263,112 @@ class AdminCardService extends BaseAdminService {
     if (input.tplId) {
       tpl = await CardTplModel.getOne({ CARD_TPL_ID: input.tplId }, "*");
     }
+    if (!tpl) this.AppError("请选择会员卡模板");
 
-    let name = (input.name || (tpl && tpl.CARD_TPL_NAME) || "").trim();
-    if (!name) this.AppError("请填写卡名称");
+    let name = (tpl.CARD_TPL_NAME || "").trim();
+    if (!name) this.AppError("卡模板名称无效");
 
-    let type =
-      input.type === CardTplModel.TYPE.PERIOD
-        ? CardTplModel.TYPE.PERIOD
-        : CardTplModel.TYPE.TIMES;
-    if (tpl) type = tpl.CARD_TPL_TYPE;
-
-    let days = Number(input.days != null ? input.days : tpl && tpl.CARD_TPL_DAYS) || 365;
-    let price =
-      Number(input.price != null ? input.price : tpl && tpl.CARD_TPL_PRICE) || 0;
+    let type = tpl.CARD_TPL_TYPE;
+    let days = Number(tpl.CARD_TPL_DAYS) || 365;
+    let price = Number(tpl.CARD_TPL_PRICE) || 0;
     let quota =
       type === CardTplModel.TYPE.PERIOD
         ? 0
-        : Number(input.quota != null ? input.quota : tpl && tpl.CARD_TPL_QUOTA) || 1;
+        : Number(tpl.CARD_TPL_QUOTA) || 1;
+
+    let activate = (input.activate || UserCardModel.ACTIVATE.IMMEDIATE).trim();
+    const validActivate = Object.values(UserCardModel.ACTIVATE);
+    if (!validActivate.includes(activate)) {
+      activate = UserCardModel.ACTIVATE.IMMEDIATE;
+    }
 
     let now = timeUtil.time();
-    let endTime = now + days * 86400;
+    let startTime = 0;
+    let endTime = 0;
+    if (activate === UserCardModel.ACTIVATE.IMMEDIATE) {
+      startTime = now;
+      endTime = now + days * 86400;
+    }
+
+    let scope = cardScopeUtil.normalizeScope(tpl.CARD_TPL_SCOPE);
 
     let data = {
       USER_CARD_USER_ID: userId,
-      USER_CARD_TPL_ID: tpl ? tpl.CARD_TPL_ID : input.tplId || "",
+      USER_CARD_TPL_ID: tpl.CARD_TPL_ID,
       USER_CARD_NAME: name,
       USER_CARD_TYPE: type,
       USER_CARD_DAYS: days,
       USER_CARD_PRICE: price,
       USER_CARD_QUOTA: quota,
       USER_CARD_QUOTA_INIT: quota,
-      USER_CARD_ACTIVATE: input.activate || "immediate",
+      USER_CARD_ACTIVATE: activate,
+      USER_CARD_SCOPE: scope,
       USER_CARD_COACH_ID: input.coachId || "",
       USER_CARD_COACH_NAME: input.coachName || "",
       USER_CARD_MEMO: (input.memo || "").trim().slice(0, 50),
       USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,
-      USER_CARD_START_TIME: now,
+      USER_CARD_START_TIME: startTime,
       USER_CARD_END_TIME: endTime,
     };
 
     let id = await UserCardModel.insert(data);
     return { id, userName: user.USER_NAME || "" };
+  }
+
+  async getUserCardList(userId) {
+    await this._ensureCardCollections();
+    userId = (userId || "").trim();
+    if (!userId) this.AppError("请选择会员");
+
+    let user = await UserModel.getOne({ USER_MINI_OPENID: userId }, "USER_NAME");
+    if (!user) this.AppError("会员不存在");
+
+    let cards = await this._safeGetAll(
+      UserCardModel,
+      { USER_CARD_USER_ID: userId },
+      "*",
+      { USER_CARD_ADD_TIME: "desc" },
+      100,
+    );
+
+    const tplIds = [
+      ...new Set((cards || []).map((c) => c.USER_CARD_TPL_ID).filter(Boolean)),
+    ];
+    let colorMap = {};
+    if (tplIds.length) {
+      let tpls = await CardTplModel.getAll(
+        { CARD_TPL_ID: ["in", tplIds] },
+        "CARD_TPL_ID,CARD_TPL_COLOR",
+        {},
+        100,
+      );
+      for (let t of tpls || []) {
+        colorMap[t.CARD_TPL_ID] = t.CARD_TPL_COLOR || "#F5A623";
+      }
+    }
+
+    const cardService = new UserCardService();
+    const now = timeUtil.time();
+    const list = (cards || []).map((c) =>
+      cardService._mapCardItem(c, now, colorMap[c.USER_CARD_TPL_ID]),
+    );
+
+    return {
+      userId,
+      userName: user.USER_NAME || "",
+      list,
+      total: list.length,
+    };
+  }
+
+  async getUserCardDetail(cardId) {
+    const cardService = new UserCardService();
+    return await cardService.getCoachUserCardDetail(cardId);
+  }
+
+  async adjustUserCard(input) {
+    const cardService = new UserCardService();
+    return await cardService.adjustCardManual(input);
   }
 
   async getCardStats() {

@@ -18,31 +18,35 @@
   </view>
 
   <view wx:else class="card-list">
-    <view class="card-item" wx:for="{{cardList}}" wx:key="CARD_TPL_ID">
-      <view class="card-preview" style="background: {{item.CARD_TPL_COLOR}};">
-        <text class="card-preview-label">VIP CARD</text>
-        <text class="card-preview-type">{{item.typeDesc}}</text>
+    <view
+      class="card-row"
+      wx:for="{{cardList}}"
+      wx:key="CARD_TPL_ID"
+      data-id="{{item.CARD_TPL_ID}}"
+      bindtap="bindCardTap"
+    >
+      <view class="card-chip" style="background: {{item.CARD_TPL_COLOR}};">
+        <text class="card-chip-type">{{item.typeDesc}}</text>
       </view>
-      <view class="card-body">
-        <view class="card-title">{{item.CARD_TPL_NAME}}</view>
-        <view class="card-meta">{{item.metaText}}</view>
-        <view class="card-actions">
+      <view class="card-info">
+        <view class="card-name">{{item.CARD_TPL_NAME}}</view>
+        <view class="card-meta-row" wx:if="{{item.metaTags.length}}">
           <view
-            class="card-action-btn"
-            data-id="{{item.CARD_TPL_ID}}"
-            bindtap="bindEditTap"
-          >编辑</view>
-          <view
-            class="card-action-btn"
-            data-id="{{item.CARD_TPL_ID}}"
-            bindtap="bindManageTap"
-          >卡管理</view>
+            class="card-meta-tag {{tag.highlight ? 'card-meta-tag--price' : ''}}"
+            wx:for="{{item.metaTags}}"
+            wx:for-item="tag"
+            wx:key="key"
+          >
+            <text class="card-meta-tag-label">{{tag.label}}</text>
+            <text class="card-meta-tag-value">{{tag.value}}</text>
+          </view>
         </view>
       </view>
+      <van-icon name="arrow" size="32rpx" color="#ccc" />
     </view>
   </view>
 
   <view class="card-fab" bindtap="bindAddTap">
-    <van-icon name="coupon-o" size="48rpx" color="#fff" />
+    <van-icon name="add" size="48rpx" color="#fff" />
   </view>
 </view>

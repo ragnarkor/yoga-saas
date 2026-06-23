@@ -333,59 +333,11 @@
 }
 /* [AI_END LINES=210 TIMESTAMP=2025-01-27 10:40:00] */
 
-/* ========== 馆长传统页 ========== */
-.admin-info {
-  position: relative;
-  height: 220rpx;
-  width: 100%;
-  color: #fff;
+/* [AI_START TIMESTAMP=2025-01-27 14:00:00] */
+/* ========== 馆长/教师页 — Hero 副标题 ========== */
+.ah-hero-sub {
   display: flex;
   align-items: center;
-  padding: 0 32rpx;
-  box-sizing: border-box;
-  background: linear-gradient(
-    135deg,
-    var(--adminColor) 0%,
-    var(--adminColorDark) 100%
-  );
-  border-bottom-left-radius: var(--adminRadiusLg, 20rpx);
-  border-bottom-right-radius: var(--adminRadiusLg, 20rpx);
+  gap: 12rpx;
 }
-
-.admin-info .pic {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 20rpx;
-}
-
-.admin-info .right .name {
-  font-size: 32rpx;
-  font-weight: 600;
-}
-
-.admin-info .exit-admin {
-  position: absolute;
-  right: 24rpx;
-  top: 24rpx;
-}
-
-.main-admin .comm-list.grid {
-  margin: 24rpx;
-  width: calc(100% - 48rpx);
-  border-radius: var(--adminRadius, 16rpx);
-  background: var(--adminSurface);
-  box-shadow: var(--adminShadowSm, 0 2rpx 8rpx rgba(74, 124, 140, 0.06));
-  overflow: hidden;
-}
-
-.menu-group {
-  margin: 0 24rpx 24rpx !important;
-  border-radius: var(--adminRadius, 16rpx) !important;
-  overflow: hidden;
-  box-shadow: var(--adminShadowSm, 0 2rpx 8rpx rgba(74, 124, 140, 0.06));
-}
+/* [AI_END LINES=6 TIMESTAMP=2025-01-27 14:00:00] */

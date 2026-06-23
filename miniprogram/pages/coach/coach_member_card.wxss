@@ -1,7 +1,6 @@
 @import "./coach_common.wxss";
 
-.member-page,
-.card-page {
+.member-page {
   padding-bottom: 48rpx;
 }
 
@@ -73,6 +72,7 @@
   align-items: center;
   padding: 24rpx 32rpx;
   border-bottom: 1rpx solid #f3f3f3;
+  gap: 12rpx;
 }
 
 .member-avatar {
@@ -128,100 +128,10 @@
   flex-shrink: 0;
 }
 
-.member-loading,
-.member-empty,
-.card-loading,
-.card-empty {
-  padding: 80rpx 0;
-  text-align: center;
-  color: #999;
-  font-size: 28rpx;
-}
-
-.card-list {
-  padding: 24rpx;
-}
-
-.card-item {
-  display: flex;
-  gap: 20rpx;
-  padding: 24rpx;
-  margin-bottom: 20rpx;
+.member-cards-btn {
   background: #fff;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
-}
-
-.card-preview {
-  width: 160rpx;
-  height: 100rpx;
-  border-radius: 16rpx;
-  padding: 12rpx 16rpx;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  flex-shrink: 0;
-  color: #fff;
-}
-
-.card-preview-label {
-  font-size: 18rpx;
-  opacity: 0.85;
-  letter-spacing: 1rpx;
-}
-
-.card-preview-type {
-  font-size: 24rpx;
-  font-weight: 600;
-}
-
-.card-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.card-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #333;
-}
-
-.card-meta {
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #999;
-  line-height: 1.5;
-}
-
-.card-actions {
-  display: flex;
-  gap: 16rpx;
-  margin-top: 16rpx;
-}
-
-.card-action-btn {
-  padding: 10rpx 24rpx;
-  border-radius: 999rpx;
-  font-size: 24rpx;
-  border: 2rpx solid var(--themeColor, #5b8a72);
   color: var(--themeColor, #5b8a72);
-  background: #fff;
-}
-
-.card-fab {
-  position: fixed;
-  right: 40rpx;
-  bottom: calc(80rpx + env(safe-area-inset-bottom));
-  width: 100rpx;
-  height: 100rpx;
-  border-radius: 50%;
-  background: var(--themeColor, #5b8a72);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
-  z-index: 100;
+  border: 2rpx solid var(--themeColor, #5b8a72);
 }
 
 .issue-page,
@@ -238,23 +148,4 @@
   padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
   background: #fff;
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
-}
-
-.color-picker-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-  padding: 16rpx 32rpx 32rpx;
-}
-
-.color-dot {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 50%;
-  border: 4rpx solid transparent;
-  box-sizing: border-box;
-}
-
-.color-dot.active {
-  border-color: #333;
 }

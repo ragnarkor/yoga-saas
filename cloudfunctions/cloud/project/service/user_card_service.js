@@ -12,6 +12,7 @@ const AdminModel = require("../model/admin_model.js");
 const TeacherModel = require("../model/teacher_model.js");
 const dbUtil = require("../../framework/database/db_util.js");
 const timeUtil = require("../../framework/utils/time_util.js");
+const cardScopeUtil = require("../utils/card_scope_util.js");
 
 const CARD_COLLECTIONS = ["ax_user_card", "ax_user_card_log"];
 
@@ -25,13 +26,83 @@ class UserCardService extends BaseService {
   }
 
   _isExpired(card, now) {
+    const start = Number(card.USER_CARD_START_TIME) || 0;
+    if (start <= 0) return false;
     const end = Number(card.USER_CARD_END_TIME) || 0;
     return end > 0 && end <= now;
+  }
+
+  _isPendingActivation(card) {
+    return !(Number(card.USER_CARD_START_TIME) > 0);
+  }
+
+  _canUsePendingForJoin(card) {
+    if (!this._isPendingActivation(card)) return false;
+    const activate = card.USER_CARD_ACTIVATE || UserCardModel.ACTIVATE.IMMEDIATE;
+    return [
+      UserCardModel.ACTIVATE.FIRST_BOOK,
+      UserCardModel.ACTIVATE.FIRST_CLASS,
+      UserCardModel.ACTIVATE.FIRST_USE_LIMIT,
+    ].includes(activate);
+  }
+
+  _buildActivatePatch(card, now) {
+    const days = Number(card.USER_CARD_DAYS) || 365;
+    return {
+      USER_CARD_START_TIME: now,
+      USER_CARD_END_TIME: now + days * 86400,
+      USER_CARD_EDIT_TIME: now,
+    };
+  }
+
+  async _tryActivateCard(card, trigger) {
+    if (!card || !this._isPendingActivation(card)) return false;
+    const activate = card.USER_CARD_ACTIVATE || UserCardModel.ACTIVATE.IMMEDIATE;
+    let shouldActivate = false;
+    if (trigger === "book") {
+      shouldActivate =
+        activate === UserCardModel.ACTIVATE.FIRST_BOOK ||
+        activate === UserCardModel.ACTIVATE.FIRST_USE_LIMIT;
+    } else if (trigger === "checkin") {
+      shouldActivate =
+        activate === UserCardModel.ACTIVATE.FIRST_CLASS ||
+        activate === UserCardModel.ACTIVATE.FIRST_USE_LIMIT;
+    }
+    if (!shouldActivate) return false;
+    await UserCardModel.edit(
+      { _id: card._id },
+      this._buildActivatePatch(card, timeUtil.time()),
+    );
+    return true;
+  }
+
+  async tryActivateForJoinBook(cardId) {
+    if (!cardId) return;
+    await this._ensureCardCollections();
+    let card = await UserCardModel.getOne({ _id: cardId });
+    await this._tryActivateCard(card, "book");
+  }
+
+  async tryActivateForJoinCheckin(joinId, userId) {
+    if (!joinId || !userId) return;
+    await this._ensureCardCollections();
+    let log = await UserCardLogModel.getOne({
+      CARD_LOG_JOIN_ID: joinId,
+      CARD_LOG_USER_ID: userId,
+      CARD_LOG_ACTION: UserCardLogModel.ACTION.DEDUCT,
+    });
+    if (!log || !log.CARD_LOG_USER_CARD_ID) return;
+    let card = await UserCardModel.getOne({
+      _id: log.CARD_LOG_USER_CARD_ID,
+      USER_CARD_USER_ID: userId,
+    });
+    await this._tryActivateCard(card, "checkin");
   }
 
   _mapCardItem(card, now, tplColor) {
     const type = card.USER_CARD_TYPE || CardTplModel.TYPE.TIMES;
     const expired = this._isExpired(card, now);
+    const pending = this._isPendingActivation(card);
     let status = card.USER_CARD_STATUS;
     if (status === UserCardModel.STATUS.NORMAL && expired) {
       status = UserCardModel.STATUS.USED;
@@ -45,15 +116,18 @@ class UserCardService extends BaseService {
     }
 
     let statusLabel = "正常";
-    if (status === UserCardModel.STATUS.STOP) statusLabel = "停卡";
+    if (pending) statusLabel = "待激活";
+    else if (status === UserCardModel.STATUS.STOP) statusLabel = "停卡";
     else if (status === UserCardModel.STATUS.USED || expired)
       statusLabel = "失效";
     else if (type === CardTplModel.TYPE.TIMES) statusLabel = "正常";
 
     const endTs = Number(card.USER_CARD_END_TIME) || 0;
     const startTs = Number(card.USER_CARD_START_TIME) || 0;
-    let endTimeDesc = "长期有效";
-    if (endTs > 0) {
+    let endTimeDesc = pending
+      ? UserCardModel.ACTIVATE_DESC[card.USER_CARD_ACTIVATE] || "待激活"
+      : "长期有效";
+    if (!pending && endTs > 0) {
       endTimeDesc = timeUtil.timestamp2Time(endTs, "Y-M-D");
     }
     let startTimeDesc = "";
@@ -61,18 +135,23 @@ class UserCardService extends BaseService {
       startTimeDesc = timeUtil.timestamp2Time(startTs, "Y-M-D");
     }
 
+    const activate = card.USER_CARD_ACTIVATE || UserCardModel.ACTIVATE.IMMEDIATE;
+    const quota = Number(card.USER_CARD_QUOTA) || 0;
+    const scope = cardScopeUtil.getCardScope(card);
+    const scopeDesc = cardScopeUtil.buildScopeDesc(scope, {});
+
     return {
       id: card._id,
       cardNo: card.USER_CARD_ID || card._id,
       name: card.USER_CARD_NAME || "会员卡",
       type,
       typeLabel: CardTplModel.TYPE_DESC[type] || "次数卡",
-      quota: Number(card.USER_CARD_QUOTA) || 0,
+      quota,
       quotaInit: Number(card.USER_CARD_QUOTA_INIT) || 0,
       balanceText:
         type === CardTplModel.TYPE.PERIOD
           ? "期限内畅练"
-          : `${Number(card.USER_CARD_QUOTA) || 0}次`,
+          : `${quota}次`,
       endTime: endTs,
       endTimeDesc,
       startTime: startTs,
@@ -80,9 +159,23 @@ class UserCardService extends BaseService {
       coachName: card.USER_CARD_COACH_NAME || "",
       memo: card.USER_CARD_MEMO || "",
       price: Number(card.USER_CARD_PRICE) || 0,
+      activate,
+      activateLabel: UserCardModel.ACTIVATE_DESC[activate] || "立即激活",
+      scope,
+      scopeDesc,
       status,
       statusLabel,
-      isActive: status === UserCardModel.STATUS.NORMAL && !expired,
+      isActive:
+        status === UserCardModel.STATUS.NORMAL &&
+        !expired &&
+        !pending &&
+        (type === CardTplModel.TYPE.PERIOD || quota > 0),
+      canBook:
+        status === UserCardModel.STATUS.NORMAL &&
+        !expired &&
+        (pending ? this._canUsePendingForJoin(card) : true) &&
+        (type === CardTplModel.TYPE.PERIOD || quota > 0),
+      isPending: pending,
       color: tplColor || "#F5A623",
     };
   }
@@ -94,8 +187,46 @@ class UserCardService extends BaseService {
     const start = log.CARD_LOG_TIME_START || "";
     const end = log.CARD_LOG_TIME_END || "";
     const times = Number(log.CARD_LOG_TIMES) || 0;
+    const action = log.CARD_LOG_ACTION || UserCardLogModel.ACTION.DEDUCT;
     const isRefund = log.CARD_LOG_STATUS === UserCardLogModel.STATUS.REFUNDED;
-    const coachName = log.CARD_LOG_COACH_NAME || "教练";
+    const coachName = log.CARD_LOG_COACH_NAME || log.CARD_LOG_OPERATOR_NAME || "教练";
+    const memo = (log.CARD_LOG_MEMO || "").trim();
+
+    if (action === UserCardLogModel.ACTION.MANUAL_ADD) {
+      return {
+        id: log._id,
+        meetTitle: log.CARD_LOG_MEET_TITLE || "手动加次",
+        meetTypeName: memo || "手动调整",
+        coachName,
+        deductText: `+${times}次`,
+        dayDesc,
+        timeRange: "",
+        scheduleText: dayDesc,
+        times,
+        statusLabel: "加次",
+        isRefund: false,
+        isManual: true,
+        addTime: log.CARD_LOG_ADD_TIME || 0,
+      };
+    }
+    if (action === UserCardLogModel.ACTION.MANUAL_DEDUCT) {
+      return {
+        id: log._id,
+        meetTitle: log.CARD_LOG_MEET_TITLE || "手动消次",
+        meetTypeName: memo || "手动调整",
+        coachName,
+        deductText: `-${times}次`,
+        dayDesc,
+        timeRange: "",
+        scheduleText: dayDesc,
+        times,
+        statusLabel: "消次",
+        isRefund: false,
+        isManual: true,
+        addTime: log.CARD_LOG_ADD_TIME || 0,
+      };
+    }
+
     let deductText = times > 0 ? `消卡${times}次` : "期限内";
     return {
       id: log._id,
@@ -153,7 +284,11 @@ class UserCardService extends BaseService {
       this._mapCardItem(c, now, colorMap[c.USER_CARD_TPL_ID]),
     );
     if (activeOnly) {
-      mapped = mapped.filter((c) => c.isActive);
+      mapped = mapped.filter((c) => {
+        if (c.status !== UserCardModel.STATUS.NORMAL) return false;
+        if (c.isPending) return true;
+        return c.isActive;
+      });
     }
     return { list: mapped, total: mapped.length };
   }
@@ -178,7 +313,14 @@ class UserCardService extends BaseService {
       {
         CARD_LOG_USER_ID: userId,
         CARD_LOG_USER_CARD_ID: cardId,
-        CARD_LOG_ACTION: UserCardLogModel.ACTION.DEDUCT,
+        CARD_LOG_ACTION: [
+          "in",
+          [
+            UserCardLogModel.ACTION.DEDUCT,
+            UserCardLogModel.ACTION.MANUAL_ADD,
+            UserCardLogModel.ACTION.MANUAL_DEDUCT,
+          ],
+        ],
       },
       "*",
       { CARD_LOG_ADD_TIME: "desc" },
@@ -255,18 +397,21 @@ class UserCardService extends BaseService {
   async getJoinCardOptions(userId, meetId) {
     if (!userId) this.AppError("请先登录");
 
-    let meet = await MeetModel.getOne({ _id: meetId }, "MEET_STYLE_SET");
+    let meet = await MeetModel.getOne(
+      { _id: meetId },
+      "MEET_STYLE_SET,MEET_TYPE_ID,MEET_TYPE_NAME",
+    );
     if (!meet) this.AppError("课程不存在");
 
     const needTimes = this._getMeetCardTimes(meet);
-    const list = await this._listUsableCards(userId, needTimes);
+    const list = await this._listUsableCards(userId, needTimes, meet);
     if (!list.length) {
       this.AppError("暂无可用会员卡，请联系馆方发卡后再预约");
     }
     return { needTimes, list };
   }
 
-  async _listUsableCards(userId, needTimes) {
+  async _listUsableCards(userId, needTimes, meet) {
     await this._ensureCardCollections();
     const now = timeUtil.time();
     let cards = await UserCardModel.getAll(
@@ -298,11 +443,14 @@ class UserCardService extends BaseService {
     let list = [];
     for (let k in cards || []) {
       let card = cards[k];
-      if (this._isExpired(card, now)) continue;
+      const pending = this._isPendingActivation(card);
+      if (!pending && this._isExpired(card, now)) continue;
 
       const type = card.USER_CARD_TYPE || CardTplModel.TYPE.TIMES;
       const quota = Number(card.USER_CARD_QUOTA) || 0;
       if (type === CardTplModel.TYPE.TIMES && quota < needTimes) continue;
+      if (pending && !this._canUsePendingForJoin(card)) continue;
+      if (meet && !cardScopeUtil.cardMatchesMeet(card, meet)) continue;
 
       const afterQuota =
         type === CardTplModel.TYPE.PERIOD ? quota : Math.max(0, quota - needTimes);
@@ -328,14 +476,14 @@ class UserCardService extends BaseService {
     return list;
   }
 
-  async _resolveCardForJoin(userId, needTimes, cardId) {
+  async _resolveCardForJoin(userId, needTimes, cardId, meet) {
     if (cardId) {
-      return await this._getCardIfUsable(userId, cardId, needTimes);
+      return await this._getCardIfUsable(userId, cardId, needTimes, meet);
     }
-    return await this._pickCardForJoin(userId, needTimes);
+    return await this._pickCardForJoin(userId, needTimes, meet);
   }
 
-  async _getCardIfUsable(userId, cardId, needTimes) {
+  async _getCardIfUsable(userId, cardId, needTimes, meet) {
     await this._ensureCardCollections();
     let card = await UserCardModel.getOne({
       _id: cardId,
@@ -345,7 +493,12 @@ class UserCardService extends BaseService {
     if (!card) this.AppError("会员卡不可用");
 
     const now = timeUtil.time();
-    if (this._isExpired(card, now)) this.AppError("会员卡已过期");
+    if (!this._isPendingActivation(card) && this._isExpired(card, now)) {
+      this.AppError("会员卡已过期");
+    }
+    if (meet && !cardScopeUtil.cardMatchesMeet(card, meet)) {
+      this.AppError("该会员卡不适用于本课程分类");
+    }
 
     if (card.USER_CARD_TYPE === CardTplModel.TYPE.PERIOD) return card;
 
@@ -358,18 +511,24 @@ class UserCardService extends BaseService {
   async checkCardForJoin(userId, meetId, cardId) {
     if (!userId) this.AppError("请先登录");
 
-    let meet = await MeetModel.getOne({ _id: meetId }, "MEET_STYLE_SET");
+    let meet = await MeetModel.getOne(
+      { _id: meetId },
+      "MEET_STYLE_SET,MEET_TYPE_ID,MEET_TYPE_NAME",
+    );
     if (!meet) this.AppError("课程不存在");
 
     const needTimes = this._getMeetCardTimes(meet);
-    const card = await this._resolveCardForJoin(userId, needTimes, cardId);
+    const card = await this._resolveCardForJoin(userId, needTimes, cardId, meet);
     if (!card) {
       this.AppError("暂无可用会员卡，请联系馆方发卡后再预约");
+    }
+    if (meet && !cardScopeUtil.cardMatchesMeet(card, meet)) {
+      this.AppError("该会员卡不适用于本课程分类");
     }
     return { cardId: card._id, needTimes, cardName: card.USER_CARD_NAME };
   }
 
-  async _pickCardForJoin(userId, needTimes) {
+  async _pickCardForJoin(userId, needTimes, meet) {
     const now = timeUtil.time();
     let list = await UserCardModel.getAll(
       {
@@ -383,7 +542,10 @@ class UserCardService extends BaseService {
 
     for (let k in list) {
       let card = list[k];
-      if (this._isExpired(card, now)) continue;
+      const pending = this._isPendingActivation(card);
+      if (!pending && this._isExpired(card, now)) continue;
+      if (pending && !this._canUsePendingForJoin(card)) continue;
+      if (meet && !cardScopeUtil.cardMatchesMeet(card, meet)) continue;
 
       if (card.USER_CARD_TYPE === CardTplModel.TYPE.PERIOD) {
         return card;
@@ -433,7 +595,7 @@ class UserCardService extends BaseService {
     await this._ensureCardCollections();
     let meet = await MeetModel.getOne(
       { _id: meetId },
-      "MEET_TITLE,MEET_TYPE_NAME,MEET_STYLE_SET,MEET_DAYS_SET,MEET_ADMIN_ID",
+      "MEET_TITLE,MEET_TYPE_NAME,MEET_TYPE_ID,MEET_STYLE_SET,MEET_DAYS_SET,MEET_ADMIN_ID",
     );
     if (!meet) return;
 
@@ -441,7 +603,14 @@ class UserCardService extends BaseService {
     if (!join) return;
 
     const needTimes = this._getMeetCardTimes(meet);
-    const card = await this._resolveCardForJoin(userId, needTimes, cardId);
+    const card = await this._resolveCardForJoin(userId, needTimes, cardId, meet);
+    if (!card) {
+      if (cardId) this.AppError("会员卡划扣失败，请联系馆方");
+      return;
+    }
+
+    await this._tryActivateCard(card, "book");
+    card = await UserCardModel.getOne({ _id: card._id });
     if (!card) return;
 
     const coachName = await this._resolveCoachName(meet, join.JOIN_MEET_TIME_MARK);
@@ -523,6 +692,148 @@ class UserCardService extends BaseService {
     );
 
     return { refunded: times, cardId };
+  }
+
+  /** 教练端：会员持卡详情（含流水） */
+  async getCoachUserCardDetail(cardId) {
+    if (!cardId) this.AppError("参数错误");
+    await this._ensureCardCollections();
+
+    let card = await UserCardModel.getOne({ _id: cardId });
+    if (!card) this.AppError("会员卡不存在");
+
+    const color = await this._getCardTplColor(card.USER_CARD_TPL_ID);
+    const now = timeUtil.time();
+    const detail = this._mapCardItem(card, now, color);
+
+    let logs = await UserCardLogModel.getAll(
+      {
+        CARD_LOG_USER_CARD_ID: cardId,
+        CARD_LOG_ACTION: [
+          "in",
+          [
+            UserCardLogModel.ACTION.DEDUCT,
+            UserCardLogModel.ACTION.MANUAL_ADD,
+            UserCardLogModel.ACTION.MANUAL_DEDUCT,
+          ],
+        ],
+      },
+      "*",
+      { CARD_LOG_ADD_TIME: "desc" },
+      100,
+    );
+
+    return {
+      card: detail,
+      usageList: (logs || []).map((log) => this._mapUsageLog(log)),
+      usageTotal: (logs || []).length,
+    };
+  }
+
+  /** 教练端：手动加次/消次/停卡/恢复 */
+  async adjustCardManual(input) {
+    await this._ensureCardCollections();
+    const cardId = (input.cardId || "").trim();
+    const action = (input.action || "").trim();
+    const memo = (input.memo || "").trim();
+    const operatorName = (input.operatorName || "").trim();
+
+    if (!cardId) this.AppError("请选择会员卡");
+    if (!memo) this.AppError("请填写备注");
+
+    let card = await UserCardModel.getOne({ _id: cardId });
+    if (!card) this.AppError("会员卡不存在");
+
+    const now = timeUtil.time();
+    const day = timeUtil.time("Y-M-D");
+
+    if (action === "stop") {
+      await UserCardModel.edit(
+        { _id: cardId },
+        { USER_CARD_STATUS: UserCardModel.STATUS.STOP, USER_CARD_EDIT_TIME: now },
+      );
+      return { cardId, action: "stop" };
+    }
+
+    if (action === "resume") {
+      const quota = Number(card.USER_CARD_QUOTA) || 0;
+      let status = UserCardModel.STATUS.NORMAL;
+      if (
+        card.USER_CARD_TYPE === CardTplModel.TYPE.TIMES &&
+        quota <= 0 &&
+        !this._isPendingActivation(card)
+      ) {
+        status = UserCardModel.STATUS.USED;
+      }
+      await UserCardModel.edit(
+        { _id: cardId },
+        { USER_CARD_STATUS: status, USER_CARD_EDIT_TIME: now },
+      );
+      return { cardId, action: "resume" };
+    }
+
+    if (card.USER_CARD_TYPE === CardTplModel.TYPE.PERIOD) {
+      this.AppError("期限卡请使用停卡/恢复操作");
+    }
+
+    const times = Number(input.times) || 0;
+    if (times <= 0) this.AppError("请输入有效次数");
+
+    if (action === "add") {
+      const next = (Number(card.USER_CARD_QUOTA) || 0) + times;
+      const patch = {
+        USER_CARD_QUOTA: next,
+        USER_CARD_EDIT_TIME: now,
+      };
+      if (card.USER_CARD_STATUS === UserCardModel.STATUS.USED && next > 0) {
+        patch.USER_CARD_STATUS = UserCardModel.STATUS.NORMAL;
+      }
+      await UserCardModel.edit({ _id: cardId }, patch);
+      await UserCardLogModel.insert({
+        CARD_LOG_USER_ID: card.USER_CARD_USER_ID,
+        CARD_LOG_USER_CARD_ID: cardId,
+        CARD_LOG_MEET_TITLE: "手动加次",
+        CARD_LOG_MEET_TYPE_NAME: "手动调整",
+        CARD_LOG_MEET_DAY: day,
+        CARD_LOG_TIMES: times,
+        CARD_LOG_ACTION: UserCardLogModel.ACTION.MANUAL_ADD,
+        CARD_LOG_STATUS: UserCardLogModel.STATUS.VALID,
+        CARD_LOG_MEMO: memo.slice(0, 50),
+        CARD_LOG_OPERATOR_NAME: operatorName,
+        CARD_LOG_ADD_TIME: now,
+        CARD_LOG_EDIT_TIME: now,
+      });
+      return { cardId, action: "add", times, quota: next };
+    }
+
+    if (action === "deduct") {
+      const left = Number(card.USER_CARD_QUOTA) || 0;
+      if (times > left) this.AppError("剩余次数不足");
+      const next = left - times;
+      const patch = {
+        USER_CARD_QUOTA: next,
+        USER_CARD_EDIT_TIME: now,
+      };
+      if (next <= 0) patch.USER_CARD_STATUS = UserCardModel.STATUS.USED;
+      await UserCardModel.edit({ _id: cardId }, patch);
+      await UserCardLogModel.insert({
+        CARD_LOG_USER_ID: card.USER_CARD_USER_ID,
+        CARD_LOG_USER_CARD_ID: cardId,
+        CARD_LOG_MEET_TITLE: "手动消次",
+        CARD_LOG_MEET_TYPE_NAME: "手动调整",
+        CARD_LOG_MEET_DAY: day,
+        CARD_LOG_TIMES: times,
+        CARD_LOG_ACTION: UserCardLogModel.ACTION.MANUAL_DEDUCT,
+        CARD_LOG_STATUS: UserCardLogModel.STATUS.VALID,
+        CARD_LOG_MEMO: memo.slice(0, 50),
+        CARD_LOG_OPERATOR_NAME: operatorName,
+        CARD_LOG_ADD_TIME: now,
+        CARD_LOG_EDIT_TIME: now,
+      });
+      return { cardId, action: "deduct", times, quota: next };
+    }
+
+    this.AppError("不支持的操作");
   }
 }
 

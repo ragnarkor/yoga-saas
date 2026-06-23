@@ -47,11 +47,45 @@
             wx:for-item="cell"
             wx:for-index="dayIdx"
             wx:key="dayIdx"
-            bindtap="bindCellTap"
             data-row="{{rowIdx}}"
             data-col="{{dayIdx}}"
           >
-            <view wx:if="{{cell}}" class="schedule-card" style="{{cell.cardStyle}}">
+            <block wx:if="{{cell && cell.mode === 'multi'}}">
+              <view class="schedule-cell-stack">
+                <view
+                  wx:for="{{cell.items}}"
+                  wx:for-item="slot"
+                  wx:key="cardId"
+                  class="schedule-card schedule-card--mini"
+                  style="{{slot.cardStyle}}"
+                  catchtap="bindSlotTap"
+                  data-row="{{rowIdx}}"
+                  data-col="{{dayIdx}}"
+                  data-item-idx="{{index}}"
+                >
+                  <text wx:if="{{slot.isPrivate}}" class="schedule-card-tag">私教</text>
+                  <text class="schedule-card-teacher">{{slot.teacherName || '教练'}}</text>
+                  <text class="schedule-card-title">{{slot.title}}</text>
+                </view>
+                <view
+                  wx:if="{{cell.overflow > 0}}"
+                  class="schedule-card-overflow"
+                  catchtap="bindOverflowTap"
+                  data-row="{{rowIdx}}"
+                  data-col="{{dayIdx}}"
+                >+{{cell.overflow}}</view>
+              </view>
+            </block>
+            <view
+              wx:elif="{{cell}}"
+              class="schedule-card"
+              style="{{cell.cardStyle}}"
+              catchtap="bindSlotTap"
+              data-row="{{rowIdx}}"
+              data-col="{{dayIdx}}"
+              data-item-idx="0"
+            >
+              <text wx:if="{{cell.isPrivate}}" class="schedule-card-tag">私教</text>
               <text class="schedule-card-teacher">{{cell.teacherName || '教练'}}</text>
               <text class="schedule-card-title">{{cell.title}}</text>
               <text class="schedule-stars">{{cell.starText}}</text>

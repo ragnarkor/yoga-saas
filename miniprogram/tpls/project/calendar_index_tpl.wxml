@@ -79,9 +79,10 @@
 						<van-tag plain type="warning" size="medium" custom-class="course-tag" wx:if="{{item.typeName}}">{{item.typeName}}</van-tag>
 					</view>
 					<view class="course-coach">
-						<view class="coach-avatar-wrap">
-							<image class="coach-avatar" src="{{item.coachAvatar}}" mode="aspectFill" />
-						</view>
+					<view class="coach-avatar-wrap">
+						<image wx:if="{{item.coachAvatar}}" class="coach-avatar" src="{{item.coachAvatar}}" mode="aspectFill" />
+						<text wx:else class="coach-avatar-fallback">{{item.coachName ? item.coachName[0] : '教'}}</text>
+					</view>
 						<text class="coach-name">{{item.coachName}}</text>
 					</view>
 				</view>

@@ -89,6 +89,8 @@ async function app(event, context) {
 			'passport/my_tenants': 1,
 			'passport/sync_profile': 1,
 			'passport/ensure_member': 1,
+			'private/meta': 1,
+			'private/available_slots': 1,
 			'my/my_join_someday': 1,
 			'my/my_join_list': 1,
 			'my/my_join_detail': 1,

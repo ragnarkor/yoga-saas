@@ -25,11 +25,7 @@ Page({
   },
 
   onShow() {
-    if (
-      AdminBiz.getAdminToken() &&
-      AdminBiz.isSuperAdmin() &&
-      this.data.isLoad
-    ) {
+    if (AdminBiz.getAdminToken() && this.data.isLoad) {
       this._loadDetail();
     }
   },

@@ -21,7 +21,7 @@ Page({
     tabsReady: false,
     activeTab: 0,
     activeTypeId: '0',
-    emptyText: '本周暂无预约',
+    emptyText: '本周暂无您的课程',
   },
 
   onLoad() {
@@ -119,6 +119,7 @@ Page({
           endDay,
           typeId: activeTypeId === '0' ? '' : activeTypeId,
           includeInactive: 1,
+          onlyMine: 1,
         },
         { hint: false, title: 'bar' },
       );
@@ -155,14 +156,36 @@ Page({
     this._loadWeek();
   },
 
-  bindCellTap(e) {
+  bindSlotTap(e) {
     const ds = e.currentTarget.dataset;
     const rowIdx = Number(ds.row);
     const colIdx = Number(ds.col);
     const row = this.data.gridRows[rowIdx];
     if (!row || !row.cells) return;
     const cell = row.cells[colIdx];
-    if (!cell || !cell.detailUrl) return;
-    wx.navigateTo({ url: cell.detailUrl });
+    const slot = bookingWeekHelper.getCellSlot(cell, ds.itemIdx);
+    if (!slot || !slot.detailUrl) return;
+    wx.navigateTo({ url: slot.detailUrl });
+  },
+
+  bindOverflowTap(e) {
+    const ds = e.currentTarget.dataset;
+    const rowIdx = Number(ds.row);
+    const colIdx = Number(ds.col);
+    const row = this.data.gridRows[rowIdx];
+    if (!row || !row.cells) return;
+    const cell = row.cells[colIdx];
+    if (!cell || !cell.overflow) return;
+    const hidden = (cell.allItems || []).slice(cell.items.length);
+    const names = hidden.map((slot) => slot.title || '课程');
+    wx.showActionSheet({
+      itemList: names,
+      success: (res) => {
+        const slot = hidden[res.tapIndex];
+        if (slot && slot.detailUrl) {
+          wx.navigateTo({ url: slot.detailUrl });
+        }
+      },
+    });
   },
 });

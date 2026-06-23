@@ -75,6 +75,45 @@ class AdminMeetController extends BaseAdminController {
     await service.checkinJoin(input.joinId, input.flag);
   }
 
+  /** 本节批量签到 */
+  async checkinJoinBatch() {
+    await this.isAdmin();
+    await FeatureGate.check("checkin");
+
+    let rules = {
+      meetId: "must|id",
+      timeMark: "must|string",
+      flag: "must|in:0,1|default=1",
+    };
+
+    let input = this.validateData(rules);
+
+    let service = new AdminMeetService();
+    return await service.checkinJoinBatch(
+      input.meetId,
+      input.timeMark,
+      input.flag,
+    );
+  }
+
+  /** 团课代预约 */
+  async bookGroupJoin() {
+    await this.isAdmin();
+
+    let rules = {
+      meetId: "must|id|name=课程",
+      timeMark: "must|string|name=时段",
+      userId: "must|string|name=会员",
+      cardId: "string|name=会员卡",
+      memo: "string|max:50|name=备注",
+    };
+
+    let input = this.validateData(rules);
+
+    let service = new AdminMeetService();
+    return await service.bookGroupJoin(input);
+  }
+
   /** 管理员扫码核验 */
   async scanJoin() {
     await this.isAdmin();
@@ -219,6 +258,8 @@ class AdminMeetController extends BaseAdminController {
       endDay: "must|date|name=结束日期",
       typeId: "string",
       includeInactive: "int",
+      excludePrivate: "int",
+      onlyMine: "int",
     };
 
     let input = this.validateData(rules);
@@ -228,6 +269,7 @@ class AdminMeetController extends BaseAdminController {
       input,
       this._adminId,
       this._adminType,
+      this._admin,
     );
   }
 
@@ -300,7 +342,7 @@ class AdminMeetController extends BaseAdminController {
       typeId: "must|id|name=分类",
       typeName: "must|string|name=分类",
       order: "must|int|min:1|max:9999|name=排序号",
-      daysSet: "must|array|name=预约时间设置",
+      daysSet: "array|default=[]|name=预约时间设置",
       isShowLimit: "must|int|in:0,1|name=是否显示可预约人数",
 
       formSet: "must|array|name=用户资料设置",
@@ -348,7 +390,7 @@ class AdminMeetController extends BaseAdminController {
       typeId: "must|id|name=分类",
       typeName: "must|string|name=分类",
       order: "must|int|min:1|max:9999|name=排序号",
-      daysSet: "must|array|name=预约时间设置",
+      daysSet: "array|default=[]|name=预约时间设置",
 
       isShowLimit: "must|int|in:0,1|name=是否显示可预约人数",
 

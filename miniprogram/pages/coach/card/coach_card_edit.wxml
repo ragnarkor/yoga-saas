@@ -12,27 +12,117 @@
   </view>
 
   <block wx:else>
-    <van-cell-group>
+    <van-cell-group custom-class="course-edit-group">
       <van-field label="卡名称" value="{{form.name}}" placeholder="如：空中瑜伽" bind:change="bindFieldChange" data-field="name" />
       <van-cell title="卡类型" is-link value="{{form.typeLabel}}" bind:click="bindTypeTap" />
       <van-field label="有效期(天)" type="number" value="{{form.days}}" bind:change="bindFieldChange" data-field="days" />
       <van-field label="售价(元)" type="number" value="{{form.price}}" bind:change="bindFieldChange" data-field="price" />
       <van-field wx:if="{{form.type === 'times'}}" label="额度(次)" type="number" value="{{form.quota}}" bind:change="bindFieldChange" data-field="quota" />
-    </van-cell-group>
 
-    <view class="color-picker-row">
-      <view
-        wx:for="{{colorOptions}}"
-        wx:key="*this"
-        class="color-dot {{form.color === item ? 'active' : ''}}"
-        style="background: {{item}};"
-        data-color="{{item}}"
-        bindtap="bindColorTap"
-      ></view>
-    </view>
+      <view class="course-edit-field course-edit-field--inline" bindtap="bindColorFieldTap">
+        <text class="course-edit-field-label-inline">卡面颜色</text>
+        <view class="course-edit-field-row course-edit-field-row--inline">
+          <view class="course-edit-color-inline">
+            <view
+              class="course-color-dot course-color-dot--md"
+              style="background: {{form.color}};"
+            ></view>
+            <text class="course-edit-field-value">{{selectedColorLabel}}</text>
+          </view>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
+      <view class="course-edit-field course-edit-field--inline" bindtap="bindScopeFieldTap">
+        <text class="course-edit-field-label-inline">适用课程</text>
+        <view class="course-edit-field-row course-edit-field-row--inline">
+          <text class="course-edit-field-value">{{scopeDescText}}</text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+    </van-cell-group>
 
     <view class="card-edit-footer">
       <van-button block round color="{{themeColor}}" bind:click="bindSaveTap">保存</van-button>
     </view>
   </block>
+
+  <van-popup
+    show="{{colorSheetShow}}"
+    position="bottom"
+    round
+    bind:close="bindCloseColorSheet"
+    custom-class="course-edit-popup"
+  >
+    <view class="course-edit-sheet">
+      <view class="course-edit-sheet-head">
+        <text class="course-edit-sheet-title">选择卡面颜色</text>
+        <text class="course-edit-sheet-sub">会员卡列表将显示此颜色</text>
+      </view>
+      <view class="course-edit-color-list">
+        <view
+          class="course-edit-color-item {{form.color === item.value ? 'active' : ''}}"
+          wx:for="{{colorOptions}}"
+          wx:key="value"
+          data-color="{{item.value}}"
+          data-label="{{item.label}}"
+          bindtap="bindColorTap"
+        >
+          <view class="course-edit-color-dot" style="background: {{item.value}};"></view>
+          <view class="course-edit-color-item-info">
+            <text class="course-edit-color-label">{{item.label}}</text>
+            <text class="course-edit-color-hex">{{item.value}}</text>
+          </view>
+          <van-icon
+            wx:if="{{form.color === item.value}}"
+            name="success"
+            size="36rpx"
+            color="{{themeColor}}"
+          />
+        </view>
+      </view>
+    </view>
+  </van-popup>
+
+  <van-popup
+    show="{{scopeSheetShow}}"
+    position="bottom"
+    round
+    bind:close="bindCloseScopeSheet"
+    custom-class="course-edit-popup"
+  >
+    <view class="course-edit-sheet">
+      <view class="course-edit-sheet-head">
+        <text class="course-edit-sheet-title">适用课程范围</text>
+        <text class="course-edit-sheet-sub">指定分类后，该卡仅可用于对应课程</text>
+      </view>
+      <view class="card-scope-list">
+        <view
+          class="card-scope-item {{scopeMode === 'all' ? 'is-active' : ''}}"
+          bindtap="bindScopeAllTap"
+        >
+          <text>全馆课程</text>
+          <van-icon wx:if="{{scopeMode === 'all'}}" name="success" size="36rpx" color="{{themeColor}}" />
+        </view>
+        <view
+          class="card-scope-item {{scopeMode === 'categories' && item.selected ? 'is-active' : ''}}"
+          wx:for="{{scopeCategories}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="bindScopeCategoryTap"
+        >
+          <text>{{item.name}}</text>
+          <van-icon
+            wx:if="{{scopeMode === 'categories' && item.selected}}"
+            name="success"
+            size="36rpx"
+            color="{{themeColor}}"
+          />
+        </view>
+      </view>
+      <view class="card-scope-done">
+        <van-button block round color="{{themeColor}}" bind:click="bindScopeDoneTap">确定</van-button>
+      </view>
+    </view>
+  </van-popup>
 </view>

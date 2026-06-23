@@ -29,15 +29,15 @@ module.exports = Behavior({
         let data = (res && res.data) ? res.data : {};
         let meetList = (data.meetList || []).map((item) => ({
           ...item,
-          pic: pageHelper.fmtImgUrl(item.pic),
+          pic: pageHelper.fmtCoverUrl(item.pic, item._id),
         }));
         let newsList = (data.newsList || []).map((item) => ({
           ...item,
-          pic: pageHelper.fmtImgUrl(item.pic),
+          pic: pageHelper.fmtCoverUrl(item.pic, item._id),
         }));
         let teacherList = (data.teacherList || []).map((item) => ({
           ...item,
-          pic: pageHelper.fmtImgUrl(item.pic),
+          pic: pageHelper.fmtCoverUrl(item.pic, item._id),
         }));
         this.setData({ meetList, newsList, teacherList, isLoad: true });
       } catch (err) {

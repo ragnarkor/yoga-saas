@@ -19,7 +19,7 @@
         bindconfirm="bindSearchConfirm"
       />
     </view>
-    <view class="member-add-btn" bindtap="bindAddTap">
+    <view class="member-add-btn" wx:if="{{!pickMode}}" bindtap="bindAddTap">
       <van-icon name="plus" size="28rpx" color="#fff" />
       <text>新增</text>
     </view>
@@ -42,7 +42,14 @@
   <view wx:elif="{{!memberList.length}}" class="member-empty">暂无会员</view>
 
   <view wx:else class="member-list">
-    <view class="member-row" wx:for="{{memberList}}" wx:key="USER_MINI_OPENID">
+    <view
+      class="member-row {{pickMode ? 'member-row-pick' : ''}}"
+      wx:for="{{memberList}}"
+      wx:key="USER_MINI_OPENID"
+      data-id="{{item.USER_MINI_OPENID}}"
+      data-name="{{item.USER_NAME}}"
+      bindtap="{{pickMode ? 'bindMemberRowTap' : ''}}"
+    >
       <view class="member-avatar">
         <image wx:if="{{item.avatarSrc}}" src="{{item.avatarSrc}}" mode="aspectFill" />
         <view wx:else class="member-avatar-placeholder">
@@ -53,15 +60,28 @@
         <view class="member-name">{{item.USER_NAME || '未命名会员'}}</view>
         <view class="member-phone">{{item.USER_MOBILE || '未绑定手机'}}</view>
       </view>
-      <view
-        class="member-issue-btn"
-        data-id="{{item.USER_MINI_OPENID}}"
-        data-name="{{item.USER_NAME}}"
-        bindtap="bindIssueTap"
-      >
-        <text>发卡</text>
-        <van-icon name="arrow" size="24rpx" color="#fff" />
-      </view>
+      <block wx:if="{{pickMode}}">
+        <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+      </block>
+      <block wx:else>
+        <view
+          class="member-issue-btn member-cards-btn"
+          data-id="{{item.USER_MINI_OPENID}}"
+          data-name="{{item.USER_NAME}}"
+          catchtap="bindCardsTap"
+        >
+          <text>持卡</text>
+        </view>
+        <view
+          class="member-issue-btn"
+          data-id="{{item.USER_MINI_OPENID}}"
+          data-name="{{item.USER_NAME}}"
+          catchtap="bindIssueTap"
+        >
+          <text>发卡</text>
+          <van-icon name="arrow" size="24rpx" color="#fff" />
+        </view>
+      </block>
     </view>
   </view>
 </view>

@@ -20,11 +20,43 @@
   box-shadow: 0 6rpx 18rpx rgba(45, 85, 64, 0.12);
 }
 
+.tenant-top--sub {
+  padding-left: 12rpx;
+}
+
+.tenant-top--no-switch {
+  padding-right: 28rpx;
+}
+
+.tenant-back {
+  flex-shrink: 0;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4rpx;
+}
+
 .tenant-title {
   min-width: 0;
+  flex: 1;
   font-size: 32rpx;
   font-weight: 600;
   letter-spacing: 1rpx;
+}
+
+.tenant-title--sub {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  flex: none;
+  max-width: 42%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .tenant-action {

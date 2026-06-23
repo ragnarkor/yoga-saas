@@ -10,7 +10,7 @@
 
 .course-loading,
 .course-empty {
-  padding: 80rpx 0;
+  /* 见 coach_common.wxss */
 }
 
 .course-list {

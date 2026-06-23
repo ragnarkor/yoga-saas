@@ -11,11 +11,30 @@
   <view class="teacher-home" wx:else>
     <view class="teacher-hero">
       <view class="hero-card">
-        <image class="hero-avatar" mode="aspectFill" src="{{teacher.avatar || '/images/default_cover_pic.gif'}}" />
+        <image class="hero-avatar" mode="aspectFill" src="{{teacher.avatar}}" />
         <view class="hero-info">
           <view class="hero-name">{{teacher.name}}</view>
           <view class="hero-specialty" wx:if="{{teacher.specialty}}">{{teacher.specialty}}</view>
           <view class="hero-desc">{{teacher.desc}}</view>
+        </view>
+      </view>
+      <view
+        class="teacher-private-entry"
+        hover-class="teacher-private-entry--active"
+        bindtap="bindPrivateBookTap"
+      >
+        <view class="teacher-private-entry-left">
+          <view class="teacher-private-entry-icon">
+            <van-icon name="clock-o" size="36rpx" color="#ffffff" />
+          </view>
+          <view class="teacher-private-entry-texts">
+            <text class="teacher-private-entry-title">预约私教</text>
+            <text class="teacher-private-entry-sub">灵活自选时段 · 会员卡扣次</text>
+          </view>
+        </view>
+        <view class="teacher-private-entry-btn">
+          <text class="teacher-private-entry-btn-text">去预约</text>
+          <van-icon name="arrow" size="24rpx" color="#ffffff" />
         </view>
       </view>
     </view>

@@ -1,0 +1,111 @@
+@import "../coach_member_card.wxss";
+@import "../card/coach_card_edit.wxss";
+
+.private-book-page {
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+}
+
+.private-book-section {
+  margin: 16rpx 24rpx 0;
+  background: #fff;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.private-book-section-title {
+  padding: 24rpx 28rpx 8rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1f2329;
+}
+
+.private-book-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx;
+  border-bottom: 1rpx solid #f3f3f3;
+}
+
+.private-book-field:last-child {
+  border-bottom: none;
+}
+
+.private-book-label {
+  font-size: 28rpx;
+  color: #646566;
+  flex-shrink: 0;
+  width: 160rpx;
+}
+
+.private-book-value-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8rpx;
+  min-width: 0;
+}
+
+.private-book-value {
+  font-size: 28rpx;
+  color: #1f2329;
+  text-align: right;
+}
+
+.private-book-buffer-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 8rpx 24rpx 20rpx;
+}
+
+.private-book-buffer-custom {
+  padding: 0 8rpx 8rpx;
+}
+
+.private-book-hint {
+  padding: 0 28rpx 20rpx;
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.private-book-hint.is-ok {
+  color: var(--themeColor, #5b8a72);
+}
+
+.private-book-hint.is-warn {
+  color: #ed6a0c;
+}
+
+.private-book-footer {
+  padding: 32rpx 24rpx;
+}
+
+.private-book-course-sub {
+  font-size: 22rpx;
+  color: #969799;
+  margin-left: 12rpx;
+}
+
+.card-scope-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.private-book-calendar-wrap {
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+}
+
+.private-book-calendar-head {
+  padding: 28rpx 32rpx 8rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #323233;
+}
+
+.private-book-calendar-wrap .van-calendar {
+  height: 640rpx !important;
+}

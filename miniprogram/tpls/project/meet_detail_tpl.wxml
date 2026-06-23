@@ -152,7 +152,7 @@
 			</view>
 			<scroll-view wx:else scroll-y class="md-card-sheet-scroll" enhanced show-scrollbar="{{false}}">
 				<view
-					class="md-card-option"
+					class="md-card-option {{selectedCardId === item.id ? 'is-selected' : ''}}"
 					wx:for="{{joinCardOptions}}"
 					wx:key="id"
 					bindtap="bindCardPick"
@@ -166,9 +166,19 @@
 						<text class="md-card-option-balance">{{item.balanceText}}</text>
 						<text class="md-card-option-hint">{{item.deductHint}}</text>
 					</view>
-					<van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+					<van-icon wx:if="{{selectedCardId === item.id}}" name="success" size="36rpx" color="{{themeColor}}" />
+					<van-icon wx:else name="arrow" size="32rpx" color="#c8c9cc" />
 				</view>
 			</scroll-view>
+			<view wx:if="{{!cardPickLoading}}" class="md-card-sheet-footer">
+				<button
+					class="md-card-confirm-btn {{selectedCardId ? '' : 'disabled'}}"
+					bindtap="bindConfirmCardJoin"
+					disabled="{{!selectedCardId || submitting}}"
+				>
+					确认预约
+				</button>
+			</view>
 		</view>
 	</van-popup>
 </template>
