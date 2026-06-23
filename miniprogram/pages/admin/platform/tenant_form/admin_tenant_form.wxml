@@ -1,0 +1,14 @@
+<view class="platform-form admin-theme">
+  <view class="form-card">
+    <view class="field">
+      <text class="label">馆名</text>
+      <input class="input" placeholder="如：静心瑜伽馆" maxlength="30" value="{{name}}" data-field="name" bindinput="bindInput" />
+    </view>
+    <view class="field">
+      <text class="label">简介（选填）</text>
+      <textarea class="textarea" placeholder="一句话介绍" maxlength="200" value="{{desc}}" data-field="desc" bindinput="bindInput" />
+    </view>
+  </view>
+  <view class="form-tip">创建后可在列表中进入教练版管理该馆</view>
+  <button class="submit-btn" loading="{{submitting}}" disabled="{{submitting}}" bindtap="bindSubmit">创建瑜伽馆</button>
+</view>

@@ -2,15 +2,15 @@
 .admin-theme,
 page {
   --adminColor: #4a7c8c;
-  --adminColorDark: #3a6572;
-  --adminColorLight: #e8f0f2;
-  --adminPageBg: #f2f5f6;
+  --adminColorDark: #3d6b78;
+  --adminColorLight: #eef3f4;
+  --adminPageBg: #f7f8fa;
   --adminSurface: #ffffff;
   --adminRedColor: #d9644a;
-  --adminText: #2c3e44;
-  --adminTextSecondary: #6b7c85;
-  --adminBorder: #e4eaec;
-  --adminShadow: 0 8rpx 28rpx rgba(58, 101, 114, 0.08);
+  --adminText: #1a2b32;
+  --adminTextSecondary: #8a9aa3;
+  --adminBorder: #e8ecef;
+  --adminShadow: none;
 
   --button-primary-background-color: #4a7c8c;
   --button-primary-border-color: #4a7c8c;

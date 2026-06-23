@@ -1,0 +1,65 @@
+@import '../../../../style/project/base/admin.wxss';
+
+.platform-form {
+  min-height: 100vh;
+  padding: 32rpx 28rpx 48rpx;
+  box-sizing: border-box;
+  background: var(--adminPageBg);
+}
+
+.form-card {
+  background: var(--adminSurface);
+  border-radius: 16rpx;
+  padding: 8rpx 28rpx;
+  border: 1rpx solid var(--adminBorder);
+}
+
+.field {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--adminBorder);
+}
+
+.field:last-child {
+  border-bottom: none;
+}
+
+.label {
+  display: block;
+  font-size: 26rpx;
+  color: var(--adminTextSecondary);
+  margin-bottom: 12rpx;
+}
+
+.input {
+  font-size: 30rpx;
+  color: var(--adminText);
+  width: 100%;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 120rpx;
+  font-size: 28rpx;
+  color: var(--adminText);
+  line-height: 1.5;
+}
+
+.form-tip {
+  font-size: 24rpx;
+  color: var(--adminTextSecondary);
+  margin: 20rpx 8rpx 32rpx;
+}
+
+.submit-btn {
+  background: var(--adminColor);
+  color: #fff;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  border: none;
+}
+
+.submit-btn::after {
+  border: none;
+}

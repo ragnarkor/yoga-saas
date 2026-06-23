@@ -61,7 +61,7 @@ Component({
 
     bindFormChange: function (e) {
       const field = e.currentTarget.dataset.field;
-      this.setData({ [field]: e.detail });
+      this.setData({ [field]: e.detail.value });
     },
 
     bindCloseTap: function () {

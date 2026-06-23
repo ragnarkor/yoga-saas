@@ -23,6 +23,12 @@ Page({
     this._loadDetail();
   },
 
+  onShow() {
+    if (AdminBiz.getAdminToken() && AdminBiz.isSuperAdmin() && this.data.isLoad) {
+      this._loadDetail();
+    }
+  },
+
   onPullDownRefresh: async function () {
     await this._loadDetail();
     wx.stopPullDownRefresh();
@@ -43,13 +49,15 @@ Page({
       };
       let res = await cloudHelper.callCloudData("admin/home", {}, opts);
       if (admin.type === "super") {
-        const tenantRes = await cloudHelper.callCloudData(
-          "tenant/list",
+        const overview = await cloudHelper.callCloudData(
+          "admin/platform_overview",
           {},
           { hint: false },
         );
         res = res || {};
-        res.tenantList = (tenantRes && tenantRes.list) || [];
+        res.tenantList = (overview && overview.tenantList) || [];
+        res.tenantCount = (overview && overview.tenantCount) || 0;
+        res.adminCount = (overview && overview.adminCount) || 0;
       }
       this.setData({
         data: res,
@@ -74,6 +82,29 @@ Page({
       return;
     }
     wx.reLaunch({ url: "/pages/coach/index/coach_index" });
+  },
+
+  bindMgrBindTap: function () {
+    const list = (this.data.data && this.data.data.tenantList) || [];
+    if (!list.length) {
+      wx.showToast({ title: "请先新建瑜伽馆", icon: "none" });
+      return;
+    }
+    const go = (item) => {
+      pageHelper.setTenant(item);
+      wx.navigateTo({ url: "/pages/admin/mgr/bind/admin_mgr_bind" });
+    };
+    if (list.length === 1) {
+      go(list[0]);
+      return;
+    }
+    wx.showActionSheet({
+      itemList: list.map((t) => t.TENANT_NAME),
+      success: (res) => {
+        const item = list[res.tapIndex];
+        if (item) go(item);
+      },
+    });
   },
 
   bindAdminLoginCloseTap: function () {
@@ -104,20 +135,8 @@ Page({
     pageHelper.showConfirm("您确认退出?", callback);
   },
 
-  bindSettingTap: function (e) {
-    let itemList = ["清除数据缓存"];
-    wx.showActionSheet({
-      itemList,
-      success: async (res) => {
-        switch (res.tapIndex) {
-          case 0: {
-            await this._clearCache();
-            break;
-          }
-        }
-      },
-      fail: function (res) {},
-    });
+  bindSettingTap: function () {
+    pageHelper.showConfirm("确认清除数据缓存？", () => this._clearCache());
   },
 
   _clearCache: async function () {

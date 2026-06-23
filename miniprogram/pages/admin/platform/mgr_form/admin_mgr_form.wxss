@@ -1,0 +1,10 @@
+@import '../../../../style/project/base/admin.wxss';
+@import '../tenant_form/admin_tenant_form.wxss';
+
+.field-picker .picker-val {
+  font-size: 30rpx;
+  color: var(--adminText);
+  padding-right: 32rpx;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%239aabb3" d="M2 4l4 4 4-4"/></svg>') no-repeat right center;
+  background-size: 24rpx;
+}

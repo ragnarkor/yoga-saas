@@ -110,6 +110,60 @@ class AdminTenantService extends BaseAdminService {
     };
   }
 
+  /** 超管：新建瑜伽馆 */
+  async insertTenant(name, desc, template, operator) {
+    name = String(name || "").trim();
+    if (!name) this.AppError("请填写瑜伽馆名称");
+    if (name.length > 30) this.AppError("名称不超过30字");
+
+    let pid = TenantModel.makeID();
+    let data = {
+      _pid: pid,
+      TENANT_ID: pid,
+      TENANT_NAME: name,
+      TENANT_DESC: String(desc || "").trim().slice(0, 200),
+      TENANT_TEMPLATE: template || "default",
+      TENANT_STATUS: TenantModel.STATUS.OPEN,
+      TENANT_MEET_TYPE: this._defaultMeetType(),
+      TENANT_MEET_NAME: "约课",
+      TENANT_THEME_COLOR: "#5B8A72",
+    };
+
+    await TenantModel.insert(data, false);
+    await this.insertLog(
+      `新建瑜伽馆「${name}」`,
+      operator,
+      require("../../model/log_model.js").TYPE.SYS,
+    );
+
+    return { pid, tenantName: name };
+  }
+
+  /** 超管：平台概览 */
+  async getPlatformOverview() {
+    let tenantList = await TenantModel.getAll(
+      { TENANT_STATUS: TenantModel.STATUS.OPEN },
+      "_pid,TENANT_ID,TENANT_NAME,TENANT_DESC,TENANT_TEMPLATE",
+      { TENANT_ADD_TIME: "desc" },
+      200,
+      false,
+    );
+
+    let adminCount = await AdminModel.count(
+      {
+        ADMIN_TYPE: ["in", [AdminModel.TYPE.OWNER, AdminModel.TYPE.TEACHER]],
+        ADMIN_STATUS: 1,
+      },
+      false,
+    );
+
+    return {
+      tenantList: tenantList || [],
+      tenantCount: (tenantList || []).length,
+      adminCount: adminCount || 0,
+    };
+  }
+
   /** 客户 Tab 会员统计 */
   async getMemberStats(pid) {
     if (!pid) this.AppError("请先选择瑜伽馆");

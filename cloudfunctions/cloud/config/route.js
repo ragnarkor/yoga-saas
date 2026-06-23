@@ -56,6 +56,10 @@ module.exports = {
   "admin/tenant_store": "admin/admin_tenant_controller@getStore",
   "admin/tenant_store_save": "admin/admin_tenant_controller@saveMeetCategories#noDemo",
   "admin/member_stats": "admin/admin_tenant_controller@getMemberStats",
+  "admin/platform_overview": "admin/admin_tenant_controller@getPlatformOverview",
+  "admin/tenant_insert": "admin/admin_tenant_controller@insertTenant#noDemo",
+  "admin/mgr_list": "admin/admin_mgr_controller@getAdminList",
+  "admin/mgr_insert": "admin/admin_mgr_controller@insertAdmin#noDemo",
 
   "admin/card_tpl_list": "admin/admin_card_controller@getCardTplList",
   "admin/card_tpl_detail": "admin/admin_card_controller@getCardTplDetail",

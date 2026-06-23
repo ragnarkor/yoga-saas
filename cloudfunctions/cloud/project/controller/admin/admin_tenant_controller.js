@@ -41,6 +41,31 @@ class AdminTenantController extends BaseAdminController {
     let service = new AdminTenantService();
     return await service.getMemberStats(pid);
   }
+
+  /** 超管：平台概览 */
+  async getPlatformOverview() {
+    await this.isSuperAdmin();
+    let service = new AdminTenantService();
+    return await service.getPlatformOverview();
+  }
+
+  /** 超管：新建瑜伽馆 */
+  async insertTenant() {
+    await this.isSuperAdmin();
+    let rules = {
+      name: "must|string|min:1|max:30|name=瑜伽馆名称",
+      desc: "string|max:200|name=简介",
+      template: "string|default=default|name=页面模板",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminTenantService();
+    return await service.insertTenant(
+      input.name,
+      input.desc,
+      input.template,
+      this._admin,
+    );
+  }
 }
 
 module.exports = AdminTenantController;

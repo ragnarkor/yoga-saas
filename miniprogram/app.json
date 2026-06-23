@@ -53,6 +53,8 @@
     "cmpts/public/form/form_set/field/form_set_field",
     "pages/admin/index/tenant/admin_tenant",
     "pages/admin/index/home/admin_home",
+    "pages/admin/platform/tenant_form/admin_tenant_form",
+    "pages/admin/platform/mgr_form/admin_mgr_form",
     "pages/admin/home/content/admin_home_content",
     "pages/admin/bind/admin_bind",
     "pages/admin/mgr/bind/admin_mgr_bind",
