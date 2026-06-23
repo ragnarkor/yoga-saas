@@ -18,7 +18,8 @@ class BaseController extends Controller {
   constructor(route, openId, event) {
     super(route, openId, event);
 
-    if (config.TEST_MODE) openId = config.TEST_TOKEN_ID;
+    // 仅开发者工具等无 OPENID 时回落测试号；真机体验/正式版始终用微信真实 openid
+    if (config.TEST_MODE && !openId) openId = config.TEST_TOKEN_ID;
 
     if (!openId) {
       console.error("OPENID is unfined");

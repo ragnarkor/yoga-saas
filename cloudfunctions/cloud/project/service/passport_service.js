@@ -16,6 +16,8 @@ const cloudBase = require('../../framework/cloud/cloud_base.js');
 
 const UserModel = require('../model/user_model.js');
 
+const TenantModel = require('../model/tenant_model.js');
+
 const config = require('../../config/config.js');
 
 
@@ -27,6 +29,15 @@ class PassportService extends BaseService {
 	// 用户资料按 openid 全局存储，不按租户 _pid 隔离
 
 	static MUST_PID = false;
+
+	/** 全局资料分区（mustPID=false 时 insert 仍需满足表结构 _pid 必填） */
+	static GLOBAL_PID = '__global__';
+
+	_prepareInsert(data) {
+		const row = Object.assign({}, data);
+		if (!row._pid) row._pid = PassportService.GLOBAL_PID;
+		return row;
+	}
 
 
 
@@ -56,7 +67,7 @@ class PassportService extends BaseService {
 
 		}
 
-		await UserModel.insert(data, PassportService.MUST_PID);
+		await UserModel.insert(this._prepareInsert(data), PassportService.MUST_PID);
 
 	}
 
@@ -146,7 +157,10 @@ class PassportService extends BaseService {
 
 		if (!user) {
 
-			await UserModel.insert({ USER_MINI_OPENID: userId }, PassportService.MUST_PID);
+			await UserModel.insert(
+				this._prepareInsert({ USER_MINI_OPENID: userId }),
+				PassportService.MUST_PID,
+			);
 
 			user = await UserModel.getOne(where, fields, {}, PassportService.MUST_PID);
 
@@ -154,6 +168,39 @@ class PassportService extends BaseService {
 
 		return user;
 
+	}
+
+	/** 当前微信用户已加入的瑜伽馆（不含全局资料分区） */
+	async getMyTenants(userId) {
+		const users = await UserModel.getAll(
+			{ USER_MINI_OPENID: userId },
+			'_pid',
+			{},
+			100,
+			false,
+		);
+
+		const pids = [];
+		for (let k in users) {
+			const pid = users[k]._pid;
+			if (!pid || pid === PassportService.GLOBAL_PID) continue;
+			if (!pids.includes(pid)) pids.push(pid);
+		}
+
+		if (!pids.length) return { list: [] };
+
+		const tenants = await TenantModel.getAll(
+			{
+				_pid: ['in', pids],
+				TENANT_STATUS: TenantModel.STATUS.OPEN,
+			},
+			'TENANT_ID,TENANT_NAME,TENANT_LOGO,TENANT_DESC,TENANT_THEME_COLOR,TENANT_TEMPLATE,_pid',
+			{ TENANT_ADD_TIME: 'desc' },
+			100,
+			false,
+		);
+
+		return { list: tenants || [] };
 	}
 
 
@@ -198,7 +245,7 @@ class PassportService extends BaseService {
 
 			data.USER_MINI_OPENID = userId;
 
-			await UserModel.insert(data, PassportService.MUST_PID);
+			await UserModel.insert(this._prepareInsert(data), PassportService.MUST_PID);
 
 		} else {
 

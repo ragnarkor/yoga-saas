@@ -103,7 +103,7 @@
    - 启动页：`pages/admin/bind/admin_bind`
    - 启动参数：`code=生成的绑定码`
 4. 绑定成功后进入 **教练版**，可在顶部 **切换馆**（仅显示已绑定的馆）
-5. 开发者工具 `TEST_MODE:true` 时使用固定 openid `test_openid_001`；真机需单独绑定一次
+5. 本地调试可在 `cloud/config/config.js` 设 `TEST_MODE: true`（**仅**开发者工具无 OPENID 时回落 `test_openid_001`）；**给别人体验前务必设 `TEST_MODE: false` 并重新部署 cloud**
 
 **权限说明：**
 

@@ -14,6 +14,20 @@ class TeacherAdminHelper {
     return !!openid;
   }
 
+  _tenantPid(admin) {
+    return (admin && admin._pid) || global.PID || "";
+  }
+
+  async _withTenantPid(pid, fn) {
+    const prevPid = global.PID;
+    global.PID = pid;
+    try {
+      return await fn();
+    } finally {
+      global.PID = prevPid;
+    }
+  }
+
   /** 微信绑定成功后：馆主/教练自动创建/恢复首页展示资料 */
   async ensureTeacherOnBind(admin) {
     if (!admin) return null;
@@ -25,78 +39,92 @@ class TeacherAdminHelper {
     }
     if (!TeacherAdminHelper.isAdminBound(admin)) return null;
 
-    let existing = await TeacherModel.getOne(
-      { TEACHER_ADMIN_ID: admin._id },
-      "*",
-      {},
-      false,
-    );
-
-    if (existing) {
-      await TeacherModel.edit(
-        { _id: existing._id },
-        {
-          TEACHER_NAME: admin.ADMIN_NAME,
-          TEACHER_HOME: 1,
-          TEACHER_STATUS: 1,
-        },
-        false,
-      );
-      return existing._id;
-    }
-
-    let pid = admin._pid || global.PID || "";
+    const pid = this._tenantPid(admin);
     if (!pid) return null;
 
-    let count = await TeacherModel.count({}, false);
-    return await TeacherModel.insert(
-      {
-        _pid: pid,
-        TEACHER_ADMIN_ID: admin._id,
-        TEACHER_NAME: admin.ADMIN_NAME,
-        TEACHER_SPECIALTY: "",
-        TEACHER_DESC: "",
-        TEACHER_PIC: [],
-        TEACHER_HOME: 1,
-        TEACHER_ORDER: count + 1,
-        TEACHER_STATUS: 1,
-      },
-      false,
-    );
+    return await this._withTenantPid(pid, async () => {
+      let existing = await TeacherModel.getOne(
+        { TEACHER_ADMIN_ID: admin._id },
+        "*",
+        {},
+        true,
+      );
+
+      if (existing) {
+        await TeacherModel.edit(
+          { _id: existing._id },
+          {
+            TEACHER_NAME: admin.ADMIN_NAME,
+            TEACHER_HOME: 1,
+            TEACHER_STATUS: 1,
+          },
+          true,
+        );
+        return existing._id;
+      }
+
+      let count = await TeacherModel.count({}, true);
+      return await TeacherModel.insert(
+        {
+          TEACHER_ADMIN_ID: admin._id,
+          TEACHER_NAME: admin.ADMIN_NAME,
+          TEACHER_SPECIALTY: "",
+          TEACHER_DESC: "",
+          TEACHER_PIC: [],
+          TEACHER_HOME: 1,
+          TEACHER_ORDER: count + 1,
+          TEACHER_STATUS: 1,
+        },
+        true,
+      );
+    });
   }
 
   /** 解绑微信：下架首页展示 */
   async hideTeacherOnUnbind(admin) {
     if (!admin || !admin._id) return;
-    let teacher = await TeacherModel.getOne(
-      { TEACHER_ADMIN_ID: admin._id },
-      "_id",
-      {},
-      false,
-    );
-    if (!teacher) return;
-    await TeacherModel.edit(
-      { _id: teacher._id },
-      { TEACHER_HOME: 0, TEACHER_STATUS: 0 },
-      false,
-    );
+    const pid = this._tenantPid(admin);
+    if (!pid) return;
+
+    await this._withTenantPid(pid, async () => {
+      let teacher = await TeacherModel.getOne(
+        { TEACHER_ADMIN_ID: admin._id },
+        "_id",
+        {},
+        true,
+      );
+      if (!teacher) return;
+      await TeacherModel.edit(
+        { _id: teacher._id },
+        { TEACHER_HOME: 0, TEACHER_STATUS: 0 },
+        true,
+      );
+    });
   }
 
   /** 删除空壳 admin 时清理关联 teacher */
   async deleteTeacherByAdmin(admin) {
     if (!admin || !admin._id) return;
-    let teacher = await TeacherModel.getOne(
-      { TEACHER_ADMIN_ID: admin._id },
-      "_id",
-      {},
-      false,
-    );
-    if (!teacher) return;
-    await TeacherModel.del({ _id: teacher._id });
+    const pid = this._tenantPid(admin);
+    if (!pid) return;
+
+    await this._withTenantPid(pid, async () => {
+      let teacher = await TeacherModel.getOne(
+        { TEACHER_ADMIN_ID: admin._id },
+        "_id",
+        {},
+        true,
+      );
+      if (!teacher) return;
+      await TeacherModel.del({ _id: teacher._id }, true);
+    });
   }
 
-  /** 会员端首页：已绑定微信的馆主/教练（自动补齐 teacher 资料） */
+  /** 会员端首页：当前租户已绑定微信的馆主/教练 */
   async listBoundStaffForHome() {
+    const pid = global.PID;
+    if (!pid) return [];
+
     let admins = await AdminModel.getAll(
       {
         ADMIN_STATUS: 1,
@@ -105,7 +133,7 @@ class TeacherAdminHelper {
       "ADMIN_ID,ADMIN_NAME,ADMIN_TYPE,ADMIN_MINI_OPENID,ADMIN_BIND_TIME,_id,_pid",
       { ADMIN_TYPE: "asc", ADMIN_BIND_TIME: "desc" },
       50,
-      false,
+      true,
     );
 
     admins = (admins || []).filter((a) =>
@@ -119,9 +147,15 @@ class TeacherAdminHelper {
         { TEACHER_ADMIN_ID: admin._id },
         "*",
         {},
-        false,
+        true,
       );
-      if (teacher) list.push(teacher);
+      if (
+        teacher &&
+        teacher.TEACHER_HOME === 1 &&
+        teacher.TEACHER_STATUS === 1
+      ) {
+        list.push(teacher);
+      }
     }
     return list;
   }

@@ -13,6 +13,8 @@
     "pages/default/my/edit/my_edit",
     "pages/default/my/join/my_join",
     "pages/default/my/join_detail/my_join_detail",
+    "pages/default/my/card_pack/my_card_pack",
+    "pages/default/my/card_detail/my_card_detail",
     "pages/default/news/index/news_index",
     "pages/default/news/detail/news_detail",
     "pages/default/news/cate1/news_cate1",

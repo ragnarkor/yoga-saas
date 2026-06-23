@@ -24,7 +24,6 @@ Page({
     this._applyTheme();
   },
 
-  /** 优先上一租户主题色，无缓存则用皮肤/默认主题 */
   _applyTheme: function () {
     const color = pageHelper.getThemeColor();
     const pageStyle = themeHelper.getPageMetaStyle(color);

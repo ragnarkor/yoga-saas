@@ -16,11 +16,14 @@
     <van-field
       label="名字"
       required
+      type="nickname"
       input-align="right"
       value="{{formName}}"
-      placeholder="请输入昵称"
+      placeholder="点击使用微信昵称"
       maxlength="30"
       bind:change="bindNameInput"
+      bind:blur="bindNameBlur"
+      bind:nicknamereview="bindNicknameReview"
     />
 
     <van-cell title="用户ID" value="{{userId || '—'}}" />

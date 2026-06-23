@@ -18,6 +18,7 @@ module.exports = {
 
   "passport/phone": "passport_controller@getPhone",
   "passport/my_detail": "passport_controller@getMyDetail",
+  "passport/my_tenants": "passport_controller@getMyTenants",
   "passport/sync_profile": "passport_controller@syncProfile",
   "passport/edit_base": "passport_controller@editBase",
   "passport/join_tenant": "passport_controller@joinTenant",

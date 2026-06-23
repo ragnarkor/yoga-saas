@@ -65,7 +65,27 @@ Page({
   },
 
   bindNameInput(e) {
-    this.setData({ formName: e.detail || '' });
+    const val =
+      typeof e.detail === 'string'
+        ? e.detail
+        : (e.detail && e.detail.value) || '';
+    this.setData({ formName: val });
+  },
+
+  bindNameBlur(e) {
+    const val = ((e.detail && e.detail.value) || this.data.formName || '').trim();
+    if (val) this.setData({ formName: val });
+  },
+
+  bindNicknameReview(e) {
+    const detail = e.detail || {};
+    if (detail.pass && detail.value) {
+      this.setData({ formName: detail.value });
+      return;
+    }
+    if (detail.pass === false) {
+      wx.showToast({ title: '昵称未通过安全检测', icon: 'none' });
+    }
   },
 
   bindGetPhone: async function (e) {

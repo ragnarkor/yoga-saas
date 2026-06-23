@@ -129,12 +129,24 @@ class MemberInviteService extends BaseAdminService {
     let isNew = exists === 0;
 
     if (isNew) {
+      const PassportService = require("../passport_service.js");
       let globalUser = await UserModel.getOne(
-        where,
+        {
+          USER_MINI_OPENID: userId,
+          _pid: PassportService.GLOBAL_PID,
+        },
         "USER_NAME,USER_MOBILE,USER_PIC,USER_CITY,USER_WORK,USER_TRADE",
         {},
         false,
       );
+      if (!globalUser) {
+        globalUser = await UserModel.getOne(
+          where,
+          "USER_NAME,USER_MOBILE,USER_PIC,USER_CITY,USER_WORK,USER_TRADE",
+          {},
+          false,
+        );
+      }
       let data = {
         USER_MINI_OPENID: userId,
         USER_STATUS: UserModel.STATUS.COMM,

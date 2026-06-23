@@ -86,6 +86,7 @@ async function app(event, context) {
 			'tenant/list': 1,
 			'tenant/detail': 1,
 			'passport/my_detail': 1,
+			'passport/my_tenants': 1,
 			'passport/sync_profile': 1,
 			'my/my_join_someday': 1,
 			'my/my_join_list': 1,

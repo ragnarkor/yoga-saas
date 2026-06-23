@@ -18,6 +18,12 @@ class PassportController extends BaseController {
 		return await service.getMyDetail(this._userId);
 	}
 
+	/** 我已加入的瑜伽馆 */
+	async getMyTenants() {
+		let service = new PassportService();
+		return await service.getMyTenants(this._userId);
+	}
+
 	/** 获取手机号码 */
 	async getPhone() {
 
