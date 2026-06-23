@@ -32,7 +32,11 @@
       <text class="arrow">›</text>
     </view>
     <view class="coach-menu-item" bindtap="onAdminLogin">
-      <text>超管密码登录（备用）</text>
+      <text>超管密码登录</text>
+      <text class="arrow">›</text>
+    </view>
+    <view class="coach-menu-item" bindtap="onPlatformAdmin">
+      <text>平台后台</text>
       <text class="arrow">›</text>
     </view>
     <view class="coach-menu-item" bindtap="onLogout">
@@ -43,3 +47,11 @@
 
   <coach-tab-bar active="{{3}}" />
 </view>
+
+<cmpt-admin-login-panel
+  show="{{adminLoginShow}}"
+  mode="{{adminLoginMode}}"
+  redirect="{{adminLoginRedirect}}"
+  bind:close="bindAdminLoginCloseTap"
+  bind:success="bindAdminLoginSuccessTap"
+/>

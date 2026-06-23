@@ -1,25 +1,28 @@
 const AdminBiz = require("../../../../biz/admin_biz.js");
 const pageHelper = require("../../../../helper/page_helper.js");
 const cloudHelper = require("../../../../helper/cloud_helper.js");
+const adminTheme = require("../../../../helper/admin_theme.js");
 
 Page({
-  /**
-   * 页面的初始数据
-   */
-  data: {},
+  data: {
+    adminLoginShow: false,
+  },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: async function (options) {
-    if (!AdminBiz.isAdmin(this)) return;
+    const needLogin = !AdminBiz.getAdminToken();
+    if (needLogin || (options && options.login === "1")) {
+      this.setData({ adminLoginShow: true });
+    }
+    if (needLogin) return;
 
+    wx.setNavigationBarColor({
+      backgroundColor: adminTheme.NAV_BG,
+      frontColor: "#ffffff",
+    });
+    this.setData({ isAdmin: true });
     this._loadDetail();
   },
 
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
   onPullDownRefresh: async function () {
     await this._loadDetail();
     wx.stopPullDownRefresh();
@@ -27,6 +30,8 @@ Page({
 
   _loadDetail: async function () {
     let admin = AdminBiz.getAdminToken();
+    if (!admin) return;
+
     this.setData({
       isLoad: true,
       admin,
@@ -37,62 +42,63 @@ Page({
         title: "bar",
       };
       let res = await cloudHelper.callCloudData("admin/home", {}, opts);
+      if (admin.type === "super") {
+        const tenantRes = await cloudHelper.callCloudData(
+          "tenant/list",
+          {},
+          { hint: false },
+        );
+        res = res || {};
+        res.tenantList = (tenantRes && tenantRes.list) || [];
+      }
       this.setData({
         data: res,
+        currentTenantName: pageHelper.getTenantName() || "",
       });
     } catch (err) {
       console.log(err);
     }
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {},
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {},
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {},
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {},
-
   url: function (e) {
     pageHelper.url(e, this);
   },
 
-  // [AI_START TIMESTAMP=2025-01-25 18:30:00]
-  /** 超级管理员：选择馆 */
-  bindTenantTap: function (e) {
-    let item = e.currentTarget.dataset.item;
-    if (!item || !item._pid) return;
-
-    pageHelper.setTenant(item);
-    pageHelper.showSuccToast("已切换到「" + item.TENANT_NAME + "」", 1500, () => {
-      this._loadDetail();
-    });
+  bindEnterCoachTap: function (e) {
+    let item = e && e.currentTarget ? e.currentTarget.dataset.item : null;
+    if (item && item._pid) {
+      pageHelper.setTenant(item);
+    }
+    if (!pageHelper.getPID()) {
+      wx.showToast({ title: "请先选择瑜伽馆", icon: "none" });
+      return;
+    }
+    wx.reLaunch({ url: "/pages/coach/index/coach_index" });
   },
 
-  /** 超级管理员：切换回馆列表 */
-  bindSwitchTenantTap: function (e) {
-    pageHelper.clearPID();
+  bindAdminLoginCloseTap: function () {
+    this.setData({ adminLoginShow: false });
+    if (!AdminBiz.getAdminToken()) {
+      wx.reLaunch({
+        url: pageHelper.fmtURLByPID("/pages/default/my/index/my_index"),
+      });
+    }
+  },
+
+  bindAdminLoginSuccessTap: function () {
+    this.setData({ adminLoginShow: false, isAdmin: true });
+    wx.setNavigationBarColor({
+      backgroundColor: adminTheme.NAV_BG,
+      frontColor: "#ffffff",
+    });
     this._loadDetail();
   },
-  // [AI_END LINES=15 TIMESTAMP=2025-01-25 18:30:00]
 
   bindExitTap: function (e) {
     let callback = function () {
       AdminBiz.clearAdminToken();
       wx.reLaunch({
-        url: pageHelper.fmtURLByPID("/pages/my/index/my_index"),
+        url: pageHelper.fmtURLByPID("/pages/default/my/index/my_index"),
       });
     };
     pageHelper.showConfirm("您确认退出?", callback);
@@ -105,7 +111,6 @@ Page({
       success: async (res) => {
         switch (res.tapIndex) {
           case 0: {
-            //清除缓存
             await this._clearCache();
             break;
           }

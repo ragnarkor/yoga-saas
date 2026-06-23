@@ -1,0 +1,21 @@
+/* 后台管理设计令牌（page / 组件根节点引用） */
+.admin-theme,
+page {
+  --adminColor: #4a7c8c;
+  --adminColorDark: #3a6572;
+  --adminColorLight: #e8f0f2;
+  --adminPageBg: #f2f5f6;
+  --adminSurface: #ffffff;
+  --adminRedColor: #d9644a;
+  --adminText: #2c3e44;
+  --adminTextSecondary: #6b7c85;
+  --adminBorder: #e4eaec;
+  --adminShadow: 0 8rpx 28rpx rgba(58, 101, 114, 0.08);
+
+  --button-primary-background-color: #4a7c8c;
+  --button-primary-border-color: #4a7c8c;
+  --switch-on-background-color: #4a7c8c;
+  --tabs-default-color: #4a7c8c;
+  --tabs-bottom-bar-color: #4a7c8c;
+  --dialog-confirm-button-text-color: #4a7c8c;
+}

@@ -5,6 +5,7 @@
  */
 
 const BaseBiz = require("./base_biz.js");
+const adminTheme = require("../helper/admin_theme.js");
 const cacheHelper = require("../helper/cache_helper.js");
 const setting = require("../setting/setting.js");
 const constants = require("../biz/constants.js");
@@ -74,8 +75,7 @@ class AdminBiz extends BaseBiz {
   //  登录状态判定
   static isAdmin(that) {
     wx.setNavigationBarColor({
-      //顶部
-      backgroundColor: "#2499f2",
+      backgroundColor: adminTheme.NAV_BG,
       frontColor: "#ffffff",
     });
 
@@ -88,7 +88,7 @@ class AdminBiz extends BaseBiz {
         confirmText: "确定",
         success: (res) => {
           wx.reLaunch({
-            url: "/pages/admin/index/login/admin_login",
+            url: "/pages/admin/index/home/admin_home?login=1",
           });
           return false;
         },

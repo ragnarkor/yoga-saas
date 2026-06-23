@@ -3,7 +3,7 @@
 </view>
 
 <view wx:else class="admin-home-content">
-  <van-tabs active="{{activeTab}}" bind:change="bindTabChange" color="#2499f2">
+  <van-tabs active="{{activeTab}}" bind:change="bindTabChange" color="#4a7c8c">
     <van-tab title="横幅">
       <view class="tip">在「编辑-联系我们」配置电话；横幅数据可通过云函数 admin/home_banner_insert 添加</view>
       <van-cell-group>

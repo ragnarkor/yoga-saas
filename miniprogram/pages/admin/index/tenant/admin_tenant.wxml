@@ -1,20 +1,22 @@
 <!-- [AI_START TIMESTAMP=2025-01-25 19:30:00] -->
-<view class="main-admin bg-admin">
+<view class="main-admin tenant-page">
 
-	<view class="tenant-header">
-		<view class="pic"><van-icon name="manager-o" size="32rpx" color="#8799a3" custom-class="text-admin"  /></view>
-		<view class="hint">请选择您所在的瑜伽馆</view>
+	<view class="tenant-page-head bg-admin">
+		<view class="tenant-header">
+			<view class="pic"><van-icon name="manager-o" size="40rpx" color="#fff" /></view>
+			<view class="hint">??????????</view>
+		</view>
 	</view>
 
 	<view wx:if="{{loading}}" class="loading-box">
-		<van-loading size="48rpx" type="spinner" color="#4a7c8c">加载中...</van-loading>
+		<van-loading size="48rpx" type="spinner" color="#4a7c8c">???...</van-loading>
 	</view>
 
 	<view wx:elif="{{tenantList.length === 0}}" class="empty-box">
-		<view class="empty-icon">📋</view>
-		<view class="empty-text">暂无可用场馆</view>
-		<view class="empty-sub">请联系管理员添加场馆</view>
-		<van-button plain type="primary" size="small" bind:click="bindRefreshTap" custom-class="retry-btn">刷新</van-button>
+		<view class="empty-icon">??</view>
+		<view class="empty-text">??????</view>
+		<view class="empty-sub">??????????</view>
+		<van-button type="primary" size="small" bind:click="bindRefreshTap">??</van-button>
 	</view>
 
 	<view wx:else class="tenant-list">
@@ -27,10 +29,10 @@
 				data-item="{{item}}"
 				bind:click="bindSelectTap"
 				is-link
-				title-style="font-weight: bold; color: #333;"
+				title-style="font-weight: 600; color: #2c3e44;"
 			>
 				<view slot="icon" class="tenant-icon">
-					<van-icon name="home-o" size="32rpx" color="#8799a3" custom-class="text-admin"  />
+					<van-icon name="home-o" size="32rpx" color="#4a7c8c" />
 				</view>
 			</van-cell>
 		</van-cell-group>

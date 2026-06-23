@@ -25,7 +25,7 @@ module.exports = Behavior({
     topShow: false,
     minDate: new Date().getTime(),
     calendarDefaultDate: [],
-    calendarColor: '#2499f2',
+    calendarColor: '#4a7c8c',
     timePickerShow: false,
     timePickerType: 'start',
     timePickerIdx: 0,

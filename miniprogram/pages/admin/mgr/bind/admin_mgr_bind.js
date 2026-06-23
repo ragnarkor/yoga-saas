@@ -25,13 +25,13 @@ Page({
   async _initPage() {
     await AdminWxBiz.ensureSession();
     if (!AdminBiz.getAdminToken()) {
-      wx.redirectTo({ url: '/pages/admin/index/login/admin_login' });
+      wx.redirectTo({ url: '/pages/admin/index/home/admin_home?login=1' });
       return;
     }
     if (!pageHelper.getPID()) {
       wx.showModal({
         title: '提示',
-        content: '请先在后台首页选择要管理的瑜伽馆',
+        content: '请先在教练版顶部切换要管理的瑜伽馆',
         showCancel: false,
         success: () => wx.navigateBack(),
       });

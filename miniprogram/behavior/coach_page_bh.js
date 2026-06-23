@@ -50,6 +50,9 @@ module.exports = Behavior({
       if (!url || !url.includes('/admin/')) {
         return true;
       }
+      if (AdminWxBiz.isSuperSession()) {
+        return true;
+      }
       const ok = await AdminWxBiz.ensureSession();
       if (!ok) {
         wx.showToast({ title: '请先完成微信绑定', icon: 'none' });

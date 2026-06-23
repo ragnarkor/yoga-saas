@@ -1,19 +1,23 @@
 const pageHelper = require('../../../helper/page_helper.js');
 const cloudHelper = require('../../../helper/cloud_helper.js');
 const AdminBiz = require('../../../biz/admin_biz.js');
+const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
 
 Page({
   behaviors: [require('../../../behavior/coach_page_bh.js')],
 
   data: {
     tenantName: '',
+    adminLoginShow: false,
+    adminLoginMode: 'coach',
+    adminLoginRedirect: 'none',
     stats: { todayJoin: 0, newCard: 0, newMember: 0 },
     noticeText: '',
     noticeTime: '',
     inviteShow: false,
     inviteShare: null,
     quickTools: [
-      { name: '超管入口', icon: 'desktop-o', color: '#64b5f6', url: '/pages/admin/index/login/admin_login' },
+      { name: '平台后台', icon: 'desktop-o', color: '#64b5f6', action: 'platformLogin' },
       { name: '邀请会员', icon: 'star-o', color: '#ffb74d', action: 'invite' },
       { name: '签到码', icon: 'qr', color: '#81c784', url: '/pages/admin/meet/scan/admin_meet_scan' },
     ],
@@ -32,6 +36,24 @@ Page({
 
   onLoad() {
     this._applyCoachTheme();
+    this._initCoachAccess();
+  },
+
+  async _initCoachAccess() {
+    if (AdminWxBiz.isSuperSession()) {
+      await AdminWxBiz.prepareCoachEntry();
+      this._loadCoachData();
+      return;
+    }
+    const ok = await AdminWxBiz.ensureSession();
+    if (!ok && !AdminWxBiz.isSuperSession()) {
+      this.setData({
+        adminLoginShow: true,
+        adminLoginMode: 'coach',
+        adminLoginRedirect: 'none',
+      });
+      return;
+    }
     this._loadCoachData();
   },
 
@@ -72,12 +94,35 @@ Page({
       return;
     }
 
+    if (action === 'platformLogin') {
+      if (AdminWxBiz.isSuperSession()) {
+        wx.reLaunch({ url: '/pages/admin/index/home/admin_home' });
+        return;
+      }
+      this.setData({
+        adminLoginShow: true,
+        adminLoginMode: 'platform',
+        adminLoginRedirect: 'admin_home',
+      });
+      return;
+    }
+
     if (!url) {
       wx.showToast({ title: '功能开发中', icon: 'none' });
       return;
     }
     if (!(await this._coachBeforeAdmin(url))) return;
     wx.navigateTo({ url });
+  },
+
+  bindAdminLoginCloseTap() {
+    this.setData({ adminLoginShow: false });
+  },
+
+  async bindAdminLoginSuccessTap() {
+    await AdminWxBiz.prepareCoachEntry();
+    await this._coachOnShow();
+    this._loadCoachData();
   },
 
   bindInviteCloseTap() {

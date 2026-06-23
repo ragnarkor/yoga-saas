@@ -1,7 +1,5 @@
 const AdminBiz = require("../../../biz/admin_biz.js");
 const PassportBiz = require("../../../biz/passport_biz.js");
-const pageHelper = require("../../../helper/page_helper.js");
-const cloudHelper = require("../../../helper/cloud_helper.js");
 
 Component({
   properties: {
@@ -9,12 +7,22 @@ Component({
       type: Boolean,
       value: false,
     },
+    /** platform=平台后台 coach=教练版超管登录 */
+    mode: {
+      type: String,
+      value: "platform",
+    },
+    /** admin_home | coach | none */
+    redirect: {
+      type: String,
+      value: "admin_home",
+    },
   },
 
   data: {
     phone: "",
     pwd: "",
-    tenantName: "",
+    panelTitle: "后台管理登录",
   },
 
   lifetimes: {
@@ -28,8 +36,13 @@ Component({
       this._setTabBarHidden(!!val);
       if (!val) return;
       AdminBiz.clearAdminToken();
-      this.setData({ phone: "", pwd: "" });
-      this._loadTenantInfo();
+      const panelTitle =
+        this.properties.mode === "coach" ? "超管密码登录" : "后台管理登录";
+      this.setData({ phone: "", pwd: "", panelTitle });
+    },
+    mode(val) {
+      const panelTitle = val === "coach" ? "超管密码登录" : "后台管理登录";
+      this.setData({ panelTitle });
     },
   },
 
@@ -45,30 +58,6 @@ Component({
         console.log(err);
       }
     },
-    _loadTenantInfo: async function () {
-      const pid = pageHelper.getPID();
-      if (!pid) {
-        this.setData({ tenantName: pageHelper.getTenantName() || "" });
-        return;
-      }
-
-      try {
-        const res = await cloudHelper.callCloudData(
-          "tenant/detail",
-          { pid },
-          { hint: false },
-        );
-        if (res?.tenant) {
-          pageHelper.setTenant(res.tenant);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-
-      this.setData({
-        tenantName: pageHelper.getTenantName() || "未知场馆",
-      });
-    },
 
     bindFormChange: function (e) {
       const field = e.currentTarget.dataset.field;
@@ -79,27 +68,22 @@ Component({
       this.triggerEvent("close");
     },
 
-    bindSwitchTenantTap: function () {
-      this.triggerEvent("close");
-      wx.navigateTo({
-        url: "/pages/tenant/select/tenant_select?switch=1",
-      });
-    },
-
     bindLoginTap: async function () {
-      const pid = pageHelper.getPID();
-      if (!pid) {
-        wx.showToast({
-          title: "请先选择瑜伽馆",
-          icon: "none",
-        });
+      const data = await PassportBiz.adminLogin(this.data.phone, this.data.pwd, {
+        redirect: this.properties.redirect,
+      });
+      if (!data) return;
+
+      if (this.properties.mode === "coach" && data.type !== "super") {
+        wx.showToast({ title: "教练版请使用微信绑定登录", icon: "none" });
+        AdminBiz.clearAdminToken();
         return;
       }
 
-      const pageCtx = {
-        setData: () => {},
-      };
-      await PassportBiz.adminLogin(this.data.phone, this.data.pwd, pageCtx);
+      if (this.properties.redirect === "none") {
+        this.triggerEvent("success", data);
+        this.triggerEvent("close");
+      }
     },
   },
 });

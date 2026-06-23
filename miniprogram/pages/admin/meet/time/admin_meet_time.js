@@ -6,7 +6,7 @@ Page({
   data: {
     isAdmin: false,
     themeCoach: false,
-    calendarColor: '#2499f2',
+    calendarColor: '#4a7c8c',
   },
 
   onLoad() {

@@ -132,11 +132,9 @@
  					reject(res.result);
  					return;
  				} else if (res.result.code == CODE.ADMIN_ERROR) {
- 					// 后台登录错误
  					wx.reLaunch({
- 						url: '/pages/admin/index/login/admin_login',
+ 						url: '/pages/admin/index/home/admin_home?login=1',
  					});
- 					//reject(res.result);
  					return;
  				} else if (res.result.code != CODE.SUCC) {
  					if (hint) {

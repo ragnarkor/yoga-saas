@@ -1,26 +1,17 @@
-page {
-  --adminColor: #4a7c8c;
-  --adminRedColor: #e76f51;
-  --adminColorLight: #e1ebef;
-}
+@import './admin_theme.wxss';
 
 /* [AI_START TIMESTAMP=2025-01-25 18:00:00] */
 .main-admin {
   width: 100%;
-  padding: 30rpx 20rpx;
+  min-height: 100vh;
+  padding: 0 0 30rpx;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
   box-sizing: border-box;
   margin-bottom: 100rpx;
-  /* VANT 组件 admin 主题色覆盖 */
-  --button-primary-background-color: #4a7c8c;
-  --button-primary-border-color: #4a7c8c;
-  --switch-on-background-color: #4a7c8c;
-  --tabs-default-color: #4a7c8c;
-  --tabs-bottom-bar-color: #4a7c8c;
-  --dialog-confirm-button-text-color: #4a7c8c;
+  background-color: var(--adminPageBg);
   --cell-font-size: 28rpx;
 }
 /* [AI_END LINES=16 TIMESTAMP=2025-01-25 18:00:00] */
@@ -40,7 +31,11 @@ page {
 
 .bg-admin,
 .bg-blue {
-  background-color: var(--adminColor) !important;
+  background: linear-gradient(
+    135deg,
+    var(--adminColor) 0%,
+    var(--adminColorDark) 100%
+  ) !important;
   color: #fff;
 }
 

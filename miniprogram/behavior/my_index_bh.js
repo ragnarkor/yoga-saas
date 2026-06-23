@@ -203,6 +203,12 @@ module.exports = Behavior({
     },
 
     bindSwitchCoachTap: async function () {
+      if (AdminWxBiz.isSuperSession()) {
+        const ok = await AdminWxBiz.prepareCoachEntry();
+        if (!ok) return;
+        wx.navigateTo({ url: "/pages/coach/index/coach_index" });
+        return;
+      }
       const ok = await AdminWxBiz.prepareCoachEntry();
       if (!ok) return;
       wx.navigateTo({
@@ -246,12 +252,7 @@ module.exports = Behavior({
           if (idx == 1) {
             pageHelper.setSkin(skin);
             if (setting.IS_SUB) {
-              PassportBiz.adminLogin("admin", "123456", this);
-            } else if (!pageHelper.getPID()) {
-              wx.showToast({
-                title: "请先选择瑜伽馆",
-                icon: "none",
-              });
+              PassportBiz.adminLogin("admin", "123456", { redirect: "admin_home" });
             } else {
               this.setData({ adminLoginShow: true });
             }

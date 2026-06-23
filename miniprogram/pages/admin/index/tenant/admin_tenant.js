@@ -42,7 +42,7 @@ Page({
 
     setTimeout(() => {
       wx.redirectTo({
-        url: "/pages/admin/index/login/admin_login",
+        url: "/pages/admin/index/home/admin_home?login=1",
       });
     }, 1000);
   },

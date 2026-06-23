@@ -68,4 +68,12 @@
     bind:close="bindInviteCloseTap"
     bind:ready="bindInviteReadyTap"
   />
+
+  <cmpt-admin-login-panel
+    show="{{adminLoginShow}}"
+    mode="{{adminLoginMode}}"
+    redirect="{{adminLoginRedirect}}"
+    bind:close="bindAdminLoginCloseTap"
+    bind:success="bindAdminLoginSuccessTap"
+  />
 </view>

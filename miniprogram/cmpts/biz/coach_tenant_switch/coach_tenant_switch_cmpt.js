@@ -1,4 +1,4 @@
-const pageHelper = require('../../../helper/page_helper.js');
+const AdminBiz = require('../../../biz/admin_biz.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
 const themeHelper = require('../../../helper/theme_helper.js');
 
@@ -90,8 +90,14 @@ Component({
       );
       this.setData({
         tenantList: list,
-        tenantName: current ? current.TENANT_NAME : pageHelper.getTenantName(),
-        roleLabel: current ? current.roleLabel : '',
+        tenantName: current
+          ? current.TENANT_NAME
+          : pageHelper.getTenantName() || '瑜伽馆',
+        roleLabel: current
+          ? current.roleLabel
+          : AdminWxBiz.isSuperSession()
+            ? '超管'
+            : '',
       });
     },
 
@@ -106,7 +112,11 @@ Component({
     bindSwitchTap() {
       const list = this.data.tenantList;
       if (!list.length) {
-        wx.showToast({ title: '暂无已绑定的馆', icon: 'none' });
+        if (AdminWxBiz.isSuperSession()) {
+          wx.showToast({ title: '暂无瑜伽馆', icon: 'none' });
+        } else {
+          wx.showToast({ title: '暂无已绑定的馆', icon: 'none' });
+        }
         return;
       }
       if (list.length === 1) {

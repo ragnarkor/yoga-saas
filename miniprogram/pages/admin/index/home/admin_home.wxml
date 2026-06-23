@@ -1,5 +1,5 @@
 <!-- [AI_START TIMESTAMP=2025-01-25 18:20:00] -->
-<view wx:if="{{!isLoad}}" class="loading-wrap"><van-loading size="40rpx">加载中...</van-loading></view>
+<view wx:if="{{!isLoad && !adminLoginShow}}" class="loading-wrap"><van-loading size="40rpx">加载中...</van-loading></view>
 
 <view class="main-admin" wx:if="{{isLoad && isAdmin}}">
 
@@ -8,60 +8,70 @@
 		<view class="right">
 			<view class="name">
 				<text class="text-xl">{{admin.name}}</text>
-
-				<!-- [AI_START TIMESTAMP=2025-01-25 18:30:00] -->
 				<van-tag wx:if="{{admin.type=='super'}}" type="danger" size="medium" custom-class="margin-left-s">超级管理员</van-tag>
-				<!-- [AI_END LINES=1 TIMESTAMP=2025-01-25 18:30:00] -->
 				<van-tag wx:if="{{admin.type=='owner'}}" type="warning" size="medium" custom-class="margin-left-s">馆长</van-tag>
 				<van-tag wx:if="{{admin.type=='teacher'}}" type="success" size="medium" custom-class="margin-left-s">教师</van-tag>
-
 			</view>
 			<view class="desc text-s">共登录{{admin.cnt}}次，上次{{admin.last}}</view>
 		</view>
 		<view class="exit-admin" bindtap="bindExitTap"><van-icon name="revoke" size="32rpx"  /></view>
 	</view>
 
-
-	<!-- [AI_START TIMESTAMP=2025-01-25 18:30:00] -->
-	<!-- ========== 超级管理员：馆列表 ========== -->
-	<block wx:if="{{data.isSuper}}">
+	<block wx:if="{{admin.type=='super'}}">
 		<view class="bar bg-white solid-bottom margin-top-s">
 			<view class="action">
-				<van-icon name="label-o" size="32rpx"  />选择瑜伽馆管理
+				<van-icon name="cluster-o" size="32rpx"  />平台概览
+			</view>
+		</view>
+		<view class="comm-list grid col-3 margin-bottom-s">
+			<view class="item">{{data.tenantList.length || 0}}<text class="text-black">瑜伽馆</text></view>
+		</view>
+
+		<view class="bar bg-white solid-bottom margin-top-s">
+			<view class="action">
+				<van-icon name="label-o" size="32rpx"  />瑜伽馆列表
 			</view>
 		</view>
 
 		<van-cell-group custom-class="menu-group margin-bottom-xl">
-			<van-cell wx:for="{{data.tenantList}}" wx:key="TENANT_ID"
-				is-link bind:click="bindTenantTap" data-item="{{item}}">
+			<van-cell wx:for="{{data.tenantList}}" wx:key="TENANT_ID">
 				<view slot="title">
-					<van-icon name="home-o" size="32rpx" color="#0081ff" custom-class="text-blue margin-right-s"  />
+					<van-icon name="home-o" size="32rpx" custom-class="text-admin margin-right-s"  />
 					<text class="text-black">{{item.TENANT_NAME}}</text>
 				</view>
+				<van-button slot="right-icon" type="primary" size="mini" data-item="{{item}}" bind:click="bindEnterCoachTap">进入教练版</van-button>
 			</van-cell>
 		</van-cell-group>
 
 		<view wx:if="{{data.tenantList.length == 0}}" class="text-center padding text-grey">暂无瑜伽馆数据</view>
-	</block>
-	<!-- [AI_END LINES=17 TIMESTAMP=2025-01-25 18:30:00] -->
 
-	<!-- ========== 普通管理（馆长/教师/超管选馆后） ========== -->
-	<block wx:if="{{!data.isSuper}}">
-
-		<!-- [AI_START TIMESTAMP=2025-01-25 18:30:00] -->
-		<!-- 超管选馆后显示"切换馆"按钮 -->
-		<view wx:if="{{admin.type=='super'}}" class="padding-lr padding-top">
-			<van-button type="primary" size="small" icon="exchange" bind:click="bindSwitchTenantTap">切换馆</van-button>
+		<view class="bar bg-white solid-bottom margin-top-s">
+			<view class="action">
+				<van-icon name="setting-o" size="32rpx"  />平台管理
+			</view>
 		</view>
-		<!-- [AI_END LINES=4 TIMESTAMP=2025-01-25 18:30:00] -->
+		<van-cell-group custom-class="menu-group margin-bottom-xl">
+			<van-cell is-link link-type="navigateTo" url="/pages/admin/mgr/log/admin_log_list">
+				<view slot="title">
+					<van-icon name="location-o" size="32rpx" color="#a5673f" custom-class="text-brown margin-right-s"  />
+					<text class="text-black">操作日志</text>
+				</view>
+			</van-cell>
+			<van-cell is-link bind:click="bindSettingTap">
+				<view slot="title">
+					<van-icon name="setting-o" size="32rpx" custom-class="text-admin margin-right-s"  />
+					<text class="text-black">设置</text>
+				</view>
+			</van-cell>
+		</van-cell-group>
+	</block>
 
+	<block wx:if="{{admin.type!='super'}}">
 		<view class="comm-list grid col-4">
 			<view class="item" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">{{data.meetCnt||'...'}}<text class="text-black">活动/预约数</text></view>
 			<view class="item" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">{{data.joinCnt||'...'}}<text class="text-black">预约数</text></view>
 			<view class="item" bindtap="url" data-url="/pages/admin/user/list/admin_user_list">{{data.userCnt||'...'}}<text class="text-black">用户</text></view>
-			<!-- [AI_START TIMESTAMP=2025-01-25 18:30:00] -->
-			<view class="item" wx:if="{{admin.type=='owner' || admin.type=='super'}}" bindtap="url" data-url="/pages/admin/news/list/admin_news_list">{{data.newsCnt||'...'}}<text class="text-black">文章数</text></view>
-			<!-- [AI_END LINES=1 TIMESTAMP=2025-01-25 18:30:00] -->
+			<view class="item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/admin/news/list/admin_news_list">{{data.newsCnt||'...'}}<text class="text-black">文章数</text></view>
 		</view>
 
 		<view class="bar bg-white solid-bottom margin-top-s ">
@@ -71,23 +81,18 @@
 		</view>
 
 		<view class="comm-list grid col-3">
-			<view class="item" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list"> <van-icon name="fire-o" size="32rpx" color="#0081ff" custom-class="text-blue"  /> <text class="text-black">活动/预约管理</text>
+			<view class="item" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list"> <van-icon name="fire-o" size="32rpx" custom-class="text-admin"  /> <text class="text-black">活动/预约管理</text>
 			</view>
-			<!-- [AI_START TIMESTAMP=2025-01-25 18:30:00] -->
-			<view class="item" wx:if="{{admin.type=='owner' || admin.type=='super'}}" bindtap="url" data-url="/pages/admin/user/list/admin_user_list"> <van-icon name="user-o" size="32rpx" color="#5b8a72" custom-class="text-green"  /> <text class="text-black">用户管理</text>
+			<view class="item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/admin/user/list/admin_user_list"> <van-icon name="user-o" size="32rpx" color="#5b8a72" custom-class="text-green"  /> <text class="text-black">用户管理</text>
 			</view>
-			<view class="item" wx:if="{{admin.type=='owner' || admin.type=='super'}}" bindtap="url" data-url="/pages/admin/news/list/admin_news_list"> <van-icon name="new-o" size="32rpx" color="#39b54a" custom-class="text-darkgreen"  /> <text class="text-black">内容管理</text>
+			<view class="item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/admin/news/list/admin_news_list"> <van-icon name="new-o" size="32rpx" color="#39b54a" custom-class="text-darkgreen"  /> <text class="text-black">内容管理</text>
 			</view>
-			<!-- [AI_END LINES=4 TIMESTAMP=2025-01-25 18:30:00] -->
 		</view>
 
-
-		<!-- BOTTOM begin -->
-		<!-- [AI_START TIMESTAMP=2025-01-25 12:00:00] -->
-		<van-cell-group custom-class="menu-group" wx:if="{{admin.type=='owner' || admin.type=='super'}}">
+		<van-cell-group custom-class="menu-group" wx:if="{{admin.type=='owner'}}">
 			<van-cell is-link link-type="navigateTo" url="/pages/admin/mgr/bind/admin_mgr_bind">
 				<view slot="title">
-					<van-icon name="link-o" size="32rpx" color="#0081ff" custom-class="text-blue margin-right-s"  />
+					<van-icon name="link-o" size="32rpx" custom-class="text-admin margin-right-s"  />
 					<text class="text-black">微信绑定码管理</text>
 				</view>
 			</van-cell>
@@ -113,10 +118,9 @@
 				</view>
 			</van-cell>
 
-			<!-- [AI_START TIMESTAMP=2025-01-25 12:00:00] -->
 			<van-cell is-link link-type="navigateTo" url="/pages/admin/setup/feature/admin_setup_feature">
 				<view slot="title">
-					<van-icon name="setting-o" size="32rpx" color="#0081ff" custom-class="text-blue margin-right-s"  />
+					<van-icon name="setting-o" size="32rpx" custom-class="text-admin margin-right-s"  />
 					<text class="text-black">功能开关设置</text>
 				</view>
 			</van-cell>
@@ -127,11 +131,10 @@
 					<text class="text-black">首页内容管理</text>
 				</view>
 			</van-cell>
-			<!-- [AI_END LINES=7 TIMESTAMP=2025-01-25 12:00:00] -->
 		</van-cell-group>
 
 		<van-cell-group custom-class="menu-group margin-bottom-xl">
-			<van-cell wx:if="{{admin.type=='owner' || admin.type=='super'}}" is-link link-type="navigateTo" url="/pages/admin/mgr/log/admin_log_list">
+			<van-cell wx:if="{{admin.type=='owner'}}" is-link link-type="navigateTo" url="/pages/admin/mgr/log/admin_log_list">
 				<view slot="title">
 					<van-icon name="location-o" size="32rpx" color="#a5673f" custom-class="text-brown margin-right-s"  />
 					<text class="text-black">管理员操作日志</text>
@@ -140,13 +143,11 @@
 
 			<van-cell is-link bind:click="bindSettingTap">
 				<view slot="title">
-					<van-icon name="setting-o" size="32rpx" color="#999999" custom-class="text-grey margin-right-s"  />
+					<van-icon name="setting-o" size="32rpx" custom-class="text-admin margin-right-s"  />
 					<text class="text-black">设置</text>
 				</view>
 			</van-cell>
 		</van-cell-group>
-
-		<!-- BOTTOM END -->
 	</block>
 
 	<view class="form-submit-wrap">
@@ -156,4 +157,11 @@
 	<view class="foot-bottom"><cmpt-foot /></view>
 
 </view>
-<!-- [AI_END LINES=95 TIMESTAMP=2025-01-25 18:20:00] -->
+
+<cmpt-admin-login-panel
+	show="{{adminLoginShow}}"
+	mode="platform"
+	redirect="admin_home"
+	bind:close="bindAdminLoginCloseTap"
+	bind:success="bindAdminLoginSuccessTap"
+/>

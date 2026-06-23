@@ -53,13 +53,19 @@ class PassportBiz extends BaseBiz {
     }
   }
 
-  static async adminLogin(phone, pwd, that) {
+  /**
+   * @param {object} options
+   * @param {'admin_home'|'coach'|'none'} options.redirect 登录成功后的跳转
+   */
+  static async adminLogin(phone, pwd, options = {}) {
+    const redirect = options.redirect || "admin_home";
+
     if (phone.length < 5 || phone.length > 30) {
       wx.showToast({
         title: "手机号输入错误",
         icon: "none",
       });
-      return;
+      return null;
     }
 
     if (pwd.length < 5 || pwd.length > 30) {
@@ -67,39 +73,34 @@ class PassportBiz extends BaseBiz {
         title: "密码输入错误(5-30位)",
         icon: "none",
       });
-      return;
+      return null;
     }
 
-    let params = {
-      phone,
-      pwd,
-    };
-    let opt = {
-      title: "登录中",
-    };
+    const params = { phone, pwd };
+    const opt = { title: "登录中" };
 
     try {
-      await cloudHelper
-        .callCloudSumbit("admin/login", params, opt)
-        .then((res) => {
-          if (res && res.data && res.data.name) {
-            AdminBiz.adminLogin(res.data);
-            // [AI_START TIMESTAMP=2025-01-25 17:00:00]
-            // 登录成功后保存租户PID，供后续API请求使用
-            if (res.data.type === "super") {
-              pageHelper.clearPID();
-            } else if (res.data.pid) {
-              pageHelper.setPID(res.data.pid);
-            }
-            // [AI_END LINES=5 TIMESTAMP=2025-01-25 17:00:00]
-          }
+      const res = await cloudHelper.callCloudSumbit("admin/login", params, opt);
+      const data = res && res.data;
+      if (!data || !data.name) return null;
 
-          wx.reLaunch({
-            url: "/pages/admin/index/home/admin_home",
-          });
-        });
+      AdminBiz.adminLogin(data);
+      if (data.type === "super") {
+        pageHelper.clearPID();
+      } else if (data.pid) {
+        pageHelper.setPID(data.pid);
+      }
+
+      if (redirect === "admin_home") {
+        wx.reLaunch({ url: "/pages/admin/index/home/admin_home" });
+      } else if (redirect === "coach") {
+        wx.reLaunch({ url: "/pages/coach/index/coach_index" });
+      }
+
+      return data;
     } catch (e) {
       console.log(e);
+      return null;
     }
   }
 }

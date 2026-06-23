@@ -1,29 +1,48 @@
-/* [AI_START TIMESTAMP=2025-01-25 19:30:00] */
+@import '../../../../style/project/base/admin.wxss';
+
+.main-admin.tenant-page {
+  min-height: 100vh;
+  background: var(--adminPageBg);
+  padding-bottom: 40rpx;
+}
+
+.tenant-page-head {
+  padding: 48rpx 32rpx 56rpx;
+  color: #fff;
+  box-shadow: var(--adminShadow);
+}
+
 .tenant-header {
   text-align: center;
-  padding: 80rpx 0 50rpx;
+  padding: 16rpx 0 0;
 }
 
 .tenant-header .pic {
-  width: 120rpx;
-  height: 120rpx;
-  line-height: 120rpx;
+  width: 112rpx;
+  height: 112rpx;
   margin: 0 auto 20rpx;
   border-radius: 50%;
-  background: rgba(74, 124, 140, 0.1);
-}
-
-.tenant-header .pic text {
-  font-size: 60rpx;
+  background: rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tenant-header .hint {
   font-size: 32rpx;
-  color: #666;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
 }
 
 .tenant-list {
-  padding: 20rpx 0;
+  padding: 24rpx;
+  margin-top: -28rpx;
+}
+
+.tenant-list .van-cell-group {
+  border-radius: 20rpx !important;
+  overflow: hidden;
+  box-shadow: var(--adminShadow);
 }
 
 .tenant-icon {
@@ -32,13 +51,9 @@
   justify-content: center;
   width: 64rpx;
   height: 64rpx;
-  margin-right: 20rpx;
+  margin-right: 16rpx;
   border-radius: 50%;
-  background: rgba(74, 124, 140, 0.08);
-}
-
-.tenant-icon text {
-  font-size: 36rpx;
+  background: var(--adminColorLight);
 }
 
 .loading-box {
@@ -50,7 +65,11 @@
 
 .empty-box {
   text-align: center;
-  padding: 100rpx 40rpx;
+  padding: 80rpx 40rpx 100rpx;
+  background: var(--adminSurface);
+  margin: 0 24rpx;
+  border-radius: 20rpx;
+  box-shadow: var(--adminShadow);
 }
 
 .empty-icon {
@@ -60,13 +79,16 @@
 
 .empty-text {
   font-size: 32rpx;
-  color: #999;
+  color: var(--adminText);
   margin-bottom: 10rpx;
 }
 
 .empty-sub {
   font-size: 26rpx;
-  color: #ccc;
+  color: var(--adminTextSecondary);
   margin-bottom: 30rpx;
 }
-/* [AI_END LINES=59 TIMESTAMP=2025-01-25 19:30:00] */
+
+.foot-bottom {
+  padding: 24rpx 0 48rpx;
+}

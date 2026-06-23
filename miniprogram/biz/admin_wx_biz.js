@@ -3,8 +3,27 @@ const pageHelper = require('../helper/page_helper.js');
 const AdminBiz = require('./admin_biz.js');
 
 class AdminWxBiz {
-  /** 静默刷新 admin token（openid 已绑定当前馆） */
+  /** 密码登录 token 是否仍有效（超管 / 馆长备用密码） */
+  static hasPasswordSession() {
+    const admin = AdminBiz.getAdminToken();
+    return !!(admin && admin.token);
+  }
+
+  static isSuperSession() {
+    const admin = AdminBiz.getAdminToken();
+    return !!(admin && admin.type === 'super' && admin.token);
+  }
+
+  /** 静默刷新 admin token（微信绑定 或 密码 token） */
   static async ensureSession() {
+    const admin = AdminBiz.getAdminToken();
+    if (admin && admin.token) {
+      if (admin.type === 'super') {
+        return AdminWxBiz._alignSuperTenantPid();
+      }
+      return true;
+    }
+
     const pid = pageHelper.getPID();
     if (!pid) return false;
 
@@ -21,11 +40,43 @@ class AdminWxBiz {
     } catch (e) {
       console.error('[AdminWxBiz.ensureSession]', e);
     }
-    return !!AdminBiz.getAdminToken();
+    return false;
   }
 
-  /** 已绑定微信的管理员可管理的馆列表 */
+  /** 超管：确保已选馆（教练版 API 依赖 PID） */
+  static async _alignSuperTenantPid() {
+    const list = await AdminWxBiz.fetchTenantList();
+    if (!list.length) return false;
+
+    const pid = pageHelper.getPID();
+    if (pid && list.some((t) => t._pid === pid)) return true;
+
+    pageHelper.setTenant(list[0]);
+    return true;
+  }
+
+  /** 可管理的馆列表（超管=全部馆，其他=微信绑定馆） */
   static async fetchTenantList() {
+    if (AdminWxBiz.isSuperSession()) {
+      try {
+        const res = await cloudHelper.callCloudData(
+          'tenant/list',
+          {},
+          { hint: false, title: 'bar' },
+        );
+        const admin = AdminBiz.getAdminToken();
+        return ((res && res.list) || []).map((t) => ({
+          ...t,
+          adminType: 'super',
+          adminName: admin ? admin.name : '',
+          roleLabel: '超管',
+        }));
+      } catch (e) {
+        console.error('[AdminWxBiz.fetchTenantList super]', e);
+        return [];
+      }
+    }
+
     try {
       const res = await cloudHelper.callCloudData(
         'admin/wx_tenant_list',
@@ -39,8 +90,20 @@ class AdminWxBiz {
     }
   }
 
-  /** 进入教练版前：校验绑定馆、对齐 PID、静默登录 */
+  /** 进入教练版前：微信绑定 或 超管密码 token */
   static async prepareCoachEntry() {
+    if (AdminWxBiz.isSuperSession()) {
+      const ok = await AdminWxBiz._alignSuperTenantPid();
+      if (!ok) {
+        wx.showModal({
+          title: '暂无瑜伽馆',
+          content: '请先在平台后台创建瑜伽馆',
+          showCancel: false,
+        });
+      }
+      return ok;
+    }
+
     const list = await AdminWxBiz.fetchTenantList();
     if (!list.length) {
       wx.showModal({
@@ -57,7 +120,6 @@ class AdminWxBiz {
     if (!matched) {
       matched = list[0];
       pageHelper.setTenant(matched);
-      pid = matched._pid;
     }
 
     const ok = await AdminWxBiz.ensureSession();
@@ -72,7 +134,9 @@ class AdminWxBiz {
   static async switchTenant(item) {
     if (!item || !item._pid) return;
     pageHelper.setTenant(item);
-    await AdminWxBiz.ensureSession();
+    if (!AdminWxBiz.isSuperSession()) {
+      await AdminWxBiz.ensureSession();
+    }
     wx.showToast({
       title: '已选择「' + item.TENANT_NAME + '」',
       icon: 'none',
