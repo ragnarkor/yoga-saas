@@ -11,6 +11,7 @@ const timeUtil = require("../../framework/utils/time_util.js");
 const CacheModel = require("../model/cache_model.js");
 const TenantModel = require("../model/tenant_model.js");
 const UserModel = require("../model/user_model.js");
+const PassportService = require("./passport_service.js");
 const config = require("../../config/config.js");
 
 const INVITE_PREFIX = "member_invite_";
@@ -112,77 +113,90 @@ class MemberInviteService extends BaseAdminService {
     };
   }
 
-  /** 用户扫码/点击邀请链接，加入瑜伽馆 */
-  async joinTenant(userId, code) {
-    let pid = await this.resolveInviteCode(code);
-    if (!pid) this.AppError("邀请链接无效或已过期");
-
+  /** 写入/更新当前馆会员记录（invite 与选馆共用） */
+  async _ensureTenantMember(userId, pid) {
     let tenant = await TenantModel.getOne({ _pid: pid }, "*", {}, false);
     if (!tenant || tenant.TENANT_STATUS !== TenantModel.STATUS.OPEN) {
       this.AppError("该瑜伽馆暂未开放");
     }
 
+    const prevPid = global.PID;
     global.PID = pid;
+    try {
+      let where = { USER_MINI_OPENID: userId };
+      let exists = await UserModel.count(where, true);
+      let isNew = exists === 0;
 
-    let where = { USER_MINI_OPENID: userId };
-    let exists = await UserModel.count(where, true);
-    let isNew = exists === 0;
-
-    if (isNew) {
-      const PassportService = require("../passport_service.js");
-      let globalUser = await UserModel.getOne(
-        {
-          USER_MINI_OPENID: userId,
-          _pid: PassportService.GLOBAL_PID,
-        },
-        "USER_NAME,USER_MOBILE,USER_PIC,USER_CITY,USER_WORK,USER_TRADE",
-        {},
-        false,
-      );
-      if (!globalUser) {
-        globalUser = await UserModel.getOne(
-          where,
+      if (isNew) {
+        let globalUser = await UserModel.getOne(
+          {
+            USER_MINI_OPENID: userId,
+            _pid: PassportService.GLOBAL_PID,
+          },
           "USER_NAME,USER_MOBILE,USER_PIC,USER_CITY,USER_WORK,USER_TRADE",
           {},
           false,
         );
-      }
-      let data = {
-        USER_MINI_OPENID: userId,
-        USER_STATUS: UserModel.STATUS.COMM,
-        USER_LOGIN_TIME: timeUtil.time(),
-        USER_LOGIN_CNT: 1,
-      };
-      if (globalUser) {
-        if (globalUser.USER_NAME) data.USER_NAME = globalUser.USER_NAME;
-        if (globalUser.USER_MOBILE) data.USER_MOBILE = globalUser.USER_MOBILE;
-        if (globalUser.USER_PIC) data.USER_PIC = globalUser.USER_PIC;
-        if (globalUser.USER_CITY) data.USER_CITY = globalUser.USER_CITY;
-        if (globalUser.USER_WORK) data.USER_WORK = globalUser.USER_WORK;
-        if (globalUser.USER_TRADE) data.USER_TRADE = globalUser.USER_TRADE;
-      }
-      await UserModel.insert(data, true);
-    } else {
-      let user = await UserModel.getOne(where, "USER_LOGIN_CNT", {}, true);
-      await UserModel.edit(
-        where,
-        {
+        if (!globalUser) {
+          globalUser = await UserModel.getOne(
+            where,
+            "USER_NAME,USER_MOBILE,USER_PIC,USER_CITY,USER_WORK,USER_TRADE",
+            {},
+            false,
+          );
+        }
+        let data = {
+          USER_MINI_OPENID: userId,
+          USER_STATUS: UserModel.STATUS.COMM,
           USER_LOGIN_TIME: timeUtil.time(),
-          USER_LOGIN_CNT: (user?.USER_LOGIN_CNT || 0) + 1,
-        },
-        true,
-      );
-    }
+          USER_LOGIN_CNT: 1,
+        };
+        if (globalUser) {
+          if (globalUser.USER_NAME) data.USER_NAME = globalUser.USER_NAME;
+          if (globalUser.USER_MOBILE) data.USER_MOBILE = globalUser.USER_MOBILE;
+          if (globalUser.USER_PIC) data.USER_PIC = globalUser.USER_PIC;
+          if (globalUser.USER_CITY) data.USER_CITY = globalUser.USER_CITY;
+          if (globalUser.USER_WORK) data.USER_WORK = globalUser.USER_WORK;
+          if (globalUser.USER_TRADE) data.USER_TRADE = globalUser.USER_TRADE;
+        }
+        await UserModel.insert(data, true);
+      } else {
+        let user = await UserModel.getOne(where, "USER_LOGIN_CNT", {}, true);
+        await UserModel.edit(
+          where,
+          {
+            USER_LOGIN_TIME: timeUtil.time(),
+            USER_LOGIN_CNT: ((user && user.USER_LOGIN_CNT) || 0) + 1,
+          },
+          true,
+        );
+      }
 
-    return {
-      isNew,
-      tenant: {
-        _pid: tenant._pid,
-        TENANT_NAME: tenant.TENANT_NAME,
-        TENANT_LOGO: tenant.TENANT_LOGO,
-        TENANT_TEMPLATE: tenant.TENANT_TEMPLATE || "default",
-      },
-    };
+      return {
+        isNew,
+        tenant: {
+          _pid: tenant._pid,
+          TENANT_NAME: tenant.TENANT_NAME,
+          TENANT_LOGO: tenant.TENANT_LOGO,
+          TENANT_TEMPLATE: tenant.TENANT_TEMPLATE || "default",
+        },
+      };
+    } finally {
+      global.PID = prevPid;
+    }
+  }
+
+  /** 用户扫码/点击邀请链接，加入瑜伽馆 */
+  async joinTenant(userId, code) {
+    let pid = await this.resolveInviteCode(code);
+    if (!pid) this.AppError("邀请链接无效或已过期");
+    return await this._ensureTenantMember(userId, pid);
+  }
+
+  /** 选馆页加入瑜伽馆（无需邀请码） */
+  async ensureMemberByPid(userId, pid) {
+    if (!pid) this.AppError("请选择瑜伽馆");
+    return await this._ensureTenantMember(userId, pid);
   }
 }
 

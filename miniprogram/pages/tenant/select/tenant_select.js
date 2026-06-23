@@ -48,11 +48,21 @@ Page({
     }
   },
 
-  bindSelectTap: function (e) {
+  bindSelectTap: async function (e) {
     let item = e.currentTarget.dataset.item;
     if (!item || !item._pid) return;
 
     pageHelper.setTenant(item);
+
+    try {
+      await cloudHelper.callCloudSumbit(
+        "passport/ensure_member",
+        {},
+        { hint: false },
+      );
+    } catch (err) {
+      console.error("[tenant/ensure_member]", err);
+    }
 
     wx.showToast({
       title: "已选择「" + item.TENANT_NAME + "」",

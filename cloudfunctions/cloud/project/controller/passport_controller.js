@@ -99,6 +99,19 @@ class PassportController extends BaseController {
 		return await service.joinTenant(this._userId, input.code);
 	}
 
+	/** 选馆后加入当前瑜伽馆（写入馆会员） */
+	async ensureMember() {
+		let pid = global.PID;
+		if (!pid) {
+			let rules = { pid: 'must|string|name=租户ID' };
+			let input = this.validateData(rules);
+			pid = input.pid;
+		}
+		const MemberInviteService = require('../service/member_invite_service.js');
+		let service = new MemberInviteService();
+		return await service.ensureMemberByPid(this._userId, pid);
+	}
+
 }
 
 module.exports = PassportController;

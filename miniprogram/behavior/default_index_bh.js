@@ -115,6 +115,16 @@ module.exports = Behavior({
       }
 
       try {
+        await cloudHelper.callCloudSumbit(
+          "passport/ensure_member",
+          {},
+          { hint: false },
+        );
+      } catch (err) {
+        console.warn("[home/ensure_member]", err);
+      }
+
+      try {
         let data = await cloudHelper.callCloudData(
           "home/index",
           {},

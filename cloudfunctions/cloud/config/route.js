@@ -22,6 +22,7 @@ module.exports = {
   "passport/sync_profile": "passport_controller@syncProfile",
   "passport/edit_base": "passport_controller@editBase",
   "passport/join_tenant": "passport_controller@joinTenant",
+  "passport/ensure_member": "passport_controller@ensureMember",
 
   "news/list": "news_controller@getNewsList",
   "news/home_list": "news_controller@getHomeNewsList",
