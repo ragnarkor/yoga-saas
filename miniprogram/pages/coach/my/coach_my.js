@@ -56,7 +56,7 @@ Page({
     let menus = BASE_MENUS.slice();
     if (admin && (admin.type === "owner" || admin.type === "teacher")) {
       menus.splice(1, 0, {
-        name: "主页资料",
+        name: "我的主页",
         url: "/pages/coach/profile/coach_profile",
       });
     }

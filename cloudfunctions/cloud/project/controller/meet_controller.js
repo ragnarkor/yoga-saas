@@ -6,6 +6,7 @@
 
 const BaseController = require('./base_controller.js');
 const MeetService = require('../service/meet_service.js');
+const UserCardService = require('../service/user_card_service.js');
 const timeUtil = require('../../framework/utils/time_util.js');
 const JoinModel = require('../model/join_model.js');
 const MeetModel = require('../model/meet_model.js');
@@ -59,6 +60,31 @@ class MeetController extends BaseController {
 			return list;
 		}
 
+	}
+
+	/** 按周获取预约项目 */
+	async getMeetListByWeek() {
+		let rules = {
+			startDay: 'must|date|name=开始日期',
+			endDay: 'must|date|name=结束日期',
+		};
+		let input = this.validateData(rules);
+		let cacheKey =
+			CACHE_CALENDAR_INDEX +
+			'_week_' +
+			globalThis.PID +
+			'_' +
+			input.startDay +
+			'_' +
+			input.endDay;
+		let list = await cacheUtil.get(cacheKey);
+		if (list) {
+			return list;
+		}
+		let service = new MeetService();
+		list = await service.getMeetListByWeek(input.startDay, input.endDay);
+		cacheUtil.set(cacheKey, list, config.CACHE_CALENDAR_TIME);
+		return list;
 	}
 
 	/** 获取从某天开始可预约的日期 */
@@ -318,6 +344,28 @@ class MeetController extends BaseController {
 		return meet;
 	}
 
+	/** 某时段已预约会员列表 */
+	async getJoinRoster() {
+		let rules = {
+			meetId: 'must|id',
+			timeMark: 'must|string',
+		};
+		let input = this.validateData(rules);
+		let service = new MeetService();
+		return await service.getJoinRoster(input.meetId, input.timeMark);
+	}
+
+	/** 预约可选会员卡 */
+	async getJoinCardOptions() {
+		await FeatureGate.check('booking');
+		let rules = {
+			meetId: 'must|id',
+		};
+		let input = this.validateData(rules);
+		let service = new UserCardService();
+		return await service.getJoinCardOptions(this._userId, input.meetId);
+	}
+
 	/** 预约前检测 */
 	async beforeJoin() {
 		await FeatureGate.check('booking');
@@ -342,14 +390,14 @@ class MeetController extends BaseController {
 			meetId: 'must|id',
 			timeMark: 'must|string',
 			forms: 'must|array',
+			cardId: 'must|id',
 		};
 
 		// 取得数据
 		let input = this.validateData(rules);
 
 		let service = new MeetService();
-		let admin = null;
-		return await service.join(this._userId, input.meetId, input.timeMark, input.forms);
+		return await service.join(this._userId, input.meetId, input.timeMark, input.forms, input.cardId);
 	}
 
 

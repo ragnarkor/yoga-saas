@@ -12,8 +12,6 @@
   </view>
 
   <block wx:else>
-    <view wx:if="{{isEdit}}" class="schedule-edit-tip">编辑已有排课，修改后保存；不需要可在底部删除。</view>
-    <view wx:else class="schedule-edit-tip">日期可多选，一次为多个日期排同一时段。</view>
 
     <van-cell-group title="排课信息" custom-class="schedule-edit-group">
       <view class="schedule-course-field" bindtap="bindCourseTap">

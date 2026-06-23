@@ -1,72 +1,74 @@
-<!-- [AI_START TIMESTAMP=2025-01-25 14:45:00] -->
+<!-- [AI_START TIMESTAMP=2025-01-25 15:00:00] -->
 <template name="myJoinDetailTpl">
 	<!-- 加载中 -->
-	<view wx:if="{{isLoad===false}}" class="loading-wrap">
-		<van-loading size="48rpx" color="#5b8a72" type="spinner" />
+	<view wx:if="{{isLoad===false}}" class="jd-loading">
+		<van-loading size="48rpx" color="#6fae96" type="spinner" />
 	</view>
+
 	<!-- 不存在 -->
 	<van-empty wx:if="{{isLoad===null}}" description="数据不存在" />
 
 	<block wx:if="{{isLoad}}">
-		<view class="main padding-project">
-			<view class="text-pic-list-box margin-top-xs">
-				<view class="item card-project shadow-project">
-					<view class="title-line" bindtap="url" data-url="../../meet/detail/meet_detail?id={{join.JOIN_MEET_ID}}">
-						<view class="title content-cut-two">{{join.JOIN_MEET_TITLE}} </view>
-						<view class="arrow"><van-icon name="arrow" size="32rpx"  /></view>
-					</view>
+		<!-- 状态横幅 -->
+		<view class="jd-status-bar jd-status--success" wx:if="{{join.JOIN_STATUS==1}}">
+			<van-icon name="passed" size="36rpx" color="#fff" />
+			<text class="jd-status-text">预约成功{{join.JOIN_IS_CHECKIN==1?' · 已签到':''}}</text>
+		</view>
+		<view class="jd-status-bar jd-status--pending" wx:if="{{join.JOIN_STATUS==0}}">
+			<van-icon name="clock-o" size="36rpx" color="#fff" />
+			<text class="jd-status-text">待确认</text>
+		</view>
+		<view class="jd-status-bar jd-status--cancel" wx:if="{{join.JOIN_STATUS==10}}">
+			<van-icon name="close" size="36rpx" color="#fff" />
+			<text class="jd-status-text">已取消</text>
+		</view>
+		<view class="jd-status-bar jd-status--system" wx:if="{{join.JOIN_STATUS==99}}">
+			<van-icon name="warning-o" size="36rpx" color="#fff" />
+			<text class="jd-status-text">系统取消</text>
+		</view>
 
-					<view class="author">
-						<van-icon name="bell" size="26rpx" custom-class="margin-right-xs text-s"  /><text class="text-cut">{{join.JOIN_MEET_DAY}} {{join.JOIN_MEET_TIME_START}}～{{join.JOIN_MEET_TIME_END}}</text>
-					</view>
-					<view class="data">
-						<text wx:if="{{join.JOIN_STATUS==1}}" class="text-green"><van-icon name="passed" size="32rpx" custom-class="margin-right-xxs"  />预约成功{{join.JOIN_IS_CHECKIN==1?'，已签到':''}}</text>
-
-						<van-button wx:if="{{(join.JOIN_STATUS==1||join.JOIN_STATUS==0) && join.JOIN_IS_CHECKIN==0}}" size="small" plain type="danger" bindtap="bindCancelTap" custom-class="margin-left-s">取消预约</van-button>
-
-						<text wx:if="{{join.JOIN_STATUS==10}}" class="text-grey"><van-icon name="close" size="32rpx" custom-class="margin-right-xxs"  />已取消</text>
-
-						<block wx:if="{{join.JOIN_STATUS==99}}">
-							<text class="text-orange"><van-icon name="close" size="32rpx" custom-class="margin-right-xxs"  />系统取消<text class="text-grey" wx:if="{{join.JOIN_REASON}}">：{{join.JOIN_REASON}}</text></text>
-						</block>
-					</view>
-
-					<view class="oprt" wx:if="{{join.JOIN_STATUS==0 || join.JOIN_STATUS==1}}">
-						<van-button wx:if="{{isShowHome}}" size="small" bindtap="url" data-url="../../my/index/my_index" data-type="relaunch" custom-class="margin-right-s">返回首页</van-button>
-						<van-button size="small" type="primary" bindtap="bindCalendarTap">加入手机日程</van-button>
-					</view>
-
+		<view class="jd-page">
+			<!-- 课程信息卡 -->
+			<view class="jd-card jd-course">
+				<!-- 课程标题 -->
+				<view class="jd-course-title" bindtap="url" data-url="../../meet/detail/meet_detail?id={{join.JOIN_MEET_ID}}">
+					<text class="jd-course-name">{{join.JOIN_MEET_TITLE}}</text>
+					<van-icon name="arrow" size="28rpx" color="#c0c4cc" />
 				</view>
 
-			</view>
+				<!-- 时间 -->
+				<view class="jd-course-time">
+					<van-icon name="clock-o" size="28rpx" color="#999" />
+					<text>{{join.JOIN_MEET_DAY}} {{join.JOIN_MEET_TIME_START}}～{{join.JOIN_MEET_TIME_END}}</text>
+				</view>
 
-			<view class="info-list-box" wx:if="{{join.JOIN_STATUS==1}}">
-				<view class="item card-project shadow-project">
-					<view class="info">
-						<view class="center"><text class="text-bold margin-right-s">预约码</text> (向工作人员出示进行核销)</view>
-					</view>
-					<view class="info">
-						<view class="center">
-							<image show-menu-by-longpress="{{true}}" src="{{qrImageData}}" class="loading" />
-						</view>
-					</view>
+				<!-- 系统取消原因 -->
+				<view class="jd-course-reason" wx:if="{{join.JOIN_STATUS==99 && join.JOIN_REASON}}">
+					取消原因：{{join.JOIN_REASON}}
 				</view>
 			</view>
 
-			<view class="info-list-box margin-bottom-xxl">
-				<view class="item card-project shadow-project">
-					<view class="info margin-bottom-s">
-						<view class="center text-bold">预约信息</view>
-					</view>
-					<view class="info" wx:for="{{join.JOIN_FORMS}}" wx:key="key">
-						<view class="title">{{item.title}}：</view>
-						<view class="content">{{item.val}}</view>
-					</view>
-
-					<view class="info text-grey margin-top-xs text-s">提交时间：{{join.JOIN_ADD_TIME}}</view>
+			<!-- 预约码 -->
+			<view class="jd-card jd-qr-card" wx:if="{{join.JOIN_STATUS==1}}">
+				<view class="jd-qr-header">
+					<text class="jd-qr-title">预约码</text>
+					<text class="jd-qr-hint">向工作人员出示进行核销</text>
 				</view>
+				<view class="jd-qr-body">
+					<image show-menu-by-longpress="{{true}}" src="{{qrImageData}}" class="jd-qr-img loading" />
+				</view>
+			</view>
+
+			<!-- 操作按钮 -->
+			<view class="jd-actions" wx:if="{{join.JOIN_STATUS==0 || join.JOIN_STATUS==1}}">
+				<view class="jd-btn jd-btn--ghost" wx:if="{{join.JOIN_IS_CHECKIN==0}}" bindtap="bindCancelTap">取消预约</view>
+				<view class="jd-btn jd-btn--ghost" wx:if="{{isShowHome}}" bindtap="url" data-url="../../my/index/my_index" data-type="relaunch">返回首页</view>
+				<view class="jd-btn jd-btn--primary" bindtap="bindCalendarTap">加入手机日程</view>
+			</view>
+			<view class="jd-actions" wx:elif="{{isShowHome}}">
+				<view class="jd-btn jd-btn--primary" bindtap="url" data-url="../../my/index/my_index" data-type="relaunch">返回首页</view>
 			</view>
 		</view>
 	</block>
 </template>
-<!-- [AI_END LINES=66 TIMESTAMP=2025-01-25 14:45:00] -->
+<!-- [AI_END LINES=66 TIMESTAMP=2025-01-25 15:00:00] -->

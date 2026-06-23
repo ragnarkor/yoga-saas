@@ -38,9 +38,23 @@
 				<text class="md-info-label">上课地点</text>
 				<text class="md-info-value">{{locationText}}</text>
 			</view>
-			<view class="md-info-item">
+			<view class="md-info-item md-info-item--coach">
 				<text class="md-info-label">授课老师</text>
-				<text class="md-info-value">{{coachName}}</text>
+				<view class="md-coach-row">
+					<image class="md-coach-avatar" src="{{coachAvatar}}" mode="aspectFill" />
+					<text class="md-info-value">{{coachName}}</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 已预约会员 -->
+		<view class="md-roster card-project shadow-project" wx:if="{{joinRosterTotal > 0}}">
+			<view class="md-section-title">已预约 {{joinRosterTotal}} 人</view>
+			<view class="md-roster-list">
+				<view class="md-roster-item" wx:for="{{joinRoster}}" wx:key="userId">
+					<image class="md-roster-avatar" src="{{item.avatarSrc}}" mode="aspectFill" />
+					<text class="md-roster-name">{{item.name}}</text>
+				</view>
 			</view>
 		</view>
 
@@ -104,6 +118,12 @@
 
 		<view class="md-bottom-spacer"></view>
 
+		<!-- 会员卡提示 -->
+		<view wx:if="{{cardHint}}" class="md-card-hint">
+			<van-icon name="info-o" size="28rpx" color="#969799" />
+			<text>{{cardHint}}</text>
+		</view>
+
 		<!-- 底部预约 -->
 		<view class="md-footer">
 			<button
@@ -114,4 +134,41 @@
 			</button>
 		</view>
 	</view>
+
+	<van-popup
+		show="{{cardSheetShow}}"
+		position="bottom"
+		round
+		bind:close="bindCloseCardSheet"
+		custom-class="md-card-popup"
+	>
+		<view class="md-card-sheet">
+			<view class="md-card-sheet-head">
+				<text class="md-card-sheet-title">选择划扣会员卡</text>
+				<text class="md-card-sheet-sub">本次预约需扣 {{cardNeedTimes}} 次</text>
+			</view>
+			<view wx:if="{{cardPickLoading}}" class="md-card-sheet-loading">
+				<van-loading size="40rpx" color="{{themeColor}}">加载中...</van-loading>
+			</view>
+			<scroll-view wx:else scroll-y class="md-card-sheet-scroll" enhanced show-scrollbar="{{false}}">
+				<view
+					class="md-card-option"
+					wx:for="{{joinCardOptions}}"
+					wx:key="id"
+					bindtap="bindCardPick"
+					data-id="{{item.id}}"
+				>
+					<view class="md-card-option-visual" style="background: {{item.color}};">
+						<text class="md-card-option-type">{{item.typeLabel}}</text>
+					</view>
+					<view class="md-card-option-body">
+						<text class="md-card-option-name">{{item.name}}</text>
+						<text class="md-card-option-balance">{{item.balanceText}}</text>
+						<text class="md-card-option-hint">{{item.deductHint}}</text>
+					</view>
+					<van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+				</view>
+			</scroll-view>
+		</view>
+	</van-popup>
 </template>

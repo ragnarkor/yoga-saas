@@ -28,8 +28,11 @@ module.exports = {
 
   "meet/list": "meet_controller@getMeetList",
   "meet/list_by_day": "meet_controller@getMeetListByDay",
+  "meet/list_by_week": "meet_controller@getMeetListByWeek",
   "meet/list_has_day": "meet_controller@getHasDaysFromDay",
   "meet/view": "meet_controller@viewMeet",
+  "meet/join_roster": "meet_controller@getJoinRoster",
+  "meet/join_card_options": "meet_controller@getJoinCardOptions",
   "meet/detail_for_join": "meet_controller@detailForJoin",
   "meet/before_join": "meet_controller@beforeJoin",
   "meet/join": "meet_controller@join",
@@ -39,6 +42,9 @@ module.exports = {
   "my/my_join_detail": "meet_controller@getMyJoinDetail",
   "my/my_join_someday": "meet_controller@getMyJoinSomeday",
   "my/my_join_checkin": "meet_controller@userSelfCheckin",
+  "my/my_card_list": "card_controller@getMyCardList",
+  "my/my_card_summary": "card_controller@getMyCardSummary",
+  "my/my_card_detail": "card_controller@getMyCardDetail",
 
   "test/test": "test/test_controller@test",
   "test/seed": "test/test_controller@seed",

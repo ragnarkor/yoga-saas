@@ -6,6 +6,7 @@
 
 const BaseAdminService = require("./base_admin_service.js");
 const MeetService = require("../meet_service.js");
+const UserCardService = require("../user_card_service.js");
 const dataUtil = require("../../../framework/utils/data_util.js");
 const timeUtil = require("../../../framework/utils/time_util.js");
 const util = require("../../../framework/utils/util.js");
@@ -207,6 +208,7 @@ class AdminMeetService extends BaseAdminService {
       JOIN_MEET_TIME_MARK: timeMark,
       JOIN_STATUS: JoinModel.STATUS.SUCC,
     };
+    let joins = await JoinModel.getAll(where, "_id", {}, 500);
     let data = {
       JOIN_STATUS: JoinModel.STATUS.ADMIN_CANCEL,
       JOIN_REASON: reason || "",
@@ -217,6 +219,11 @@ class AdminMeetService extends BaseAdminService {
       JOIN_EDIT_ADMIN_STATUS: JoinModel.STATUS.ADMIN_CANCEL,
     };
     await JoinModel.edit(where, data);
+
+    let cardService = new UserCardService();
+    for (let k in joins || []) {
+      await cardService.refundForJoinCancel(joins[k]._id);
+    }
 
     let meetService = new MeetService();
     await meetService.statJoinCnt(meetId, timeMark);
@@ -589,6 +596,14 @@ class AdminMeetService extends BaseAdminService {
 
     await JoinModel.edit({ _id: joinId }, data);
 
+    if (
+      join.JOIN_STATUS === JoinModel.STATUS.SUCC &&
+      (status == 10 || status == 99)
+    ) {
+      let cardService = new UserCardService();
+      await cardService.refundForJoinCancel(joinId);
+    }
+
     let meetService = new MeetService();
     await meetService.statJoinCnt(join.JOIN_MEET_ID, join.JOIN_MEET_TIME_MARK);
     return await this._getTimeStat(join.JOIN_MEET_ID, join.JOIN_MEET_TIME_MARK);
@@ -625,7 +640,7 @@ class AdminMeetService extends BaseAdminService {
   }
 
   /** 教练端周课表 */
-  async getScheduleWeek({ startDay, endDay, typeId }, adminId, adminType) {
+  async getScheduleWeek({ startDay, endDay, typeId, includeInactive }, adminId, adminType) {
     let meetWhere = { MEET_STATUS: MeetModel.STATUS.COMM };
     if (adminType === AdminModel.TYPE.TEACHER) {
       meetWhere.MEET_ADMIN_ID = adminId;
@@ -665,8 +680,8 @@ class AdminMeetService extends BaseAdminService {
       let times = dayRecords[k].times || [];
       for (let j in times) {
         let t = times[j];
-        if (t.status != 1) continue;
-        timeSet.add(t.start);
+        if (t.status != 1 && !includeInactive) continue;
+        if (t.status == 1) timeSet.add(t.start);
         slots.push({
           day: dayRecords[k].day,
           start: t.start,
@@ -685,6 +700,10 @@ class AdminMeetService extends BaseAdminService {
           ),
           duration: style.duration || 60,
           difficulty: Number(style.difficulty || style.level || 3),
+          stat: t.stat || { succCnt: 0, cancelCnt: 0, adminCancelCnt: 0 },
+          limit: t.limit || 0,
+          isLimit: !!t.isLimit,
+          slotStatus: t.status,
         });
       }
     }

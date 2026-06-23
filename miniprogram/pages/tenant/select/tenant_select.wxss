@@ -11,6 +11,11 @@
   padding: 30rpx 20rpx;
 }
 
+.header-title {
+  color: var(--themeColor, #5b8a72);
+  font-weight: 600;
+}
+
 .empty-tip {
   text-align: center;
   padding: 120rpx 0;
@@ -34,7 +39,7 @@
   width: 100rpx;
   height: 100rpx;
   border-radius: 50%;
-  background: #f0f5f1;
+  background: var(--themeColorLight, #f0f5f1);
   display: flex;
   align-items: center;
   justify-content: center;

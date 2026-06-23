@@ -218,6 +218,7 @@ class AdminMeetController extends BaseAdminController {
       startDay: "must|date|name=开始日期",
       endDay: "must|date|name=结束日期",
       typeId: "string",
+      includeInactive: "int",
     };
 
     let input = this.validateData(rules);

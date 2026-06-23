@@ -12,7 +12,7 @@ const UserModel = require("../../model/user_model.js");
 const AdminModel = require("../../model/admin_model.js");
 
 const DEFAULT_TPL_COLORS = ["#F5A623", "#4A90A4", "#E57373", "#81C784"];
-const CARD_COLLECTIONS = ["ax_card_tpl", "ax_user_card"];
+const CARD_COLLECTIONS = ["ax_card_tpl", "ax_user_card", "ax_user_card_log"];
 
 class AdminCardService extends BaseAdminService {
   async _ensureCardCollections() {

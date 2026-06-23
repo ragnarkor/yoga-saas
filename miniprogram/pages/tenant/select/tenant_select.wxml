@@ -1,12 +1,13 @@
 <!-- [AI_START TIMESTAMP=2025-01-25 19:10:00] -->
+<page-meta page-style="{{pageStyle}}" />
 <view wx:if="{{!isLoad}}" class="loading-wrap">
-	<van-loading size="40rpx">加载中...</van-loading>
+	<van-loading size="40rpx" color="{{themeColor}}">加载中...</van-loading>
 </view>
 
-<view class="tenant-select" wx:if="{{isLoad}}">
+<view class="tenant-select theme-scope" style="{{pageStyle}}" wx:if="{{isLoad}}">
 	<view class="header">
-		<van-icon name="home-o" size="44rpx" color="#0081ff" custom-class="text-xxl text-blue"  />
-		<text class="text-xl margin-left-s">选择瑜伽馆</text>
+		<van-icon name="home-o" size="44rpx" color="{{themeColor}}" custom-class="text-xxl" />
+		<text class="text-xl margin-left-s header-title">选择瑜伽馆</text>
 	</view>
 
 	<view wx:if="{{list.length==0}}" class="empty-tip">
@@ -20,7 +21,7 @@
 
 			<view class="tenant-logo">
 					<image wx:if="{{item.TENANT_LOGO}}" src="{{item.TENANT_LOGO}}" mode="aspectFill" class="logo-img" />
-					<van-icon wx:else name="home-o" size="56rpx" color="#0081ff" custom-class="text-xxxl text-blue" />
+					<van-icon wx:else name="home-o" size="56rpx" color="{{themeColor}}" custom-class="text-xxxl" />
 				</view>
 
 			<view class="tenant-info">

@@ -22,7 +22,7 @@ Page({
       { name: '签到码', icon: 'qr', color: '#81c784', url: '/pages/admin/meet/scan/admin_meet_scan' },
     ],
     menus: [
-      { name: '预约', icon: 'clock-o', color: '#f48fb1', url: '/pages/admin/meet/list/admin_meet_list' },
+      { name: '预约', icon: 'clock-o', color: '#f48fb1', url: '/pages/coach/booking/coach_booking' },
       { name: '排课', icon: 'calendar-o', color: '#64b5f6', url: '/pages/coach/schedule/coach_schedule' },
       { name: '课程管理', icon: 'apps-o', color: '#81c784', url: '/pages/coach/course/coach_course_list' },
       { name: '私教', icon: 'exchange', color: '#b39ddb', url: '/pages/admin/meet/list/admin_meet_list' },

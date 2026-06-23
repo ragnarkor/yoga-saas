@@ -12,7 +12,8 @@ page {
 .page-header {
   position: relative;
   overflow: hidden;
-  padding: 40rpx 32rpx 30rpx;
+  padding: 48rpx 32rpx 36rpx;
+  margin-bottom: 8rpx;
 }
 
 .page-header-bg {
@@ -21,9 +22,13 @@ page {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--neutralIconBg, #f2f3f5);
+  background: linear-gradient(
+    145deg,
+    var(--projectColor, #5b8a72) 0%,
+    var(--projectColorDark, #4a7160) 100%
+  );
+  border-radius: 0 0 40rpx 40rpx;
   opacity: 1;
-  border-radius: 0 0 48rpx 48rpx;
 }
 
 .page-header-content {
@@ -33,17 +38,27 @@ page {
 }
 
 .page-title {
-  font-size: 40rpx;
+  font-size: 44rpx;
   font-weight: 700;
-  color: var(--neutralText, #1f2329);
+  color: #ffffff;
   letter-spacing: 2rpx;
 }
 
 .page-subtitle {
-  font-size: 24rpx;
-  color: var(--neutralTextTertiary, #8f959e);
-  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.88);
+  margin-top: 10rpx;
   letter-spacing: 1rpx;
+}
+
+.page-header-date {
+  display: inline-block;
+  margin-top: 16rpx;
+  padding: 6rpx 24rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 /* ==================== 课程分类 Tab ==================== */
@@ -99,8 +114,10 @@ page {
 /* ==================== 日期选择条 ==================== */
 .date-selector {
   background: #ffffff;
-  padding: 20rpx 0;
-  box-shadow: 0 4rpx 16rpx rgba(91, 138, 114, 0.04);
+  padding: 20rpx 0 24rpx;
+  margin-top: -12rpx;
+  border-radius: 24rpx 24rpx 0 0;
+  box-shadow: 0 -4rpx 20rpx rgba(91, 138, 114, 0.05);
 }
 
 .date-scroll {
@@ -259,8 +276,24 @@ page {
 .course-tags {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 12rpx;
   margin-top: 8rpx;
+}
+
+.course-stars {
+  display: flex;
+  align-items: center;
+  gap: 2rpx;
+}
+
+.course-star {
+  font-size: 24rpx;
+  color: #ddd;
+  line-height: 1;
+}
+
+.course-star.on {
+  color: #ffb74d;
 }
 
 .course-tag {
@@ -274,12 +307,13 @@ page {
 }
 
 .coach-avatar-wrap {
-  width: 44rpx;
-  height: 44rpx;
+  width: 52rpx;
+  height: 52rpx;
   border-radius: 50%;
   overflow: hidden;
-  border: 2rpx solid #e8efe9;
+  border: 2rpx solid var(--projectColorLight, #e3efe8);
   flex-shrink: 0;
+  background: #f0f0f0;
 }
 
 .coach-avatar {

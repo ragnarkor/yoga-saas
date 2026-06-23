@@ -17,6 +17,8 @@ const PassportService = require("../service/passport_service.js");
 const cloudBase = require("../../framework/cloud/cloud_base.js");
 const UserModel = require("../model/user_model.js");
 const AdminModel = require("../model/admin_model.js");
+const TeacherModel = require("../model/teacher_model.js");
+const UserCardService = require("./user_card_service.js");
 
 class MeetService extends BaseService {
   constructor() {
@@ -116,7 +118,7 @@ class MeetService extends BaseService {
   }
 
   // 预约逻辑
-  async join(userId, meetId, timeMark, forms) {
+  async join(userId, meetId, timeMark, forms, cardId) {
     // 预约时段是否存在
     let meetWhere = {
       _id: meetId,
@@ -175,6 +177,10 @@ class MeetService extends BaseService {
 
     // 统计
     this.statJoinCnt(meetId, timeMark);
+
+    // 扣减会员卡次数
+    let cardService = new UserCardService();
+    await cardService.consumeForJoin(userId, meetId, joinId, cardId);
 
     return {
       result: "ok",
@@ -280,6 +286,10 @@ class MeetService extends BaseService {
 
     // 针对用户的次数限制
     await this.checkMeetLimitSet(userId, meet, timeMark);
+
+    // 会员卡次数/期限校验
+    let cardService = new UserCardService();
+    await cardService.checkCardForJoin(userId, meetId, cardId);
   }
 
   // 预约次数限制校验
@@ -401,18 +411,17 @@ class MeetService extends BaseService {
     ret.MEET_TYPE_NAME = meet.MEET_TYPE_NAME || "";
     ret.MEET_STYLE_SET = meet.MEET_STYLE_SET || {};
 
-    let coachName = "";
     let style = meet.MEET_STYLE_SET || {};
-    if (style.teacherName) {
-      coachName = style.teacherName;
-    } else if (meet.MEET_ADMIN_ID) {
-      let admin = await AdminModel.getOne(
-        { _id: meet.MEET_ADMIN_ID },
-        "ADMIN_NAME",
-      );
-      if (admin) coachName = admin.ADMIN_NAME;
-    }
-    ret.coachName = coachName;
+    let coachProfile = await this._resolveCoachProfile(
+      style,
+      null,
+      meet,
+      {},
+      {},
+    );
+    ret.coachName = coachProfile.coachName;
+    ret.coachAvatar = coachProfile.coachAvatar;
+    ret.coachId = coachProfile.teacherId;
 
     return ret;
   }
@@ -555,6 +564,21 @@ class MeetService extends BaseService {
       { day: "asc" },
       500,
     );
+    return await this._buildMeetListFromDayRecords(dayRecords);
+  }
+
+  /** 按周获取预约项目 */
+  async getMeetListByWeek(startDay, endDay) {
+    let dayRecords = await DayModel.getAllBig(
+      { day: ["between", startDay, endDay] },
+      "day,times,DAY_MEET_ID",
+      { day: "asc" },
+      2000,
+    );
+    return await this._buildMeetListFromDayRecords(dayRecords);
+  }
+
+  async _buildMeetListFromDayRecords(dayRecords) {
     if (!dayRecords.length) return [];
 
     let meetIds = [];
@@ -578,6 +602,7 @@ class MeetService extends BaseService {
     }
 
     let adminNameCache = {};
+    let teacherCache = {};
     let retList = [];
 
     for (let k in dayRecords) {
@@ -591,7 +616,10 @@ class MeetService extends BaseService {
         let t = times[j];
         if (t.status != 1) continue;
 
+        let teacherId = t.teacherId || style.teacherId || "";
         let coachName = "";
+        let coachAvatar = "";
+
         if (t.teacherName) {
           coachName = t.teacherName;
         } else if (style.teacherName) {
@@ -608,7 +636,23 @@ class MeetService extends BaseService {
           coachName = adminNameCache[adminId];
         }
 
+        if (teacherId) {
+          if (teacherCache[teacherId] === undefined) {
+            let teacher = await TeacherModel.getOne(
+              { _id: teacherId },
+              "TEACHER_NAME,TEACHER_AVATAR",
+            );
+            teacherCache[teacherId] = teacher || null;
+          }
+          let teacher = teacherCache[teacherId];
+          if (teacher) {
+            if (!coachName) coachName = teacher.TEACHER_NAME || coachName;
+            coachAvatar = teacher.TEACHER_AVATAR || "";
+          }
+        }
+
         retList.push({
+          day: dayRecords[k].day,
           timeDesc: t.start + " ~ " + t.end,
           timeStart: t.start,
           timeEnd: t.end,
@@ -619,7 +663,8 @@ class MeetService extends BaseService {
           _id: meet._id,
           typeId: meet.MEET_TYPE_ID,
           typeName: meet.MEET_TYPE_NAME,
-          level: style.level || "",
+          level: style.level || style.difficulty || 3,
+          difficulty: style.difficulty || style.level || 3,
           isShowLimit: meet.MEET_IS_SHOW_LIMIT,
           limit: t.limit || 0,
           stat: t.stat || {
@@ -629,6 +674,7 @@ class MeetService extends BaseService {
           },
           timeSlotCnt: 1,
           coachName,
+          coachAvatar,
           meetOrder: meet.MEET_ORDER || 0,
         });
       }
@@ -649,6 +695,101 @@ class MeetService extends BaseService {
     }
 
     return retList;
+  }
+
+  /** 某时段已预约会员（公开展示姓名与头像） */
+  async getJoinRoster(meetId, timeMark) {
+    if (!meetId || !timeMark) return { list: [], total: 0 };
+
+    let joins = await JoinModel.getAll(
+      {
+        JOIN_MEET_ID: meetId,
+        JOIN_MEET_TIME_MARK: timeMark,
+        JOIN_STATUS: JoinModel.STATUS.SUCC,
+      },
+      "JOIN_USER_ID,JOIN_FORMS",
+      { JOIN_ADD_TIME: "asc" },
+      50,
+    );
+
+    if (!joins.length) return { list: [], total: 0 };
+
+    let userIds = [];
+    for (let k in joins) {
+      let uid = joins[k].JOIN_USER_ID;
+      if (uid && !userIds.includes(uid)) userIds.push(uid);
+    }
+
+    let userMap = {};
+    if (userIds.length) {
+      let users = await UserModel.getAll(
+        { USER_MINI_OPENID: ["in", userIds] },
+        "USER_MINI_OPENID,USER_NAME,USER_PIC",
+        {},
+        userIds.length,
+      );
+      for (let u of users || []) {
+        userMap[u.USER_MINI_OPENID] = u;
+      }
+    }
+
+    let list = [];
+    for (let k in joins) {
+      let join = joins[k];
+      let user = userMap[join.JOIN_USER_ID] || {};
+      let name = user.USER_NAME || "";
+      if (!name && join.JOIN_FORMS && join.JOIN_FORMS.length) {
+        let nameField = join.JOIN_FORMS.find(
+          (f) => f.mark === "name" || f.title === "姓名",
+        );
+        if (nameField && nameField.val) name = nameField.val;
+        else if (join.JOIN_FORMS[0].val) name = join.JOIN_FORMS[0].val;
+      }
+      list.push({
+        userId: join.JOIN_USER_ID,
+        name: name || "会员",
+        avatar: user.USER_PIC || "",
+      });
+    }
+
+    return { list, total: list.length };
+  }
+
+  async _resolveCoachProfile(style, timeNode, meet, teacherCache, adminNameCache) {
+    let teacherId =
+      (timeNode && timeNode.teacherId) || style.teacherId || "";
+    let coachName = "";
+    let coachAvatar = "";
+
+    if (timeNode && timeNode.teacherName) {
+      coachName = timeNode.teacherName;
+    } else if (style.teacherName) {
+      coachName = style.teacherName;
+    } else if (meet.MEET_ADMIN_ID) {
+      let adminId = meet.MEET_ADMIN_ID;
+      if (adminNameCache[adminId] === undefined) {
+        let admin = await AdminModel.getOne({ _id: adminId }, "ADMIN_NAME");
+        adminNameCache[adminId] = admin ? admin.ADMIN_NAME : "";
+      }
+      coachName = adminNameCache[adminId];
+    }
+
+    if (teacherId) {
+      if (teacherCache[teacherId] === undefined) {
+        let teacher = await TeacherModel.getOne(
+          { _id: teacherId },
+          "TEACHER_NAME,TEACHER_AVATAR",
+        );
+        teacherCache[teacherId] = teacher || null;
+      }
+      let teacher = teacherCache[teacherId];
+      if (teacher) {
+        if (!coachName) coachName = teacher.TEACHER_NAME || "";
+        coachAvatar = teacher.TEACHER_AVATAR || "";
+      }
+    }
+
+    return { coachName, coachAvatar, teacherId };
   }
 
   /** 获取从某天开始可预约的日期 */
@@ -777,6 +918,9 @@ class MeetService extends BaseService {
     };
     await JoinModel.edit(where, data);
     this.statJoinCnt(join.JOIN_MEET_ID, join.JOIN_MEET_TIME_MARK);
+
+    let cardService = new UserCardService();
+    await cardService.refundForJoinCancel(joinId);
   }
 
   /** 取得我的预约详情 */

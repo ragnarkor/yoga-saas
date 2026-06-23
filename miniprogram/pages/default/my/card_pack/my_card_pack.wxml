@@ -1,0 +1,49 @@
+<page-meta page-style="{{pageStyle}}" />
+<view class="card-pack-page theme-scope" style="{{pageStyle}}">
+  <view class="card-pack-toolbar">
+    <view
+      class="card-pack-toggle {{showInvalid ? 'is-active' : ''}}"
+      bindtap="bindToggleInvalidTap"
+    >
+      <van-icon name="credit-pay" size="28rpx" color="{{showInvalid ? themeColor : '#969799'}}" />
+      <text>{{showInvalid ? '查看有效卡' : '查看失效卡'}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="card-pack-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <van-empty
+    wx:elif="{{!cardList.length}}"
+    description="{{showInvalid ? '暂无失效会员卡' : '暂无可用会员卡'}}"
+  />
+
+  <view wx:else class="card-pack-list">
+    <view class="card-pack-item" wx:for="{{cardList}}" wx:key="id" bindtap="bindCardTap" data-id="{{item.id}}">
+      <view class="card-pack-no-row">
+        <text class="card-pack-no-label">卡号：{{item.cardNo}}</text>
+        <view class="card-pack-copy" catchtap="bindCopyCardNo" data-no="{{item.cardNo}}">
+          <van-icon name="description" size="32rpx" color="{{themeColor}}" />
+        </view>
+      </view>
+
+      <view class="card-pack-body">
+        <view class="card-pack-visual" style="background: {{item.color}};">
+          <text class="card-pack-vip">VIP CARD</text>
+          <text class="card-pack-type">{{item.typeLabel}}</text>
+        </view>
+
+        <view class="card-pack-info">
+          <view class="card-pack-name">{{item.name}}</view>
+          <view class="card-pack-balance">余额：{{item.balanceText}}</view>
+          <view class="card-pack-expire">到期时间：{{item.endTimeDesc}}</view>
+        </view>
+
+        <view class="card-pack-stamp {{item.isActive ? 'is-normal' : 'is-invalid'}}">
+          <text>{{item.statusLabel}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

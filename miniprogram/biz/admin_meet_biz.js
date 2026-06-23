@@ -431,7 +431,7 @@ class AdminMeetBiz extends BaseBiz {
 			cardTimes: 1,
 			teacherId: '',
 			teacherName: '',
-			color: '#e57373',
+			color: '#81c784',
 			carousel: [],
 			notice: '',
 			capacity: 7,
@@ -451,6 +451,7 @@ class AdminMeetBiz extends BaseBiz {
 		merged.cardTimes = Number(merged.cardTimes || 1);
 		merged.capacity = Number(merged.capacity || 7);
 		merged.minJoin = Number(merged.minJoin || 2);
+		if (!merged.color) merged.color = def.color;
 		if (!Array.isArray(merged.carousel)) {
 			merged.carousel = merged.carousel ? [merged.carousel] : [];
 		}

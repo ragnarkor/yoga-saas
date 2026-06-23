@@ -1,0 +1,162 @@
+@import "../../skin/skin.wxss";
+
+.card-detail-page {
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+.card-detail-loading {
+  padding: 120rpx 0;
+  display: flex;
+  justify-content: center;
+}
+
+.card-detail-tabs {
+  display: flex;
+  background: var(--themeColor, #5b8a72);
+}
+
+.card-detail-tab {
+  flex: 1;
+  text-align: center;
+  padding: 28rpx 0;
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.75);
+  background: transparent;
+}
+
+.card-detail-tab.is-active {
+  color: var(--themeColor, #5b8a72);
+  background: #fff;
+  font-weight: 600;
+  border-radius: 16rpx 16rpx 0 0;
+}
+
+.card-detail-panel {
+  padding: 24rpx;
+}
+
+.card-usage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.card-usage-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.card-usage-tag {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #fce4ec;
+  color: #e91e63;
+  font-size: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.2;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.card-usage-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-usage-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #323233;
+  margin-bottom: 8rpx;
+}
+
+.card-usage-sub {
+  font-size: 24rpx;
+  color: #969799;
+  line-height: 1.6;
+}
+
+.card-usage-status {
+  font-size: 26rpx;
+  color: var(--themeColor, #5b8a72);
+  flex-shrink: 0;
+  padding-top: 4rpx;
+}
+
+.card-usage-status.is-refund {
+  color: #969799;
+}
+
+.card-info-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 32rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+}
+
+.card-info-visual {
+  width: 240rpx;
+  height: 140rpx;
+  border-radius: 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  margin: 0 auto 32rpx;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.15);
+}
+
+.card-info-vip {
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+
+.card-info-type {
+  font-size: 28rpx;
+  margin-top: 8rpx;
+}
+
+.card-info-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.card-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24rpx;
+}
+
+.card-info-label {
+  font-size: 28rpx;
+  color: #969799;
+  flex-shrink: 0;
+}
+
+.card-info-value {
+  font-size: 28rpx;
+  color: #323233;
+  text-align: right;
+  flex: 1;
+}
+
+.card-info-copy {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8rpx;
+}

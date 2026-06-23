@@ -11,6 +11,8 @@ module.exports = {
   meet_self_bh: require("./meet_self_bh.js"),
   my_index_bh: require("./my_index_bh.js"),
   my_join_bh: require("./my_join_bh.js"),
+  my_card_pack_bh: require("./my_card_pack_bh.js"),
+  my_card_detail_bh: require("./my_card_detail_bh.js"),
   my_course_bh: require("./my_course_bh.js"),
   my_join_detail_bh: require("./my_join_detail_bh.js"),
   news_index_bh: require("./news_index_bh.js"),

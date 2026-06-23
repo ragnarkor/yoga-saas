@@ -34,6 +34,7 @@
     "pages/coach/course/coach_course_edit",
     "pages/coach/schedule/coach_schedule",
     "pages/coach/schedule/coach_schedule_edit",
+    "pages/coach/booking/coach_booking",
     "pages/coach/member/coach_member_list",
     "pages/coach/card/coach_card_list",
     "pages/coach/card/coach_card_edit",

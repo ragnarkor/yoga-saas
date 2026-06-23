@@ -189,12 +189,19 @@ module.exports = Behavior({
           duration = this._calcDuration(timeStart, timeEnd);
         }
 
+        const levelNum = Math.min(
+          5,
+          Math.max(1, Number(item.level) || Number(item.difficulty) || 3),
+        );
+        const levelStars = [0, 0, 0, 0, 0].map((_, i) => (i < levelNum ? 1 : 0));
+
         const skin = pageHelper.getSkin();
         const defaultCover =
           skin.IMG_DEFAULT_COVER || "/images/default_cover_pic.gif";
 
         return {
           _id: item._id,
+          cardKey: (item._id || '') + '_' + (item.timeMark || timeStart),
           title: item.title || "未命名课程",
           typeName: item.typeName || "",
           typeId: item.typeId || "",
@@ -206,7 +213,9 @@ module.exports = Behavior({
           coachAvatar: pageHelper.fmtImgUrl(item.coachAvatar || item.pic) || defaultCover,
           slots: slots === 99 ? "不限" : slots,
           status,
-          level: item.level || "",
+          level: levelNum,
+          levelNum,
+          levelStars,
           pic: pageHelper.fmtImgUrl(item.pic),
         };
       });

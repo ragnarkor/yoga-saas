@@ -33,6 +33,9 @@ module.exports = Behavior({
 		classTimeText: '',
 		locationText: '',
 		coachName: '',
+		coachAvatar: '',
+		joinRoster: [],
+		joinRosterTotal: 0,
 		seatText: '',
 		seatPercent: 0,
 		limitHint: '',
@@ -42,6 +45,12 @@ module.exports = Behavior({
 		bookDisabled: true,
 		bookBtnText: '立即预约',
 		submitting: false,
+		cardCanBook: true,
+		cardHint: '',
+		cardNeedTimes: 1,
+		cardSheetShow: false,
+		cardPickLoading: false,
+		joinCardOptions: [],
 	},
 
 	methods: {
@@ -77,15 +86,53 @@ module.exports = Behavior({
 				canNullTime: setting.MEET_CAN_NULL_TIME,
 			}, () => {
 				this._buildDisplay();
+				this._loadCardSummary();
+			});
+		},
+
+		_loadCardSummary: async function () {
+			try {
+				const summary = await cloudHelper.callCloudData(
+					'my/my_card_summary',
+					{},
+					{ hint: false },
+				);
+				const canBook = !!(summary && summary.canBook);
+				let cardHint = '';
+				if (!canBook) {
+					cardHint = '预约需可用会员卡次数，请联系馆方发卡';
+				} else if (summary.hasPeriod) {
+					cardHint = '当前期限内卡可畅练';
+				} else if (summary.timesTotal > 0) {
+					cardHint = `可用次数合计 ${summary.timesTotal} 次`;
+				}
+				this.setData({ cardCanBook: canBook, cardHint });
+				this._applyCardBookState();
+			} catch (e) {
+				console.error(e);
+			}
+		},
+
+		_applyCardBookState: function () {
+			if (this.data.cardCanBook) return;
+			if (this.data.bookDisabled && this.data.bookBtnText !== '立即预约') return;
+			this.setData({
+				bookDisabled: true,
+				bookBtnText: '暂无可用会员卡',
 			});
 		},
 
 		_fmtMeetMedia: function (meet) {
 			const skin = pageHelper.getSkin();
 			const defaultCover = skin.IMG_DEFAULT_COVER || '/images/default_cover_pic.gif';
+			const defaultAvatar = skin.USER_DEFAULT_AVATAR || defaultCover;
 
 			if (meet.MEET_STYLE_SET && meet.MEET_STYLE_SET.pic) {
 				meet.MEET_STYLE_SET.pic = pageHelper.fmtImgUrl(meet.MEET_STYLE_SET.pic) || defaultCover;
+			}
+
+			if (meet.coachAvatar) {
+				meet.coachAvatar = pageHelper.fmtImgUrl(meet.coachAvatar) || defaultAvatar;
 			}
 
 			if (meet.MEET_CONTENT && meet.MEET_CONTENT.length) {
@@ -94,6 +141,48 @@ module.exports = Behavior({
 						node.val = pageHelper.fmtImgUrl(node.val);
 					}
 				});
+			}
+		},
+
+		_loadJoinRoster: async function (meetId, timeMark) {
+			if (!meetId || !timeMark) {
+				this.setData({ joinRoster: [], joinRosterTotal: 0 });
+				return;
+			}
+			try {
+				const res = await cloudHelper.callCloudData(
+					'meet/join_roster',
+					{ meetId, timeMark },
+					{ hint: false },
+				);
+				const rawList = (res && res.list) || [];
+				const skin = pageHelper.getSkin();
+				const defaultAvatar =
+					skin.USER_DEFAULT_AVATAR ||
+					skin.IMG_DEFAULT_COVER ||
+					'/images/default_cover_pic.gif';
+				const joinRoster = await Promise.all(
+					rawList.map(async (item) => {
+						let avatarSrc = defaultAvatar;
+						if (item.avatar) {
+							avatarSrc =
+								(await UserProfileBiz.resolveAvatarUrl(item.avatar)) ||
+								pageHelper.fmtImgUrl(item.avatar) ||
+								defaultAvatar;
+						}
+						return {
+							...item,
+							avatarSrc,
+						};
+					}),
+				);
+				this.setData({
+					joinRoster,
+					joinRosterTotal: (res && res.total) || joinRoster.length,
+				});
+			} catch (e) {
+				console.error(e);
+				this.setData({ joinRoster: [], joinRosterTotal: 0 });
 			}
 		},
 
@@ -132,6 +221,10 @@ module.exports = Behavior({
 
 			const level = Number(styleSet.level) || 3;
 			const levelStars = [0, 0, 0, 0, 0].map((_, i) => (i < level ? 1 : 0));
+			const defaultAvatar =
+				skin.USER_DEFAULT_AVATAR ||
+				skin.IMG_DEFAULT_COVER ||
+				'/images/default_cover_pic.gif';
 
 			this.setData({
 				selectedDayIdx: dayIdx,
@@ -142,13 +235,14 @@ module.exports = Behavior({
 				levelStars,
 				introPics,
 				introText,
+				coachAvatar: meet.coachAvatar || defaultAvatar,
 				currentDayTimes: daysSet[dayIdx] ? daysSet[dayIdx].times : [],
 			}, () => {
 				this._updateSlotDisplay(dayIdx, timeIdx);
 			});
 		},
 
-		_updateSlotDisplay: function (dayIdx, timeIdx) {
+		_updateSlotDisplay: async function (dayIdx, timeIdx) {
 			const meet = this.data.meet;
 			const dayNode = meet.MEET_DAYS_SET[dayIdx];
 			const timeNode = dayNode && dayNode.times[timeIdx];
@@ -162,6 +256,8 @@ module.exports = Behavior({
 					bookDisabled: true,
 					bookBtnText: '暂无可预约时段',
 					currentDayTimes: dayNode ? dayNode.times : [],
+					joinRoster: [],
+					joinRosterTotal: 0,
 				});
 				return;
 			}
@@ -194,6 +290,7 @@ module.exports = Behavior({
 			}
 
 			const styleSet = meet.MEET_STYLE_SET || {};
+			const needTimes = Number(styleSet.cardTimes) > 0 ? Number(styleSet.cardTimes) : 1;
 			const coachName =
 				timeNode.teacherName ||
 				meet.coachName ||
@@ -212,7 +309,12 @@ module.exports = Behavior({
 				bookDisabled,
 				bookBtnText,
 				currentDayTimes: dayNode.times,
+				cardNeedTimes: needTimes,
 			});
+
+			this._applyCardBookState();
+
+			await this._loadJoinRoster(this.data.id, timeNode.mark);
 		},
 
 		bindSelectTimeTap: function (e) {
@@ -230,13 +332,87 @@ module.exports = Behavior({
 
 		bindBookTap: function () {
 			if (this.data.submitting) return;
+			if (!this.data.cardCanBook) {
+				wx.showModal({
+					title: '提示',
+					content: `预约本课程需扣除 ${this.data.cardNeedTimes || 1} 次会员卡，您暂无可用会员卡，请联系馆方发卡。`,
+					confirmText: '我的卡包',
+					cancelText: '知道了',
+					success(res) {
+						if (res.confirm) {
+							wx.navigateTo({ url: '/pages/default/my/card_pack/my_card_pack' });
+						}
+					},
+				});
+				return;
+			}
 			if (this.data.bookDisabled) {
 				return pageHelper.showModal(this.data.bookBtnText + '，请更换时段后再试');
 			}
 
+			this._openCardSheet();
+		},
+
+		_openCardSheet: async function () {
+			const meetId = this.data.id;
+			if (!meetId) return;
+
+			this.setData({ cardSheetShow: true, cardPickLoading: true, joinCardOptions: [] });
+
+			try {
+				const res = await cloudHelper.callCloudData(
+					'meet/join_card_options',
+					{ meetId },
+					{ title: 'bar' },
+				);
+				const list = (res && res.list) || [];
+				if (!list.length) {
+					this.setData({ cardSheetShow: false, cardPickLoading: false });
+					wx.showModal({
+						title: '提示',
+						content: '暂无可用会员卡，请联系馆方发卡。',
+						confirmText: '我的卡包',
+						success(r) {
+							if (r.confirm) {
+								wx.navigateTo({ url: '/pages/default/my/card_pack/my_card_pack' });
+							}
+						},
+					});
+					return;
+				}
+
+				if (list.length === 1) {
+					this.setData({ cardSheetShow: false, cardPickLoading: false, joinCardOptions: list });
+					this._confirmJoinWithCard(list[0].id);
+					return;
+				}
+
+				this.setData({
+					joinCardOptions: list,
+					cardNeedTimes: (res && res.needTimes) || this.data.cardNeedTimes || 1,
+					cardPickLoading: false,
+				});
+			} catch (e) {
+				console.error(e);
+				this.setData({ cardSheetShow: false, cardPickLoading: false });
+			}
+		},
+
+		bindCloseCardSheet: function () {
+			this.setData({ cardSheetShow: false, cardPickLoading: false });
+		},
+
+		bindCardPick: function (e) {
+			const cardId = pageHelper.dataset(e, 'id');
+			if (!cardId) return;
+			this.setData({ cardSheetShow: false });
+			this._confirmJoinWithCard(cardId);
+		},
+
+		_confirmJoinWithCard: function (cardId) {
 			const callback = async () => {
 				try {
-					await this._submitJoin();
+					await this._submitJoin(cardId);
 				} catch (ex) {
 					console.log(ex);
 				}
@@ -299,10 +475,10 @@ module.exports = Behavior({
 			return val;
 		},
 
-		_submitJoin: async function () {
+		_submitJoin: async function (cardId) {
 			const meetId = this.data.id;
 			const timeMark = this.data.timeMark;
-			if (!meetId || !timeMark) return;
+			if (!meetId || !timeMark || !cardId) return;
 
 			this.setData({ submitting: true, bookBtnText: '预约中...' });
 
@@ -340,7 +516,11 @@ module.exports = Behavior({
 				}
 
 				await cloudHelper.callCloudSumbit('meet/before_join', { meetId, timeMark }, opts);
-				const res = await cloudHelper.callCloudSumbit('meet/join', { meetId, timeMark, forms }, opts);
+				const res = await cloudHelper.callCloudSumbit(
+					'meet/join',
+					{ meetId, timeMark, forms, cardId },
+					opts,
+				);
 				const joinId = res.data.joinId;
 
 				wx.showModal({

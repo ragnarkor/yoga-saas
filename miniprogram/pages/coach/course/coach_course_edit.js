@@ -7,14 +7,14 @@ const validate = require('../../../helper/validate.js');
 const formSetHelper = require('../../../cmpts/public/form/form_set_helper.js');
 
 const COLOR_OPTIONS = [
-  '#e57373',
-  '#f48fb1',
-  '#64b5f6',
-  '#81c784',
-  '#ffb74d',
-  '#ba68c8',
-  '#4db6ac',
-  '#ffd54f',
+  { value: '#e57373', label: '珊瑚红' },
+  { value: '#f48fb1', label: '樱花粉' },
+  { value: '#64b5f6', label: '天空蓝' },
+  { value: '#81c784', label: '薄荷绿' },
+  { value: '#ffb74d', label: '暖橙色' },
+  { value: '#ba68c8', label: '薰衣草' },
+  { value: '#4db6ac', label: '青绿色' },
+  { value: '#ffd54f', label: '阳光黄' },
 ];
 
 Page({
@@ -32,6 +32,8 @@ Page({
     templateSheetShow: false,
     typeSheetShow: false,
     colorOptions: COLOR_OPTIONS,
+    colorSheetShow: false,
+    selectedColorLabel: '薄荷绿',
     thumbList: [],
     carouselList: [],
     formTitle: '',
@@ -96,6 +98,7 @@ Page({
       });
       this._syncTypeName();
       this._syncSelectedTemplatePreview();
+      this._syncColorLabel();
     } catch (e) {
       console.error(e);
     }
@@ -156,6 +159,7 @@ Page({
       });
       this._syncTypeName();
       this._syncSelectedTemplatePreview();
+      this._syncColorLabel();
     } catch (e) {
       console.error(e);
       this.setData({ loading: false });
@@ -258,8 +262,28 @@ Page({
     });
   },
 
+  _syncColorLabel() {
+    const color = this.data.formStyleSet.color;
+    const hit = this.data.colorOptions.find((c) => c.value === color);
+    this.setData({ selectedColorLabel: hit ? hit.label : '自定义' });
+  },
+
   bindColorTap(e) {
-    this.setData({ 'formStyleSet.color': e.currentTarget.dataset.color });
+    const color = e.currentTarget.dataset.color;
+    const label = e.currentTarget.dataset.label || '';
+    this.setData({
+      'formStyleSet.color': color,
+      selectedColorLabel: label,
+      colorSheetShow: false,
+    });
+  },
+
+  bindColorFieldTap() {
+    this.setData({ colorSheetShow: true });
+  },
+
+  bindCloseColorSheet() {
+    this.setData({ colorSheetShow: false });
   },
 
   bindTemplateTap() {
@@ -291,6 +315,7 @@ Page({
       carouselList: carousel.map((url) => ({ url, isImage: true })),
       selectedTemplatePreview: preview,
     });
+    this._syncColorLabel();
   },
 
   bindCloseTemplateSheet() {

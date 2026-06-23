@@ -57,6 +57,7 @@
 			<!-- VANT 菜单列表 -->
 			<van-cell-group inset custom-class="menu-group">
 				<van-cell custom-class="mi-cell mi-records" title="我的所有{{skin.MEET_NAME}}" is-link link-type="navigateTo" url="../join/my_join" icon="records" label="查看所有预约记录" />
+				<van-cell custom-class="mi-cell mi-card" title="我的卡包" is-link link-type="navigateTo" url="../card_pack/my_card_pack" icon="credit-pay" label="查看会员卡余额与到期" />
 				<van-cell custom-class="mi-cell mi-coach" title="切换到教练版" is-link bindtap="bindSwitchCoachTap" icon="manager-o" label="馆主/教练工作台" />
 			</van-cell-group>
 

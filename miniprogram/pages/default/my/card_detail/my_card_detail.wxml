@@ -1,0 +1,97 @@
+<page-meta page-style="{{pageStyle}}" />
+<view class="card-detail-page theme-scope" style="{{pageStyle}}">
+  <view wx:if="{{loading}}" class="card-detail-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <van-empty wx:elif="{{!card}}" description="会员卡不存在" />
+
+  <block wx:else>
+    <view class="card-detail-tabs">
+      <view
+        class="card-detail-tab {{activeTab === 0 ? 'is-active' : ''}}"
+        bindtap="bindTabTap"
+        data-tab="0"
+      >
+        上课记录({{usageTotal}}条)
+      </view>
+      <view
+        class="card-detail-tab {{activeTab === 1 ? 'is-active' : ''}}"
+        bindtap="bindTabTap"
+        data-tab="1"
+      >
+        详细资料
+      </view>
+    </view>
+
+    <!-- 上课记录 -->
+    <view wx:if="{{activeTab === 0}}" class="card-detail-panel">
+      <van-empty wx:if="{{!usageList.length}}" description="暂无上课记录" />
+      <view wx:else class="card-usage-list">
+        <view class="card-usage-item" wx:for="{{usageList}}" wx:key="id">
+          <view class="card-usage-tag">{{item.meetTypeName}}</view>
+          <view class="card-usage-body">
+            <view class="card-usage-title">{{item.meetTitle}}</view>
+            <view class="card-usage-sub">{{tenantName}}</view>
+            <view class="card-usage-sub">{{item.deductText}}</view>
+            <view class="card-usage-sub">{{item.scheduleText}}</view>
+          </view>
+          <view class="card-usage-status {{item.isRefund ? 'is-refund' : ''}}">
+            {{item.statusLabel}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 详细资料 -->
+    <view wx:else class="card-detail-panel">
+      <view class="card-info-card">
+        <view class="card-info-visual" style="background: {{card.color}};">
+          <text class="card-info-vip">VIP CARD</text>
+          <text class="card-info-type">{{card.typeLabel}}</text>
+        </view>
+        <view class="card-info-rows">
+          <view class="card-info-row">
+            <text class="card-info-label">卡名称</text>
+            <text class="card-info-value">{{card.name}}</text>
+          </view>
+          <view class="card-info-row">
+            <text class="card-info-label">卡号</text>
+            <view class="card-info-value card-info-copy" bindtap="bindCopyCardNo">
+              <text>{{card.cardNo}}</text>
+              <van-icon name="description" size="28rpx" color="{{themeColor}}" />
+            </view>
+          </view>
+          <view class="card-info-row">
+            <text class="card-info-label">余额</text>
+            <text class="card-info-value">{{card.balanceText}}</text>
+          </view>
+          <view wx:if="{{card.type !== 'period'}}" class="card-info-row">
+            <text class="card-info-label">初始次数</text>
+            <text class="card-info-value">{{card.quotaInit}}次</text>
+          </view>
+          <view class="card-info-row">
+            <text class="card-info-label">开卡时间</text>
+            <text class="card-info-value">{{card.startTimeDesc || '—'}}</text>
+          </view>
+          <view class="card-info-row">
+            <text class="card-info-label">到期时间</text>
+            <text class="card-info-value">{{card.endTimeDesc}}</text>
+          </view>
+          <view class="card-info-row">
+            <text class="card-info-label">状态</text>
+            <text class="card-info-value">{{card.statusLabel}}</text>
+          </view>
+          <view wx:if="{{card.coachName}}" class="card-info-row">
+            <text class="card-info-label">归属教练</text>
+            <text class="card-info-value">{{card.coachName}}</text>
+          </view>
+          <view wx:if="{{card.memo}}" class="card-info-row">
+            <text class="card-info-label">备注</text>
+            <text class="card-info-value">{{card.memo}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,41 @@
+@import "../schedule/coach_schedule.wxss";
+
+.booking-page {
+  padding-bottom: calc(200rpx + env(safe-area-inset-bottom));
+}
+
+.schedule-empty-hint--readonly {
+  border-style: solid;
+  border-color: #eef0f2;
+  color: #e3e6e8;
+  font-size: 28rpx;
+}
+
+.booking-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx 28rpx;
+  padding: 20rpx 32rpx;
+  margin: 8rpx 24rpx 0;
+  background: var(--neutralSurface, #fff);
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.booking-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.booking-legend-swatch {
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 6rpx;
+  flex-shrink: 0;
+}
+
+.booking-legend-label {
+  font-size: 22rpx;
+  color: #646566;
+}

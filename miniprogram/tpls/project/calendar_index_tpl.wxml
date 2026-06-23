@@ -56,7 +56,7 @@
 
 		<!-- 课程列表 -->
 		<view class="course-list" wx:if="{{courseList && courseList.length > 0}}">
-			<view class="course-card" wx:for="{{courseList}}" wx:key="_id"
+			<view class="course-card" wx:for="{{courseList}}" wx:key="cardKey"
 				bindtap="url" data-url="/pages/default/meet/detail/meet_detail?id={{item._id}}&day={{selectedDate}}&timeMark={{item.timeMark}}">
 
 				<view class="card-time-section">
@@ -68,7 +68,14 @@
 				<view class="card-info-section">
 					<view class="course-name text-cut">{{item.title}}</view>
 					<view class="course-tags">
-						<van-tag plain type="success" size="medium" custom-class="course-tag" wx:if="{{item.level}}">{{item.level}}</van-tag>
+						<view class="course-stars" wx:if="{{item.levelNum > 0}}">
+							<text
+								wx:for="{{item.levelStars}}"
+								wx:for-item="star"
+								wx:key="index"
+								class="course-star {{star ? 'on' : ''}}"
+							>★</text>
+						</view>
 						<van-tag plain type="warning" size="medium" custom-class="course-tag" wx:if="{{item.typeName}}">{{item.typeName}}</van-tag>
 					</view>
 					<view class="course-coach">

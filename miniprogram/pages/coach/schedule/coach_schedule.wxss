@@ -63,22 +63,24 @@
 
 .schedule-scroll {
   width: 100%;
-  white-space: nowrap;
   padding: 16rpx 0 8rpx;
 }
 
 .schedule-grid-wrap {
-  margin: 0 24rpx 24rpx;
+  display: inline-block;
+  padding: 0 24rpx 24rpx;
+  box-sizing: border-box;
+}
+
+.schedule-grid {
+  display: inline-block;
+  width: 1140rpx;
+  min-width: 1140rpx;
   border-radius: 20rpx;
   overflow: hidden;
   background: var(--neutralSurface, #fff);
   box-shadow: 0 8rpx 28rpx rgba(91, 138, 114, 0.1);
   border: 1rpx solid var(--neutralBorderLight, #eef0f2);
-}
-
-.schedule-grid {
-  display: inline-block;
-  min-width: 100%;
 }
 
 .schedule-row {
@@ -204,14 +206,15 @@
   bottom: 0;
   z-index: 100;
   display: flex;
-  gap: 16rpx;
-  padding: 16rpx 24rpx calc(16rpx + env(safe-area-inset-bottom));
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 32rpx calc(16rpx + env(safe-area-inset-bottom));
   background: #fff;
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
 }
 
 .schedule-bottom van-button {
-  flex: 1;
+  flex: none;
 }
 
 .schedule-canvas-hidden {

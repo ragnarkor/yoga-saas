@@ -40,19 +40,23 @@ Page({
       const tenant = (res && res.tenant) || {};
       if (tenant._pid) pageHelper.setTenant(tenant);
 
-      let tabs = (res && res.categories) || [];
-      if (!tabs.length) {
-        tabs = dataHelper.getSelectOptions(pageHelper.getMeetTypeStr()).map((o) => ({
-          id: o.val,
-          name: o.label,
-        }));
+      let tabs = [{ id: '0', name: '全部' }];
+      const categories = (res && res.categories) || [];
+      if (categories.length) {
+        tabs = tabs.concat(categories);
+      } else {
+        tabs = tabs.concat(
+          dataHelper.getSelectOptions(pageHelper.getMeetTypeStr()).map((o) => ({
+            id: o.val,
+            name: o.label,
+          })),
+        );
       }
 
-      const activeTypeId = tabs.length ? tabs[0].id : '';
       this.setData({
         tabs,
         activeTab: 0,
-        activeTypeId,
+        activeTypeId: '0',
       });
     } catch (e) {
       console.error(e);
@@ -61,20 +65,16 @@ Page({
 
   async _loadCourses() {
     const typeId = this.data.activeTypeId;
-    if (!typeId) {
-      this.setData({ loading: false, courseList: [] });
-      return;
-    }
 
     try {
+      const params = { page: 1, size: 100 };
+      if (typeId && typeId !== '0') {
+        params.sortType = 'typeId';
+        params.sortVal = typeId;
+      }
       const res = await cloudHelper.callCloudData(
         'admin/meet_list',
-        {
-          page: 1,
-          size: 100,
-          sortType: 'typeId',
-          sortVal: typeId,
-        },
+        params,
         { hint: false, title: 'bar' },
       );
       const list = ((res && res.list) || []).map((item, idx) =>
@@ -119,9 +119,11 @@ Page({
   },
 
   bindAddTap() {
-    const typeId = this.data.activeTypeId || '';
+    const typeId = this.data.activeTypeId;
+    const qs =
+      typeId && typeId !== '0' ? `?typeId=${typeId}` : '';
     wx.navigateTo({
-      url: `/pages/coach/course/coach_course_edit${typeId ? '?typeId=' + typeId : ''}`,
+      url: `/pages/coach/course/coach_course_edit${qs}`,
     });
   },
 

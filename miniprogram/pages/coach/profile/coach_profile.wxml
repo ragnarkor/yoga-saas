@@ -1,7 +1,7 @@
 <page-meta page-style="{{themeStyle}}" />
 <view class="coach-page profile-page">
   <coach-tenant-switch
-    title="主页资料"
+    title="我的主页"
     show-back="{{true}}"
     theme-color="{{themeColor}}"
     nav-bg="{{themeNavBg}}"

@@ -72,18 +72,19 @@
         data-field="cardTimes"
         bind:change="bindStyleFieldChange"
       />
-    </van-cell-group>
 
-    <van-cell-group title="课程颜色" custom-class="course-edit-group">
-      <view class="course-edit-colors">
-        <view
-          wx:for="{{colorOptions}}"
-          wx:key="*this"
-          class="course-edit-color {{formStyleSet.color === item ? 'active' : ''}}"
-          style="background: {{item}};"
-          data-color="{{item}}"
-          bindtap="bindColorTap"
-        />
+      <view class="course-edit-field course-edit-field--inline" bindtap="bindColorFieldTap">
+        <text class="course-edit-field-label-inline">课程颜色</text>
+        <view class="course-edit-field-row course-edit-field-row--inline">
+          <view class="course-edit-color-inline">
+            <view
+              class="course-edit-color-swatch course-edit-color-swatch--sm"
+              style="background: {{formStyleSet.color}};"
+            ></view>
+            <text class="course-edit-field-value">{{selectedColorLabel}}</text>
+          </view>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
       </view>
     </van-cell-group>
 
@@ -234,6 +235,43 @@
           <text>{{item.name}}</text>
           <van-icon
             wx:if="{{formTypeId === item.id}}"
+            name="success"
+            size="36rpx"
+            color="{{themeColor}}"
+          />
+        </view>
+      </view>
+    </view>
+  </van-popup>
+
+  <van-popup
+    show="{{colorSheetShow}}"
+    position="bottom"
+    round
+    bind:close="bindCloseColorSheet"
+    custom-class="course-edit-popup"
+  >
+    <view class="course-edit-sheet">
+      <view class="course-edit-sheet-head">
+        <text class="course-edit-sheet-title">选择课程颜色</text>
+        <text class="course-edit-sheet-sub">排课表与约课页将显示此颜色</text>
+      </view>
+      <view class="course-edit-color-list">
+        <view
+          class="course-edit-color-item {{formStyleSet.color === item.value ? 'active' : ''}}"
+          wx:for="{{colorOptions}}"
+          wx:key="value"
+          data-color="{{item.value}}"
+          data-label="{{item.label}}"
+          bindtap="bindColorTap"
+        >
+          <view class="course-edit-color-dot" style="background: {{item.value}};"></view>
+          <view class="course-edit-color-item-info">
+            <text class="course-edit-color-label">{{item.label}}</text>
+            <text class="course-edit-color-hex">{{item.value}}</text>
+          </view>
+          <van-icon
+            wx:if="{{formStyleSet.color === item.value}}"
             name="success"
             size="36rpx"
             color="{{themeColor}}"
