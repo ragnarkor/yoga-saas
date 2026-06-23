@@ -8,7 +8,6 @@ Page({
     activeTab: 0,
     banners: [],
     announces: [],
-    teachers: [],
     photos: [],
   },
 
@@ -22,17 +21,15 @@ Page({
 
   async _loadAll() {
     try {
-      let [banners, announces, teachers, photos] = await Promise.all([
+      let [banners, announces, photos] = await Promise.all([
         cloudHelper.callCloudData("admin/home_banner_list", {}),
         cloudHelper.callCloudData("admin/home_announce_list", {}),
-        cloudHelper.callCloudData("admin/home_teacher_list", {}),
         cloudHelper.callCloudData("admin/home_photo_list", {}),
       ]);
       this.setData({
         isLoad: true,
         banners: (banners && banners.list) || [],
         announces: (announces && announces.list) || [],
-        teachers: (teachers && teachers.list) || [],
         photos: (photos && photos.list) || [],
       });
     } catch (err) {
@@ -50,7 +47,6 @@ Page({
     let routeMap = {
       banner: "admin/home_banner_del",
       announce: "admin/home_announce_del",
-      teacher: "admin/home_teacher_del",
       photo: "admin/home_photo_del",
     };
     let route = routeMap[type];

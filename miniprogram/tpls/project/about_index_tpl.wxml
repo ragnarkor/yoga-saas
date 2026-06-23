@@ -8,8 +8,13 @@
 	<view wx:if="{{isLoad}}" class="main padding-project">
 		<view class="main-content">
 			<view class="content card-project shadow-project">
-				<view class="title text-project">关于我们</view>
-				<view class="txt"><text user-select="true">{{about.SETUP_ABOUT}}</text></view>
+				<view class="store-intro-head" wx:if="{{tenantLogo || tenantName}}">
+					<image wx:if="{{tenantLogo}}" src="{{tenantLogo}}" mode="aspectFill" class="store-intro-logo" />
+					<view class="store-intro-name text-project">{{tenantName}}</view>
+				</view>
+				<view wx:if="{{tenantDesc}}" class="store-intro-desc">{{tenantDesc}}</view>
+				<view class="title text-project" wx:if="{{about.SETUP_ABOUT}}">门店介绍</view>
+				<view class="txt" wx:if="{{about.SETUP_ABOUT}}"><text user-select="true">{{about.SETUP_ABOUT}}</text></view>
 
 				<view class="pics">
 					<image bindtap="url" data-url="{{item}}" data-type="img" wx:key="key" wx:for="{{about.SETUP_ABOUT_PIC}}" show-menu-by-longpress="{{true}}" class="loading" mode='aspectFit' lazy-load="true" src="{{item}}">

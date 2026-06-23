@@ -5,47 +5,98 @@
 
   <!-- 超管：平台控制台 -->
   <block wx:if="{{admin.type=='super'}}">
-    <view class="platform-top">
-      <view>
-        <view class="platform-title">平台管理</view>
-        <view class="platform-user">{{admin.name}} · 超级管理员</view>
+    <!-- [AI_START TIMESTAMP=2025-01-27 10:40:00] -->
+    <!-- Hero 渐变头：标题 + 身份 + 核心数据 -->
+    <view class="platform-hero">
+      <view class="platform-hero-top">
+        <view class="platform-hero-info">
+          <view class="platform-hero-title">平台管理</view>
+          <view class="platform-hero-sub">{{admin.name}} · 超级管理员</view>
+        </view>
+        <view class="platform-hero-logout" bindtap="bindExitTap">
+          <van-icon name="revoke" size="28rpx" />
+          <text>退出</text>
+        </view>
       </view>
-      <view class="platform-logout" bindtap="bindExitTap">退出</view>
-    </view>
-
-    <view class="platform-stats">
-      <view class="stat-box">
-        <text class="stat-num">{{data.tenantCount || 0}}</text>
-        <text class="stat-label">瑜伽馆</text>
-      </view>
-      <view class="stat-box">
-        <text class="stat-num">{{data.adminCount || 0}}</text>
-        <text class="stat-label">管理员</text>
-      </view>
-    </view>
-
-    <view class="platform-actions">
-      <view class="action-item" bindtap="url" data-url="/pages/admin/platform/tenant_form/admin_tenant_form">
-        <van-icon name="plus" size="36rpx" color="#4a7c8c" />
-        <text>新建瑜伽馆</text>
-      </view>
-      <view class="action-item" bindtap="url" data-url="/pages/admin/platform/mgr_form/admin_mgr_form">
-        <van-icon name="contact" size="36rpx" color="#4a7c8c" />
-        <text>新建管理员</text>
-      </view>
-      <view class="action-item" bindtap="bindMgrBindTap">
-        <van-icon name="link-o" size="36rpx" color="#4a7c8c" />
-        <text>绑定码</text>
+      <view class="platform-hero-stats">
+        <view class="platform-hero-stat">
+          <text class="platform-hero-stat-num">{{data.tenantCount || 0}}</text>
+          <text class="platform-hero-stat-label">瑜伽馆</text>
+        </view>
+        <view class="platform-hero-divider"></view>
+        <view class="platform-hero-stat">
+          <text class="platform-hero-stat-num">{{data.adminCount || 0}}</text>
+          <text class="platform-hero-stat-label">管理员</text>
+        </view>
       </view>
     </view>
+<!-- [AI_START TIMESTAMP=2025-01-27 11:10:00] -->
+<!-- Tab 切换 -->
+<view class="platform-tabs">
+  <view class="platform-tab {{platformTab === 0 ? 'platform-tab--active' : ''}}" bindtap="onPlatformTabTap" data-tab="0">
+    <text>概览</text>
+  </view>
+  <view class="platform-tab {{platformTab === 1 ? 'platform-tab--active' : ''}}" bindtap="onPlatformTabTap" data-tab="1">
+    <text>瑜伽馆</text>
+    <text class="platform-tab-count">{{data.tenantList.length || 0}}</text>
+  </view>
+</view>
 
-    <view class="section-head">
-      <text class="section-title">瑜伽馆</text>
-      <text class="section-count">{{data.tenantList.length || 0}}</text>
+<!-- Tab 0: 概览 -->
+<block wx:if="{{platformTab === 0}}">
+  <view class="platform-section">
+    <view class="platform-section-head">
+      <text class="platform-section-title">快捷操作</text>
     </view>
+    <view class="platform-action-grid">
+      <view class="platform-action-item" bindtap="url" data-url="/pages/admin/platform/tenant_form/admin_tenant_form">
+        <view class="platform-action-icon">
+          <van-icon name="add-o" size="40rpx" color="#4a7c8c" />
+        </view>
+        <text class="platform-action-text">新建瑜伽馆</text>
+      </view>
+      <view class="platform-action-item" bindtap="url" data-url="/pages/admin/platform/mgr_form/admin_mgr_form">
+        <view class="platform-action-icon">
+          <van-icon name="manager-o" size="40rpx" color="#4a7c8c" />
+        </view>
+        <text class="platform-action-text">新建管理员</text>
+      </view>
+      <view class="platform-action-item" bindtap="bindPlatformTenantTabTap">
+        <view class="platform-action-icon">
+          <van-icon name="shop-o" size="40rpx" color="#4a7c8c" />
+        </view>
+        <text class="platform-action-text">瑜伽馆管理</text>
+      </view>
+      <view class="platform-action-item" bindtap="bindStaffManageTap">
+        <view class="platform-action-icon">
+          <van-icon name="friends-o" size="40rpx" color="#4a7c8c" />
+        </view>
+        <text class="platform-action-text">管理员配置</text>
+      </view>
+    </view>
+  </view>
 
+  <view class="platform-section platform-section--footer">
+    <view class="platform-section-head">
+      <text class="platform-section-title">系统</text>
+    </view>
+    <view class="platform-menu-item" bindtap="url" data-url="/pages/admin/mgr/log/admin_log_list">
+      <van-icon name="description" size="32rpx" color="#4a7c8c" />
+      <text class="platform-menu-text">操作日志</text>
+      <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
+    </view>
+    <view class="platform-menu-item" bindtap="bindSettingTap">
+      <van-icon name="delete-o" size="32rpx" color="#4a7c8c" />
+      <text class="platform-menu-text">清除缓存</text>
+      <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
+    </view>
+  </view>
+</block>
+
+<!-- Tab 1: 瑜伽馆 -->
+<block wx:else>
+  <view class="platform-section">
     <view wx:if="{{!data.tenantList.length}}" class="empty-block">暂无瑜伽馆，点击上方新建</view>
-
     <view class="tenant-row" wx:for="{{data.tenantList}}" wx:key="TENANT_ID">
       <view class="tenant-row-main">
         <text class="tenant-row-name">{{item.TENANT_NAME}}</text>
@@ -53,12 +104,9 @@
       </view>
       <view class="tenant-row-btn" data-item="{{item}}" bindtap="bindEnterCoachTap">管理</view>
     </view>
-
-    <view class="platform-footer">
-      <text class="footer-link" bindtap="url" data-url="/pages/admin/mgr/log/admin_log_list">操作日志</text>
-      <text class="footer-dot">·</text>
-      <text class="footer-link" bindtap="bindSettingTap">清除缓存</text>
-    </view>
+  </view>
+</block>
+<!-- [AI_END LINES=70 TIMESTAMP=2025-01-27 11:10:00] -->
   </block>
 
   <!-- 馆长/教师：传统后台 -->
@@ -84,7 +132,6 @@
     </view>
 
     <van-cell-group custom-class="menu-group" wx:if="{{admin.type=='owner'}}">
-      <van-cell is-link url="/pages/admin/mgr/bind/admin_mgr_bind" title="微信绑定码" />
       <van-cell is-link url="/pages/admin/mgr/log/admin_log_list" title="操作日志" />
     </van-cell-group>
   </block>

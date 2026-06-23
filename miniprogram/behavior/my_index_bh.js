@@ -195,11 +195,8 @@ module.exports = Behavior({
       }
     },
 
-    bindGetPhone: async function (e) {
-      const user = await UserProfileBiz.syncPhoneFromEvent(e);
-      if (user) {
-        this.setData({ user });
-      }
+    bindProfileTap: function () {
+      wx.navigateTo({ url: '/pages/default/my/edit/my_edit' });
     },
 
     bindSwitchCoachTap: async function () {

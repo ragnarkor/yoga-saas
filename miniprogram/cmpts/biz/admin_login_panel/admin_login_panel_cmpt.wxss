@@ -1,11 +1,11 @@
-@import '../../../style/project/base/admin_theme.wxss';
+@import '../../../style/project/base/admin_theme_vars.wxss';
 
 .admin-login-popup {
   background: transparent !important;
 }
 
 .login-sheet {
-  background: #fff;
+  background: var(--adminSurface);
   border-radius: 24rpx 24rpx 0 0;
   padding: 12rpx 40rpx calc(32rpx + env(safe-area-inset-bottom));
 }
@@ -13,7 +13,7 @@
 .login-sheet-bar {
   width: 64rpx;
   height: 8rpx;
-  background: #e8ecee;
+  background: var(--adminBorder);
   border-radius: 4rpx;
   margin: 8rpx auto 28rpx;
 }

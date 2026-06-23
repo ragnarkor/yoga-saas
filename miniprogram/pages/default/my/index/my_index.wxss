@@ -108,6 +108,21 @@
   color: rgba(255, 255, 255, 0.92);
 }
 
+.profile-hint {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.profile-arrow {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.main .upside .user-bar {
+  align-items: center;
+  padding-right: 32rpx;
+}
+
 /* 菜单列表图标：统一主题色，次要项略降透明度 */
 .menu-group .van-icon {
   color: var(--themeColor, #5b8a72) !important;

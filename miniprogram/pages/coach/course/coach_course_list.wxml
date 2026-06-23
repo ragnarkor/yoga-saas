@@ -27,6 +27,7 @@
       class="course-card"
       wx:for="{{courseList}}"
       wx:key="_id"
+      style="border-left-color: {{item.color}};"
       data-id="{{item._id}}"
       bindtap="bindCourseTap"
     >
@@ -42,9 +43,6 @@
       <view class="course-info">
         <view class="course-title">{{item.MEET_TITLE}}</view>
         <view class="course-duration">{{item.duration}}</view>
-      </view>
-      <view class="course-tag" style="background: {{item.color}}20; border-color: {{item.color}};">
-        <view class="course-tag-dot" style="background: {{item.color}};"></view>
       </view>
       <van-icon name="arrow" size="32rpx" color="#ccc" />
     </view>

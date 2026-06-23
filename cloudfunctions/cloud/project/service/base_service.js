@@ -131,36 +131,24 @@ class BaseService {
       stats.announces++;
     }
 
-    let teacherList = links.teachers || [
-      {
-        name: "教练小王",
-        specialty: "哈他瑜伽 · 流瑜伽",
-        desc: "10年教学经验，擅长基础与进阶课程",
-      },
-      {
-        name: "教练小李",
-        specialty: "阴瑜伽 · 普拉提",
-        desc: "注重呼吸与体式细节，适合初学者",
-      },
-      {
-        name: "教练小陈",
-        specialty: "空中瑜伽 · 核心训练",
-        desc: "国家认证教练，课程节奏清晰有趣",
-      },
-    ];
-    for (let i in teacherList) {
-      let t = teacherList[i];
-      await TeacherModel.insert({
-        TEACHER_NAME: t.name,
-        TEACHER_AVATAR: pic,
-        TEACHER_PIC: [pic, pic],
-        TEACHER_SPECIALTY: t.specialty,
-        TEACHER_DESC: t.desc,
-        TEACHER_HOME: 1,
-        TEACHER_ORDER: Number(i) + 1,
-        TEACHER_STATUS: 1,
-      });
-      stats.teachers++;
+    let teacherList = links.teachers;
+    if (teacherList && teacherList.length) {
+      for (let i in teacherList) {
+        let t = teacherList[i];
+        if (!t.adminId) continue;
+        await TeacherModel.insert({
+          TEACHER_ADMIN_ID: t.adminId,
+          TEACHER_NAME: t.name,
+          TEACHER_AVATAR: pic,
+          TEACHER_PIC: [pic, pic],
+          TEACHER_SPECIALTY: t.specialty,
+          TEACHER_DESC: t.desc,
+          TEACHER_HOME: 1,
+          TEACHER_ORDER: Number(i) + 1,
+          TEACHER_STATUS: 1,
+        });
+        stats.teachers++;
+      }
     }
 
     let photoList = [
@@ -677,6 +665,9 @@ class BaseService {
       let setupData = {};
       setupData.SETUP_ABOUT = "关于我们 - " + tc.name;
       setupData.SETUP_PHONE = "400-888-0001";
+      setupData.SETUP_THEME_COLOR = "#5B8A72";
+      setupData.SETUP_MEET_TYPE =
+        "1=特色课程|leftbig3,2=精品课|leftbig2,3=私教定制|leftbig2,4=核心床|leftbig3";
       setupData.SETUP_FEATURES = {
         booking: true,
         payment: false,
@@ -687,25 +678,9 @@ class BaseService {
       };
       await SetupModel.insert(setupData);
 
-      let seedTeachers = [];
-      for (let i in tc.admins) {
-        if (tc.admins[i].type === AdminModel.TYPE.TEACHER) {
-          seedTeachers.push({
-            name: tc.admins[i].name,
-            specialty:
-              tc.admins[i].name.indexOf("张") >= 0
-                ? "空中瑜伽 · 塑形训练"
-                : tc.admins[i].name.indexOf("李") >= 0
-                  ? "阴瑜伽 · 普拉提"
-                  : "哈他瑜伽 · 流瑜伽",
-            desc: tc.name + "签约教练，欢迎预约体验课",
-          });
-        }
-      }
       let homeStats = await this.seedHomeContent(tc.name, {
         meetId: firstMeetId,
         newsId: firstNewsId,
-        teachers: seedTeachers.length ? seedTeachers : undefined,
       });
       result.home.push({ tenant: tc.name, pid: tenantId, ...homeStats });
 

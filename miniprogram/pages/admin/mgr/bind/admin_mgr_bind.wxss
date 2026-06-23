@@ -82,6 +82,7 @@
 
 .item-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 16rpx;
   margin-top: 24rpx;
   padding-top: 24rpx;
@@ -89,7 +90,8 @@
 }
 
 .btn {
-  flex: 1;
+  flex: 1 1 40%;
+  min-width: 180rpx;
   text-align: center;
   font-size: 26rpx;
   color: #4a7c8c;
@@ -102,6 +104,11 @@
 .btn.unbind {
   color: #e54d42;
   border-color: #e54d42;
+}
+
+.btn.delete {
+  color: #999;
+  border-color: #ccc;
 }
 
 .btn.disabled {

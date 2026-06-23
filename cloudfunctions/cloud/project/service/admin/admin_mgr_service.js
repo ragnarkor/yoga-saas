@@ -7,6 +7,9 @@ const AdminModel = require("../../model/admin_model.js");
 const TenantModel = require("../../model/tenant_model.js");
 const LogModel = require("../../model/log_model.js");
 const util = require("../../../framework/utils/util.js");
+const dataUtil = require("../../../framework/utils/data_util.js");
+const MeetModel = require("../../model/meet_model.js");
+const teacherAdminHelper = require("../teacher_admin_helper.js");
 
 class AdminMgrService extends BaseAdminService {
   /** 取得日志分页列表 */
@@ -87,7 +90,8 @@ class AdminMgrService extends BaseAdminService {
 
     if (!name) this.AppError("请填写姓名");
     if (phone.length < 5 || phone.length > 30) this.AppError("手机号格式不正确");
-    if (pwd.length < 5 || pwd.length > 30) this.AppError("密码需5-30位");
+    if (!pwd || pwd.length < 5) pwd = dataUtil.genRandomString(16);
+    if (pwd.length > 30) this.AppError("密码不能超过30位");
     if (
       adminType !== AdminModel.TYPE.OWNER &&
       adminType !== AdminModel.TYPE.TEACHER
@@ -135,6 +139,75 @@ class AdminMgrService extends BaseAdminService {
     );
 
     return { adminName: name, phone, adminType };
+  }
+
+  /** 馆主/超管：为本馆添加教练员工（待绑定空壳） */
+  async insertStaff(pid, name, phone, pwd, operator) {
+    if (!operator) this.AppError("无权限");
+    const opType = operator.ADMIN_TYPE;
+    if (opType !== AdminModel.TYPE.OWNER && opType !== AdminModel.TYPE.SUPER) {
+      this.AppError("仅馆主可添加员工");
+    }
+    if (opType === AdminModel.TYPE.OWNER && operator._pid !== pid) {
+      this.AppError("只能为本馆添加员工");
+    }
+    return await this.insertAdmin(
+      pid,
+      name,
+      phone,
+      pwd,
+      AdminModel.TYPE.TEACHER,
+      operator,
+    );
+  }
+
+  /** 删除未绑微信的空壳账号（超管任意；馆主仅本馆教练） */
+  async deleteAdmin(adminId, operator) {
+    if (!adminId) this.AppError("参数错误");
+    if (!operator) this.AppError("无权限");
+
+    let admin = await AdminModel.getOne({ _id: adminId }, "*", {}, false);
+    if (!admin) this.AppError("管理员不存在");
+    if (admin.ADMIN_TYPE === AdminModel.TYPE.SUPER) {
+      this.AppError("不能删除超级管理员");
+    }
+
+    const opType = operator.ADMIN_TYPE;
+    if (opType === AdminModel.TYPE.OWNER) {
+      if (operator._pid !== admin._pid) this.AppError("无权限");
+      if (admin.ADMIN_TYPE !== AdminModel.TYPE.TEACHER) {
+        this.AppError("馆主仅可删除待绑定的教练账号");
+      }
+    } else if (opType !== AdminModel.TYPE.SUPER) {
+      this.AppError("无权限");
+    }
+    if (teacherAdminHelper.constructor.isAdminBound(admin)) {
+      this.AppError("该账号已绑定微信，请先解绑再删除");
+    }
+
+    let meetCnt = await MeetModel.count({ MEET_ADMIN_ID: admin._id }, false);
+    if (meetCnt > 0) this.AppError("该账号已有关联课程，无法删除");
+
+    let tenant = await TenantModel.getOne(
+      { _pid: admin._pid },
+      "TENANT_NAME",
+      {},
+      false,
+    );
+
+    await teacherAdminHelper.deleteTeacherByAdmin(admin);
+    await AdminModel.del({ _id: admin._id });
+
+    await this.insertLog(
+      `删除了待绑定${admin.ADMIN_TYPE === AdminModel.TYPE.OWNER ? "馆长" : "教练"}账号 ${admin.ADMIN_NAME}`,
+      operator,
+      LogModel.TYPE.SYS,
+    );
+
+    return {
+      adminName: admin.ADMIN_NAME,
+      tenantName: tenant ? tenant.TENANT_NAME : "",
+    };
   }
 }
 

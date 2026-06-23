@@ -1,0 +1,50 @@
+<view class="profile-edit-page" wx:if="{{isLoad}}">
+  <van-cell-group>
+    <van-cell title="头像" required center>
+      <view slot="right-icon" class="avatar-cell">
+        <view class="avatar-box">
+          <image wx:if="{{showAvatar}}" class="avatar-img" mode="aspectFill" src="{{avatarSrc}}" />
+          <view wx:else class="avatar-placeholder">
+            <van-icon name="user-o" size="48rpx" color="{{themeColor}}" />
+          </view>
+          <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="bindChooseAvatar"></button>
+        </view>
+        <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
+      </view>
+    </van-cell>
+
+    <van-field
+      label="名字"
+      required
+      input-align="right"
+      value="{{formName}}"
+      placeholder="请输入昵称"
+      maxlength="30"
+      bind:change="bindNameInput"
+    />
+
+    <van-cell title="用户ID" value="{{userId || '—'}}" />
+
+    <van-cell title="绑定手机号" center>
+      <view slot="right-icon" class="phone-cell">
+        <button
+          class="phone-auth-btn"
+          open-type="getPhoneNumber"
+          bindgetphonenumber="bindGetPhone"
+        >授权更新</button>
+        <text class="phone-text">{{phone || '未绑定'}}</text>
+      </view>
+    </van-cell>
+  </van-cell-group>
+
+  <view class="submit-wrap">
+    <van-button
+      block
+      round
+      color="{{themeColor}}"
+      loading="{{submitting}}"
+      disabled="{{submitting}}"
+      bind:click="bindSubmitTap"
+    >保存</van-button>
+  </view>
+</view>

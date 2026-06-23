@@ -140,7 +140,7 @@ class PassportService extends BaseService {
 
 		}
 
-		let fields = 'USER_MOBILE,USER_NAME,USER_PIC,USER_CITY,USER_TRADE,USER_WORK'
+		let fields = 'USER_ID,USER_MOBILE,USER_NAME,USER_PIC,USER_CITY,USER_TRADE,USER_WORK'
 
 		let user = await UserModel.getOne(where, fields, {}, PassportService.MUST_PID);
 

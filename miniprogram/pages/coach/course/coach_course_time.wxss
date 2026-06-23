@@ -1,5 +1,0 @@
-@import "../../../tpls/project/meet_time_vant_tpl.wxss";
-
-.coach-page {
-  padding-bottom: 0;
-}

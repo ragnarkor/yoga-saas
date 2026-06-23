@@ -16,6 +16,8 @@ const JoinModel = require("../../model/join_model.js");
 const UserModel = require("../../model/user_model.js");
 const NewsModel = require("../../model/news_model.js");
 const LogModel = require("../../model/log_model.js");
+const tenantSetupHelper = require("../tenant_setup_helper.js");
+const teacherAdminHelper = require("../teacher_admin_helper.js");
 
 const BIND_CODE_TTL = 86400; // 24h
 const BIND_CACHE_PREFIX = "admin_bind_";
@@ -147,6 +149,7 @@ class AdminWxService extends BaseAdminService {
     for (let a of admins) {
       let t = tenantMap[a._pid];
       if (!t) continue;
+      t = await tenantSetupHelper.getMergedTenant(a._pid, t);
       list.push({
         ...t,
         adminType: a.ADMIN_TYPE,
@@ -259,6 +262,8 @@ class AdminWxService extends BaseAdminService {
     let token = await this._issueToken(admin);
     await this.insertLog("绑定了微信并登录", admin, LogModel.TYPE.SYS);
 
+    await teacherAdminHelper.ensureTeacherOnBind(admin);
+
     let tenant = await TenantModel.getOne(
       { _pid: admin._pid },
       "_pid,TENANT_NAME,TENANT_TEMPLATE,TENANT_THEME_COLOR",
@@ -331,6 +336,8 @@ class AdminWxService extends BaseAdminService {
       false,
     );
 
+    await teacherAdminHelper.hideTeacherOnUnbind(admin);
+
     await this.insertLog("解除了微信绑定", admin, LogModel.TYPE.SYS);
 
     return {
@@ -363,7 +370,7 @@ class AdminWxService extends BaseAdminService {
 
     global.PID = pid;
 
-    let [meetCnt, joinCnt, userCnt, newsCnt, todayJoinCnt, newUserCnt] =
+    let [meetCnt, joinCnt, userCnt, newsCnt, todayJoinCnt, newUserCnt, newCardCnt] =
       await Promise.all([
         MeetModel.count({}),
         JoinModel.count({ JOIN_STATUS: JoinModel.STATUS.SUCC }),
@@ -378,6 +385,16 @@ class AdminWxService extends BaseAdminService {
         UserModel.count({
           USER_ADD_TIME: [">=", monthStart],
         }),
+        (async () => {
+          try {
+            const AdminCardService = require("./admin_card_service.js");
+            const cardSvc = new AdminCardService();
+            const cardStats = await cardSvc.getCardStats();
+            return cardStats.newCards ?? 0;
+          } catch (e) {
+            return 0;
+          }
+        })(),
       ]);
 
     return {
@@ -388,7 +405,7 @@ class AdminWxService extends BaseAdminService {
       newsCnt,
       todayJoinCnt,
       newUserCnt,
-      newCardCnt: 0,
+      newCardCnt,
     };
   }
 
@@ -397,6 +414,18 @@ class AdminWxService extends BaseAdminService {
     if (!pid) this.AppError("请先选择瑜伽馆");
 
     const opType = (operator && operator.ADMIN_TYPE) || adminType || "";
+
+    if (opType === AdminModel.TYPE.TEACHER) {
+      if (!operator || operator._pid !== pid) {
+        this.AppError("无权限", appCode.ADMIN_ERROR);
+      }
+      return {
+        pid,
+        selfOnly: true,
+        list: [this._mapBindAdminItem(operator, opType, operator)],
+      };
+    }
+
     if (
       opType !== AdminModel.TYPE.SUPER &&
       opType !== AdminModel.TYPE.OWNER
@@ -420,33 +449,100 @@ class AdminWxService extends BaseAdminService {
 
     return {
       pid,
-      list: (list || []).map((item) => {
-        const openid = item.ADMIN_MINI_OPENID
-          ? String(item.ADMIN_MINI_OPENID).trim()
-          : "";
-        const bound = !!openid;
-        const isOwner = item.ADMIN_TYPE === AdminModel.TYPE.OWNER;
-        return {
-          id: item._id,
-          name: item.ADMIN_NAME,
-          phone: item.ADMIN_PHONE,
-          type: item.ADMIN_TYPE,
-          typeLabel: isOwner ? "馆长" : "教练",
-          bound,
-          boundOpenid: bound ? openid.slice(-8) : "",
-          bindTime: item.ADMIN_BIND_TIME || 0,
-          canGenCode:
-            opType === AdminModel.TYPE.SUPER ||
-            (opType === AdminModel.TYPE.OWNER && !isOwner),
-          canUnbind:
-            opType === AdminModel.TYPE.SUPER ||
+      selfOnly: false,
+      list: (list || []).map((item) =>
+        this._mapBindAdminItem(item, opType, operator),
+      ),
+    };
+  }
+
+  /** 超管：全平台员工列表 */
+  async listPlatformStaff(operator) {
+    if (!operator || operator.ADMIN_TYPE !== AdminModel.TYPE.SUPER) {
+      this.AppError("仅超级管理员可访问", appCode.ADMIN_ERROR);
+    }
+
+    let tenants = await TenantModel.getAll(
+      { TENANT_STATUS: TenantModel.STATUS.OPEN },
+      "_pid,TENANT_NAME",
+      {},
+      200,
+      false,
+    );
+    let tenantMap = {};
+    for (let t of tenants || []) {
+      tenantMap[t._pid] = t.TENANT_NAME;
+    }
+
+    let list = await AdminModel.getAll(
+      {
+        ADMIN_STATUS: 1,
+        ADMIN_TYPE: ["in", [AdminModel.TYPE.OWNER, AdminModel.TYPE.TEACHER]],
+      },
+      "ADMIN_ID,ADMIN_NAME,ADMIN_PHONE,ADMIN_TYPE,ADMIN_MINI_OPENID,ADMIN_BIND_TIME,_pid",
+      { ADMIN_ADD_TIME: "desc" },
+      500,
+      false,
+    );
+
+    const opType = AdminModel.TYPE.SUPER;
+    let mapped = (list || []).map((item) => ({
+      ...this._mapBindAdminItem(item, opType, operator),
+      pid: item._pid,
+      tenantName: tenantMap[item._pid] || "未知门店",
+    }));
+
+    let bound = mapped.filter((x) => x.bound).length;
+    return {
+      list: mapped,
+      stats: {
+        total: mapped.length,
+        bound,
+        pending: mapped.length - bound,
+      },
+    };
+  }
+
+  _mapBindAdminItem(item, opType, operator) {
+    const openid = item.ADMIN_MINI_OPENID
+      ? String(item.ADMIN_MINI_OPENID).trim()
+      : "";
+    const bound = !!openid;
+    const isOwner = item.ADMIN_TYPE === AdminModel.TYPE.OWNER;
+    const isSelf =
+      operator &&
+      ((operator._id && operator._id === item._id) ||
+        (operator.ADMIN_ID && operator.ADMIN_ID === item.ADMIN_ID));
+    return {
+      id: item._id,
+      name: item.ADMIN_NAME,
+      phone: item.ADMIN_PHONE,
+      type: item.ADMIN_TYPE,
+      typeLabel: isOwner ? "馆主" : "教练",
+      bound,
+      isShell: !bound,
+      boundOpenid: bound ? openid.slice(-8) : "",
+      bindTime: item.ADMIN_BIND_TIME || 0,
+      canGenCode:
+        !bound &&
+        (opType === AdminModel.TYPE.SUPER ||
+          (opType === AdminModel.TYPE.OWNER && !isOwner)),
+      canUnbind:
+        bound &&
+        (opType === AdminModel.TYPE.SUPER ||
+          isSelf ||
+          (opType === AdminModel.TYPE.OWNER &&
+            (!isOwner || isSelf))),
+      canDelete:
+        (!bound &&
+          item.ADMIN_TYPE === AdminModel.TYPE.TEACHER &&
+          (opType === AdminModel.TYPE.SUPER ||
             (opType === AdminModel.TYPE.OWNER &&
-              (!isOwner ||
-                (operator &&
-                  operator.ADMIN_ID &&
-                  operator.ADMIN_ID === item.ADMIN_ID))),
-        };
-      }),
+              operator &&
+              operator._pid === item._pid))) ||
+        (!bound &&
+          opType === AdminModel.TYPE.SUPER &&
+          item.ADMIN_TYPE === AdminModel.TYPE.OWNER),
     };
   }
 }

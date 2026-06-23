@@ -140,7 +140,6 @@ module.exports = Behavior({
 				shortDesc: styleSet.desc || meet.MEET_TYPE_NAME || '',
 				level,
 				levelStars,
-				coachName: meet.coachName || '专业教练',
 				introPics,
 				introText,
 				currentDayTimes: daysSet[dayIdx] ? daysSet[dayIdx].times : [],
@@ -194,11 +193,19 @@ module.exports = Behavior({
 				else bookBtnText = timeNode.error;
 			}
 
+			const styleSet = meet.MEET_STYLE_SET || {};
+			const coachName =
+				timeNode.teacherName ||
+				meet.coachName ||
+				styleSet.teacherName ||
+				'专业教练';
+
 			this.setData({
 				selectedDayIdx: dayIdx,
 				selectedTimeIdx: timeIdx,
 				timeMark: timeNode.mark,
 				classTimeText,
+				coachName,
 				seatText,
 				seatPercent,
 				limitHint,

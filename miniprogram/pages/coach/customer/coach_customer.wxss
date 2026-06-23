@@ -1,1 +1,159 @@
+/* [AI_START TIMESTAMP=2025-01-27 10:30:00] */
 @import "../coach_common.wxss";
+
+/* ==================== 客户页 — Hero 汇总 ==================== */
+.customer-hero {
+  margin: 0 24rpx 28rpx;
+  padding: 48rpx 32rpx;
+  border-radius: var(--radius-xl, 24rpx);
+  text-align: center;
+  box-shadow:
+    0 4rpx 20rpx rgba(91, 138, 114, 0.18),
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hero 装饰光晕 */
+.customer-hero::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 240rpx;
+  height: 240rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.customer-hero-num {
+  font-size: 72rpx;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  letter-spacing: 2rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.customer-hero-label {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 4rpx;
+  position: relative;
+  z-index: 1;
+}
+
+/* ==================== 客户页 — 分区卡片 ==================== */
+.customer-section {
+  margin-bottom: 24rpx;
+  background: var(--neutralSurface, #fff);
+  border-radius: var(--radius-xl, 24rpx);
+  padding: 28rpx 20rpx 8rpx;
+  box-shadow: var(--projectShadowSm, 0 2rpx 12rpx rgba(91, 138, 114, 0.08));
+}
+
+.customer-section--alert {
+  border-left: 6rpx solid #dd9168;
+}
+
+.customer-section-head {
+  padding: 0 8rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.customer-section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--neutralText, #1f2329);
+}
+
+.customer-section--alert .customer-section-title {
+  color: #dd9168;
+}
+
+.customer-section-desc {
+  font-size: 24rpx;
+  color: var(--neutralTextTertiary, #8f959e);
+}
+
+/* ==================== 客户页 — 卡片网格 ==================== */
+.customer-card-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* 统一 3 列 */
+.customer-card-item {
+  width: 33.33%;
+}
+
+.customer-card-item {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx 8rpx 20rpx;
+  border-radius: var(--radius-md, 16rpx);
+  transition:
+    background var(--transition-fast, 0.15s ease),
+    transform var(--transition-fast, 0.15s ease);
+}
+
+.customer-card-item:active {
+  background: var(--projectColorLight, #e5f1ec);
+  transform: scale(0.94);
+}
+
+/* 关注分区点击态用赤陶浅色，避免与主题绿冲突 */
+.customer-section--alert .customer-card-item:active {
+  background: rgba(221, 145, 104, 0.14);
+}
+
+.customer-card-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: var(--radius-lg, 22rpx);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8rpx;
+  background: var(--projectColorLight, #e5f1ec);
+  transition:
+    background var(--transition-base, 0.25s ease),
+    transform var(--transition-base, 0.25s ease);
+}
+
+.customer-card-item:active .customer-card-icon {
+  transform: scale(0.88);
+}
+
+/* 关注分区图标用赤陶色底 */
+.customer-card-icon--alert {
+  background: rgba(221, 145, 104, 0.12);
+}
+
+.customer-card-num {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--themeColor, #6fae96);
+  line-height: 1.2;
+}
+
+.customer-section--alert .customer-card-num {
+  color: #dd9168;
+}
+
+.customer-card-label {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--neutralTextSecondary, #646a73);
+  text-align: center;
+  line-height: 1.35;
+}
+/* [AI_END LINES=127 TIMESTAMP=2025-01-27 10:30:00] */

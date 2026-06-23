@@ -3,9 +3,10 @@
 </view>
 
 <view wx:else class="admin-home-content">
+  <view class="content-tip">老师由员工绑定微信后自动展示在首页，请在「员工管理」中维护。此处仅管理横幅、公告与照片墙。</view>
   <van-tabs active="{{activeTab}}" bind:change="bindTabChange" color="#4a7c8c">
     <van-tab title="横幅">
-      <view class="tip">在「编辑-联系我们」配置电话；横幅数据可通过云函数 admin/home_banner_insert 添加</view>
+      <view class="tip">横幅可通过云函数 admin/home_banner_insert 添加</view>
       <van-cell-group>
         <van-cell wx:for="{{banners}}" wx:key="_id" title="{{item.BANNER_TITLE || '未命名横幅'}}" label="{{item.BANNER_TYPE}} · 排序{{item.BANNER_ORDER}}">
           <view slot="right-icon" data-type="banner" data-id="{{item._id}}" bindtap="bindDelTap">
@@ -27,18 +28,8 @@
       <van-empty wx:if="{{announces.length==0}}" description="暂无公告" />
     </van-tab>
 
-    <van-tab title="老师">
-      <van-cell-group>
-        <van-cell wx:for="{{teachers}}" wx:key="_id" title="{{item.TEACHER_NAME}}" label="{{item.TEACHER_SPECIALTY}}">
-          <view slot="right-icon" data-type="teacher" data-id="{{item._id}}" bindtap="bindDelTap">
-            <van-button size="mini" type="danger">删除</van-button>
-          </view>
-        </van-cell>
-      </van-cell-group>
-      <van-empty wx:if="{{teachers.length==0}}" description="暂无老师" />
-    </van-tab>
-
     <van-tab title="照片墙">
+      <view class="tip">「描述」字段填相册名称（相同名称的照片会归为一组，首页左右滑动切换相册）</view>
       <van-cell-group>
         <van-cell wx:for="{{photos}}" wx:key="_id" title="{{item.PHOTO_TITLE || '照片'}}" label="{{item.PHOTO_DESC}}">
           <view slot="right-icon" data-type="photo" data-id="{{item._id}}" bindtap="bindDelTap">

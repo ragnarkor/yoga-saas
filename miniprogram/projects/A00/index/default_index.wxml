@@ -57,24 +57,7 @@
 		</view>
 		<view class="a00-feat-card" bindtap="url" data-url="/pages/default/about/index/about_index">
 			<view class="a00-feat-icon a00-icon-4"><van-icon name="home-o" size="44rpx" color="#1a1a2e" /></view>
-			<view class="a00-feat-name">关于我们</view>
-		</view>
-	</view>
-
-	<!-- 公告 -->
-	<view class="a00-section" wx:if="{{announcements.length > 0}}">
-		<view class="a00-sec-header">
-			<view class="a00-sec-line"></view>
-			<view class="a00-sec-title">公告</view>
-			<view class="a00-sec-line"></view>
-		</view>
-		<view class="a00-news-card" wx:for="{{announcements}}" wx:key="_id" bindtap="bindAnnounceTap" data-id="{{item._id}}">
-			<view class="a00-news-body">
-				<view class="a00-news-cate">NOTICE</view>
-				<view class="a00-news-title text-cut">{{item.title}}</view>
-				<view class="a00-news-desc text-cut" wx:if="{{item.desc}}">{{item.desc}}</view>
-			</view>
-			<van-icon name="arrow" size="24rpx" color="rgba(201,169,110,0.6)" />
+			<view class="a00-feat-name">门店介绍</view>
 		</view>
 	</view>
 
@@ -96,18 +79,53 @@
 		</scroll-view>
 	</view>
 
-	<!-- 照片墙 -->
-	<view class="a00-section" wx:if="{{photos.length > 0}}">
+	<!-- 照片墙：多相册左右滑动 -->
+	<view class="a00-section a00-section--compact" wx:if="{{photoAlbums && photoAlbums.length > 0}}">
 		<view class="a00-sec-header">
 			<view class="a00-sec-line"></view>
 			<view class="a00-sec-title">照片墙</view>
 			<view class="a00-sec-line"></view>
 		</view>
-		<view class="a00-photo-grid">
-			<view class="a00-photo-item" wx:for="{{photos}}" wx:key="_id" bindtap="bindPhotoTap" data-index="{{index}}">
-				<image mode="aspectFill" src="{{item.pic}}" />
-				<view class="a00-photo-cap text-cut" wx:if="{{item.title}}">{{item.title}}</view>
+		<swiper class="a00-album-swiper" indicator-dots indicator-color="rgba(255,255,255,0.35)" indicator-active-color="#c9a96e" circular duration="400">
+			<swiper-item wx:for="{{photoAlbums}}" wx:for-index="albumIdx" wx:key="albumIdx">
+				<view class="a00-album-panel">
+					<view class="a00-album-title">{{item.title}}</view>
+					<scroll-view class="a00-album-scroll" scroll-x show-scrollbar="{{false}}">
+						<view class="a00-album-photos">
+							<view
+								class="a00-album-photo"
+								wx:for="{{item.photos}}"
+								wx:for-item="photo"
+								wx:for-index="photoIdx"
+								wx:key="_id"
+								bindtap="bindPhotoTap"
+								data-album-index="{{albumIdx}}"
+								data-photo-index="{{photoIdx}}"
+							>
+								<image mode="aspectFill" src="{{photo.pic}}" />
+								<view class="a00-album-cap text-cut" wx:if="{{photo.title}}">{{photo.title}}</view>
+							</view>
+						</view>
+					</scroll-view>
+				</view>
+			</swiper-item>
+		</swiper>
+	</view>
+
+	<!-- 公告（底部） -->
+	<view class="a00-section" wx:if="{{announcements.length > 0}}">
+		<view class="a00-sec-header">
+			<view class="a00-sec-line"></view>
+			<view class="a00-sec-title">公告</view>
+			<view class="a00-sec-line"></view>
+		</view>
+		<view class="a00-news-card" wx:for="{{announcements}}" wx:key="_id" bindtap="bindAnnounceTap" data-id="{{item._id}}">
+			<view class="a00-news-body">
+				<view class="a00-news-cate">NOTICE</view>
+				<view class="a00-news-title text-cut">{{item.title}}</view>
+				<view class="a00-news-desc text-cut" wx:if="{{item.desc}}">{{item.desc}}</view>
 			</view>
+			<van-icon name="arrow" size="24rpx" color="rgba(201,169,110,0.6)" />
 		</view>
 	</view>
 

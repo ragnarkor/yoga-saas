@@ -15,11 +15,11 @@
       </view>
       <view class="coach-stat-item">
         <view class="coach-stat-num">{{stats.newCard}}</view>
-        <view class="coach-stat-label">新增会员卡</view>
+        <view class="coach-stat-label">本月新卡</view>
       </view>
       <view class="coach-stat-item">
         <view class="coach-stat-num">{{stats.newMember}}</view>
-        <view class="coach-stat-label">新增会员</view>
+        <view class="coach-stat-label">本月新会员</view>
       </view>
     </view>
 
@@ -34,6 +34,12 @@
         <view class="coach-section-title">快捷工具</view>
       </view>
       <view class="coach-grid coach-grid-3">
+        <view wx:if="{{isSuperAdmin}}" class="coach-grid-item" bindtap="onMenuTap" data-action="platform">
+          <view class="coach-grid-icon" style="background: #4a7c8c20;">
+            <van-icon name="cluster-o" color="#4a7c8c" size="40rpx" />
+          </view>
+          <text class="coach-grid-text">平台管理</text>
+        </view>
         <view class="coach-grid-item" wx:for="{{quickTools}}" wx:key="name" bindtap="onMenuTap" data-url="{{item.url}}" data-action="{{item.action}}">
           <view class="coach-grid-icon" style="background: {{item.color}}20;">
             <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
@@ -49,7 +55,7 @@
         <view class="coach-section-desc">预约、会员与门店日常运营</view>
       </view>
       <view class="coach-grid coach-grid-3">
-        <view class="coach-grid-item" wx:for="{{menus}}" wx:key="name" bindtap="onMenuTap" data-url="{{item.url}}">
+        <view class="coach-grid-item" wx:for="{{menus}}" wx:key="name" bindtap="onMenuTap" data-url="{{item.url}}" data-action="{{item.action}}">
           <view class="coach-grid-icon" style="background: {{item.color}}20;">
             <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
           </view>

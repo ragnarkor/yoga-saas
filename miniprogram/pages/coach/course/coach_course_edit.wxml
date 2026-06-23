@@ -8,12 +8,24 @@
 
   <block wx:else>
     <van-cell-group title="基本信息" custom-class="course-edit-group">
-      <van-cell
-        title="课程模板"
-        is-link
-        value="{{formStyleSet.templateName || '选择模板'}}"
-        bind:click="bindTemplateTap"
-      />
+      <view class="course-edit-field" bindtap="bindTemplateTap">
+        <view class="course-edit-field-label">课程模板</view>
+        <view wx:if="{{selectedTemplatePreview}}" class="course-edit-field-selected">
+          <image class="course-edit-field-cover" src="{{selectedTemplatePreview.cover}}" mode="aspectFill" />
+          <view class="course-edit-field-info">
+            <view class="course-edit-field-title">{{selectedTemplatePreview.title}}</view>
+            <view class="course-edit-field-meta">
+              {{selectedTemplatePreview.typeName}} · {{selectedTemplatePreview.durationText}}
+            </view>
+          </view>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+        <view wx:else class="course-edit-field-placeholder">
+          <text>选择已有课程作为模板</text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
       <van-field
         label="课程名称"
         required
@@ -22,13 +34,19 @@
         maxlength="50"
         bind:change="bindTitleChange"
       />
-      <van-cell
-        title="课程类型"
-        required
-        is-link
-        value="{{typeName || '请选择'}}"
-        bind:click="bindTypeTap"
-      />
+
+      <view class="course-edit-field" bindtap="bindTypeTap">
+        <view class="course-edit-field-label">
+          <text>课程类型</text>
+          <text class="course-edit-required">*</text>
+        </view>
+        <view class="course-edit-field-row">
+          <text class="{{typeName ? 'course-edit-field-value' : 'course-edit-field-placeholder-text'}}">
+            {{typeName || '请选择课程类型'}}
+          </text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
       <van-field
         label="时长(分钟)"
         required
@@ -53,12 +71,6 @@
         placeholder="1"
         data-field="cardTimes"
         bind:change="bindStyleFieldChange"
-      />
-      <van-cell
-        title="授课老师"
-        is-link
-        value="{{formStyleSet.teacherName || '请选择'}}"
-        bind:click="bindTeacherTap"
       />
     </van-cell-group>
 
@@ -121,7 +133,7 @@
       />
     </van-cell-group>
 
-    <van-cell-group title="预约设置" custom-class="course-edit-group">
+    <van-cell-group title="课程设置" custom-class="course-edit-group">
       <van-field
         label="容纳人数"
         type="number"
@@ -146,13 +158,6 @@
           bind:change="bindRateChange"
         />
       </van-cell>
-      <van-cell
-        wx:if="{{id}}"
-        title="排课时段"
-        is-link
-        value="{{formDaysSet.length ? formDaysSet.length + '天可约' : '去配置'}}"
-        bind:click="bindTimeTap"
-      />
     </van-cell-group>
 
     <view class="course-edit-save">
@@ -166,27 +171,76 @@
     </view>
   </block>
 
-  <van-action-sheet
-    show="{{ templateSheetShow }}"
-    actions="{{ templateActions }}"
-    cancel-text="取消"
-    bind:select="bindTemplateSelect"
+  <van-popup
+    show="{{templateSheetShow}}"
+    position="bottom"
+    round
     bind:close="bindCloseTemplateSheet"
-  />
+    custom-class="course-edit-popup"
+  >
+    <view class="course-edit-sheet">
+      <view class="course-edit-sheet-head">
+        <text class="course-edit-sheet-title">选择课程模板</text>
+        <text class="course-edit-sheet-sub">复制封面、时长、颜色等配置</text>
+      </view>
+      <scroll-view scroll-y class="course-edit-sheet-scroll" enhanced show-scrollbar="{{false}}">
+        <view
+          class="course-edit-option {{formStyleSet.templateId === item._id ? 'is-active' : ''}}"
+          wx:for="{{templatePickerList}}"
+          wx:key="_id"
+          data-id="{{item._id}}"
+          bindtap="bindTemplatePick"
+          style="border-left-color: {{item.color}};"
+        >
+          <image class="course-edit-option-cover" src="{{item.cover}}" mode="aspectFill" />
+          <view class="course-edit-option-body">
+            <view class="course-edit-option-title">{{item.title}}</view>
+            <view class="course-edit-option-meta">
+              <text class="course-edit-option-tag">{{item.typeName}}</text>
+              <text>{{item.durationText}}</text>
+            </view>
+            <view wx:if="{{item.desc}}" class="course-edit-option-desc">{{item.desc}}</view>
+          </view>
+          <van-icon
+            wx:if="{{formStyleSet.templateId === item._id}}"
+            name="success"
+            size="40rpx"
+            color="{{themeColor}}"
+          />
+        </view>
+      </scroll-view>
+    </view>
+  </van-popup>
 
-  <van-action-sheet
-    show="{{ typeSheetShow }}"
-    actions="{{ typeActions }}"
-    cancel-text="取消"
-    bind:select="bindTypeSelect"
+  <van-popup
+    show="{{typeSheetShow}}"
+    position="bottom"
+    round
     bind:close="bindCloseTypeSheet"
-  />
+    custom-class="course-edit-popup"
+  >
+    <view class="course-edit-sheet">
+      <view class="course-edit-sheet-head">
+        <text class="course-edit-sheet-title">选择课程类型</text>
+      </view>
+      <view class="course-edit-type-list">
+        <view
+          class="course-edit-type-item {{formTypeId === item.id ? 'is-active' : ''}}"
+          wx:for="{{categories}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="bindTypePick"
+        >
+          <text>{{item.name}}</text>
+          <van-icon
+            wx:if="{{formTypeId === item.id}}"
+            name="success"
+            size="36rpx"
+            color="{{themeColor}}"
+          />
+        </view>
+      </view>
+    </view>
+  </van-popup>
 
-  <van-action-sheet
-    show="{{ teacherSheetShow }}"
-    actions="{{ teacherActions }}"
-    cancel-text="取消"
-    bind:select="bindTeacherSelect"
-    bind:close="bindCloseTeacherSheet"
-  />
 </view>

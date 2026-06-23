@@ -1,0 +1,29 @@
+@import "../coach_member_card.wxss";
+
+.staff-page {
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+}
+
+.staff-avatar-letter text {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.staff-add-panel {
+  padding: 32rpx 24rpx calc(32rpx + env(safe-area-inset-bottom));
+}
+
+.staff-add-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 24rpx;
+  color: var(--neutralText, #1f2329);
+}
+
+.staff-add-tip {
+  margin: 16rpx 8rpx 24rpx;
+  font-size: 24rpx;
+  color: var(--neutralTextTertiary, #8f959e);
+  line-height: 1.5;
+}

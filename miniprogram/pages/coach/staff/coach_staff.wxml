@@ -1,0 +1,113 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page member-page staff-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <block wx:if="{{!selfOnly}}">
+    <view class="member-toolbar">
+      <view class="member-search">
+        <van-icon name="search" size="32rpx" color="{{themeColor}}" />
+        <input
+          class="member-search-input"
+          placeholder="搜索姓名或手机号"
+          value="{{keyword}}"
+          confirm-type="search"
+          bindinput="bindSearchInput"
+          bindconfirm="bindSearchConfirm"
+        />
+      </view>
+      <view
+        wx:if="{{canManage}}"
+        class="member-add-btn"
+        bindtap="bindAddOpenTap"
+      >
+        <van-icon name="plus" size="28rpx" color="#fff" />
+        <text>新增</text>
+      </view>
+    </view>
+
+    <view class="member-filters">
+      <view
+        wx:for="{{filters}}"
+        wx:key="key"
+        class="member-filter-item {{activeFilter === item.key ? 'active' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="bindFilterTap"
+      >{{item.label}}</view>
+    </view>
+  </block>
+
+  <view wx:if="{{loading}}" class="member-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <view wx:elif="{{!displayList.length}}" class="member-empty">
+    {{selfOnly ? '未找到您的账号信息' : '暂无员工'}}
+  </view>
+
+  <view wx:else class="member-list">
+    <view class="member-row" wx:for="{{displayList}}" wx:key="id">
+      <view class="member-avatar">
+        <view class="member-avatar-placeholder staff-avatar-letter">
+          <text style="color: {{themeColor}};">{{item.initial}}</text>
+        </view>
+      </view>
+      <view class="member-info">
+        <view class="member-name">{{item.name || '未命名'}}</view>
+        <view class="member-phone">{{item.subtitle}}</view>
+      </view>
+      <view
+        wx:if="{{item.showManage}}"
+        class="member-issue-btn"
+        data-index="{{index}}"
+        bindtap="bindActionTap"
+      >
+        <text>管理</text>
+        <van-icon name="arrow" size="24rpx" color="#fff" />
+      </view>
+    </view>
+  </view>
+</view>
+
+<van-popup show="{{addShow}}" position="bottom" round bind:close="bindAddCloseTap">
+  <view class="staff-add-panel">
+    <view class="staff-add-title">添加教练</view>
+    <van-cell-group>
+      <van-field
+        label="姓名"
+        required
+        input-align="right"
+        value="{{addForm.name}}"
+        placeholder="员工姓名"
+        maxlength="20"
+        data-field="name"
+        bind:change="bindAddInput"
+      />
+      <van-field
+        label="手机号"
+        required
+        type="number"
+        input-align="right"
+        value="{{addForm.phone}}"
+        placeholder="用于账号识别"
+        maxlength="11"
+        data-field="phone"
+        bind:change="bindAddInput"
+      />
+    </van-cell-group>
+    <view class="staff-add-tip">创建后发送绑定邀请，员工微信扫码即可上岗。</view>
+    <van-button
+      block
+      round
+      loading="{{submitting}}"
+      disabled="{{submitting}}"
+      color="{{themeColor}}"
+      bind:click="bindAddSubmitTap"
+    >确认添加</van-button>
+  </view>
+</van-popup>

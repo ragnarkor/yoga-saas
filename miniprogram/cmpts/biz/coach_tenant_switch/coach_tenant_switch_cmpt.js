@@ -1,5 +1,5 @@
-const AdminBiz = require('../../../biz/admin_biz.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
+const pageHelper = require('../../../helper/page_helper.js');
 const themeHelper = require('../../../helper/theme_helper.js');
 
 Component({
@@ -81,24 +81,28 @@ Component({
     },
 
     async refresh() {
-      const list = await AdminWxBiz.fetchTenantList();
-      const pid = pageHelper.getPID();
-      let current = list.find((t) => t._pid === pid) || list[0];
-      this._syncHeaderBg(
-        this.properties.themeColor,
-        this.properties.navBg,
-      );
-      this.setData({
-        tenantList: list,
-        tenantName: current
-          ? current.TENANT_NAME
-          : pageHelper.getTenantName() || '瑜伽馆',
-        roleLabel: current
-          ? current.roleLabel
-          : AdminWxBiz.isSuperSession()
-            ? '超管'
-            : '',
-      });
+      try {
+        const list = await AdminWxBiz.fetchTenantList();
+        const pid = pageHelper.getPID();
+        let current = list.find((t) => t._pid === pid) || list[0];
+        this._syncHeaderBg(
+          this.properties.themeColor,
+          this.properties.navBg,
+        );
+        this.setData({
+          tenantList: list,
+          tenantName: current
+            ? current.TENANT_NAME
+            : pageHelper.getTenantName() || '瑜伽馆',
+          roleLabel: current
+            ? current.roleLabel
+            : AdminWxBiz.isSuperSession()
+              ? '超管'
+              : '',
+        });
+      } catch (e) {
+        console.error('[coach_tenant_switch.refresh]', e);
+      }
     },
 
     bindBackTap() {
@@ -119,7 +123,7 @@ Component({
         }
         return;
       }
-      if (list.length === 1) {
+      if (list.length === 1 && !AdminWxBiz.isSuperSession()) {
         wx.showToast({ title: '仅有一个馆', icon: 'none' });
         return;
       }

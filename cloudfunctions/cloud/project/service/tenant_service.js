@@ -4,6 +4,7 @@
 
 const BaseService = require("./base_service.js");
 const TenantModel = require("../model/tenant_model.js");
+const tenantSetupHelper = require("./tenant_setup_helper.js");
 
 class TenantService extends BaseService {
   async getTenantList() {
@@ -14,8 +15,12 @@ class TenantService extends BaseService {
       "_pid,TENANT_ID,TENANT_NAME,TENANT_LOGO,TENANT_DESC,TENANT_TEMPLATE,TENANT_MEET_TYPE,TENANT_MEET_NAME,TENANT_THEME_COLOR";
     let orderBy = { TENANT_ADD_TIME: "asc" };
 
-    // 第4个参数 size(条数) 不能传 false；第5个参数 mustPID=false 表示跨租户全局列出（租户选择页需列出所有馆，不能按 _pid='ONE' 过滤）
-    return await TenantModel.getAll(where, fields, orderBy, 100, false);
+    let list = await TenantModel.getAll(where, fields, orderBy, 100, false);
+    let merged = [];
+    for (let tenant of list || []) {
+      merged.push(await tenantSetupHelper.getMergedTenant(tenant._pid, tenant));
+    }
+    return merged;
   }
 
   async getTenantDetail(pid) {
@@ -23,7 +28,9 @@ class TenantService extends BaseService {
       _pid: pid,
       TENANT_STATUS: TenantModel.STATUS.OPEN,
     };
-    return await TenantModel.getOne(where, "*", {}, false);
+    let tenant = await TenantModel.getOne(where, "*", {}, false);
+    if (!tenant) return null;
+    return await tenantSetupHelper.getMergedTenant(pid, tenant);
   }
 }
 

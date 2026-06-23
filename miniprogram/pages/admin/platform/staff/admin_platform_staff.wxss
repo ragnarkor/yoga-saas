@@ -1,0 +1,248 @@
+/* [AI_START TIMESTAMP=2025-01-27 14:30:00] */
+.platform-staff-page {
+  min-height: 100vh;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  background: #f4f6f7;
+}
+
+.staff-loading {
+  display: flex;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+/* ==================== 紧凑统计头 ==================== */
+.staff-hero {
+  margin: 20rpx 24rpx 0;
+  padding: 24rpx 24rpx 20rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(74, 124, 140, 0.06);
+}
+
+.staff-hero-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #2c3e44;
+}
+
+.staff-hero-tip {
+  margin-top: 8rpx;
+  font-size: 23rpx;
+  line-height: 1.55;
+  color: #8f959e;
+}
+
+.staff-stats {
+  display: flex;
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f0f1f2;
+}
+
+.staff-stat {
+  flex: 1;
+  text-align: center;
+}
+
+.staff-stat-num {
+  display: block;
+  font-size: 38rpx;
+  font-weight: 700;
+  color: #2c3e44;
+  line-height: 1.1;
+}
+
+.staff-stat-num--ok {
+  color: #07c160;
+}
+
+.staff-stat-num--warn {
+  color: #e6a23c;
+}
+
+.staff-stat-label {
+  display: block;
+  margin-top: 2rpx;
+  font-size: 21rpx;
+  color: #8f959e;
+}
+
+/* ==================== 工具栏 ==================== */
+.staff-toolbar {
+  padding: 16rpx 24rpx 0;
+}
+
+.staff-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  height: 76rpx;
+  border-radius: 14rpx;
+  background: var(--adminColor, #4a7c8c);
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: 600;
+  transition: opacity 0.15s ease;
+}
+
+.staff-add-btn:active {
+  opacity: 0.82;
+}
+
+.staff-empty {
+  padding: 40rpx 0;
+}
+
+/* ==================== 紧凑卡片列表 ==================== */
+.staff-list {
+  padding: 12rpx 24rpx 0;
+}
+
+.staff-card {
+  position: relative;
+  background: #fff;
+  border-radius: 18rpx;
+  padding: 20rpx 20rpx 16rpx 24rpx;
+  margin-bottom: 14rpx;
+  box-shadow: 0 2rpx 10rpx rgba(74, 124, 140, 0.05);
+  overflow: hidden;
+}
+
+/* 状态左侧色条，便于快速扫视绑定情况 */
+.staff-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6rpx;
+  background: #e6a23c;
+}
+
+.staff-card.is-bound::before {
+  background: #07c160;
+}
+
+.staff-card-head {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.staff-avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 16rpx;
+  background: rgba(74, 124, 140, 0.12);
+  color: var(--adminColor, #4a7c8c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.staff-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.staff-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.staff-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1f2329;
+}
+
+.staff-role-tag {
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 6rpx;
+  color: var(--adminColor, #4a7c8c);
+  background: rgba(74, 124, 140, 0.1);
+}
+
+.staff-tenant {
+  margin-top: 5rpx;
+  font-size: 22rpx;
+  color: #6b7177;
+}
+
+.staff-phone {
+  margin-top: 2rpx;
+  font-size: 22rpx;
+  color: #8f959e;
+}
+
+.staff-badge {
+  flex-shrink: 0;
+  font-size: 21rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  color: #e6a23c;
+  background: rgba(230, 162, 60, 0.12);
+}
+
+.staff-badge--on {
+  color: #07c160;
+  background: rgba(7, 193, 96, 0.12);
+}
+
+.staff-card-meta {
+  margin-top: 10rpx;
+  font-size: 21rpx;
+  color: #bbb;
+}
+
+/* ==================== 药丸状操作按钮 ==================== */
+.staff-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 14rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid #f2f3f4;
+}
+
+.staff-action {
+  padding: 8rpx 20rpx;
+  font-size: 23rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid #e0e2e3;
+  color: #6b7177;
+  transition: opacity 0.15s ease;
+}
+
+.staff-action:active {
+  opacity: 0.65;
+}
+
+.staff-action--primary {
+  color: var(--adminColor, #4a7c8c);
+  border-color: var(--adminColor, #4a7c8c);
+}
+
+.staff-action--warn {
+  color: #e54d42;
+  border-color: #f5c0bb;
+}
+
+.staff-action--muted {
+  color: #999;
+  border-color: #e5e5e5;
+}
+
+.staff-action.disabled {
+  color: #ccc;
+  border-color: #eee;
+  background: #fafafa;
+}
+/* [AI_END LINES=160 TIMESTAMP=2025-01-27 14:30:00] */

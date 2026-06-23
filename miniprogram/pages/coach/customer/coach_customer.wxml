@@ -1,21 +1,47 @@
+<!-- [AI_START TIMESTAMP=2025-01-27 10:25:00] -->
 <page-meta page-style="{{themeStyle}}" />
 <view class="coach-page">
-  <coach-tenant-switch title="客户" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" bind:change="bindCoachTenantChange" />
+  <coach-tenant-switch
+    title="客户"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
 
   <view class="coach-customer-wrap">
-    <view class="coach-welcome">
-      <text class="coach-welcome-title">客户洞察</text>
-      <text class="coach-welcome-sub">会员与持卡情况一览</text>
+    <!-- Hero 汇总卡片 -->
+    <view class="customer-hero" style="background: {{themeColor}};">
+      <view class="customer-hero-num">{{totalMembers}}</view>
+      <view class="customer-hero-label">总会员数</view>
     </view>
 
-    <view class="coach-customer-grid">
-      <view class="coach-customer-card" wx:for="{{cards}}" wx:key="label" bindtap="onCardTap" data-key="{{item.key}}">
-        <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
-        <view class="coach-customer-num">{{item.num}}</view>
-        <view class="coach-customer-label">{{item.label}}</view>
+    <!-- 分组卡片 -->
+    <block wx:for="{{sections}}" wx:key="title" wx:for-item="section">
+      <view class="customer-section {{section.alert ? 'customer-section--alert' : ''}}">
+        <view class="customer-section-head">
+          <text class="customer-section-title">{{section.title}}</text>
+          <text class="customer-section-desc">{{section.desc}}</text>
+        </view>
+        <view class="customer-card-grid">
+          <view
+            class="customer-card-item"
+            wx:for="{{section.cards}}"
+            wx:key="key"
+            wx:for-item="card"
+            bindtap="onCardTap"
+            data-key="{{card.key}}"
+          >
+            <view class="customer-card-icon {{section.alert ? 'customer-card-icon--alert' : ''}}">
+              <van-icon name="{{card.icon}}" size="36rpx" color="{{section.alert ? '#DD9168' : themeColor}}" />
+            </view>
+            <view class="customer-card-num">{{card.num}}</view>
+            <view class="customer-card-label">{{card.label}}</view>
+          </view>
+        </view>
       </view>
-    </view>
+    </block>
   </view>
 
   <coach-tab-bar active="{{1}}" />
 </view>
+<!-- [AI_END LINES=44 TIMESTAMP=2025-01-27 10:25:00] -->

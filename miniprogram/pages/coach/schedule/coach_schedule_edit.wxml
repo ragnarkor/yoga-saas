@@ -1,0 +1,175 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page schedule-edit-page">
+  <coach-tenant-switch
+    title="{{pageTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+  />
+
+  <view wx:if="{{loading}}" class="schedule-edit-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <view wx:if="{{isEdit}}" class="schedule-edit-tip">编辑已有排课，修改后保存；不需要可在底部删除。</view>
+    <view wx:else class="schedule-edit-tip">日期可多选，一次为多个日期排同一时段。</view>
+
+    <van-cell-group title="排课信息" custom-class="schedule-edit-group">
+      <view class="schedule-course-field" bindtap="bindCourseTap">
+        <view class="schedule-course-field-label">
+          <text>课程</text>
+          <text class="schedule-course-required">*</text>
+        </view>
+        <view wx:if="{{selectedCourse}}" class="schedule-course-selected">
+          <image
+            class="schedule-course-cover"
+            src="{{selectedCourse.cover}}"
+            mode="aspectFill"
+          />
+          <view class="schedule-course-info">
+            <view class="schedule-course-title">{{selectedCourse.title}}</view>
+            <view class="schedule-course-meta">
+              {{selectedCourse.typeName}} · {{selectedCourse.durationText}} · {{selectedCourse.teacherName}}
+            </view>
+            <view wx:if="{{selectedCourse.desc}}" class="schedule-course-desc">{{selectedCourse.desc}}</view>
+          </view>
+          <van-icon wx:if="{{!isEdit}}" name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+        <view wx:else class="schedule-course-placeholder">
+          <text>请选择课程</text>
+          <van-icon wx:if="{{!isEdit}}" name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+      <van-cell
+        title="上课日期"
+        required
+        is-link="{{!isEdit}}"
+        value="{{formDayDisplay || '请选择'}}"
+        label="{{isEdit ? '编辑时不可改日期' : '支持多选'}}"
+        bind:click="bindDayTap"
+      />
+      <van-cell
+        title="开始时间"
+        required
+        is-link
+        value="{{formStartTime || '请选择'}}"
+        bind:click="bindStartTimeTap"
+      />
+      <van-cell
+        title="结束时间"
+        value="{{formEndTime}}"
+        label="按课程时长 {{duration}} 分钟自动计算"
+      />
+      <van-cell
+        title="授课老师"
+        required
+        is-link
+        value="{{formTeacherName || '请选择'}}"
+        bind:click="bindTeacherTap"
+      />
+      <van-field
+        label="人数上限"
+        type="number"
+        value="{{formLimit}}"
+        placeholder="0 表示不限"
+        bind:change="bindLimitChange"
+      />
+    </van-cell-group>
+
+    <view class="schedule-edit-save">
+      <van-button
+        block
+        round
+        color="{{themeColor}}"
+        loading="{{saving}}"
+        disabled="{{saving}}"
+        bind:click="bindSaveTap"
+      >{{isEdit ? '保存修改' : '确认排课'}}</van-button>
+    </view>
+
+    <view wx:if="{{isEdit}}" class="schedule-edit-del">
+      <van-button block plain type="danger" loading="{{saving}}" bind:click="bindDeleteTap">删除此排课</van-button>
+    </view>
+  </block>
+
+  <van-popup
+    show="{{courseSheetShow}}"
+    position="bottom"
+    round
+    bind:close="bindCloseCourseSheet"
+    custom-class="schedule-course-popup"
+  >
+    <view class="schedule-course-sheet">
+      <view class="schedule-course-sheet-head">
+        <text class="schedule-course-sheet-title">选择课程</text>
+        <text class="schedule-course-sheet-sub">共 {{coursePickerList.length}} 门</text>
+      </view>
+      <scroll-view scroll-y class="schedule-course-sheet-scroll" enhanced show-scrollbar="{{false}}">
+        <view
+          class="schedule-course-option {{formMeetId === item._id ? 'is-active' : ''}}"
+          wx:for="{{coursePickerList}}"
+          wx:key="_id"
+          data-id="{{item._id}}"
+          bindtap="bindCoursePick"
+          style="border-left-color: {{item.color}};"
+        >
+          <image class="schedule-course-option-cover" src="{{item.cover}}" mode="aspectFill" />
+          <view class="schedule-course-option-body">
+            <view class="schedule-course-option-title">{{item.title}}</view>
+            <view class="schedule-course-option-meta">
+              <text class="schedule-course-option-tag">{{item.typeName}}</text>
+              <text>{{item.durationText}}</text>
+              <text wx:if="{{item.teacherName}}"> · {{item.teacherName}}</text>
+            </view>
+            <view wx:if="{{item.desc}}" class="schedule-course-option-desc">{{item.desc}}</view>
+          </view>
+          <van-icon
+            wx:if="{{formMeetId === item._id}}"
+            name="success"
+            size="40rpx"
+            color="{{themeColor}}"
+          />
+        </view>
+      </scroll-view>
+    </view>
+  </van-popup>
+
+  <van-action-sheet
+    show="{{teacherSheetShow}}"
+    actions="{{teacherActions}}"
+    cancel-text="取消"
+    bind:select="bindTeacherSelect"
+    bind:close="bindCloseTeacherSheet"
+  />
+
+  <van-popup
+    show="{{datePickerShow}}"
+    position="bottom"
+    round
+    bind:close="bindDatePickerClose"
+    custom-class="schedule-calendar-popup"
+  >
+    <view class="schedule-calendar-wrap">
+      <view class="schedule-calendar-head">{{isEdit ? '选择日期' : '选择日期（可多选）'}}</view>
+      <van-calendar
+        poppable="{{ false }}"
+        type="{{isEdit ? 'single' : 'multiple'}}"
+        show-confirm="{{ true }}"
+        color="{{themeColor}}"
+        min-date="{{datePickerMin}}"
+        default-date="{{calendarDefaultDate}}"
+        bind:confirm="bindCalendarConfirm"
+      />
+    </view>
+  </van-popup>
+
+  <van-popup show="{{timePickerShow}}" position="bottom" round bind:close="bindTimePickerClose">
+    <van-datetime-picker
+      type="time"
+      value="{{formStartTime}}"
+      bind:confirm="bindTimeConfirm"
+      bind:cancel="bindTimePickerClose"
+    />
+  </van-popup>
+</view>

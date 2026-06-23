@@ -2,5 +2,5 @@
 	"usingComponents": { 
 	  },
 	"enablePullDownRefresh": true,
-	"navigationBarTitleText": "关于我们"
+	"navigationBarTitleText": "门店介绍"
   }

@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "管理员配置",
+  "navigationBarBackgroundColor": "#4a7c8c",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-icon": "@vant/weapp/icon/index"
+  }
+}

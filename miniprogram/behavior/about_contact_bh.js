@@ -7,7 +7,9 @@ module.exports = Behavior({
 	 * 页面的初始数据
 	 */
 	data: {
-		isLoad: false
+		isLoad: false,
+		hasMapPoint: false,
+		contactMarkers: [],
 	},
 
 	methods: {
@@ -35,10 +37,34 @@ module.exports = Behavior({
 				return;
 			}
 
-			if (about) this.setData({
-				about,
-				isLoad: true
-			});
+			if (about) {
+				const lat = about.SETUP_LATITUDE;
+				const lng = about.SETUP_LONGITUDE;
+				const hasMapPoint =
+					lat !== undefined &&
+					lat !== '' &&
+					lng !== undefined &&
+					lng !== '' &&
+					!Number.isNaN(Number(lat)) &&
+					!Number.isNaN(Number(lng));
+				this.setData({
+					about,
+					isLoad: true,
+					hasMapPoint,
+					contactMarkers: hasMapPoint
+						? [
+								{
+									id: 1,
+									latitude: Number(lat),
+									longitude: Number(lng),
+									title: '门店',
+									width: 28,
+									height: 28,
+								},
+							]
+						: [],
+				});
+			}
 		},
 
 		/**
@@ -87,6 +113,20 @@ module.exports = Behavior({
 
 		url: function (e) {
 			pageHelper.url(e, this);
+		},
+
+		bindOpenMapTap: function () {
+			const about = this.data.about || {};
+			const lat = Number(about.SETUP_LATITUDE);
+			const lng = Number(about.SETUP_LONGITUDE);
+			if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+			wx.openLocation({
+				latitude: lat,
+				longitude: lng,
+				name: '门店',
+				address: about.SETUP_ADDRESS || '',
+				scale: 16,
+			});
 		}
 	}
 })

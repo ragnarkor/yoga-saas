@@ -265,6 +265,19 @@ class AdminHomeController extends BaseAdminController {
     return await service.listBindableAdmins(pid, operator, this._adminType);
   }
 
+  /** 超管：全平台员工列表 */
+  async listPlatformStaff() {
+    await this.isSuperAdmin();
+    let operator = await AdminModel.getOne(
+      { ADMIN_ID: this._adminId },
+      "*",
+      {},
+      false,
+    );
+    let service = new AdminWxService();
+    return await service.listPlatformStaff(operator);
+  }
+
   /** 生成会员邀请小程序码（教练/馆长） */
   async genMemberInviteQr() {
     await this.isAdmin();
@@ -273,6 +286,39 @@ class AdminHomeController extends BaseAdminController {
     const MemberInviteService = require("../../service/member_invite_service.js");
     let service = new MemberInviteService();
     return await service.genInviteQr(pid);
+  }
+
+  /** 馆主/教练：读取自己的会员端主页资料 */
+  async getMyTeacherProfile() {
+    await this.isAdmin();
+    let operator = await AdminModel.getOne(
+      { ADMIN_ID: this._adminId },
+      "*",
+      {},
+      false,
+    );
+    let service = new AdminHomeService();
+    return await service.getMyTeacherProfile(operator);
+  }
+
+  /** 馆主/教练：保存自己的会员端主页资料 */
+  async saveMyTeacherProfile() {
+    await this.isAdmin();
+    let rules = {
+      avatar: "string",
+      specialty: "string|max:200",
+      desc: "string|max:2000",
+      pics: "array",
+    };
+    let input = this.validateData(rules);
+    let operator = await AdminModel.getOne(
+      { ADMIN_ID: this._adminId },
+      "*",
+      {},
+      false,
+    );
+    let service = new AdminHomeService();
+    return await service.saveMyTeacherProfile(operator, input);
   }
 }
 

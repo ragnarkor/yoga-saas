@@ -10,6 +10,11 @@ const TeacherModel = require("../model/teacher_model.js");
 const PhotoModel = require("../model/photo_model.js");
 const NewsModel = require("../model/news_model.js");
 const MeetModel = require("../model/meet_model.js");
+const DayModel = require("../model/day_model.js");
+const AdminModel = require("../model/admin_model.js");
+const teacherAdminHelper = require("./teacher_admin_helper.js");
+const dataUtil = require("../../framework/utils/data_util.js");
+const timeUtil = require("../../framework/utils/time_util.js");
 const dbUtil = require("../../framework/database/db_util.js");
 const cloudUtil = require("../../framework/cloud/cloud_util.js");
 
@@ -121,7 +126,7 @@ class HomeService extends BaseService {
     let setup = await this.getSetup("SETUP_PHONE");
     let phone = setup ? setup.SETUP_PHONE || "" : "";
 
-    let [rawBanners, rawAnnounces, rawTeachers, rawPhotos] = await Promise.all([
+    let [rawBanners, rawAnnounces, rawPhotos] = await Promise.all([
       this._safeGetAll(
         BannerModel,
         { BANNER_STATUS: 1 },
@@ -137,13 +142,6 @@ class HomeService extends BaseService {
         10,
       ),
       this._safeGetAll(
-        TeacherModel,
-        { TEACHER_STATUS: 1, TEACHER_HOME: 1 },
-        "TEACHER_NAME,TEACHER_AVATAR,TEACHER_PIC,TEACHER_SPECIALTY,TEACHER_DESC",
-        { TEACHER_ORDER: "asc", TEACHER_ADD_TIME: "desc" },
-        20,
-      ),
-      this._safeGetAll(
         PhotoModel,
         { PHOTO_STATUS: 1 },
         "PHOTO_TITLE,PHOTO_DESC,PHOTO_PIC,PHOTO_LINK_TYPE,PHOTO_LINK_ID",
@@ -151,6 +149,8 @@ class HomeService extends BaseService {
         30,
       ),
     ]);
+
+    let rawTeachers = await teacherAdminHelper.listBoundStaffForHome();
 
     let banners = rawBanners.map((item) => ({
       _id: item._id,
@@ -189,19 +189,37 @@ class HomeService extends BaseService {
       pic: this._fmtMediaUrlSync(item.PHOTO_PIC),
       title: item.PHOTO_TITLE || "",
       desc: item.PHOTO_DESC || "",
+      album: (item.PHOTO_DESC || "").trim() || "馆舍风采",
       linkType: item.PHOTO_LINK_TYPE || "none",
       linkId: item.PHOTO_LINK_ID || "",
     }));
 
-    return { phone, banners, announcements, teachers, photos };
+    let photoAlbums = this._buildPhotoAlbums(photos);
+
+    return { phone, banners, announcements, teachers, photos, photoAlbums };
+  }
+
+  _buildPhotoAlbums(photos) {
+    if (!photos || !photos.length) return [];
+    let map = {};
+    let idx = 0;
+    for (let item of photos) {
+      let key = item.album || "馆舍风采";
+      if (!map[key]) {
+        map[key] = { id: String(idx++), title: key, photos: [] };
+      }
+      map[key].photos.push(item);
+    }
+    return Object.values(map);
   }
 
   async getTeacherDetail(id) {
     let teacher = await TeacherModel.getOne(
-      { _id: id, TEACHER_STATUS: 1 },
-      "TEACHER_NAME,TEACHER_AVATAR,TEACHER_PIC,TEACHER_SPECIALTY,TEACHER_DESC",
+      { _id: id },
+      "TEACHER_NAME,TEACHER_AVATAR,TEACHER_PIC,TEACHER_SPECIALTY,TEACHER_DESC,TEACHER_ADMIN_ID,TEACHER_HOME,TEACHER_STATUS",
     );
     if (!teacher) return null;
+    if (!(await teacherAdminHelper.isTeacherVisibleOnHome(teacher))) return null;
 
     return {
       _id: teacher._id,
@@ -210,6 +228,161 @@ class HomeService extends BaseService {
       specialty: teacher.TEACHER_SPECIALTY || "",
       desc: teacher.TEACHER_DESC || "",
       pics: await this._fmtMediaUrls(teacher.TEACHER_PIC || []),
+      adminId: teacher.TEACHER_ADMIN_ID || "",
+    };
+  }
+
+  _parseMeetCategories(meetTypeStr) {
+    let opts = dataUtil.getSelectOptions(meetTypeStr || "");
+    let tabs = [{ id: "0", name: "全部课程" }];
+    for (let o of opts) {
+      if (!o || o.val == null || !o.label) continue;
+      let name = String(o.label).split("|")[0];
+      tabs.push({ id: String(o.val), name });
+    }
+    return tabs;
+  }
+
+  _meetBelongsToTeacher(meet, teacherId, adminId) {
+    if (!meet) return false;
+    if (adminId && meet.MEET_ADMIN_ID === adminId) return true;
+    let style = meet.MEET_STYLE_SET || {};
+    if (teacherId && style.teacherId === teacherId) return true;
+    return false;
+  }
+
+  /** 老师主页：资料 + 课程分类 + 可预约排课 */
+  async getTeacherHome(id, typeId) {
+    let teacher = await TeacherModel.getOne(
+      { _id: id },
+      "TEACHER_NAME,TEACHER_AVATAR,TEACHER_PIC,TEACHER_SPECIALTY,TEACHER_DESC,TEACHER_ADMIN_ID,TEACHER_HOME,TEACHER_STATUS",
+    );
+    if (!teacher) return null;
+    if (!(await teacherAdminHelper.isTeacherVisibleOnHome(teacher))) return null;
+
+    let adminId = teacher.TEACHER_ADMIN_ID || "";
+    let setup = await this.getSetup("SETUP_MEET_TYPE");
+    let categories = this._parseMeetCategories(
+      setup && setup.SETUP_MEET_TYPE ? setup.SETUP_MEET_TYPE : "",
+    );
+
+    let meets = await this._safeGetAll(
+      MeetModel,
+      { MEET_STATUS: MeetModel.STATUS.COMM },
+      "MEET_TITLE,MEET_TYPE_ID,MEET_TYPE_NAME,MEET_STYLE_SET,MEET_ADMIN_ID,MEET_IS_SHOW_LIMIT",
+      { MEET_ORDER: "asc", MEET_ADD_TIME: "desc" },
+      200,
+    );
+
+    meets = (meets || []).filter((m) =>
+      this._meetBelongsToTeacher(m, teacher._id, adminId),
+    );
+
+    if (!meets.length) {
+      return {
+        teacher: {
+          _id: teacher._id,
+          name: teacher.TEACHER_NAME,
+          avatar: await this._fmtMediaUrl(teacher.TEACHER_AVATAR),
+          specialty: teacher.TEACHER_SPECIALTY || "",
+          desc: teacher.TEACHER_DESC || "",
+          pics: await this._fmtMediaUrls(teacher.TEACHER_PIC || []),
+          adminId,
+        },
+        categories,
+        sessions: [],
+      };
+    }
+
+    let meetMap = {};
+    let meetIds = [];
+    for (let m of meets) {
+      meetMap[m._id] = m;
+      meetIds.push(m._id);
+    }
+
+    let today = timeUtil.time("Y-M-D");
+    let dayRecords = await DayModel.getAllBig(
+      {
+        DAY_MEET_ID: ["in", meetIds],
+        day: [">=", today],
+      },
+      "DAY_MEET_ID,day,dayDesc,times",
+      { day: "asc", DAY_ADD_TIME: "asc" },
+      500,
+    );
+
+    let filterType = typeId && typeId !== "0" ? String(typeId) : "";
+    let sessions = [];
+
+    for (let rec of dayRecords || []) {
+      let meet = meetMap[rec.DAY_MEET_ID];
+      if (!meet) continue;
+      if (filterType && String(meet.MEET_TYPE_ID) !== filterType) continue;
+
+      let style = meet.MEET_STYLE_SET || {};
+      let times = rec.times || [];
+      let weekLabel = timeUtil.week(rec.day);
+
+      for (let t of times) {
+        if (!t || t.status != 1) continue;
+
+        let limit = Number(t.limit) || 0;
+        let succCnt =
+          t.stat && t.stat.succCnt ? Number(t.stat.succCnt) : 0;
+        let slotsLeft = limit > 0 ? Math.max(0, limit - succCnt) : 99;
+        let isShowLimit = meet.MEET_IS_SHOW_LIMIT !== 0;
+        let level = Number(style.difficulty || style.level || 3);
+        if (level < 1) level = 1;
+        if (level > 5) level = 5;
+
+        sessions.push({
+          meetId: meet._id,
+          title: meet.MEET_TITLE,
+          pic: this._fmtMediaUrlSync(style.pic || ""),
+          typeId: meet.MEET_TYPE_ID,
+          typeName: meet.MEET_TYPE_NAME || "",
+          day: rec.day,
+          dayDesc: rec.dayDesc || weekLabel,
+          weekLabel,
+          timeStart: t.start || "",
+          timeEnd: t.end || "",
+          timeMark: t.mark || "",
+          dateTimeText: `${rec.day} (${weekLabel}) ${t.start || ""}-${t.end || ""}`,
+          level,
+          levelStars: [1, 2, 3, 4, 5].map((i) => (i <= level ? 1 : 0)),
+          limit,
+          succCnt,
+          slotsLeft,
+          isShowLimit,
+          slotsText:
+            !isShowLimit || limit <= 0
+              ? "开放预约"
+              : slotsLeft > 0
+                ? `还可以预约${slotsLeft}人`
+                : "已满员",
+          status: limit > 0 && slotsLeft <= 0 ? "full" : "available",
+        });
+      }
+    }
+
+    sessions.sort((a, b) => {
+      if (a.day !== b.day) return a.day < b.day ? -1 : 1;
+      return (a.timeStart || "").localeCompare(b.timeStart || "");
+    });
+
+    return {
+      teacher: {
+        _id: teacher._id,
+        name: teacher.TEACHER_NAME,
+        avatar: await this._fmtMediaUrl(teacher.TEACHER_AVATAR),
+        specialty: teacher.TEACHER_SPECIALTY || "",
+        desc: teacher.TEACHER_DESC || "",
+        pics: await this._fmtMediaUrls(teacher.TEACHER_PIC || []),
+        adminId,
+      },
+      categories,
+      sessions,
     };
   }
 
@@ -278,17 +451,16 @@ class HomeService extends BaseService {
       })),
     );
 
-    let teacherWhere = {
-      TEACHER_STATUS: 1,
-      TEACHER_NAME: { $regex: ".*" + keyword, $options: "i" },
-    };
-    let teacherList = await this._safeGetAll(
-      TeacherModel,
-      teacherWhere,
-      "TEACHER_NAME,TEACHER_AVATAR,TEACHER_SPECIALTY",
-      { TEACHER_ORDER: "asc" },
-      10,
-    );
+    let teacherList = await teacherAdminHelper.listBoundStaffForHome();
+    if (keyword) {
+      const kw = keyword.toLowerCase();
+      teacherList = teacherList.filter(
+        (item) =>
+          (item.TEACHER_NAME || "").toLowerCase().includes(kw) ||
+          (item.TEACHER_SPECIALTY || "").toLowerCase().includes(kw),
+      );
+    }
+    teacherList = teacherList.slice(0, 10);
     teacherList = await Promise.all(
       teacherList.map(async (item) => ({
         _id: item._id,

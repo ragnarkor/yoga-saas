@@ -97,7 +97,7 @@ class AdminWxBiz {
       if (!ok) {
         wx.showModal({
           title: '暂无瑜伽馆',
-          content: '请先在平台后台创建瑜伽馆',
+          content: '请先新建瑜伽馆',
           showCancel: false,
         });
       }
@@ -142,6 +142,13 @@ class AdminWxBiz {
       icon: 'none',
       duration: 800,
     });
+  }
+
+  /** 退出超管密码模式，尝试恢复微信绑定的教练/馆主会话 */
+  static async exitSuperMode() {
+    if (!AdminWxBiz.isSuperSession()) return false;
+    AdminBiz.clearAdminToken();
+    return AdminWxBiz.ensureSession();
   }
 
   /** 解除当前馆微信绑定；adminId 可选，超管/馆长代解绑 */

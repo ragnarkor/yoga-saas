@@ -1,0 +1,84 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page profile-page">
+  <coach-tenant-switch
+    title="主页资料"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view wx:if="{{loading}}" class="profile-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <view class="profile-edit-page" wx:elif="{{isLoad}}">
+    <view class="profile-tip">以下内容将展示在会员端首页与老师主页</view>
+
+    <van-cell-group>
+      <van-cell title="头像" required center>
+        <view slot="right-icon" class="avatar-cell">
+          <view class="avatar-box">
+            <image wx:if="{{showAvatar}}" class="avatar-img" mode="aspectFill" src="{{avatarSrc}}" />
+            <view wx:else class="avatar-placeholder">
+              <van-icon name="user-o" size="48rpx" color="{{themeColor}}" />
+            </view>
+            <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="bindChooseAvatar"></button>
+          </view>
+          <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
+        </view>
+      </van-cell>
+
+      <van-cell title="展示姓名" value="{{name || '—'}}" />
+
+      <van-field
+        label="擅长课程"
+        input-align="right"
+        value="{{formSpecialty}}"
+        placeholder="如：哈他瑜伽、流瑜伽"
+        maxlength="200"
+        bind:change="bindFieldChange"
+        data-field="formSpecialty"
+      />
+
+      <van-field
+        label="个人简介"
+        type="textarea"
+        autosize
+        input-align="left"
+        value="{{formDesc}}"
+        placeholder="介绍您的教学理念与经历"
+        maxlength="2000"
+        show-word-limit
+        bind:change="bindFieldChange"
+        data-field="formDesc"
+      />
+    </van-cell-group>
+
+    <van-cell-group custom-class="profile-group-gap">
+      <van-cell title="教学照片" use-label-slot border="{{false}}">
+        <view slot="label" class="profile-uploader">
+          <van-uploader
+            file-list="{{picsFileList}}"
+            max-count="{{9}}"
+            multiple
+            deletable="{{true}}"
+            bind:after-read="bindPicsAfterRead"
+            bind:delete="bindPicsDelete"
+          />
+        </view>
+      </van-cell>
+    </van-cell-group>
+
+    <view class="submit-wrap">
+      <van-button
+        block
+        round
+        color="{{themeColor}}"
+        loading="{{submitting}}"
+        disabled="{{submitting}}"
+        bind:click="bindSubmitTap"
+      >保存</van-button>
+    </view>
+  </view>
+</view>

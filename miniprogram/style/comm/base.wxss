@@ -9,8 +9,8 @@ page {
   --orange: #e89b6c;
   --yellow: #e9c46a;
   --olive: #8ab17d;
-  --green: #5b8a72;
-  --darkgreen: #4a7160;
+  --green: #6fae96;
+  --darkgreen: #4f8c76;
   --cyan: #5ba4a4;
   --blue: #4a7c8c;
   --purple: #7b6d9e;
@@ -28,7 +28,7 @@ page {
   --orangeLight: #fbf0e8;
   --yellowLight: #fcf5e3;
   --oliveLight: #edf3e8;
-  --greenLight: #e3efe8;
+  --greenLight: #e5f1ec;
   --cyanLight: #e3f0f0;
   --blueLight: #e1ebef;
   --purpleLight: #ece8f2;
@@ -39,12 +39,12 @@ page {
 
   /* [AI_START TIMESTAMP=2025-01-26 10:00:00] */
   /* === 项目主题变量（与 theme_helper.js 同步，提供页面级 fallback） === */
-  --projectColor: #5b8a72;
-  --projectColorLight: #e3efe8;
-  --projectColorDark: #4a7160;
+  --projectColor: #6fae96;
+  --projectColorLight: #e5f1ec;
+  --projectColorDark: #4f8c76;
   --projectBgSoft: #fafbf9;
-  --themeColor: #5b8a72;
-  --calendarMainColor: #5b8a72;
+  --themeColor: #6fae96;
+  --calendarMainColor: #6fae96;
 
   /* === 统一圆角尺度 === */
   --radius-xs: 8rpx;

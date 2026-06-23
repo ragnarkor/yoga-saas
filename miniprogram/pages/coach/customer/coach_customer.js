@@ -1,23 +1,45 @@
-const cloudHelper = require('../../../helper/cloud_helper.js');
-const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
+// [AI_START TIMESTAMP=2025-01-27 10:20:00]
+const cloudHelper = require("../../../helper/cloud_helper.js");
+const AdminWxBiz = require("../../../biz/admin_wx_biz.js");
 
-const CARD_DEFS = [
-  { label: '全部会员卡', key: 'total', icon: 'friends-o', color: '#64b5f6' },
-  { label: '新增会员卡', key: 'newCard', icon: 'add-o', color: '#81c784' },
-  { label: '本月生日', key: 'monthBirthday', icon: 'gift-o', color: '#f48fb1' },
-  { label: '本月新增会员', key: 'monthNew', icon: 'contact', color: '#4fc3f7' },
-  { label: '30天未上课', key: 'inactive30', icon: 'close', color: '#ffb74d' },
-  { label: '流失会员', key: 'churn', icon: 'warning-o', color: '#e57373' },
-  { label: '次数不足', key: 'lowTimes', icon: 'info-o', color: '#b39ddb' },
-  { label: '储蓄不足', key: 'lowBalance', icon: 'gold-coin-o', color: '#ffb74d' },
-  { label: '即将到期', key: 'expiringSoon', icon: 'clock-o', color: '#ce93d8' },
+/**
+ * 卡片分组：图标颜色统一使用 themeColor（页面主题色），不再五颜六色。
+ * 分两组：概况 + 需关注，让教练一眼定位要跟进的会员。
+ */
+const SECTIONS = [
+  {
+    title: "会员概况",
+    desc: "掌握整体会员动态",
+    cards: [
+      { label: "全部会员卡", key: "totalCards", icon: "friends-o" },
+      { label: "本月新增会员", key: "monthNew", icon: "add-o" },
+      { label: "本月新增会员卡", key: "newCard", icon: "coupon-o" },
+      { label: "本月生日", key: "monthBirthday", icon: "gift-o" },
+    ],
+  },
+  {
+    title: "需关注会员",
+    desc: "及时跟进，减少流失",
+    alert: true,
+    cards: [
+      { label: "30天未上课", key: "inactive30", icon: "warning-o" },
+      { label: "流失会员", key: "churn", icon: "close" },
+      { label: "即将到期", key: "expiringSoon", icon: "clock-o" },
+      { label: "次数不足", key: "lowTimes", icon: "info-o" },
+      { label: "储蓄不足", key: "lowBalance", icon: "gold-coin-o" },
+    ],
+  },
 ];
 
 Page({
-  behaviors: [require('../../../behavior/coach_page_bh.js')],
+  behaviors: [require("../../../behavior/coach_page_bh.js")],
 
   data: {
-    cards: CARD_DEFS.map((c) => ({ ...c, num: 0 })),
+    sections: SECTIONS.map((s) => ({
+      ...s,
+      cards: s.cards.map((c) => ({ ...c, num: 0 })),
+    })),
+    totalMembers: 0,
     loading: false,
   },
 
@@ -38,15 +60,20 @@ Page({
     this.setData({ loading: true });
     try {
       const stats = await cloudHelper.callCloudData(
-        'admin/member_stats',
+        "admin/member_stats",
         {},
-        { hint: false, title: 'bar' },
+        { hint: false, title: "bar" },
       );
-      const cards = CARD_DEFS.map((c) => ({
-        ...c,
-        num: stats && stats[c.key] != null ? stats[c.key] : 0,
+      const sections = SECTIONS.map((s) => ({
+        ...s,
+        cards: s.cards.map((c) => ({
+          ...c,
+          num: stats && stats[c.key] != null ? stats[c.key] : 0,
+        })),
       }));
-      this.setData({ cards, loading: false });
+      const totalMembers =
+        stats && stats.totalMembers != null ? stats.totalMembers : 0;
+      this.setData({ sections, totalMembers, loading: false });
     } catch (e) {
       console.error(e);
       this.setData({ loading: false });
@@ -55,11 +82,19 @@ Page({
 
   async onCardTap(e) {
     const key = e.currentTarget.dataset.key;
-    if (!(await this._coachBeforeAdmin('/pages/coach/member/coach_member_list'))) return;
-    if (key === 'newCard') {
-      wx.navigateTo({ url: '/pages/coach/card/coach_card_list' });
+    if (key === "totalCards" || key === "newCard") {
+      if (
+        !(await this._coachBeforeAdmin("/pages/coach/card/coach_card_list"))
+      )
+        return;
+      wx.navigateTo({ url: "/pages/coach/card/coach_card_list" });
       return;
     }
-    wx.navigateTo({ url: '/pages/coach/member/coach_member_list' });
+    if (
+      !(await this._coachBeforeAdmin("/pages/coach/member/coach_member_list"))
+    )
+      return;
+    wx.navigateTo({ url: "/pages/coach/member/coach_member_list" });
   },
 });
+// [AI_END LINES=76 TIMESTAMP=2025-01-27 10:20:00]

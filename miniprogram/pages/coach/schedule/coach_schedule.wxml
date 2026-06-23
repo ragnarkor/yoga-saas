@@ -28,28 +28,41 @@
   </view>
 
   <van-empty wx:elif="{{!gridRows.length}}" description="本周暂无排课">
-    <van-button round color="{{themeColor}}" size="small" bind:click="bindGoSchedule">去排课</van-button>  </van-empty>
+    <van-button round color="{{themeColor}}" size="small" bind:click="bindGoSchedule">去排课</van-button>
+  </van-empty>
 
   <scroll-view wx:else scroll-x enhanced show-scrollbar="{{false}}" class="schedule-scroll">
-    <view class="schedule-grid">
-      <view class="schedule-row schedule-head">
-        <view class="schedule-time-col"></view>
-        <view class="schedule-day-col" wx:for="{{weekDays}}" wx:key="day">{{item.label}}</view>
-      </view>
-      <view class="schedule-row" wx:for="{{gridRows}}" wx:key="time">
-        <view class="schedule-time-col">{{item.time}}</view>
-        <view class="schedule-day-col" wx:for="{{item.cells}}" wx:for-item="cell" wx:key="index">
+    <view class="schedule-grid-wrap">
+      <view class="schedule-grid">
+        <view class="schedule-row schedule-head">
+          <view class="schedule-time-col schedule-time-col--head"></view>
+          <view class="schedule-day-col schedule-day-col--head" wx:for="{{weekDays}}" wx:key="day">
+            <text class="schedule-day-date">{{item.shortLabel}}</text>
+            <text class="schedule-day-week">{{item.weekday}}</text>
+          </view>
+        </view>
+        <view class="schedule-row" wx:for="{{gridRows}}" wx:for-index="rowIdx" wx:key="time">
+          <view class="schedule-time-col">{{item.time}}</view>
           <view
-            wx:if="{{cell}}"
-            class="schedule-card"
-            style="background: {{cell.color}};"
-            data-meet-id="{{cell.meetId}}"
-            bindtap="bindCourseTap"
+            class="schedule-day-col {{cell ? 'schedule-day-col--filled' : 'schedule-day-col--empty'}}"
+            wx:for="{{item.cells}}"
+            wx:for-item="cell"
+            wx:for-index="dayIdx"
+            wx:key="dayIdx"
+            bindtap="bindCellTap"
+            bindlongpress="bindCellLongPress"
+            data-row="{{rowIdx}}"
+            data-col="{{dayIdx}}"
+            data-day="{{weekDays[dayIdx].day}}"
+            data-time="{{item.time}}"
           >
-            <text class="schedule-card-teacher">{{cell.teacherName || '教练'}}</text>
-            <text class="schedule-card-title">{{cell.title}}</text>
-            <text class="schedule-stars">{{cell.starText}}</text>
-            <text class="schedule-card-meta">{{cell.duration}}m [{{cell.typeName}}]</text>
+            <view wx:if="{{cell}}" class="schedule-card" style="{{cell.cardStyle}}">
+              <text class="schedule-card-teacher">{{cell.teacherName || '教练'}}</text>
+              <text class="schedule-card-title">{{cell.title}}</text>
+              <text class="schedule-stars">{{cell.starText}}</text>
+              <text class="schedule-card-meta">{{cell.duration}}m · {{cell.typeName}}</text>
+            </view>
+            <view wx:else class="schedule-empty-hint">+</view>
           </view>
         </view>
       </view>
@@ -58,9 +71,9 @@
 
   <view class="schedule-bottom">
     <van-button icon="photo-o" color="{{themeColor}}" plain bind:click="bindSaveImageTap">保存图片</van-button>
-    <van-button icon="ellipsis" color="{{themeColor}}" plain bind:click="bindMoreTap">更多操作</van-button>
     <van-button icon="plus" color="{{themeColor}}" bind:click="bindGoSchedule">排课</van-button>
   </view>
+
   <canvas
     type="2d"
     id="scheduleCanvas"
@@ -73,15 +86,16 @@
       <image wx:if="{{previewUrl}}" class="schedule-preview-img" src="{{previewUrl}}" mode="widthFix" />
       <view class="schedule-preview-actions">
         <van-button block plain bind:click="bindClosePreview">关闭</van-button>
-        <van-button block color="{{themeColor}}" bind:click="bindConfirmSave">保存到相册</van-button>      </view>
+        <van-button block color="{{themeColor}}" bind:click="bindConfirmSave">保存到相册</van-button>
+      </view>
     </view>
   </van-popup>
 
   <van-action-sheet
-    show="{{moreShow}}"
-    actions="{{moreActions}}"
+    show="{{slotActionShow}}"
+    actions="{{slotActions}}"
     cancel-text="取消"
-    bind:select="bindMoreSelect"
-    bind:close="bindMoreClose"
+    bind:select="bindSlotActionSelect"
+    bind:close="bindSlotActionClose"
   />
 </view>

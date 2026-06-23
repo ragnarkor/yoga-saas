@@ -27,20 +27,16 @@
       <text>切换回会员版</text>
       <text class="arrow">›</text>
     </view>
-    <view class="coach-menu-item" bindtap="onUnbindWx">
-      <text>解除微信绑定</text>
+    <view class="coach-menu-item" wx:if="{{isSuperAdmin}}" bindtap="onPlatformTap">
+      <text>平台管理</text>
       <text class="arrow">›</text>
     </view>
-    <view class="coach-menu-item" bindtap="onAdminLogin">
+    <view class="coach-menu-item" wx:if="{{!isSuperAdmin}}" bindtap="onAdminLogin">
       <text>超管密码登录</text>
       <text class="arrow">›</text>
     </view>
-    <view class="coach-menu-item" bindtap="onPlatformAdmin">
-      <text>平台后台</text>
-      <text class="arrow">›</text>
-    </view>
     <view class="coach-menu-item" bindtap="onLogout">
-      <text>退出当前会话</text>
+      <text>{{isSuperAdmin ? '退出超管模式' : '退出当前会话'}}</text>
       <text class="arrow">›</text>
     </view>
   </view>

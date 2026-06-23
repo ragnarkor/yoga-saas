@@ -298,13 +298,18 @@ class AdminCardService extends BaseAdminService {
 
   async getCardStats() {
     await this._ensureCardCollections();
-    let totalCards = await this._safeCount(UserCardModel, {
-      USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,
-    });
+    let totalCardTpls = await this._safeCount(CardTplModel, {});
     let monthStart = timeUtil.time2Timestamp(
       timeUtil.time("Y-M") + "-01 00:00:00",
     );
+    let newCardTpls = await this._safeCount(CardTplModel, {
+      CARD_TPL_ADD_TIME: [">=", monthStart],
+    });
+    let totalCards = await this._safeCount(UserCardModel, {
+      USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,
+    });
     let newCards = await this._safeCount(UserCardModel, {
+      USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,
       USER_CARD_ADD_TIME: [">=", monthStart],
     });
     let now = timeUtil.time();
@@ -326,7 +331,14 @@ class AdminCardService extends BaseAdminService {
       USER_CARD_TYPE: CardTplModel.TYPE.TIMES,
       USER_CARD_QUOTA: ["<=", 3],
     });
-    return { totalCards, newCards, expiringSoon, lowTimes };
+    return {
+      totalCardTpls,
+      newCardTpls,
+      totalCards,
+      newCards,
+      expiringSoon,
+      lowTimes,
+    };
   }
 }
 

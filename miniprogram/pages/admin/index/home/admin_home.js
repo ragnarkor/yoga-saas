@@ -6,6 +6,7 @@ const adminTheme = require("../../../../helper/admin_theme.js");
 Page({
   data: {
     adminLoginShow: false,
+    platformTab: 0,
   },
 
   onLoad: async function (options) {
@@ -24,7 +25,11 @@ Page({
   },
 
   onShow() {
-    if (AdminBiz.getAdminToken() && AdminBiz.isSuperAdmin() && this.data.isLoad) {
+    if (
+      AdminBiz.getAdminToken() &&
+      AdminBiz.isSuperAdmin() &&
+      this.data.isLoad
+    ) {
       this._loadDetail();
     }
   },
@@ -72,6 +77,13 @@ Page({
     pageHelper.url(e, this);
   },
 
+  onPlatformTabTap: function (e) {
+    const tab = Number(e.currentTarget.dataset.tab) || 0;
+    if (tab !== this.data.platformTab) {
+      this.setData({ platformTab: tab });
+    }
+  },
+
   bindEnterCoachTap: function (e) {
     let item = e && e.currentTarget ? e.currentTarget.dataset.item : null;
     if (item && item._pid) {
@@ -84,27 +96,12 @@ Page({
     wx.reLaunch({ url: "/pages/coach/index/coach_index" });
   },
 
-  bindMgrBindTap: function () {
-    const list = (this.data.data && this.data.data.tenantList) || [];
-    if (!list.length) {
-      wx.showToast({ title: "请先新建瑜伽馆", icon: "none" });
-      return;
-    }
-    const go = (item) => {
-      pageHelper.setTenant(item);
-      wx.navigateTo({ url: "/pages/admin/mgr/bind/admin_mgr_bind" });
-    };
-    if (list.length === 1) {
-      go(list[0]);
-      return;
-    }
-    wx.showActionSheet({
-      itemList: list.map((t) => t.TENANT_NAME),
-      success: (res) => {
-        const item = list[res.tapIndex];
-        if (item) go(item);
-      },
-    });
+  bindStaffManageTap: function () {
+    wx.navigateTo({ url: "/pages/admin/platform/staff/admin_platform_staff" });
+  },
+
+  bindPlatformTenantTabTap: function () {
+    this.setData({ platformTab: 1 });
   },
 
   bindAdminLoginCloseTap: function () {

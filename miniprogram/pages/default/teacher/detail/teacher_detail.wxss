@@ -1,54 +1,207 @@
-.teacher-detail {
-  padding: 24rpx;
-  padding-bottom: 60rpx;
+.loading-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
 }
 
-.hero {
-  text-align: center;
-  padding: 40rpx 24rpx;
+.teacher-home {
+  min-height: 100vh;
+  background: var(--neutralBg, #f5f6f8);
+  padding-bottom: 48rpx;
+}
+
+.teacher-hero {
+  padding: 24rpx 24rpx 0;
+  background: linear-gradient(
+    180deg,
+    var(--projectColorLight, #e5f1ec) 0%,
+    var(--neutralBg, #f5f6f8) 100%
+  );
+}
+
+.hero-card {
+  display: flex;
+  gap: 24rpx;
   background: #fff;
   border-radius: 24rpx;
-  margin-bottom: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.04);
 }
 
 .hero-avatar {
-  width: 180rpx;
-  height: 180rpx;
+  width: 140rpx;
+  height: 140rpx;
   border-radius: 50%;
-  margin: 0 auto;
+  flex-shrink: 0;
+  background: #eee;
+}
+
+.hero-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .hero-name {
-  margin-top: 24rpx;
   font-size: 36rpx;
   font-weight: 700;
   color: #2d332e;
 }
 
 .hero-specialty {
-  margin-top: 12rpx;
-  font-size: 26rpx;
-  color: #5b8a72;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--projectColor, #5b8a72);
 }
 
-.card {
+.hero-desc {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+.category-tabs {
+  width: 100%;
+  margin-top: 24rpx;
+  white-space: nowrap;
+}
+
+.category-tabs-inner {
+  display: inline-flex;
+  padding: 0 24rpx 8rpx;
+  gap: 8rpx;
+}
+
+.category-tab {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 24rpx 8rpx;
+  position: relative;
+}
+
+.category-tab-text {
+  font-size: 28rpx;
+  color: #666;
+  white-space: nowrap;
+}
+
+.category-tab.active .category-tab-text {
+  color: #2d332e;
+  font-weight: 600;
+}
+
+.category-tab-line {
+  width: 40rpx;
+  height: 6rpx;
+  border-radius: 3rpx;
+  margin-top: 8rpx;
+  background: var(--projectColor, #5b8a72);
+}
+
+.session-list {
+  padding: 8rpx 24rpx 0;
+}
+
+.session-card {
+  display: flex;
+  gap: 20rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.session-pic {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+  background: #eee;
+}
+
+.session-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.session-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #2d332e;
+}
+
+.session-time {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+.session-meta {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.session-stars {
+  display: flex;
+  gap: 2rpx;
+}
+
+.star.on {
+  color: var(--projectColor, #5b8a72);
+}
+
+.star {
+  font-size: 22rpx;
+  color: #ddd;
+}
+
+.session-slots {
+  font-size: 22rpx;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.session-footer {
+  margin-top: auto;
+  padding-top: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.book-btn {
+  padding: 10rpx 28rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  color: #fff;
+  line-height: 1.4;
+  background: var(--projectColor, #5b8a72);
+}
+
+.book-btn.disabled {
+  opacity: 0.7;
+  background: #ccc;
+}
+
+.photo-section {
+  margin: 24rpx 24rpx 0;
   background: #fff;
   border-radius: 24rpx;
   padding: 24rpx;
-  margin-bottom: 24rpx;
 }
 
-.card-title {
+.section-title {
   font-size: 30rpx;
   font-weight: 600;
   color: #2d332e;
   margin-bottom: 16rpx;
-}
-
-.card-text {
-  font-size: 28rpx;
-  line-height: 1.7;
-  color: #475569;
 }
 
 .pic-grid {

@@ -2,20 +2,20 @@ page {
   background-color: #f6f7f5;
 
   /* === Yoga Wellness Design System - Sage Green + Warm Terracotta === */
-  --projectColor: #5b8a72;
-  --projectColorLight: #e3efe8;
+  --projectColor: #6fae96;
+  --projectColorLight: #e5f1ec;
   --projectCompareColor: #d4956b;
-  --projectColorDark: #4a7160;
-  --projectAccent: #c8895a;
+  --projectColorDark: #4f8c76;
+  --projectAccent: #dd9168;
   --projectBgSoft: #fafbf9;
 
   /*#### 父组件日历颜色定义*/
   /* 整体颜色 */
   --calendarPageColor: #fff;
   /* 加重颜色*/
-  --calendarMainColor: #5b8a72 !important;
+  --calendarMainColor: #6fae96 !important;
   /* 加重的亮颜色 用于选中日期的数据小圆点 */
-  --calendarLightColor: #8bb3a0;
+  --calendarLightColor: #9dc4b3;
 }
 
 .text-project {

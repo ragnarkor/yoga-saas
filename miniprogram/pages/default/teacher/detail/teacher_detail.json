@@ -1,4 +1,10 @@
 {
-  "navigationBarTitleText": "老师详情",
-  "usingComponents": {}
+  "navigationBarTitleText": "老师主页",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-tag": "@vant/weapp/tag/index"
+  }
 }

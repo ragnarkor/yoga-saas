@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "微信绑定码",
+  "navigationBarTitleText": "员工管理",
   "enablePullDownRefresh": true,
   "usingComponents": {
     "van-loading": "@vant/weapp/loading/index",

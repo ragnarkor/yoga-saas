@@ -13,6 +13,7 @@ module.exports = {
   "home/index": "home_controller@getHomeIndex",
   "home/search": "home_controller@searchHome",
   "home/teacher_detail": "home_controller@getTeacherDetail",
+  "home/teacher_home": "home_controller@getTeacherHome",
   "home/announce_detail": "home_controller@getAnnounceDetail",
 
   "passport/phone": "passport_controller@getPhone",
@@ -57,9 +58,12 @@ module.exports = {
   "admin/tenant_store_save": "admin/admin_tenant_controller@saveMeetCategories#noDemo",
   "admin/member_stats": "admin/admin_tenant_controller@getMemberStats",
   "admin/platform_overview": "admin/admin_tenant_controller@getPlatformOverview",
+  "admin/platform_staff_list": "admin/admin_home_controller@listPlatformStaff",
   "admin/tenant_insert": "admin/admin_tenant_controller@insertTenant#noDemo",
   "admin/mgr_list": "admin/admin_mgr_controller@getAdminList",
   "admin/mgr_insert": "admin/admin_mgr_controller@insertAdmin#noDemo",
+  "admin/staff_insert": "admin/admin_mgr_controller@insertStaff#noDemo",
+  "admin/mgr_del": "admin/admin_mgr_controller@deleteAdmin#noDemo",
 
   "admin/card_tpl_list": "admin/admin_card_controller@getCardTplList",
   "admin/card_tpl_detail": "admin/admin_card_controller@getCardTplDetail",
@@ -93,6 +97,9 @@ module.exports = {
   "admin/home_teacher_list": "admin/admin_home_controller@getTeacherList",
   "admin/home_teacher_insert": "admin/admin_home_controller@insertTeacher#noDemo",
   "admin/home_teacher_del": "admin/admin_home_controller@delTeacher#noDemo",
+  "admin/my_teacher_profile": "admin/admin_home_controller@getMyTeacherProfile",
+  "admin/my_teacher_profile_save":
+    "admin/admin_home_controller@saveMyTeacherProfile#noDemo",
   "admin/home_photo_list": "admin/admin_home_controller@getPhotoList",
   "admin/home_photo_insert": "admin/admin_home_controller@insertPhoto#noDemo",
   "admin/home_photo_del": "admin/admin_home_controller@delPhoto#noDemo",
@@ -110,6 +117,8 @@ module.exports = {
 
   "admin/meet_list": "admin/admin_meet_controller@getMeetList",
   "admin/schedule_week": "admin/admin_meet_controller@getScheduleWeek",
+  "admin/schedule_slot_remove":
+    "admin/admin_meet_controller@removeScheduleSlot#noDemo",
   "admin/meet_join_list": "admin/admin_meet_controller@getJoinList",
   "admin/join_status": "admin/admin_meet_controller@statusJoin#noDemo",
   "admin/join_del": "admin/admin_meet_controller@delJoin#noDemo",

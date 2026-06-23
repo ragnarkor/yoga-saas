@@ -21,10 +21,10 @@
       <input class="input" type="number" placeholder="手机号" maxlength="11" value="{{phone}}" data-field="phone" bindinput="bindInput" />
     </view>
     <view class="field">
-      <text class="label">初始密码</text>
-      <input class="input" password placeholder="5-30位" maxlength="30" value="{{pwd}}" data-field="pwd" bindinput="bindInput" />
+      <text class="label">初始密码（选填）</text>
+      <input class="input" password placeholder="不填则自动生成，微信绑定为主" maxlength="30" value="{{pwd}}" data-field="pwd" bindinput="bindInput" />
     </view>
   </view>
-  <view class="form-tip">创建后请为管理员生成微信绑定码，用于登录教练版</view>
+  <view class="form-tip">创建后为待绑定空壳账号。馆主请在教练版「员工管理」中添加教练并发送绑定邀请；馆主账号由平台在新建管理员时创建。</view>
   <button class="submit-btn" loading="{{submitting}}" disabled="{{submitting}}" bindtap="bindSubmit">创建管理员</button>
 </view>

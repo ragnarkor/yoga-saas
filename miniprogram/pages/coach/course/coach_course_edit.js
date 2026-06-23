@@ -2,6 +2,7 @@ const pageHelper = require('../../../helper/page_helper.js');
 const cloudHelper = require('../../../helper/cloud_helper.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
 const AdminMeetBiz = require('../../../biz/admin_meet_biz.js');
+const scheduleSlotHelper = require('../../../helper/schedule_slot_helper.js');
 const validate = require('../../../helper/validate.js');
 const formSetHelper = require('../../../cmpts/public/form/form_set_helper.js');
 
@@ -26,13 +27,10 @@ Page({
     typeName: '',
     categories: [],
     templateList: [],
-    teacherList: [],
-    templateActions: [],
-    typeActions: [],
-    teacherActions: [],
+    templatePickerList: [],
+    selectedTemplatePreview: null,
     templateSheetShow: false,
     typeSheetShow: false,
-    teacherSheetShow: false,
     colorOptions: COLOR_OPTIONS,
     thumbList: [],
     carouselList: [],
@@ -75,7 +73,6 @@ Page({
     await Promise.all([
       this._loadCategories(),
       this._loadTemplates(),
-      this._loadTeachers(),
     ]);
 
     if (this.data.id) {
@@ -96,9 +93,9 @@ Page({
       const categories = (res && res.categories) || [];
       this.setData({
         categories,
-        typeActions: categories.map((c) => ({ name: c.name })),
       });
       this._syncTypeName();
+      this._syncSelectedTemplatePreview();
     } catch (e) {
       console.error(e);
     }
@@ -112,33 +109,14 @@ Page({
         { hint: false },
       );
       const templateList = (res && res.list) || [];
+      const templatePickerList = templateList.map((m, idx) =>
+        scheduleSlotHelper.formatCoursePickerItem(m, idx),
+      );
       this.setData({
         templateList,
-        templateActions: templateList.map((m) => ({
-          name: m.MEET_TITLE,
-          id: m._id,
-        })),
+        templatePickerList,
       });
-    } catch (e) {
-      console.error(e);
-    }
-  },
-
-  async _loadTeachers() {
-    try {
-      const res = await cloudHelper.callCloudData(
-        'admin/home_teacher_list',
-        {},
-        { hint: false },
-      );
-      const teacherList = (res && res.list) || [];
-      this.setData({
-        teacherList,
-        teacherActions: teacherList.map((t) => ({
-          name: t.TEACHER_NAME,
-          id: t._id,
-        })),
-      });
+      this._syncSelectedTemplatePreview();
     } catch (e) {
       console.error(e);
     }
@@ -177,9 +155,35 @@ Page({
         carouselList: carousel.map((url) => ({ url, isImage: true })),
       });
       this._syncTypeName();
+      this._syncSelectedTemplatePreview();
     } catch (e) {
       console.error(e);
       this.setData({ loading: false });
+    }
+  },
+
+  _syncSelectedTemplatePreview() {
+    const templateId = this.data.formStyleSet.templateId;
+    if (!templateId) {
+      this.setData({ selectedTemplatePreview: null });
+      return;
+    }
+    const item = this.data.templatePickerList.find((t) => t._id === templateId);
+    if (item) {
+      this.setData({ selectedTemplatePreview: item });
+      return;
+    }
+    if (this.data.formStyleSet.templateName) {
+      this.setData({
+        selectedTemplatePreview: {
+          _id: templateId,
+          title: this.data.formStyleSet.templateName,
+          cover: pageHelper.fmtImgUrl(this.data.formStyleSet.pic) || '',
+          typeName: this.data.typeName || '',
+          durationText: (this.data.formStyleSet.duration || 60) + '分钟',
+          color: this.data.formStyleSet.color || '#81c784',
+        },
+      });
     }
   },
 
@@ -259,22 +263,23 @@ Page({
   },
 
   bindTemplateTap() {
-    if (!this.data.templateActions.length) {
+    if (!this.data.templatePickerList.length) {
       wx.showToast({ title: '暂无可选模板', icon: 'none' });
       return;
     }
     this.setData({ templateSheetShow: true });
   },
 
-  bindTemplateSelect(e) {
-    const name = e.detail.name;
-    const meet = this.data.templateList.find((m) => m.MEET_TITLE === name);
+  bindTemplatePick(e) {
+    const id = e.currentTarget.dataset.id;
+    const meet = this.data.templateList.find((m) => m._id === id);
     if (!meet) return;
     const style = AdminMeetBiz.normalizeCourseStyleSet(meet.MEET_STYLE_SET);
     const pic = style.pic ? pageHelper.fmtImgUrl(style.pic) || style.pic : '';
     const carousel = (style.carousel || []).map(
       (p) => pageHelper.fmtImgUrl(p) || p,
     );
+    const preview = this.data.templatePickerList.find((t) => t._id === id) || null;
     this.setData({
       templateSheetShow: false,
       formStyleSet: Object.assign({}, this.data.formStyleSet, style, {
@@ -284,6 +289,7 @@ Page({
       }),
       thumbList: pic ? [{ url: pic, isImage: true }] : [],
       carouselList: carousel.map((url) => ({ url, isImage: true })),
+      selectedTemplatePreview: preview,
     });
   },
 
@@ -292,15 +298,16 @@ Page({
   },
 
   bindTypeTap() {
-    if (!this.data.typeActions.length) {
+    if (!this.data.categories.length) {
       wx.showToast({ title: '请先在「我的门店」配置分类', icon: 'none' });
       return;
     }
     this.setData({ typeSheetShow: true });
   },
 
-  bindTypeSelect(e) {
-    const item = this.data.categories.find((c) => c.name === e.detail.name);
+  bindTypePick(e) {
+    const id = e.currentTarget.dataset.id;
+    const item = this.data.categories.find((c) => c.id === id);
     if (!item) return;
     this.setData({
       typeSheetShow: false,
@@ -311,35 +318,6 @@ Page({
 
   bindCloseTypeSheet() {
     this.setData({ typeSheetShow: false });
-  },
-
-  bindTeacherTap() {
-    if (!this.data.teacherActions.length) {
-      wx.showToast({ title: '请先在后台添加老师', icon: 'none' });
-      return;
-    }
-    this.setData({ teacherSheetShow: true });
-  },
-
-  bindTeacherSelect(e) {
-    const teacher = this.data.teacherList.find(
-      (t) => t.TEACHER_NAME === e.detail.name,
-    );
-    if (!teacher) return;
-    this.setData({
-      teacherSheetShow: false,
-      'formStyleSet.teacherId': teacher._id,
-      'formStyleSet.teacherName': teacher.TEACHER_NAME,
-    });
-  },
-
-  bindCloseTeacherSheet() {
-    this.setData({ teacherSheetShow: false });
-  },
-
-  async bindTimeTap() {
-    if (!(await AdminWxBiz.ensureSession())) return;
-    wx.navigateTo({ url: '/pages/coach/course/coach_course_time' });
   },
 
   async bindSaveTap() {

@@ -1,4 +1,4 @@
-@import './admin_theme.wxss';
+@import "./admin_theme.wxss";
 
 /* [AI_START TIMESTAMP=2025-01-25 18:00:00] */
 .main-admin {
@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: stretch;
   box-sizing: border-box;
   margin-bottom: 100rpx;
   background-color: var(--adminPageBg);
@@ -50,24 +50,36 @@
   border-color: var(--adminColor) !important;
 }
 
+/* [AI_START TIMESTAMP=2025-01-27 09:10:00] */
 .form-box {
-  border-radius: 10rpx;
+  border-radius: var(--adminRadius, 16rpx);
+  box-shadow: var(--adminShadowSm, 0 2rpx 8rpx rgba(74, 124, 140, 0.06));
+  overflow: hidden;
 }
 
 .btn {
-  border-radius: 10rpx;
+  border-radius: var(--adminRadiusSm, 12rpx);
+  transition:
+    opacity var(--adminTransition, 0.2s ease),
+    transform var(--adminTransition, 0.2s ease);
+}
+
+.btn:active {
+  opacity: 0.85;
+  transform: scale(0.97);
 }
 
 .search-form.round {
-  border-radius: 10rpx;
+  border-radius: var(--adminRadius, 16rpx);
 }
+/* [AI_END LINES=12 TIMESTAMP=2025-01-27 09:10:00] */
 
 .load.text-grey {
-  color: #999 !important;
+  color: var(--adminTextSecondary) !important;
 }
 
 .tabs {
-  color: #333 !important;
+  color: var(--adminText) !important;
   font-weight: bold;
 }
 
@@ -94,13 +106,13 @@
 
 .modal-admin .modal-content .pics image {
   flex: 1;
-  border-radius: 10rpx;
+  border-radius: var(--adminRadiusSm, 12rpx);
   margin-bottom: 20rpx;
 }
 
 .modal-admin .modal-content .modal-list {
   flex: 1;
-  border-radius: 10rpx;
+  border-radius: var(--adminRadiusSm, 12rpx);
   margin: 20rpx 0;
   padding: 20rpx 0;
   display: flex;
@@ -119,7 +131,7 @@
   width: 100%;
   margin-bottom: 10rpx;
   padding: 10rpx 0;
-  border-bottom: 2rpx dashed #ccc;
+  border-bottom: 2rpx dashed var(--adminBorder);
   padding: 20rpx 40rpx;
 }
 
@@ -140,7 +152,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   line-height: 50rpx;
-  border-bottom: 2rpx dashed #ccc;
+  border-bottom: 2rpx dashed var(--adminBorder);
   margin-bottom: 10rpx;
 }
 
@@ -150,9 +162,9 @@
 
 .form-box .title-desc {
   padding-left: 24rpx;
-  color: #666;
+  color: var(--adminTextSecondary);
   padding-bottom: 30rpx;
-  border-bottom: 1rpx solid #eee;
+  border-bottom: 1rpx solid var(--adminBorderLight);
 }
 
 /** 通用列表 **/
@@ -164,18 +176,20 @@
   justify-content: flex-start;
 }
 
+/* [AI_START TIMESTAMP=2025-01-27 09:20:00] */
 .admin-comm-list .item {
   width: 100%;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background-color: #fff;
-  border-radius: 5rpx;
+  background-color: var(--adminSurface);
+  border-radius: var(--adminRadius, 16rpx);
   overflow: hidden;
-  margin-bottom: 30rpx;
+  margin-bottom: 24rpx;
   position: relative;
-  border: 1rpx solid #ccc;
+  box-shadow: var(--adminShadow, 0 4rpx 16rpx rgba(74, 124, 140, 0.08));
 }
+/* [AI_END LINES=12 TIMESTAMP=2025-01-27 09:20:00] */
 
 .admin-comm-list .item:last-child {
   margin-bottom: 0;
@@ -188,7 +202,7 @@
   line-height: 2.6;
   padding: 0 15rpx;
   display: flex;
-  background-color: #f2f2f2;
+  background-color: var(--adminIconBg);
   justify-content: space-between;
   align-items: center;
 }
@@ -213,7 +227,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background-color: #fff;
+  background-color: var(--adminSurface);
   min-height: 150rpx;
   padding: 15rpx 20rpx 30rpx;
   position: relative;
@@ -224,7 +238,6 @@
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  background-color: #fff;
   line-height: 1.5;
   font-size: 25rpx;
   margin-bottom: 20rpx;
@@ -232,20 +245,20 @@
 
 .admin-comm-list .item .info .info-item .title {
   width: 110rpx;
-  color: #333;
+  color: var(--adminText);
   text-align: right;
   font-weight: bold;
 }
 
 .admin-comm-list .item .info .info-item .mao {
-  color: #333;
+  color: var(--adminText);
   text-align: left;
   margin-right: 10rpx;
 }
 
 .admin-comm-list .item .info .info-item .content {
   flex: 1;
-  color: #555;
+  color: var(--adminTextSecondary);
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -262,15 +275,15 @@
 .admin-comm-list .item .info .oprt .btn {
   padding: 0 20rpx;
   font-size: 26rpx;
-  border-radius: 8rpx !important;
+  border-radius: var(--adminRadiusSm, 12rpx) !important;
   line-height: unset;
   height: 55rpx !important;
-  background-color: #eee !important;
+  background-color: var(--adminIconBg) !important;
 }
 
 .admin-comm-list .btn-more {
-  background-color: #fadbd9 !important;
-  color: #e54d42;
+  background-color: rgba(217, 100, 74, 0.1) !important;
+  color: var(--adminRedColor);
 }
 
 .btn-admin {

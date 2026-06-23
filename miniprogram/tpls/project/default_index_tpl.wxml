@@ -1,84 +1,75 @@
-<!-- [AI_START TIMESTAMP=2025-01-24 13:00:00] -->
 <template name="defaultIndexTpl">
+
 	<cmpt-tenant-switch title="首页" theme-color="{{themeColor}}" />
 
 	<view class="home-page">
-		<!-- 1. 顶部横幅 -->
-		<view class="home-banner" wx:if="{{banners.length > 0}}">
-			<swiper class="banner-swiper" indicator-dots autoplay circular interval="4000" duration="500">
-				<swiper-item wx:for="{{banners}}" wx:key="_id">
-					<view class="banner-item" bindtap="bindBannerTap" data-url="{{item.linkUrl}}">
-						<video wx:if="{{item.type === 'video' && item.video}}" class="banner-media" src="{{item.video}}" poster="{{item.pic}}" object-fit="cover" show-center-play-btn="{{false}}" controls="{{false}}"></video>
-						<image wx:else class="banner-media" mode="aspectFill" src="{{item.pic || skin.IMG_DEFAULT_INDEX_BG}}" />
-						<view class="banner-mask" wx:if="{{item.title}}">
-							<text class="banner-title">{{item.title}}</text>
+
+		<!-- 顶部横幅 -->
+		<view class="home-hero">
+			<view class="home-banner" wx:if="{{banners.length > 0}}">
+				<swiper class="banner-swiper" indicator-dots autoplay circular interval="4000" duration="500">
+					<swiper-item wx:for="{{banners}}" wx:key="_id">
+						<view class="banner-item" bindtap="bindBannerTap" data-url="{{item.linkUrl}}">
+							<video wx:if="{{item.type === 'video' && item.video}}" class="banner-media" src="{{item.video}}" poster="{{item.pic}}" object-fit="cover" show-center-play-btn="{{false}}" controls="{{false}}"></video>
+							<image wx:else class="banner-media" mode="aspectFill" src="{{item.pic || skin.IMG_DEFAULT_INDEX_BG}}" />
 						</view>
-					</view>
-				</swiper-item>
-			</swiper>
-		</view>
-		<view class="home-banner home-banner-fallback" wx:else>
-			<image mode="aspectFill" src="{{skin.IMG_DEFAULT_INDEX_BG}}" />
+					</swiper-item>
+				</swiper>
+			</view>
+			<view class="home-banner home-banner-fallback" wx:else>
+				<image mode="aspectFill" src="{{skin.IMG_DEFAULT_INDEX_BG}}" />
+			</view>
 		</view>
 
-		<!-- 2. 搜索栏 + 电话 -->
-		<view class="home-toolbar card-project shadow-project">
-			<view class="home-search" bindtap="bindSearchTap">
-				<van-icon name="search" size="32rpx" color="{{themeColor}}" />
-				<text class="home-search-placeholder">搜索课程、老师、活动</text>
-			</view>
-			<view class="home-phone" bindtap="bindPhoneTap">
+		<!-- 场馆名 + 电话 -->
+		<view class="home-studio-card">
+			<text class="home-studio-name text-cut">{{tenantName || '瑜伽馆'}}</text>
+			<view class="home-studio-divider"></view>
+			<view class="home-studio-phone" bindtap="bindPhoneTap">
 				<van-icon name="phone-o" size="40rpx" color="{{themeColor}}" />
 			</view>
 		</view>
 
-		<!-- 3. 公告区 -->
-		<view class="home-section card-project shadow-project">
-			<view class="section-head">
-				<text class="section-title">公告</text>
-			</view>
-			<view wx:if="{{announcements.length === 0}}" class="section-empty">暂无公告</view>
-			<view wx:else>
-				<view class="announce-item" wx:for="{{announcements}}" wx:key="_id" bindtap="bindAnnounceTap" data-id="{{item._id}}">
-					<van-icon name="volume-o" size="28rpx" color="{{themeColor}}" custom-class="announce-icon" />
-					<view class="announce-body">
-						<view class="announce-title text-cut">{{item.title}}</view>
-						<view class="announce-desc text-cut" wx:if="{{item.desc}}">{{item.desc}}</view>
-					</view>
-					<van-icon name="arrow" size="24rpx" color="#c8c8c8" />
-				</view>
-			</view>
+		<!-- 公告条 -->
+		<view class="home-announce-strip" bindtap="bindAnnounceStripTap">
+			<van-icon name="volume-o" size="28rpx" color="{{themeColor}}" custom-class="home-announce-icon" />
+			<text class="home-announce-text text-cut">{{announcements.length ? announcements[0].title : '暂无公告'}}</text>
 		</view>
 
-		<!-- 4. 金牌老师 -->
+		<!-- 金牌老师（横向滑动） -->
 		<view class="home-section" wx:if="{{teachers.length > 0}}">
 			<view class="section-head">
 				<text class="section-title">金牌老师</text>
 			</view>
-			<scroll-view class="teacher-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-				<view class="teacher-list">
-					<view class="teacher-card card-project shadow-project" wx:for="{{teachers}}" wx:key="_id" bindtap="bindTeacherTap" data-id="{{item._id}}">
+			<scroll-view class="hscroll" scroll-x enhanced show-scrollbar="{{false}}">
+				<view class="hscroll-inner">
+					<view class="teacher-card" wx:for="{{teachers}}" wx:key="_id" bindtap="bindTeacherTap" data-id="{{item._id}}">
 						<image class="teacher-cover" mode="aspectFill" src="{{item.cover || item.avatar}}" />
-						<view class="teacher-info">
-							<view class="teacher-name">{{item.name}}</view>
-							<view class="teacher-specialty text-cut">{{item.specialty}}</view>
-						</view>
+						<view class="teacher-name text-cut">{{item.name}}</view>
 					</view>
 				</view>
 			</scroll-view>
 		</view>
 
-		<!-- 5. 照片墙 -->
+		<!-- 照片墙（横向滑动） -->
 		<view class="home-section" wx:if="{{photos.length > 0}}">
 			<view class="section-head">
 				<text class="section-title">照片墙</text>
 			</view>
-			<view class="photo-grid">
-				<view class="photo-item" wx:for="{{photos}}" wx:key="_id" bindtap="bindPhotoTap" data-index="{{index}}">
-					<image mode="aspectFill" src="{{item.pic}}" />
-					<view class="photo-caption text-cut" wx:if="{{item.title}}">{{item.title}}</view>
+			<scroll-view class="hscroll" scroll-x enhanced show-scrollbar="{{false}}">
+				<view class="hscroll-inner">
+					<view
+						class="photo-card"
+						wx:for="{{photos}}"
+						wx:key="_id"
+						bindtap="bindPhotoTap"
+						data-index="{{index}}"
+					>
+						<image class="photo-cover" mode="aspectFill" src="{{item.pic}}" />
+						<view class="photo-title text-cut">{{item.title || item.album || '馆舍风采'}}</view>
+					</view>
 				</view>
-			</view>
+			</scroll-view>
 		</view>
 
 		<view class="home-safe-bottom"></view>
@@ -88,5 +79,5 @@
 		<import src="../../tpls/public/menu_tpl.wxml" />
 		<template is="menuTpl" data="{{skin,themeColor,curMenu:'home_index',returnHome}}" />
 	</block>
+
 </template>
-<!-- [AI_END LINES=33 TIMESTAMP=2025-01-24 13:00:00] -->

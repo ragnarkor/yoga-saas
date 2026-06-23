@@ -1,0 +1,147 @@
+@import '../coach_common.wxss';
+
+.platform-page {
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+}
+
+.platform-loading {
+  display: flex;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.platform-hero {
+  margin: 16rpx 24rpx 0;
+  padding: 32rpx;
+  background: linear-gradient(135deg, #1f2329 0%, #3d4f5f 100%);
+  border-radius: 24rpx;
+  color: #fff;
+}
+
+.platform-hero-title {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.platform-hero-sub {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  opacity: 0.75;
+}
+
+.platform-stats {
+  display: flex;
+  gap: 48rpx;
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.15);
+}
+
+.platform-stat-num {
+  display: block;
+  font-size: 44rpx;
+  font-weight: 700;
+}
+
+.platform-stat-label {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  opacity: 0.7;
+}
+
+.platform-toolbar {
+  padding: 20rpx 24rpx 0;
+}
+
+.platform-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  height: 84rpx;
+  border-radius: 16rpx;
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.platform-list {
+  padding: 16rpx 24rpx 0;
+}
+
+.platform-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.platform-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.platform-card-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1f2329;
+}
+
+.platform-card-desc {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #8f959e;
+  line-height: 1.5;
+}
+
+.platform-card-stats {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #64748b;
+}
+
+.platform-card-stats .dot {
+  margin: 0 8rpx;
+  color: #ddd;
+}
+
+.platform-card-stats .ok {
+  color: #07c160;
+}
+
+.platform-card-stats .warn {
+  color: #e6a23c;
+}
+
+.platform-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0f1f2;
+}
+
+.platform-action {
+  flex: 1 1 30%;
+  min-width: 140rpx;
+  text-align: center;
+  font-size: 24rpx;
+  padding: 16rpx 8rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid #ddd;
+  box-sizing: border-box;
+  color: #475569;
+}
+
+.platform-action--primary {
+  font-weight: 600;
+}
+
+.platform-empty {
+  padding: 40rpx 0;
+}

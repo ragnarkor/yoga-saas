@@ -1,10 +1,8 @@
 {
   "navigationStyle": "custom",
-  "navigationBarTitleText": "预约时间",
+  "navigationBarTitleText": "排课",
   "usingComponents": {
     "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt",
-    "van-calendar": "@vant/weapp/calendar/index",
-    "van-datetime-picker": "@vant/weapp/datetime-picker/index",
     "van-action-sheet": "@vant/weapp/action-sheet/index"
   }
 }

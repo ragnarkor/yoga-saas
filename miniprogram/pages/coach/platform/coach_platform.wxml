@@ -1,0 +1,81 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page platform-page">
+  <coach-tenant-switch
+    title="平台管理"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    show-switch="{{false}}"
+  />
+
+  <view wx:if="{{loading}}" class="platform-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <view class="platform-hero">
+      <view class="platform-hero-title">全平台瑜伽馆</view>
+      <view class="platform-hero-sub">管理所有门店，员工请在平台控制台统一管理</view>
+      <view class="platform-stats">
+        <view class="platform-stat">
+          <text class="platform-stat-num">{{stats.tenantCount}}</text>
+          <text class="platform-stat-label">瑜伽馆</text>
+        </view>
+        <view class="platform-stat">
+          <text class="platform-stat-num">{{stats.adminCount}}</text>
+          <text class="platform-stat-label">员工账号</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="platform-toolbar">
+      <view
+        class="platform-add-btn"
+        style="background: {{themeColor}};"
+        bindtap="bindAddTenantTap"
+      >
+        <van-icon name="plus" size="32rpx" color="#fff" />
+        <text>新建瑜伽馆</text>
+      </view>
+    </view>
+
+    <view wx:if="{{tenantList.length === 0}}" class="platform-empty">
+      <van-empty description="暂无瑜伽馆，请先新建" />
+    </view>
+
+    <view class="platform-list">
+      <view class="platform-card" wx:for="{{tenantList}}" wx:key="_pid">
+        <view class="platform-card-head">
+          <view>
+            <view class="platform-card-name">{{item.TENANT_NAME}}</view>
+            <view class="platform-card-desc" wx:if="{{item.TENANT_DESC}}">{{item.TENANT_DESC}}</view>
+          </view>
+          <van-tag wx:if="{{item.TENANT_TEMPLATE}}" plain size="medium">{{item.TENANT_TEMPLATE}}</van-tag>
+        </view>
+
+        <view class="platform-card-actions">
+          <view
+            class="platform-action"
+            bindtap="bindAddAdminTap"
+            data-pid="{{item._pid}}"
+            data-name="{{item.TENANT_NAME}}"
+          >新建馆主/教练</view>
+          <view
+            class="platform-action platform-action--primary"
+            style="color: {{themeColor}}; border-color: {{themeColor}};"
+            bindtap="bindEnterCoachTap"
+            data-item="{{item}}"
+          >进入门店</view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>
+
+<cmpt-admin-login-panel
+  show="{{adminLoginShow}}"
+  mode="{{adminLoginMode}}"
+  redirect="{{adminLoginRedirect}}"
+  bind:close="bindAdminLoginCloseTap"
+  bind:success="bindAdminLoginSuccessTap"
+/>

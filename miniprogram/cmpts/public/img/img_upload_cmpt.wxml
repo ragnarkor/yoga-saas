@@ -7,19 +7,21 @@
 	</view>
 </view>
 <view class="form-group padding">
-		<view class="upload-img">
-		<view class="bg-img" wx:for="{{imgList}}" wx:key="index" bindtap="bindPreviewImgTap" data-url="{{imgList[index]}}">
-			<image src='{{imgList[index]}}' mode='aspectFill'></image>
+	<view class="upload-img">
+		<view class="bg-img upload-item" wx:for="{{imgList}}" wx:key="index" bindtap="bindPreviewImgTap" data-url="{{imgList[index]}}">
+			<image class="upload-img-el" src='{{imgList[index]}}' mode='aspectFill'></image>
 			<view class="tag bg-red" catchtap="catchDelImgTap" data-index="{{index}}">
 				<van-icon name="cross" size="32rpx"  />
 			</view>
 
 			<view wx:if="{{isShowNo}}" class="bg-olive img-no">
-				<text>#{{index}}</text>
+				<view class="img-no-text">#{{index}}</view>
 			</view>
 		</view>
-		<view class="solid" bindtap="bindChooseImgTap" wx:if="{{imgList.length < imgMax}}">
-			<van-icon name="photograph" size="32rpx"  />
+		<view class="solid upload-item" bindtap="bindChooseImgTap" wx:if="{{imgList.length < imgMax}}">
+			<view class="upload-add-icon">
+				<van-icon name="photograph" size="32rpx"  />
+			</view>
 		</view>
 	</view>
 </view>

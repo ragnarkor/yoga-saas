@@ -21,6 +21,14 @@ class AdminTenantController extends BaseAdminController {
       categories: "must|array|name=课程分类",
       themeColor: "string|false|name=主题色",
       tenantDesc: "string|false|name=品牌简介",
+      tenantName: "string|max:30|name=门店名称",
+      tenantLogo: "string|false|name=门店LOGO",
+      about: "string|max:50000|name=门店介绍",
+      aboutPic: "array|false|name=介绍图片",
+      contactPhone: "string|max:30|name=联系电话",
+      contactAddress: "string|max:200|name=门店地址",
+      contactLatitude: "string|false|name=纬度",
+      contactLongitude: "string|false|name=经度",
     };
     let input = this.validateData(rules);
     let pid = global.PID || this.getParameter("pid") || "";
@@ -31,6 +39,14 @@ class AdminTenantController extends BaseAdminController {
       this._adminType,
       input.themeColor,
       input.tenantDesc,
+      input.tenantName,
+      input.tenantLogo,
+      input.about,
+      input.aboutPic,
+      input.contactPhone,
+      input.contactAddress,
+      input.contactLatitude,
+      input.contactLongitude,
     );
   }
 

@@ -402,7 +402,10 @@ class MeetService extends BaseService {
     ret.MEET_STYLE_SET = meet.MEET_STYLE_SET || {};
 
     let coachName = "";
-    if (meet.MEET_ADMIN_ID) {
+    let style = meet.MEET_STYLE_SET || {};
+    if (style.teacherName) {
+      coachName = style.teacherName;
+    } else if (meet.MEET_ADMIN_ID) {
       let admin = await AdminModel.getOne(
         { _id: meet.MEET_ADMIN_ID },
         "ADMIN_NAME",
@@ -544,67 +547,107 @@ class MeetService extends BaseService {
     return usefulTimes;
   }
 
-  /** 按天获取预约项目 */
+  /** 按天获取预约项目（与 admin/schedule_week 一致：每个可用时段一条） */
   async getMeetListByDay(day) {
-    let where = {
-      MEET_STATUS: MeetModel.STATUS.COMM,
-    };
+    let dayRecords = await DayModel.getAllBig(
+      { day },
+      "day,times,DAY_MEET_ID",
+      { day: "asc" },
+      500,
+    );
+    if (!dayRecords.length) return [];
 
-    let orderBy = {
-      MEET_ORDER: "asc",
-      MEET_ADD_TIME: "desc",
-    };
+    let meetIds = [];
+    for (let k in dayRecords) {
+      let mid = dayRecords[k].DAY_MEET_ID;
+      if (mid && !meetIds.includes(mid)) meetIds.push(mid);
+    }
 
-    let fields =
-      "MEET_TITLE,MEET_DAYS_SET,MEET_STYLE_SET,MEET_TYPE_ID,MEET_TYPE_NAME,MEET_IS_SHOW_LIMIT,MEET_ADMIN_ID";
+    let meets = await MeetModel.getAll(
+      {
+        _id: ["in", meetIds],
+        MEET_STATUS: MeetModel.STATUS.COMM,
+      },
+      "MEET_TITLE,MEET_STYLE_SET,MEET_TYPE_ID,MEET_TYPE_NAME,MEET_IS_SHOW_LIMIT,MEET_ADMIN_ID,MEET_ORDER",
+      { MEET_ORDER: "asc", MEET_ADD_TIME: "desc" },
+    );
 
-    let list = await MeetModel.getAll(where, fields, orderBy);
+    let meetMap = {};
+    for (let k in meets) {
+      meetMap[meets[k]._id] = meets[k];
+    }
 
+    let adminNameCache = {};
     let retList = [];
 
-    for (let k in list) {
-      let usefulTimes = await this.getUsefulTimesByDaysSet(list[k]._id, day);
+    for (let k in dayRecords) {
+      let meet = meetMap[dayRecords[k].DAY_MEET_ID];
+      if (!meet) continue;
 
-      if (usefulTimes.length == 0) continue;
+      let style = meet.MEET_STYLE_SET || {};
+      let times = dayRecords[k].times || [];
 
-      let node = {};
-      let firstTime = usefulTimes[0];
-      node.timeDesc =
-        usefulTimes.length > 1
-          ? usefulTimes.length + "个时段"
-          : firstTime.start;
-      node.timeStart = firstTime.start;
-      node.timeEnd = firstTime.end;
-      node.timeMark = firstTime.mark;
-      node.title = list[k].MEET_TITLE;
-      node.pic = list[k].MEET_STYLE_SET.pic;
-      node.desc = list[k].MEET_STYLE_SET.desc || "";
-      node._id = list[k]._id;
-      node.typeId = list[k].MEET_TYPE_ID;
-      node.typeName = list[k].MEET_TYPE_NAME;
-      node.level =
-        (list[k].MEET_STYLE_SET && list[k].MEET_STYLE_SET.level) || "";
-      node.isShowLimit = list[k].MEET_IS_SHOW_LIMIT;
-      node.limit = firstTime.limit || 0;
-      node.stat = firstTime.stat || {
-        succCnt: 0,
-        cancelCnt: 0,
-        adminCancelCnt: 0,
-      };
-      node.timeSlotCnt = usefulTimes.length;
+      for (let j in times) {
+        let t = times[j];
+        if (t.status != 1) continue;
 
-      let coachName = "";
-      if (list[k].MEET_ADMIN_ID) {
-        let admin = await AdminModel.getOne(
-          { _id: list[k].MEET_ADMIN_ID },
-          "ADMIN_NAME",
-        );
-        if (admin) coachName = admin.ADMIN_NAME;
+        let coachName = "";
+        if (t.teacherName) {
+          coachName = t.teacherName;
+        } else if (style.teacherName) {
+          coachName = style.teacherName;
+        } else if (meet.MEET_ADMIN_ID) {
+          let adminId = meet.MEET_ADMIN_ID;
+          if (adminNameCache[adminId] === undefined) {
+            let admin = await AdminModel.getOne(
+              { _id: adminId },
+              "ADMIN_NAME",
+            );
+            adminNameCache[adminId] = admin ? admin.ADMIN_NAME : "";
+          }
+          coachName = adminNameCache[adminId];
+        }
+
+        retList.push({
+          timeDesc: t.start + " ~ " + t.end,
+          timeStart: t.start,
+          timeEnd: t.end,
+          timeMark: t.mark,
+          title: meet.MEET_TITLE,
+          pic: style.pic,
+          desc: style.desc || "",
+          _id: meet._id,
+          typeId: meet.MEET_TYPE_ID,
+          typeName: meet.MEET_TYPE_NAME,
+          level: style.level || "",
+          isShowLimit: meet.MEET_IS_SHOW_LIMIT,
+          limit: t.limit || 0,
+          stat: t.stat || {
+            succCnt: 0,
+            cancelCnt: 0,
+            adminCancelCnt: 0,
+          },
+          timeSlotCnt: 1,
+          coachName,
+          meetOrder: meet.MEET_ORDER || 0,
+        });
       }
-      node.coachName = coachName;
-
-      retList.push(node);
     }
+
+    retList.sort((a, b) => {
+      if (a.timeStart !== b.timeStart) {
+        return a.timeStart < b.timeStart ? -1 : 1;
+      }
+      if (a.meetOrder !== b.meetOrder) {
+        return a.meetOrder - b.meetOrder;
+      }
+      return String(a.title).localeCompare(String(b.title), "zh");
+    });
+
+    for (let k in retList) {
+      delete retList[k].meetOrder;
+    }
+
     return retList;
   }
 

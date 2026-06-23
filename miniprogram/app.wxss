@@ -2,19 +2,19 @@
 @import "style/project/base/project.wxss";
 
 /* [AI_START TIMESTAMP=2025-01-24 12:10:00] */
-/* VANT Weapp 主题色 - 与项目设计系统保持一致 (Sage Green #5b8a72) */
+/* VANT Weapp 主题色 - 与项目设计系统保持一致 (Sage Green #6fae96) */
 page {
   /* Button */
-  --button-primary-background-color: #5b8a72;
-  --button-primary-border-color: #5b8a72;
+  --button-primary-background-color: #6fae96;
+  --button-primary-border-color: #6fae96;
   --button-default-border-color: #e4e7e2;
   --button-border-radius: 24rpx;
   --button-default-font-size: 28rpx;
   --button-normal-padding: 0 32rpx;
 
   /* Tabs */
-  --tabs-default-color: #5b8a72;
-  --tabs-bottom-bar-color: #5b8a72;
+  --tabs-default-color: #6fae96;
+  --tabs-bottom-bar-color: #6fae96;
   --tabs-active-text-color: #2d2d2d;
   --tabs-inactive-text-color: #999999;
   --tab-text-color: #999999;
@@ -46,19 +46,19 @@ page {
   --divider-border-color: #ebedf0;
 
   /* Dialog */
-  --dialog-confirm-button-text-color: #5b8a72;
+  --dialog-confirm-button-text-color: #6fae96;
 
   /* Switch */
-  --switch-on-background-color: #5b8a72;
+  --switch-on-background-color: #6fae96;
 
   /* Sidebar */
-  --sidebar-selected-border-color: #5b8a72;
+  --sidebar-selected-border-color: #6fae96;
 
   /* NoticeBar */
-  --notice-bar-background-color: #e3efe8;
+  --notice-bar-background-color: #e5f1ec;
 
   /* ActionSheet */
-  --action-sheet-item-text-color: #5b8a72;
+  --action-sheet-item-text-color: #6fae96;
 }
 /* [AI_END LINES=53 TIMESTAMP=2025-01-24 12:10:00] */
 
@@ -129,7 +129,7 @@ page {
 
 /* VANT Cell 图标色 */
 .van-cell__left-icon {
-  color: #5b8a72 !important;
+  color: #6fae96 !important;
 }
 
 /* VANT 标签边距 */

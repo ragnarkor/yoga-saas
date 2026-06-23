@@ -1,12 +1,119 @@
-@import "../../../style/comm/comm.wxss"; 
-@import "../../../style/project/base/project.wxss";  
+.form-group {
+  padding: 1rpx 30rpx;
+  display: flex;
+  align-items: center;
+  min-height: 100rpx;
+  justify-content: space-between;
+  position: relative;
+  border-top: 1rpx solid #eef0ed;
+}
+
+.form-group.padding {
+  padding-bottom: 24rpx;
+}
+
+.form-group .title {
+  text-align: justify;
+  padding-right: 30rpx;
+  font-size: 30rpx;
+  position: relative;
+  height: 60rpx;
+  line-height: 60rpx;
+}
+
+.form-group .action {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.form-group .upload-img {
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  flex: 1;
+}
+
+.form-group .upload-img .upload-item {
+  width: calc((100% - 60rpx) / 4);
+  padding-bottom: calc((100% - 60rpx) / 4);
+  height: 0;
+  margin-right: 12rpx;
+  margin-bottom: 20rpx;
+  border-radius: 6rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-group .upload-img .bg-img {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.form-group .upload-img .bg-img .upload-img-el {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+.form-group .upload-img .tag {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border-bottom-left-radius: 6rpx;
+  padding: 6rpx 12rpx;
+  height: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
 
 .form-group .upload-img .img-no {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    border-top-left-radius: 6rpx;
-    padding: 6rpx 12rpx;
-    height: 35rpx;
-    opacity: .9;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  border-top-left-radius: 6rpx;
+  padding: 6rpx 12rpx;
+  height: 35rpx;
+  opacity: 0.9;
+}
+
+.form-group .upload-img .solid {
+  width: calc((100% - 60rpx) / 4);
+  padding-bottom: calc((100% - 60rpx) / 4);
+  height: 0;
+  margin-right: 12rpx;
+  margin-bottom: 20rpx;
+  border-radius: 6rpx;
+  position: relative;
+  border: 1rpx dashed #ddd;
+  box-sizing: border-box;
+}
+
+.form-group .upload-img .solid .upload-add-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+.bg-red {
+  background-color: #e54d42;
+  color: #fff;
+}
+
+.bg-olive {
+  background-color: #8dc63f;
+  color: #fff;
+}
+
+.text-gray {
+  color: #999;
+}
+
+.text-normal {
+  font-weight: normal;
 }

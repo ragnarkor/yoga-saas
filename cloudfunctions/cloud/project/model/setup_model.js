@@ -21,11 +21,18 @@ SetupModel.DB_STRUCTURE = {
   SETUP_ABOUT: "string|false|comment=关于我们",
   SETUP_ABOUT_PIC: "array|false|default=[]|comment=关于我们的图片cloudId",
 
+  SETUP_THEME_COLOR:
+    "string|false|comment=品牌主题色，如 #5B8A72，会员端与教练端共用",
+  SETUP_MEET_TYPE:
+    "string|false|comment=课程分类配置，格式 1=特色课程|leftbig3,2=精品课|leftbig2",
+
   SETUP_SERVICE_PIC: "array|false|default=[]|comment=客服图片cloudId",
   SETUP_OFFICE_PIC: "array|false|default=[]|comment=官微图片cloudId",
 
   SETUP_ADDRESS: "string|false|comment=地址",
   SETUP_PHONE: "string|false|comment=电话",
+  SETUP_LATITUDE: "float|false|comment=门店纬度",
+  SETUP_LONGITUDE: "float|false|comment=门店经度",
 
   // [AI_START TIMESTAMP=2025-01-25 10:00:00]
   SETUP_FEATURES: "object|true|default={} |comment=功能开关配置",

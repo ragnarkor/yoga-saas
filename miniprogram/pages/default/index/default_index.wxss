@@ -3,13 +3,21 @@
 @import "../../../style/project/default_index_base.wxss";
 
 .home-page {
-  padding-bottom: 120rpx;
+  background: #f7f8fa;
+  min-height: 100vh;
+  padding-bottom: 100rpx;
+}
+
+/* ---- 顶部横幅 ---- */
+
+.home-hero {
+  background: #fff;
 }
 
 .home-banner,
 .home-banner-fallback {
   width: 100%;
-  height: 360rpx;
+  height: 380rpx;
   overflow: hidden;
 }
 
@@ -18,191 +26,176 @@
 .banner-media,
 .home-banner-fallback image {
   width: 100%;
-  height: 360rpx;
+  height: 380rpx;
 }
 
 .banner-item {
   position: relative;
 }
 
-.banner-mask {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 24rpx 32rpx;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.45));
-}
+/* ---- 场馆信息卡 ---- */
 
-.banner-title {
-  color: #fff;
-  font-size: 30rpx;
-  font-weight: 600;
-}
-
-.home-toolbar {
+.home-studio-card {
   display: flex;
   align-items: center;
-  margin: -40rpx 24rpx 24rpx;
-  padding: 16rpx 20rpx;
+  margin: -36rpx 24rpx 0;
+  padding: 28rpx 32rpx;
   position: relative;
   z-index: 2;
   background: #fff;
   border-radius: 20rpx;
-  border: 1rpx solid var(--neutralBorder, #e8e9eb);
-  box-shadow: 0 4rpx 20rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
+  box-shadow: 0 8rpx 32rpx rgba(31, 35, 41, 0.08);
 }
 
-.home-search {
+.home-studio-name {
   flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-  height: 72rpx;
-  padding: 0 24rpx;
-  background: var(--neutralIconBg, #f2f3f5);
-  border-radius: 999rpx;
+  min-width: 0;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #1a1a1a;
 }
 
-.home-search-placeholder {
-  color: #999;
-  font-size: 26rpx;
+.home-studio-divider {
+  width: 1rpx;
+  height: 48rpx;
+  margin: 0 28rpx;
+  background: #e8e8e8;
 }
 
-.home-phone {
+.home-studio-phone {
   width: 72rpx;
   height: 72rpx;
-  margin-left: 16rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
+  border: 2rpx solid var(--projectColor, #6fae96);
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
+.home-studio-phone:active {
+  opacity: 0.7;
+}
+
+/* ---- 公告条 ---- */
+
+.home-announce-strip {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin: 20rpx 24rpx 0;
+  padding: 20rpx 24rpx;
+  background: var(--projectColorLight, #f0edf8);
+  border-radius: 16rpx;
+}
+
+.home-announce-strip:active {
+  opacity: 0.85;
+}
+
+.home-announce-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* ---- 板块 ---- */
+
 .home-section {
-  margin: 0 24rpx 24rpx;
-  padding: 24rpx;
-  border-radius: 20rpx;
-  background: #fff;
-  border: 1rpx solid var(--neutralBorder, #e8e9eb);
-  box-shadow: 0 4rpx 20rpx var(--neutralShadow, rgba(31, 35, 41, 0.06));
+  margin: 32rpx 0 0;
+  padding: 0 0 8rpx;
 }
 
 .section-head {
+  padding: 0 24rpx;
   margin-bottom: 20rpx;
 }
 
 .section-title {
-  font-size: 32rpx;
+  font-size: 34rpx;
   font-weight: 700;
-  color: #2d332e;
+  color: #1a1a1a;
 }
 
-.section-empty {
-  color: #999;
-  font-size: 26rpx;
-  padding: 12rpx 0;
-}
+/* ---- 横向滚动通用 ---- */
 
-.announce-item {
-  display: flex;
-  align-items: center;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
-}
-
-.announce-item:last-child {
-  border-bottom: none;
-}
-
-.announce-body {
-  flex: 1;
-  min-width: 0;
-  margin: 0 16rpx;
-}
-
-.announce-title {
-  font-size: 28rpx;
-  color: #333;
-  font-weight: 500;
-}
-
-.announce-desc {
-  margin-top: 6rpx;
-  font-size: 24rpx;
-  color: #999;
-}
-
-.teacher-scroll {
+.hscroll {
   width: 100%;
-  white-space: nowrap;
 }
 
-.teacher-list {
+.hscroll-inner {
   display: inline-flex;
   gap: 20rpx;
-  padding-bottom: 8rpx;
+  padding: 4rpx 24rpx 12rpx;
 }
 
+/* ---- 金牌老师 ---- */
+
 .teacher-card {
-  display: inline-block;
-  width: 260rpx;
-  overflow: hidden;
-  border-radius: 20rpx;
+  display: inline-flex;
+  flex-direction: column;
+  width: 220rpx;
+  padding: 16rpx;
   background: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(31, 35, 41, 0.06);
+  flex-shrink: 0;
+}
+
+.teacher-card:active {
+  opacity: 0.88;
 }
 
 .teacher-cover {
-  width: 260rpx;
-  height: 180rpx;
-  display: block;
-}
-
-.teacher-info {
-  padding: 16rpx;
+  width: 188rpx;
+  height: 188rpx;
+  border-radius: 12rpx;
+  background: #f0f1f3;
 }
 
 .teacher-name {
+  margin-top: 14rpx;
   font-size: 28rpx;
   font-weight: 600;
-  color: #333;
+  color: #1a1a1a;
+  text-align: center;
 }
 
-.teacher-specialty {
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #999;
+/* ---- 照片墙 ---- */
+
+.photo-card {
+  display: inline-flex;
+  flex-direction: column;
+  width: 280rpx;
+  padding: 16rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(31, 35, 41, 0.06);
+  flex-shrink: 0;
 }
 
-.photo-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
+.photo-card:active {
+  opacity: 0.88;
 }
 
-.photo-item {
-  width: calc(50% - 8rpx);
-  position: relative;
-  border-radius: 16rpx;
-  overflow: hidden;
-  background: #f6f8f5;
+.photo-cover {
+  width: 248rpx;
+  height: 186rpx;
+  border-radius: 12rpx;
+  background: #f0f1f3;
 }
 
-.photo-item image {
-  width: 100%;
-  height: 220rpx;
-  display: block;
-}
-
-.photo-caption {
-  padding: 12rpx 16rpx;
-  font-size: 24rpx;
-  color: #666;
+.photo-title {
+  margin-top: 14rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-align: center;
 }
 
 .home-safe-bottom {
-  height: 40rpx;
+  height: 24rpx;
 }
 
 .menu .item {

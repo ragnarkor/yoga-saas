@@ -8,7 +8,7 @@ Page({
     tenantIndex: 0,
     name: '',
     phone: '',
-    pwd: '123456',
+    pwd: '',
     roleIndex: 0,
     roleOptions: [
       { label: '馆长', value: 'owner' },
@@ -67,8 +67,8 @@ Page({
     const phone = (this.data.phone || '').trim();
     const pwd = (this.data.pwd || '').trim();
 
-    if (!name || !phone || !pwd) {
-      wx.showToast({ title: '请填写完整信息', icon: 'none' });
+    if (!name || !phone) {
+      wx.showToast({ title: '请填写姓名和手机号', icon: 'none' });
       return;
     }
     if (this.data.submitting) return;

@@ -7,7 +7,7 @@
   </view>
 
   <view wx:elif="{{list.length === 0}}" class="empty">
-    本馆暂无馆长/教练账号。请确认已在后台首页选择了正确的瑜伽馆。
+    {{selfOnly ? '未找到您的绑定信息，请重新登录后再试。' : '本馆暂无馆长/教练账号。请确认已在后台首页选择了正确的瑜伽馆。'}}
   </view>
 
   <view wx:else class="list">
@@ -19,11 +19,14 @@
         </view>
         <view class="meta">手机：{{item.phone}}</view>
         <view class="status {{item.bound ? 'status-bound' : 'status-unbound'}}">
-          微信绑定：{{item.bound ? '已绑定' : '未绑定'}}
+          微信绑定：{{item.bound ? '已绑定' : '待绑定（空壳账号）'}}
           <text wx:if="{{item.boundOpenid}}">（…{{item.boundOpenid}}）</text>
         </view>
-        <view class="hint" wx:if="{{item.type === 'owner' && !item.canGenCode}}">
+        <view class="hint" wx:if="{{item.type === 'owner' && !item.canGenCode && !item.bound}}">
           馆长绑定码需由超管生成
+        </view>
+        <view class="hint" wx:if="{{item.isShell && !selfOnly}}">
+          尚未绑定微信，绑定成功后教练将自动出现在首页
         </view>
       </view>
       <view class="item-actions">
@@ -42,6 +45,14 @@
           data-bound="{{item.bound}}"
           data-can-unbind="{{item.canUnbind}}"
         >解除绑定</view>
+        <view
+          wx:if="{{item.canDelete}}"
+          class="btn delete"
+          bindtap="bindDeleteTap"
+          data-id="{{item.id}}"
+          data-name="{{item.name}}"
+          data-can-delete="{{item.canDelete}}"
+        >删除账号</view>
       </view>
     </view>
   </view>

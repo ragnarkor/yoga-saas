@@ -81,6 +81,8 @@ async function app(event, context) {
 		// 读接口跳过 initSetup，避免每次请求多轮数据库探测拖慢响应
 		const FAST_ROUTES = {
 			'home/index': 1,
+			'home/teacher_home': 1,
+			'home/teacher_detail': 1,
 			'tenant/list': 1,
 			'tenant/detail': 1,
 			'passport/my_detail': 1,

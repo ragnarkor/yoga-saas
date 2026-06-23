@@ -7,7 +7,10 @@ module.exports = Behavior({
 	 * 页面的初始数据
 	 */
 	data: {
-		isLoad: false
+		isLoad: false,
+		tenantName: '',
+		tenantDesc: '',
+		tenantLogo: '',
 	},
 
 	methods: {
@@ -35,8 +38,18 @@ module.exports = Behavior({
 				return;
 			}
 
+			const tenant = pageHelper.getTenantInfo() || {};
+			const tenantName = tenant.TENANT_NAME || pageHelper.getTenantName() || '';
+			const tenantDesc = tenant.TENANT_DESC || '';
+			const tenantLogo = tenant.TENANT_LOGO
+				? pageHelper.fmtImgUrl(tenant.TENANT_LOGO)
+				: '';
+
 			if (about) this.setData({
 				about,
+				tenantName,
+				tenantDesc,
+				tenantLogo,
 				isLoad: true
 			});
 		},

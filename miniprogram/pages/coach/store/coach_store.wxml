@@ -1,77 +1,240 @@
 <page-meta page-style="{{themeStyle}}" />
 <view class="coach-page store-page">
-  <coach-tenant-switch title="我的门店" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
+  <coach-tenant-switch title="我的门店" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" bind:change="bindCoachTenantChange" />
 
   <view wx:if="{{loading}}" class="store-loading">
     <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
   </view>
 
   <block wx:else>
-    <view class="store-card">
-      <view class="store-section-title">品牌与门店</view>
-      <view class="store-name">{{tenantName}}</view>
-      <textarea
-        wx:if="{{canEdit}}"
-        class="store-desc-input"
-        value="{{tenantDesc}}"
-        placeholder="填写品牌简介（会员端可见）"
-        maxlength="200"
-        bindinput="bindDescInput"
-      />
-      <view wx:else class="store-desc">{{tenantDesc || '暂无品牌简介'}}</view>
-    </view>
-
-    <view class="store-section">
-      <view class="store-section-title">品牌主题色</view>
-      <view class="store-section-tip">会员端与教练端将统一使用该颜色</view>
-      <view class="store-theme-row {{canEdit ? '' : 'store-theme-row--readonly'}}">
+    <scroll-view scroll-x class="store-tab-scroll" enhanced show-scrollbar="{{false}}">
+      <view class="store-tab-bar">
         <view
-          wx:for="{{presetColors}}"
-          wx:key="color"
-          class="store-theme-swatch {{themePickIndex === index ? 'active' : ''}}"
-          style="background: {{item.color}};"
+          wx:for="{{tabs}}"
+          wx:key="id"
+          class="store-tab-item {{activeTab === index ? 'store-tab-item--active' : ''}}"
+          style="{{activeTab === index ? 'color:' + themeColor + ';border-color:' + themeColor : ''}}"
           data-index="{{index}}"
-          bindtap="bindThemePick"
+          bindtap="onStoreTabTap"
         >
-          <van-icon wx:if="{{themePickIndex === index}}" name="success" color="#fff" size="28rpx" />
+          {{item.name}}
         </view>
       </view>
-      <view class="store-theme-current">当前：{{themeColor}}</view>
-      <view wx:if="{{!canEdit}}" class="store-theme-readonly">仅馆主可修改主题色</view>
-    </view>
+    </scroll-view>
 
-    <view class="store-section">
-      <view class="store-section-title">课程分类</view>
-      <view class="store-section-tip">教练版「课程管理」顶部分类 Tab 由此配置生成</view>
+    <scroll-view scroll-y class="store-body" enhanced show-scrollbar="{{false}}">
+      <!-- 基础信息 -->
+      <view wx:if="{{activeTab === 0}}" class="store-panel">
+        <van-cell-group title="基本信息" custom-class="store-group">
+          <block wx:if="{{canEdit}}">
+            <van-field
+              label="门店名称"
+              required
+              input-align="right"
+              value="{{tenantName}}"
+              placeholder="请输入"
+              maxlength="30"
+              bind:change="bindFieldChange"
+              data-field="tenantName"
+            />
+            <van-field
+              label="简介"
+              input-align="right"
+              value="{{tenantDesc}}"
+              placeholder="一句话简介"
+              maxlength="200"
+              bind:change="bindFieldChange"
+              data-field="tenantDesc"
+            />
+          </block>
+          <block wx:else>
+            <van-cell title="门店名称" value="{{tenantName || '未设置'}}" />
+            <van-cell title="简介" value="{{tenantDesc || '未填写'}}" />
+          </block>
+        </van-cell-group>
 
-      <view class="store-cate-row" wx:for="{{categories}}" wx:key="id">
-        <text class="store-cate-id">{{item.id}}</text>
-        <input
-          class="store-cate-input"
-          value="{{item.name}}"
-          placeholder="分类名称，如：特色课程"
-          disabled="{{!canEdit}}"
-          data-index="{{index}}"
-          bindinput="bindNameInput"
-        />
-        <van-icon
-          wx:if="{{canEdit}}"
-          name="cross"
-          size="36rpx"
-          color="#999"
-          data-index="{{index}}"
-          bindtap="bindRemoveCategory"
-        />
+        <van-cell-group title="详细介绍" custom-class="store-group">
+          <block wx:if="{{canEdit}}">
+            <van-field
+              label="详情"
+              type="textarea"
+              autosize
+              value="{{tenantAbout}}"
+              placeholder="门店故事、师资、环境等"
+              maxlength="50000"
+              bind:change="bindFieldChange"
+              data-field="tenantAbout"
+            />
+          </block>
+          <block wx:else>
+            <van-cell title="详情" label="{{tenantAbout || '未填写'}}" />
+          </block>
+        </van-cell-group>
+
+        <van-cell-group title="图片" custom-class="store-group">
+          <van-cell title="门店 LOGO" use-label-slot>
+            <view slot="label" class="store-uploader">
+              <van-uploader
+                wx:if="{{canEdit}}"
+                file-list="{{logoFileList}}"
+                max-count="{{1}}"
+                deletable="{{canEdit}}"
+                bind:after-read="bindLogoAfterRead"
+                bind:delete="bindLogoDelete"
+              />
+              <image wx:elif="{{logoList.length}}" class="store-logo-thumb" src="{{logoList[0]}}" mode="aspectFill" />
+              <text wx:else class="store-empty-text">未上传</text>
+            </view>
+          </van-cell>
+          <van-cell title="介绍图片" use-label-slot>
+            <view slot="label" class="store-uploader">
+              <van-uploader
+                wx:if="{{canEdit}}"
+                file-list="{{aboutFileList}}"
+                max-count="{{8}}"
+                multiple
+                deletable="{{canEdit}}"
+                bind:after-read="bindAboutAfterRead"
+                bind:delete="bindAboutDelete"
+              />
+              <view wx:elif="{{aboutPics.length}}" class="store-about-readonly">
+                <image
+                  wx:for="{{aboutPics}}"
+                  wx:key="*this"
+                  class="store-about-thumb"
+                  src="{{item}}"
+                  mode="aspectFill"
+                />
+              </view>
+              <text wx:else class="store-empty-text">未上传</text>
+            </view>
+          </van-cell>
+        </van-cell-group>
       </view>
 
-      <view wx:if="{{canEdit}}" class="store-add" bindtap="bindAddCategory">
-        <van-icon name="plus" size="32rpx" color="{{themeColor}}" />
-        <text>添加分类</text>
-      </view>
-    </view>
+      <!-- 联系信息 -->
+      <view wx:if="{{activeTab === 1}}" class="store-panel">
+        <van-cell-group title="联系信息" custom-class="store-group">
+          <block wx:if="{{canEdit}}">
+            <van-field
+              label="联系电话"
+              type="tel"
+              input-align="right"
+              value="{{contactPhone}}"
+              placeholder="请输入"
+              maxlength="30"
+              bind:change="bindFieldChange"
+              data-field="contactPhone"
+            />
+            <van-cell
+              title="地图选点"
+              is-link
+              value="{{hasMapPoint ? '已选位置' : '请选择'}}"
+              bind:click="bindChooseLocationTap"
+            />
+            <van-field
+              label="门店地址"
+              type="textarea"
+              autosize
+              value="{{contactAddress}}"
+              placeholder="选点后自动填充，也可手动修改"
+              maxlength="200"
+              bind:change="bindFieldChange"
+              data-field="contactAddress"
+            />
+            <van-cell
+              wx:if="{{hasMapPoint}}"
+              title="清除地图坐标"
+              is-link
+              title-class="store-danger-text"
+              bind:click="bindClearLocationTap"
+            />
+          </block>
+          <block wx:else>
+            <van-cell title="联系电话" value="{{contactPhone || '未填写'}}" />
+            <van-cell title="门店地址" label="{{contactAddress || '未填写'}}" />
+          </block>
+        </van-cell-group>
 
-    <view wx:if="{{canEdit}}" class="store-save-wrap">
-      <van-button type="primary" block color="{{themeColor}}" bind:click="bindSaveTap">保存门店配置</van-button>
+        <van-cell-group wx:if="{{hasMapPoint}}" title="地图预览" custom-class="store-group">
+          <van-cell use-label-slot>
+            <view slot="label" class="store-map-wrap">
+              <map
+                class="store-map"
+                latitude="{{contactLatitude}}"
+                longitude="{{contactLongitude}}"
+                scale="16"
+                markers="{{mapMarkers}}"
+                show-location="{{false}}"
+                enable-scroll="{{false}}"
+                enable-zoom="{{false}}"
+                bindtap="bindPreviewMapTap"
+              />
+              <view class="store-map-tip">点击打开导航</view>
+            </view>
+          </van-cell>
+        </van-cell-group>
+      </view>
+
+      <!-- 课程分类 -->
+      <view wx:if="{{activeTab === 2}}" class="store-panel store-panel--card">
+        <view class="store-section">
+          <view class="store-section-title">课程分类</view>
+          <view class="store-section-tip store-section-tip--inner">教练版「课程管理」顶部分类 Tab 由此配置</view>
+
+          <view class="store-cate-row" wx:for="{{categories}}" wx:key="id">
+            <text class="store-cate-id">{{item.id}}</text>
+            <input
+              wx:if="{{canEdit}}"
+              class="store-cate-input"
+              value="{{item.name}}"
+              placeholder="分类名称，如：特色课程"
+              data-index="{{index}}"
+              bindinput="bindCategoryNameInput"
+            />
+            <view wx:else class="store-cate-readonly">{{item.name}}</view>
+            <van-icon
+              wx:if="{{canEdit && categories.length > 1}}"
+              name="cross"
+              size="36rpx"
+              color="#999"
+              data-index="{{index}}"
+              bindtap="bindRemoveCategory"
+            />
+          </view>
+
+          <view wx:if="{{canEdit}}" class="store-add" bindtap="bindAddCategory">
+            <van-icon name="plus" size="32rpx" color="{{themeColor}}" />
+            <text>添加分类</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 品牌设置 -->
+      <view wx:if="{{activeTab === 3}}" class="store-panel store-panel--card">
+        <view class="store-section">
+          <view class="store-section-title">门店设置</view>
+          <view class="store-section-tip store-section-tip--inner">品牌主题色，会员端与教练端统一使用</view>
+          <view class="store-theme-row {{canEdit ? '' : 'store-theme-row--readonly'}}">
+            <view
+              wx:for="{{presetColors}}"
+              wx:key="color"
+              class="store-theme-swatch {{themePickIndex === index ? 'active' : ''}}"
+              style="background: {{item.color}};"
+              data-index="{{index}}"
+              bindtap="bindThemePick"
+            >
+              <van-icon wx:if="{{themePickIndex === index}}" name="success" color="#fff" size="28rpx" />
+            </view>
+          </view>
+          <view class="store-theme-current">当前：{{themeColor}}</view>
+          <view wx:if="{{!canEdit}}" class="store-theme-readonly">仅馆主可修改主题色</view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view wx:if="{{canEdit}}" class="store-save-bar">
+      <van-button round block color="{{themeColor}}" custom-class="store-save-btn" bind:click="bindSaveTap">保存</van-button>
     </view>
     <view wx:else class="store-readonly-tip">仅馆主可修改门店配置</view>
   </block>

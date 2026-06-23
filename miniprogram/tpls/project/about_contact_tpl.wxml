@@ -8,6 +8,22 @@
 	<view wx:if="{{isLoad}}" class="main padding-project">
 		<view class="main-content">
 			<view class="content card-project shadow-project">
+				<block wx:if="{{hasMapPoint}}">
+					<view class="title text-project"><van-icon name="location-o" size="32rpx" custom-class="margin-right-xs"  />门店位置</view>
+					<map
+						class="contact-map"
+						latitude="{{about.SETUP_LATITUDE}}"
+						longitude="{{about.SETUP_LONGITUDE}}"
+						scale="16"
+						markers="{{contactMarkers}}"
+						show-location="{{false}}"
+						enable-scroll="{{false}}"
+						enable-zoom="{{false}}"
+						bindtap="bindOpenMapTap"
+					/>
+					<view class="contact-map-tip">点击地图打开导航</view>
+				</block>
+
 				<block wx:if="{{about.SETUP_ADDRESS}}">
 					<view class="title text-project"><van-icon name="location-o" size="32rpx" custom-class="margin-right-xs"  />地址</view>
 					<view class="txt"><text user-select="true">{{about.SETUP_ADDRESS}}</text></view>

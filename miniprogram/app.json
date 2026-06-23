@@ -10,6 +10,7 @@
     "pages/default/meet/detail/meet_detail",
     "pages/default/meet/self/meet_self",
     "pages/default/my/index/my_index",
+    "pages/default/my/edit/my_edit",
     "pages/default/my/join/my_join",
     "pages/default/my/join_detail/my_join_detail",
     "pages/default/news/index/news_index",
@@ -26,10 +27,13 @@
     "pages/coach/marketing/coach_marketing",
     "pages/coach/my/coach_my",
     "pages/coach/store/coach_store",
+    "pages/coach/staff/coach_staff",
+    "pages/coach/profile/coach_profile",
+    "pages/coach/platform/coach_platform",
     "pages/coach/course/coach_course_list",
     "pages/coach/course/coach_course_edit",
-    "pages/coach/course/coach_course_time",
     "pages/coach/schedule/coach_schedule",
+    "pages/coach/schedule/coach_schedule_edit",
     "pages/coach/member/coach_member_list",
     "pages/coach/card/coach_card_list",
     "pages/coach/card/coach_card_edit",
@@ -55,6 +59,7 @@
     "pages/admin/index/home/admin_home",
     "pages/admin/platform/tenant_form/admin_tenant_form",
     "pages/admin/platform/mgr_form/admin_mgr_form",
+    "pages/admin/platform/staff/admin_platform_staff",
     "pages/admin/home/content/admin_home_content",
     "pages/admin/bind/admin_bind",
     "pages/admin/mgr/bind/admin_mgr_bind",
@@ -113,7 +118,12 @@
       }
     ]
   },
-  "permission": {},
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于在地图上选择门店位置"
+    }
+  },
+  "requiredPrivateInfos": ["chooseLocation"],
   "useExtendedLib": {
     "weui": true
   },

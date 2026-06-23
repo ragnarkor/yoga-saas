@@ -230,6 +230,26 @@ class AdminMeetController extends BaseAdminController {
     );
   }
 
+  /** 教练端：删除单个排课时段 */
+  async removeScheduleSlot() {
+    await this.isAdmin();
+
+    let rules = {
+      meetId: "must|id|name=课程ID",
+      day: "must|date|name=日期",
+      mark: "must|string|name=时段标识",
+    };
+
+    let input = this.validateData(rules);
+
+    let service = new AdminMeetService();
+    let result = await service.removeScheduleSlot(input);
+
+    cacheUtil.clear();
+
+    return result;
+  }
+
   /** 预约名单列表 */
   async getJoinList() {
     await this.isAdmin();
@@ -306,13 +326,14 @@ class AdminMeetController extends BaseAdminController {
     // 数据校验
     let rules = {
       id: "must|id",
+      fromDay: "string|false|name=起始日期",
     };
 
     // 取得数据
     let input = this.validateData(rules);
 
     let service = new AdminMeetService();
-    let detail = await service.getMeetDetail(input.id);
+    let detail = await service.getMeetDetail(input.id, input.fromDay || "");
     return detail;
   }
 
@@ -337,7 +358,7 @@ class AdminMeetController extends BaseAdminController {
     let input = this.validateData(rules);
 
     let service = new AdminMeetService();
-    let result = service.editMeet(input);
+    let result = await service.editMeet(input);
 
     // 清空缓存
     cacheUtil.clear();

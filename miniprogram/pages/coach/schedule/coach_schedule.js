@@ -3,11 +3,12 @@ const cloudHelper = require('../../../helper/cloud_helper.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
 const dataHelper = require('../../../helper/data_helper.js');
 const schedulePoster = require('../../../helper/schedule_poster_helper.js');
+const scheduleSlotHelper = require('../../../helper/schedule_slot_helper.js');
 
 const WEEK_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
 function pad2(n) {
-  return n < 10 ? '0' + n : n;
+  return n < 10 ? '0' + n : '' + n;
 }
 
 function formatDayStr(d) {
@@ -32,6 +33,7 @@ function getWeekRange(weekOffset) {
       day,
       label: pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' + WEEK_NAMES[d.getDay()],
       shortLabel: pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()),
+      weekday: WEEK_NAMES[d.getDay()],
     });
   }
 
@@ -61,11 +63,12 @@ Page({
     canvasHeight: 1200,
     previewShow: false,
     previewUrl: '',
-    moreShow: false,
-    moreActions: [
-      { name: '保存课表图片' },
-      { name: '刷新课表' },
+    slotActionShow: false,
+    slotActions: [
+      { name: '编辑排课' },
+      { name: '删除排课', color: '#ee0a24' },
     ],
+    activeSlot: null,
   },
 
   onLoad() {
@@ -143,24 +146,35 @@ Page({
     this.setData({ loading: true });
     try {
       const { startDay, endDay, activeTypeId } = this.data;
-      const res = await cloudHelper.callCloudData(
-        'admin/schedule_week',
-        {
-          startDay,
-          endDay,
-          typeId: activeTypeId === '0' ? '' : activeTypeId,
-        },
-        { hint: false, title: 'bar' },
-      );
+      const [res, meetRes] = await Promise.all([
+        cloudHelper.callCloudData(
+          'admin/schedule_week',
+          {
+            startDay,
+            endDay,
+            typeId: activeTypeId === '0' ? '' : activeTypeId,
+          },
+          { hint: false, title: 'bar' },
+        ),
+        cloudHelper.callCloudData(
+          'admin/meet_list',
+          { page: 1, size: 200 },
+          { hint: false },
+        ),
+      ]);
+
+      const meetMetaMap = {};
+      ((meetRes && meetRes.list) || []).forEach((m, idx) => {
+        meetMetaMap[m._id] = {
+          styleSet: m.MEET_STYLE_SET || {},
+          typeId: m.MEET_TYPE_ID,
+          index: idx,
+        };
+      });
 
       const slots = (res && res.slots) || [];
       let timeRows = (res && res.timeRows) || [];
       const weekDays = this.data.weekDays;
-
-      const slotMap = {};
-      slots.forEach((s) => {
-        slotMap[s.start + '|' + s.day] = this._fmtSlot(s);
-      });
 
       if (!timeRows.length && slots.length) {
         timeRows = Array.from(new Set(slots.map((s) => s.start))).sort();
@@ -168,7 +182,14 @@ Page({
 
       const gridRows = timeRows.map((time) => ({
         time,
-        cells: weekDays.map((d) => slotMap[time + '|' + d.day] || null),
+        cells: weekDays.map((d) => {
+          const hit = slots.find(
+            (s) => s.start === time && s.day === d.day,
+          );
+          return hit
+            ? scheduleSlotHelper.formatScheduleSlot(hit, meetMetaMap[hit.meetId])
+            : null;
+        }),
       }));
 
       this.setData({ loading: false, gridRows });
@@ -178,17 +199,119 @@ Page({
     }
   },
 
-  _fmtSlot(s) {
-    const diff = Number(s.difficulty) || 3;
-    let starText = '';
-    for (let i = 0; i < 5; i++) {
-      starText += i < diff ? '★' : '☆';
+  _openScheduleForm(params = {}) {
+    const qs = Object.keys(params)
+      .filter((k) => params[k] != null && params[k] !== '')
+      .map((k) => `${k}=${encodeURIComponent(params[k])}`)
+      .join('&');
+    wx.navigateTo({
+      url: '/pages/coach/schedule/coach_schedule_edit' + (qs ? '?' + qs : ''),
+    });
+  },
+
+  bindGoSchedule() {
+    this._openScheduleForm();
+  },
+
+  _cellFromEvent(e) {
+    const ds = e.currentTarget.dataset;
+    const rowIdx = Number(ds.row);
+    const colIdx = Number(ds.col);
+    const row = this.data.gridRows[rowIdx];
+    if (!row || !row.cells) return null;
+    return row.cells[colIdx] || null;
+  },
+
+  bindCellTap(e) {
+    const ds = e.currentTarget.dataset;
+    const cell = this._cellFromEvent(e);
+    if (cell) {
+      this._openScheduleForm({
+        meetId: cell.meetId,
+        day: cell.day,
+        mark: cell.mark,
+        start: cell.start,
+        end: cell.end,
+        teacherName: cell.teacherName || '',
+      });
+      return;
     }
-    return {
-      ...s,
-      starText,
-      duration: s.duration || 60,
-    };
+    this._openScheduleForm({
+      day: ds.day,
+      time: ds.time,
+    });
+  },
+
+  bindCellLongPress(e) {
+    const cell = this._cellFromEvent(e);
+    if (!cell || !cell.mark) return;
+    wx.vibrateShort({ type: 'light' });
+    this.setData({
+      activeSlot: {
+        meetId: cell.meetId,
+        day: cell.day,
+        mark: String(cell.mark),
+        start: cell.start,
+        end: cell.end,
+        title: cell.title || '',
+        teacherName: cell.teacherName || '',
+      },
+      slotActionShow: true,
+    });
+  },
+
+  bindSlotActionClose() {
+    this.setData({ slotActionShow: false, activeSlot: null });
+  },
+
+  bindSlotActionSelect(e) {
+    const slot = this.data.activeSlot;
+    this.setData({ slotActionShow: false });
+    if (!slot) return;
+
+    if (e.detail.name === '编辑排课') {
+      this._openScheduleForm({
+        meetId: slot.meetId,
+        day: slot.day,
+        mark: slot.mark,
+        start: slot.start,
+        end: slot.end,
+        teacherName: slot.teacherName || '',
+      });
+      return;
+    }
+
+    if (e.detail.name === '删除排课') {
+      wx.showModal({
+        title: '删除排课',
+        content: `确定删除「${slot.title || '课程'}」${slot.day} ${slot.start} 的排课吗？已有预约无法删除。`,
+        confirmColor: '#ee0a24',
+        success: (res) => {
+          if (res.confirm) this._deleteSlot(slot);
+        },
+      });
+    }
+  },
+
+  async _deleteSlot(slot) {
+    if (!slot || !slot.meetId || !slot.mark || !slot.day) return;
+    try {
+      await cloudHelper.callCloudSumbit(
+        'admin/schedule_slot_remove',
+        {
+          meetId: slot.meetId,
+          day: slot.day,
+          mark: String(slot.mark),
+        },
+        { title: '删除中' },
+      );
+
+      wx.showToast({ title: '已删除', icon: 'success' });
+      this.setData({ activeSlot: null });
+      await this._loadSchedule();
+    } catch (err) {
+      console.error(err);
+    }
   },
 
   bindTabChange(e) {
@@ -209,33 +332,6 @@ Page({
   bindNextWeek() {
     this._initWeek(this.data.weekOffset + 1);
     this._loadSchedule();
-  },
-
-  bindGoSchedule() {
-    wx.navigateTo({ url: '/pages/coach/course/coach_course_list' });
-  },
-
-  bindCourseTap(e) {
-    const id = e.currentTarget.dataset.meetId;
-    if (!id) return;
-    wx.navigateTo({ url: '/pages/coach/course/coach_course_edit?id=' + id });
-  },
-
-  bindMoreTap() {
-    this.setData({ moreShow: true });
-  },
-
-  bindMoreClose() {
-    this.setData({ moreShow: false });
-  },
-
-  bindMoreSelect(e) {
-    this.setData({ moreShow: false });
-    if (e.detail.name === '保存课表图片') {
-      this.bindSaveImageTap();
-    } else if (e.detail.name === '刷新课表') {
-      this._loadSchedule();
-    }
   },
 
   async bindSaveImageTap() {

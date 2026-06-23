@@ -5,27 +5,22 @@
 		<!--top area begin-->
 		<view class="upside upside-shadow">
 			<image mode="aspectFill" lazy-load class="upImg loading" src="{{skin.IMG_UPIMG}}" />
-			<view class="user-bar">
+			<view class="user-bar" bindtap="bindProfileTap">
 				<view class="avatar-wrap">
 					<image wx:if="{{showAvatarImg}}" class="avatar-img" mode="aspectFill" src="{{avatarSrc}}" />
 					<view wx:else class="avatar-placeholder">
 						<van-icon name="user-o" size="68rpx" color="{{themeColor}}" />
 					</view>
-					<button class="avatar-choose-btn" open-type="chooseAvatar" disabled="{{avatarChoosing}}" bindtap="bindAvatarTap" bindchooseavatar="bindChooseAvatar"></button>
 				</view>
 				<view class="detail">
-					<!-- 有昵称且非编辑态：用 view 显示（与教练版一致，可靠回显） -->
-					<view wx:if="{{userNameInput && !nicknameEditing}}" class="name-text" bindtap="bindNicknameEditTap">
-						<text>{{userNameInput}}</text>
-						<text class="name-edit-hint">修改</text>
+					<!-- [AI_START TIMESTAMP=2025-01-25 12:30:00] -->
+					<view class="name-text">
+						<text>{{userNameInput || '点击完善资料'}}</text>
+						<text class="name-edit-hint">编辑</text>
 					</view>
-					<!-- 无昵称或编辑态：用 input type=nickname 引导选择微信昵称 -->
-					<input wx:else type="nickname" class="name-input" placeholder="点击填写微信昵称" value="{{userNameInput}}" bindinput="bindNicknameInput" bindblur="bindNicknameBlur" bindnicknamereview="bindNicknameReview" />
-					<view class="desc">
-						<button wx:if="{{!user || !user.USER_MOBILE}}" open-type="getPhoneNumber" bindgetphonenumber="bindGetPhone" class="phone-auth-btn">绑定手机号（可选）</button>
-						<text wx:elif="{{user.USER_MOBILE}}" class="phone-text">{{user.USER_MOBILE}}</text>
-					</view>
+					<!-- [AI_END LINES=3 TIMESTAMP=2025-01-25 12:30:00] -->
 				</view>
+				<van-icon name="arrow" size="28rpx" color="rgba(255,255,255,0.7)" custom-class="profile-arrow" />
 			</view>
 		</view>
 		<!--top area end-->
@@ -66,7 +61,6 @@
 			</van-cell-group>
 
 			<van-cell-group inset custom-class="menu-group">
-				<van-cell custom-class="mi-cell mi-about" title="关于我们" is-link link-type="navigateTo" url="../../about/index/about_index" icon="info-o" />
 				<van-cell wx:if="{{!skin.IS_SUB}}" custom-class="mi-cell mi-contact" title="联系我们" is-link link-type="navigateTo" url="../../about/contact/about_contact" icon="phone-o" />
 				<van-cell wx:else custom-class="mi-cell mi-contact" title="联系作者了解更多详情" is-link link-type="navigateTo" url="../../../../pages/home/service/home_service" icon="phone-o" />
 				<van-cell custom-class="mi-cell mi-setting" title="{{skin.IS_SUB?'系统后台管理（可试用）':'设置'}}" is-link bindtap="bindSetTap" icon="setting-o" />

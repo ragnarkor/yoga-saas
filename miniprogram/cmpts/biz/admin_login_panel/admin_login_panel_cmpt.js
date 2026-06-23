@@ -7,7 +7,7 @@ Component({
       type: Boolean,
       value: false,
     },
-    /** platform=平台后台 coach=教练版超管登录 */
+    /** platform=会员端后台登录 coach=教练版超管登录 */
     mode: {
       type: String,
       value: "platform",

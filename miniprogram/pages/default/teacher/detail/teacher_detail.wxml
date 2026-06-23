@@ -1,28 +1,99 @@
 <page-meta page-style="{{pageStyle}}" />
-<view wx:if="{{!isLoad}}" class="loading-wrap">
-  <van-loading size="48rpx" color="{{themeColor}}" />
-</view>
-
-<view wx:elif="{{!teacher}}" class="loading-wrap">
-  <van-empty description="???????" />
-</view>
-
-<view class="teacher-detail" wx:else>
-  <view class="hero">
-    <image class="hero-avatar" mode="aspectFill" src="{{teacher.avatar}}" />
-    <view class="hero-name">{{teacher.name}}</view>
-    <view class="hero-specialty">{{teacher.specialty}}</view>
+<view class="theme-scope" style="{{pageStyle}}">
+  <view wx:if="{{!isLoad}}" class="loading-wrap">
+    <van-loading size="48rpx" color="{{themeColor}}" />
   </view>
 
-  <view class="card" wx:if="{{teacher.desc}}">
-    <view class="card-title">??</view>
-    <view class="card-text">{{teacher.desc}}</view>
+  <view wx:elif="{{!teacher}}" class="loading-wrap">
+    <van-empty description="老师不存在或未开放展示" />
   </view>
 
-  <view class="card" wx:if="{{teacher.pics.length > 0}}">
-    <view class="card-title">????</view>
-    <view class="pic-grid">
-      <image wx:for="{{teacher.pics}}" wx:key="*this" mode="aspectFill" src="{{item}}" bindtap="bindPreviewPic" data-url="{{item}}" />
+  <view class="teacher-home" wx:else>
+    <view class="teacher-hero">
+      <view class="hero-card">
+        <image class="hero-avatar" mode="aspectFill" src="{{teacher.avatar || '/images/default_cover_pic.gif'}}" />
+        <view class="hero-info">
+          <view class="hero-name">{{teacher.name}}</view>
+          <view class="hero-specialty" wx:if="{{teacher.specialty}}">{{teacher.specialty}}</view>
+          <view class="hero-desc">{{teacher.desc}}</view>
+        </view>
+      </view>
+    </view>
+
+    <scroll-view
+      wx:if="{{categories.length}}"
+      class="category-tabs"
+      scroll-x
+      enhanced
+      show-scrollbar="{{false}}"
+    >
+      <view class="category-tabs-inner">
+        <view
+          class="category-tab {{activeTab === index ? 'active' : ''}}"
+          wx:for="{{categories}}"
+          wx:key="id"
+          data-index="{{index}}"
+          bindtap="bindCategoryTap"
+        >
+          <text class="category-tab-text">{{item.name}}</text>
+          <view class="category-tab-line" wx:if="{{activeTab === index}}"></view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="session-list">
+      <view
+        class="session-card"
+        wx:for="{{displaySessions}}"
+        wx:key="sessionKey"
+      >
+        <image class="session-pic" mode="aspectFill" src="{{item.pic}}" />
+        <view class="session-body">
+          <view class="session-title">{{item.title}}</view>
+          <view class="session-time">{{item.dateTimeText}}</view>
+          <view class="session-meta">
+            <view class="session-stars">
+              <text
+                wx:for="{{item.levelStars}}"
+                wx:for-item="star"
+                wx:key="*this"
+                class="star {{star ? 'on' : ''}}"
+              >★</text>
+            </view>
+            <text class="session-slots">{{item.slotsText}}</text>
+          </view>
+          <view class="session-footer">
+            <van-tag wx:if="{{item.typeName}}" plain size="medium">{{item.typeName}}</van-tag>
+            <view
+              class="book-btn {{item.status === 'full' ? 'disabled' : ''}}"
+              bindtap="bindBookTap"
+              data-meet-id="{{item.meetId}}"
+              data-day="{{item.day}}"
+              data-mark="{{item.timeMark}}"
+              data-status="{{item.status}}"
+            >{{item.status === 'full' ? '已满' : '预约'}}</view>
+          </view>
+        </view>
+      </view>
+
+      <van-empty
+        wx:if="{{displaySessions.length === 0}}"
+        description="该分类暂无排课，请切换分类或稍后再看"
+      />
+    </view>
+
+    <view class="photo-section" wx:if="{{teacher.pics.length > 0}}">
+      <view class="section-title">教学照片</view>
+      <view class="pic-grid">
+        <image
+          wx:for="{{teacher.pics}}"
+          wx:key="*this"
+          mode="aspectFill"
+          src="{{item}}"
+          bindtap="bindPreviewPic"
+          data-url="{{item}}"
+        />
+      </view>
     </view>
   </view>
 </view>

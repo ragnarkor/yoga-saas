@@ -7,6 +7,7 @@ TeacherModel.CL = "ax_teacher";
 TeacherModel.DB_STRUCTURE = {
   _pid: "string|true",
   TEACHER_ID: "string|true",
+  TEACHER_ADMIN_ID: "string|false|comment=关联管理员_id，绑定微信后创建",
   TEACHER_NAME: "string|true|comment=姓名",
   TEACHER_AVATAR: "string|false|comment=头像",
   TEACHER_PIC: "array|false|default=[]|comment=教学照片",

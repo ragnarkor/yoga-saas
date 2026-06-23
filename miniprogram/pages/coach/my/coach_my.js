@@ -2,6 +2,11 @@ const AdminBiz = require("../../../biz/admin_biz.js");
 const AdminWxBiz = require("../../../biz/admin_wx_biz.js");
 const UserProfileBiz = require("../../../biz/user_profile_biz.js");
 
+const BASE_MENUS = [
+  { name: "我的门店", url: "/pages/coach/store/coach_store" },
+  { name: "首页内容", url: "/pages/admin/home/content/admin_home_content" },
+];
+
 Page({
   behaviors: [require("../../../behavior/coach_page_bh.js")],
 
@@ -11,15 +16,11 @@ Page({
     avatarSrc: "",
     showAvatar: false,
     roleTag: "馆主",
+    isSuperAdmin: false,
     adminLoginShow: false,
     adminLoginMode: "coach",
     adminLoginRedirect: "none",
-    menus: [
-      { name: "我的门店", url: "/pages/coach/store/coach_store" },
-      { name: "门店公告", url: "/pages/admin/home/content/admin_home_content" },
-      { name: "微信绑定码", url: "/pages/admin/mgr/bind/admin_mgr_bind" },
-      { name: "用户指南", url: "/pages/default/about/index/about_index" },
-    ],
+    menus: BASE_MENUS.slice(),
   },
 
   onShow() {
@@ -36,20 +37,73 @@ Page({
       avatarSrc = await UserProfileBiz.resolveAvatarUrl(user.USER_PIC);
     }
     this.setData({
-      userName: (user && user.USER_NAME) || "馆主",
       avatarSrc,
       showAvatar: !!avatarSrc,
     });
+
+    const admin = AdminBiz.getAdminToken();
+    if (admin && admin.name && !AdminWxBiz.isSuperSession()) {
+      this.setData({ userName: admin.name });
+      return;
+    }
+    if (!AdminWxBiz.isSuperSession()) {
+      this.setData({ userName: (user && user.USER_NAME) || "馆主" });
+    }
+  },
+
+  _buildMenus(admin) {
+    const staffUrl = "/pages/coach/staff/coach_staff";
+    let menus = BASE_MENUS.slice();
+    if (admin && (admin.type === "owner" || admin.type === "teacher")) {
+      menus.splice(1, 0, {
+        name: "主页资料",
+        url: "/pages/coach/profile/coach_profile",
+      });
+    }
+    if (admin && admin.type === "owner") {
+      menus.push({ name: "员工管理", url: staffUrl });
+    } else if (admin && admin.type === "teacher") {
+      menus.push({ name: "我的账号", url: staffUrl });
+    }
+    return menus;
   },
 
   _loadAdmin() {
     const admin = AdminBiz.getAdminToken();
-    if (admin && admin.name) {
-      let roleTag = "馆主";
-      if (admin.type === "teacher") roleTag = "教练";
-      if (admin.type === "super") roleTag = "超级管理员";
-      this.setData({ userName: admin.name, roleTag });
+    const isSuperAdmin = AdminWxBiz.isSuperSession();
+
+    if (isSuperAdmin) {
+      this.setData({
+        menus: BASE_MENUS.slice(),
+        isSuperAdmin: true,
+        roleTag: "超级管理员",
+        userName: admin.name || "超级管理员",
+      });
+      return;
     }
+
+    const menus = admin ? this._buildMenus(admin) : BASE_MENUS.slice();
+    let roleTag = "馆主";
+    if (admin && admin.type === "teacher") roleTag = "教练";
+
+    this.setData({
+      menus,
+      isSuperAdmin: false,
+      roleTag,
+      userName: admin && admin.name ? admin.name : this.data.userName,
+    });
+  },
+
+  onPlatformTap() {
+    if (!AdminWxBiz.isSuperSession()) {
+      this.setData({
+        adminLoginShow: true,
+        adminLoginMode: "coach",
+        adminLoginRedirect: "none",
+      });
+      return;
+    }
+    wx.navigateTo({ url: "/pages/admin/index/home/admin_home" });
   },
 
   async onMenuTap(e) {
@@ -66,61 +120,37 @@ Page({
     wx.switchTab({ url: "/pages/default/my/index/my_index" });
   },
 
-  onUnbindWx() {
+  async onLogout() {
     if (AdminWxBiz.isSuperSession()) {
-      wx.showToast({ title: "超管无需微信绑定", icon: "none" });
+      wx.showLoading({ title: "退出中", mask: true });
+      await AdminWxBiz.exitSuperMode();
+      wx.hideLoading();
+      await this._coachOnShow();
+      this._loadAdmin();
+      await this._loadProfile();
+      wx.showToast({ title: "已退出超管模式", icon: "none" });
       return;
     }
-    wx.showModal({
-      title: "解除微信绑定",
-      content:
-        "将解除您在当前馆的教练/馆主微信绑定，解除后需重新使用绑定码才能进入教练版管理功能。",
-      confirmText: "确认解绑",
-      confirmColor: "#e54d42",
-      success: async (res) => {
-        if (!res.confirm) return;
-        try {
-          await AdminWxBiz.unbind();
-          wx.showToast({ title: "已解绑", icon: "success" });
-          setTimeout(() => {
-            wx.switchTab({ url: "/pages/default/my/index/my_index" });
-          }, 800);
-        } catch (e) {
-          console.error(e);
-        }
-      },
-    });
-  },
 
-  onLogout() {
     AdminBiz.clearAdminToken();
+    this.setData({
+      isSuperAdmin: false,
+      roleTag: "馆主",
+      menus: BASE_MENUS.slice(),
+    });
+    await this._loadProfile();
     wx.showToast({ title: "已退出当前会话", icon: "none" });
-    if (!AdminWxBiz.isSuperSession()) {
-      this.setData({ roleTag: "馆主", userName: "馆主" });
-    }
   },
 
   onAdminLogin() {
     if (AdminWxBiz.isSuperSession()) {
-      wx.reLaunch({ url: "/pages/admin/index/home/admin_home" });
+      wx.showToast({ title: "已登录超管", icon: "none" });
       return;
     }
     this.setData({
       adminLoginShow: true,
       adminLoginMode: "coach",
       adminLoginRedirect: "none",
-    });
-  },
-
-  onPlatformAdmin() {
-    if (AdminWxBiz.isSuperSession()) {
-      wx.reLaunch({ url: "/pages/admin/index/home/admin_home" });
-      return;
-    }
-    this.setData({
-      adminLoginShow: true,
-      adminLoginMode: "platform",
-      adminLoginRedirect: "admin_home",
     });
   },
 
@@ -132,5 +162,6 @@ Page({
     await AdminWxBiz.prepareCoachEntry();
     await this._coachOnShow();
     this._loadAdmin();
+    await this._loadProfile();
   },
 });

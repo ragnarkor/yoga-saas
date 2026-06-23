@@ -1,10 +1,8 @@
 const pageHelper = require('../../../helper/page_helper.js');
 const cloudHelper = require('../../../helper/cloud_helper.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
-const AdminMeetBiz = require('../../../biz/admin_meet_biz.js');
+const scheduleSlotHelper = require('../../../helper/schedule_slot_helper.js');
 const dataHelper = require('../../../helper/data_helper.js');
-
-const TAB_COLORS = ['#c4b5fd', '#f48fb1', '#64b5f6', '#81c784', '#ffb74d'];
 
 Page({
   behaviors: [require('../../../behavior/coach_page_bh.js')],
@@ -90,20 +88,12 @@ Page({
   },
 
   _formatCourse(item, idx) {
-    const style = AdminMeetBiz.normalizeCourseStyleSet(item.MEET_STYLE_SET || {});
-    let cover = '';
-    if (typeof style.pic === 'string' && style.pic) {
-      cover = pageHelper.fmtImgUrl(style.pic) || style.pic;
-    } else if (Array.isArray(style.pic) && style.pic.length) {
-      cover = pageHelper.fmtImgUrl(style.pic[0]) || style.pic[0];
-    }
-    const duration = style.duration ? style.duration + '分钟' : '60分钟';
-    const color = style.color || TAB_COLORS[idx % TAB_COLORS.length];
+    const picker = scheduleSlotHelper.formatCoursePickerItem(item, idx);
     return {
       ...item,
-      cover,
-      duration,
-      color,
+      cover: picker.cover,
+      duration: picker.durationText,
+      color: picker.color,
     };
   },
 

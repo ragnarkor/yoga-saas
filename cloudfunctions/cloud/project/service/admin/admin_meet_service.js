@@ -13,6 +13,7 @@ const cloudUtil = require("../../../framework/cloud/cloud_util.js");
 const cloudBase = require("../../../framework/cloud/cloud_base.js");
 
 const MeetModel = require("../../model/meet_model.js");
+const TeacherModel = require("../../model/teacher_model.js");
 const AdminModel = require("../../model/admin_model.js");
 const JoinModel = require("../../model/join_model.js");
 const DayModel = require("../../model/day_model.js");
@@ -256,7 +257,7 @@ class AdminMeetService extends BaseAdminService {
   }
 
   /**获取信息 */
-  async getMeetDetail(id) {
+  async getMeetDetail(id, fromDay) {
     let fields = "*";
 
     let where = {
@@ -266,10 +267,12 @@ class AdminMeetService extends BaseAdminService {
     if (!meet) return null;
 
     let meetService = new MeetService();
-    meet.MEET_DAYS_SET = await meetService.getDaysSet(
-      id,
-      timeUtil.time("Y-M-D"),
-    );
+    const today = timeUtil.time("Y-M-D");
+    let startDay = today;
+    if (fromDay && fromDay < today) {
+      startDay = fromDay;
+    }
+    meet.MEET_DAYS_SET = await meetService.getDaysSet(id, startDay);
 
     return meet;
   }
@@ -315,6 +318,22 @@ class AdminMeetService extends BaseAdminService {
     }
 
     await MeetModel.edit(where, { MEET_STYLE_SET: styleSet });
+
+    if (styleSet && styleSet.teacherId) {
+      let teacher = await TeacherModel.getOne(
+        { _id: styleSet.teacherId },
+        "TEACHER_ADMIN_ID,TEACHER_NAME",
+        {},
+        false,
+      );
+      if (teacher && teacher.TEACHER_ADMIN_ID) {
+        await MeetModel.edit(
+          where,
+          { MEET_ADMIN_ID: teacher.TEACHER_ADMIN_ID },
+          false,
+        );
+      }
+    }
 
     let urls = [];
     if (newPic) {
@@ -585,6 +604,26 @@ class AdminMeetService extends BaseAdminService {
     await MeetModel.edit({ _id: id }, { MEET_ORDER: sort });
   }
 
+  /** 读取课程配置色（与小程序端 schedule_slot_helper 一致） */
+  _resolveCourseColor(styleSet, typeId, index = 0) {
+    const palette = [
+      "#e57373",
+      "#f48fb1",
+      "#64b5f6",
+      "#81c784",
+      "#ffb74d",
+      "#ba68c8",
+      "#4db6ac",
+      "#ffd54f",
+    ];
+    const typeColors = { 1: "#64b5f6", 2: "#81c784", 3: "#f48fb1" };
+    const raw = styleSet || {};
+    if (raw.color) return raw.color;
+    const tid = String(typeId || "");
+    if (typeColors[tid]) return typeColors[tid];
+    return palette[index % palette.length];
+  }
+
   /** 教练端周课表 */
   async getScheduleWeek({ startDay, endDay, typeId }, adminId, adminType) {
     let meetWhere = { MEET_STATUS: MeetModel.STATUS.COMM };
@@ -600,7 +639,7 @@ class AdminMeetService extends BaseAdminService {
 
     let meetMap = {};
     for (let k in meets) {
-      meetMap[meets[k]._id] = meets[k];
+      meetMap[meets[k]._id] = { meet: meets[k], index: Number(k) };
     }
 
     let dayWhere = {
@@ -617,7 +656,8 @@ class AdminMeetService extends BaseAdminService {
     let timeSet = new Set();
 
     for (let k in dayRecords) {
-      let meet = meetMap[dayRecords[k].DAY_MEET_ID];
+      let meetEntry = meetMap[dayRecords[k].DAY_MEET_ID];
+      let meet = meetEntry ? meetEntry.meet : null;
       if (!meet) continue;
       if (typeId && typeId !== "0" && meet.MEET_TYPE_ID != typeId) continue;
 
@@ -636,8 +676,13 @@ class AdminMeetService extends BaseAdminService {
           title: meet.MEET_TITLE,
           typeName: meet.MEET_TYPE_NAME,
           typeId: meet.MEET_TYPE_ID,
-          teacherName: style.teacherName || "",
-          color: style.color || "#81c784",
+          teacherName: t.teacherName || style.teacherName || "",
+          teacherId: t.teacherId || style.teacherId || "",
+          color: this._resolveCourseColor(
+            style,
+            meet.MEET_TYPE_ID,
+            meetEntry ? meetEntry.index : 0,
+          ),
           duration: style.duration || 60,
           difficulty: Number(style.difficulty || style.level || 3),
         });
@@ -647,6 +692,111 @@ class AdminMeetService extends BaseAdminService {
     let timeRows = Array.from(timeSet).sort();
 
     return { slots, timeRows, startDay, endDay };
+  }
+
+  /** 同步 meet 上的可用日期列表（今天及以后） */
+  async _syncMeetDaysAfterChange(meetId) {
+    const nowDay = timeUtil.time("Y-M-D");
+    let dayRecords = await DayModel.getAllBig(
+      { DAY_MEET_ID: meetId, day: [">=", nowDay] },
+      "day",
+      { day: "asc" },
+      1000,
+    );
+    let days = [];
+    for (let k in dayRecords) {
+      days.push(dayRecords[k].day);
+    }
+    await MeetModel.edit({ _id: meetId }, { MEET_DAYS: days });
+  }
+
+  /** 在时段列表中定位 mark（兼容 seed 格式 T+日期+HHmm） */
+  _findScheduleTimeIndex(times, markStr, day) {
+    if (!times || !times.length) return -1;
+    const mark = String(markStr || "");
+    for (let j = 0; j < times.length; j++) {
+      if (String(times[j].mark) === mark) return j;
+    }
+    const dayKey = (day || "").replace(/-/g, "");
+    const legacyMark = mark.startsWith("T") ? mark : "T" + dayKey + mark;
+    for (let j = 0; j < times.length; j++) {
+      if (String(times[j].mark) === legacyMark) return j;
+    }
+    if (mark.startsWith("T" + dayKey) && mark.length > 1 + dayKey.length) {
+      const timePart = mark.slice(1 + dayKey.length);
+      if (/^\d{4}$/.test(timePart)) {
+        const start = timePart.slice(0, 2) + ":" + timePart.slice(2);
+        for (let j = 0; j < times.length; j++) {
+          if (times[j].start === start) return j;
+        }
+      }
+    }
+    return -1;
+  }
+
+  /** 教练端：删除单个排课时段（直接改 day 表，避免 meet_edit 漏删） */
+  async removeScheduleSlot({ meetId, day, mark }) {
+    let meet = await MeetModel.getOne({ _id: meetId }, "_id");
+    if (!meet) this.AppError("课程不存在");
+
+    const markStr = String(mark || "");
+    let dayList = await DayModel.getAllBig(
+      { DAY_MEET_ID: meetId, day },
+      "times,day,dayDesc",
+      { day: "asc" },
+      100,
+    );
+    if (!dayList.length) this.AppError("排课不存在");
+
+    let targetRec = null;
+    let timeIdx = -1;
+    for (let k in dayList) {
+      const idx = this._findScheduleTimeIndex(dayList[k].times, markStr, day);
+      if (idx >= 0) {
+        targetRec = dayList[k];
+        timeIdx = idx;
+        break;
+      }
+    }
+    if (!targetRec || timeIdx < 0) {
+      this.AppError("排课时段不存在，请刷新后重试");
+    }
+
+    const timeNode = targetRec.times[timeIdx];
+    if (timeNode.stat && timeNode.stat.succCnt) {
+      this.AppError("该时段已有预约，无法删除");
+    }
+
+    let joinCnt = await JoinModel.count({
+      JOIN_MEET_ID: meetId,
+      JOIN_MEET_TIME_MARK: String(timeNode.mark),
+      JOIN_STATUS: JoinModel.STATUS.SUCC,
+    });
+    if (joinCnt > 0) {
+      this.AppError("该时段已有预约，无法删除");
+    }
+
+    const times = targetRec.times.filter((t, i) => i !== timeIdx);
+    let affected = 0;
+    if (times.length === 0) {
+      affected = await DayModel.del(targetRec._id);
+    } else {
+      affected = await DayModel.edit(targetRec._id, { times });
+    }
+    if (!affected) this.AppError("删除失败，请重试");
+
+    const verify = await DayModel.getOne(targetRec._id, "times");
+    if (verify && verify.times && verify.times.length) {
+      const stillThere = this._findScheduleTimeIndex(
+        verify.times,
+        String(timeNode.mark),
+        day,
+      );
+      if (stillThere >= 0) this.AppError("删除失败，请重试");
+    }
+
+    await this._syncMeetDaysAfterChange(meetId);
+    return { ok: true, mark: String(timeNode.mark) };
   }
 }
 
