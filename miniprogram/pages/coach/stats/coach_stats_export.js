@@ -11,10 +11,8 @@ Page({
     navTitle: '预约名单导出',
     loading: true,
     isLoad: false,
-    courseList: [],
     meetId: '',
     meetTitle: '',
-    courseSheetShow: false,
     startDay: timeHelper.time('Y-M-D'),
     endDay: timeHelper.time('Y-M-D'),
     status: 1,
@@ -41,42 +39,13 @@ Page({
       this.setData({ loading: false });
       return;
     }
-    await this._loadCourses();
     await this._loadDetail(1);
-  },
-
-  async _loadCourses() {
-    try {
-      const res = await cloudHelper.callCloudData(
-        'admin/meet_list',
-        { page: 1, size: 200 },
-        { hint: false, title: 'bar' },
-      );
-      const list = (res && res.list) || [];
-      let meetId = this.data.meetId;
-      let meetTitle = this.data.meetTitle;
-      if (!meetId && list.length) {
-        meetId = list[0]._id;
-        meetTitle = list[0].MEET_TITLE || '';
-      } else if (meetId) {
-        const hit = list.find((it) => it._id === meetId);
-        meetTitle = (hit && hit.MEET_TITLE) || meetTitle;
-      }
-      this.setData({
-        loading: false,
-        courseList: list,
-        meetId,
-        meetTitle,
-      });
-    } catch (e) {
-      console.error(e);
-      this.setData({ loading: false, courseList: [] });
-    }
+    this.setData({ loading: false, isLoad: true });
   },
 
   async _loadDetail(isDel) {
     if (!this.data.meetId) {
-      this.setData({ isLoad: true, url: '', time: '' });
+      this.setData({ isLoad: true, url: '', time: '', loading: false });
       return;
     }
     try {
@@ -90,31 +59,20 @@ Page({
         isLoad: true,
         url: data.url,
         time: data.time,
+        loading: false,
       });
     } catch (e) {
       console.error(e);
-      this.setData({ isLoad: true });
+      this.setData({ isLoad: true, loading: false });
     }
   },
 
-  bindCourseTap() {
-    if (!this.data.courseList.length) {
-      pageHelper.showNoneToast('暂无课程，请先在课程管理中创建');
-      return;
-    }
-    this.setData({ courseSheetShow: true });
-  },
-
-  bindCloseCourseSheet() {
-    this.setData({ courseSheetShow: false });
-  },
-
-  bindPickCourse(e) {
-    const { id, title } = e.currentTarget.dataset;
+  onCoursePick(e) {
+    const { meetId, course } = e.detail || {};
+    if (!meetId) return;
     this.setData({
-      courseSheetShow: false,
-      meetId: id,
-      meetTitle: title,
+      meetId,
+      meetTitle: (course && course.title) || '',
       url: '',
       time: '',
     });

@@ -141,4 +141,31 @@ Page({
       console.error(e);
     }
   },
+
+  bindDeleteTap() {
+    const { cardId, card } = this.data;
+    if (!cardId || !card) return;
+    wx.vibrateShort({ type: 'light' });
+    wx.showModal({
+      title: '删除会员卡？',
+      content: `确定删除「${card.name || '该卡'}」？删除后不可恢复，变动记录仍保留。`,
+      confirmColor: '#ee0a24',
+      success: async (res) => {
+        if (!res.confirm) return;
+        const ok = await AdminWxBiz.ensureSession();
+        if (!ok) return;
+        try {
+          await cloudHelper.callCloudSumbit(
+            'admin/user_card_del',
+            { cardId },
+            { title: '删除中' },
+          );
+          wx.showToast({ title: '已删除', icon: 'success' });
+          setTimeout(() => wx.navigateBack(), 500);
+        } catch (err) {
+          console.error(err);
+        }
+      },
+    });
+  },
 });

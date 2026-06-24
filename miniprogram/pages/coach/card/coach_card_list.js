@@ -79,4 +79,32 @@ Page({
     if (!id) return;
     wx.navigateTo({ url: `/pages/coach/card/coach_card_edit?id=${id}` });
   },
+
+  bindDeleteTap(e) {
+    const id = e.currentTarget.dataset.id;
+    const name = e.currentTarget.dataset.name || '该会员卡';
+    if (!id) return;
+    wx.vibrateShort({ type: 'light' });
+    wx.showModal({
+      title: '删除卡模板？',
+      content: `确定删除「${name}」？已发给会员的持卡不受影响，但无法再按此模板发卡。`,
+      confirmColor: '#ee0a24',
+      success: async (res) => {
+        if (!res.confirm) return;
+        const ok = await AdminWxBiz.ensureSession();
+        if (!ok) return;
+        try {
+          await cloudHelper.callCloudSumbit(
+            'admin/card_tpl_del',
+            { id },
+            { title: '删除中' },
+          );
+          wx.showToast({ title: '已删除', icon: 'success' });
+          this._loadCards();
+        } catch (err) {
+          console.error(err);
+        }
+      },
+    });
+  },
 });

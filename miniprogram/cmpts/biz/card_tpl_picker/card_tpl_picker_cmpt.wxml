@@ -22,7 +22,6 @@
       <view class="ctp-card-meta">
         <text wx:for="{{selectedTpl.metaTags}}" wx:key="key" class="ctp-card-tag">{{item.label}} {{item.value}}</text>
       </view>
-      <text wx:if="{{selectedTpl.scopeDesc && selectedTpl.scopeDesc !== '全馆课程'}}" class="ctp-card-scope">适用：{{selectedTpl.scopeDesc}}</text>
     </view>
   </view>
 </view>

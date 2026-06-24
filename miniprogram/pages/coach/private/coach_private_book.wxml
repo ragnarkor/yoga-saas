@@ -16,21 +16,26 @@
         </view>
       </view>
 
-      <view class="private-book-field" bindtap="bindCourseTap">
-        <text class="private-book-label">私教课程</text>
-        <view class="private-book-value-row">
-          <text class="private-book-value">{{form.courseName || '请选择'}}</text>
-          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-      </view>
+      <meet-course-picker
+        value="{{form.meetId}}"
+        courses="{{courses}}"
+        load-from="none"
+        theme-color="{{themeColor}}"
+        label="私教课程"
+        sheet-title="选择私教课程"
+        empty-text="暂无私教课，请先在「我的门店」将分类标记为私教并创建课程"
+        field-class="mcp-in-section"
+        bind:pick="onCoursePick"
+      />
 
-      <view class="private-book-field" bindtap="bindTeacherTap">
-        <text class="private-book-label">授课教练</text>
-        <view class="private-book-value-row">
-          <text class="private-book-value">{{form.teacherName || '请选择'}}</text>
-          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-      </view>
+      <coach-picker
+        id-mode="teacher"
+        value="{{form.teacherId}}"
+        theme-color="{{themeColor}}"
+        label="授课教练"
+        field-class="private-book-field"
+        bind:pick="onCoachPick"
+      />
 
       <view class="private-book-field" bindtap="bindDayTap">
         <text class="private-book-label">上课日期</text>
@@ -56,13 +61,16 @@
         </view>
       </view>
 
-      <view class="private-book-field" bindtap="bindCardTap">
-        <text class="private-book-label">会员卡</text>
-        <view class="private-book-value-row">
-          <text class="private-book-value">{{form.cardName || '可选'}}</text>
-          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-      </view>
+      <user-card-picker
+        user-id="{{userId}}"
+        meet-id="{{form.meetId}}"
+        value="{{form.cardId}}"
+        theme-color="{{themeColor}}"
+        label="会员卡"
+        placeholder="可选"
+        field-class="private-book-field"
+        bind:pick="onUserCardPick"
+      />
     </view>
 
     <view class="private-book-section">
@@ -92,32 +100,6 @@
       <van-button block round color="{{themeColor}}" loading="{{submitting}}" bind:click="bindSubmitTap">确认代约</van-button>
     </view>
   </block>
-
-  <van-popup show="{{courseSheetShow}}" position="bottom" round bind:close="bindCloseCourseSheet">
-    <view class="course-edit-sheet">
-      <view class="course-edit-sheet-head"><text class="course-edit-sheet-title">选择私教课程</text></view>
-      <view class="card-scope-list">
-        <view class="card-scope-item" wx:for="{{coursePicker}}" wx:key="_id" data-id="{{item._id}}" bindtap="bindCoursePick">
-          <text>{{item.title}}</text>
-          <text class="private-book-course-sub">{{item.duration}}分钟</text>
-        </view>
-      </view>
-    </view>
-  </van-popup>
-
-  <van-action-sheet show="{{teacherSheetShow}}" actions="{{teacherActions}}" bind:close="bindCloseTeacherSheet" bind:select="bindTeacherSelect" />
-
-  <van-popup show="{{cardSheetShow}}" position="bottom" round bind:close="bindCloseCardSheet">
-    <view class="course-edit-sheet">
-      <view class="course-edit-sheet-head"><text class="course-edit-sheet-title">选择会员卡</text></view>
-      <view class="card-scope-list">
-        <view class="card-scope-item" wx:for="{{cards}}" wx:key="id" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="bindCardPick">
-          <text>{{item.name}}</text>
-          <text class="private-book-course-sub">{{item.balanceText}}</text>
-        </view>
-      </view>
-    </view>
-  </van-popup>
 
   <van-popup
     show="{{datePickerShow}}"

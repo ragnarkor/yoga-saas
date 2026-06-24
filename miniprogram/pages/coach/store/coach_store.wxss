@@ -62,35 +62,62 @@
   color: #333;
 }
 
+.store-panel--categories {
+  padding-bottom: 24rpx;
+}
+
+.store-section--gap {
+  margin-top: 24rpx;
+}
+
 .store-section-tip--inner {
-  margin: 8rpx 0 24rpx;
+  margin: 8rpx 0 20rpx;
+}
+
+.store-cate-area {
+  width: 100%;
+}
+
+.store-cate-mv {
+  width: 100%;
+  z-index: 1;
+}
+
+.store-cate-mv.is-dragging {
+  z-index: 3;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+.store-panel--categories .store-cate-row {
+  margin-bottom: 16rpx;
+}
+
+.store-cate-mv .store-cate-row {
+  margin-bottom: 0;
 }
 
 .store-cate-row {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  margin-bottom: 20rpx;
+  gap: 12rpx;
+  height: 88rpx;
+  box-sizing: border-box;
 }
 
-.store-cate-id {
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 12rpx;
-  background: var(--projectColorLight, #e3efe8);
-  color: var(--themeColor, #5b8a72);
-  font-size: 24rpx;
+.store-cate-handle {
+  flex-shrink: 0;
+  width: 40rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
 .store-cate-input {
   flex: 1;
+  min-width: 0;
   height: 72rpx;
   padding: 0 20rpx;
-  background: #f8f8f8;
+  background: #f7f8fa;
   border-radius: 12rpx;
   font-size: 28rpx;
 }
@@ -99,7 +126,46 @@
   flex: 1;
   font-size: 28rpx;
   color: #333;
-  padding: 0 8rpx;
+}
+
+.store-cate-link {
+  flex-shrink: 0;
+  font-size: 26rpx;
+  color: var(--themeColor, #5b8a72);
+  padding: 8rpx;
+}
+
+.store-cate-link--muted {
+  color: #969799;
+}
+
+.store-cate-del {
+  flex-shrink: 0;
+  padding: 8rpx;
+}
+
+.store-cate-empty {
+  padding: 24rpx 0 8rpx;
+  font-size: 26rpx;
+  color: #c8c9cc;
+}
+
+.store-cate-empty--private {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.store-private-picks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8rpx 16rpx;
+}
+
+.store-private-picks-label {
+  font-size: 24rpx;
+  color: #969799;
 }
 
 .store-add {
@@ -107,7 +173,7 @@
   align-items: center;
   justify-content: center;
   gap: 8rpx;
-  padding: 20rpx;
+  padding: 20rpx 0 4rpx;
   color: var(--themeColor, #5b8a72);
   font-size: 28rpx;
 }

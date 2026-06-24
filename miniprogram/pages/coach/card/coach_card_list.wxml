@@ -23,7 +23,9 @@
       wx:for="{{cardList}}"
       wx:key="CARD_TPL_ID"
       data-id="{{item.CARD_TPL_ID}}"
+      data-name="{{item.CARD_TPL_NAME}}"
       bindtap="bindCardTap"
+      bindlongpress="bindDeleteTap"
     >
       <view class="card-chip" style="background: {{item.CARD_TPL_COLOR}};">
         <text class="card-chip-type">{{item.typeDesc}}</text>
@@ -42,7 +44,6 @@
           </view>
         </view>
       </view>
-      <van-icon name="arrow" size="32rpx" color="#ccc" />
     </view>
   </view>
 

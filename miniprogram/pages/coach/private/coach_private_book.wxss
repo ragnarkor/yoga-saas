@@ -20,6 +20,11 @@
   color: #1f2329;
 }
 
+.mcp-in-section {
+  border-bottom: 1rpx solid #f3f3f3;
+  padding: 24rpx 28rpx;
+}
+
 .private-book-field {
   display: flex;
   align-items: center;
@@ -32,12 +37,36 @@
   border-bottom: none;
 }
 
+.private-book-field.ucp-field .ucp-field-label {
+  width: 160rpx;
+}
+
+.private-book-field.ucp-field .ucp-field-value-wrap {
+  flex: 1;
+}
+
+.private-book-field.coach-picker-field {
+  padding: 28rpx;
+  border-bottom: 1rpx solid #f3f3f3;
+}
+
+.private-book-field.coach-picker-field .coach-picker-label {
+  width: 160rpx;
+  font-size: 28rpx;
+  color: #646566;
+}
+
+.private-book-field.coach-picker-field .coach-picker-value-wrap {
+  flex: 1;
+}
+
 .private-book-label {
   font-size: 28rpx;
   color: #646566;
   flex-shrink: 0;
   width: 160rpx;
 }
+
 
 .private-book-value-row {
   flex: 1;

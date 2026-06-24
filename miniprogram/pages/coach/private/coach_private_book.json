@@ -10,7 +10,9 @@
     "van-field": "@vant/weapp/field/index",
     "van-cell": "@vant/weapp/cell/index",
     "van-datetime-picker": "@vant/weapp/datetime-picker/index",
-    "van-action-sheet": "@vant/weapp/action-sheet/index",
-    "van-calendar": "@vant/weapp/calendar/index"
+    "van-calendar": "@vant/weapp/calendar/index",
+    "user-card-picker": "/cmpts/biz/user_card_picker/user_card_picker_cmpt",
+    "coach-picker": "/cmpts/biz/coach_picker/coach_picker_cmpt",
+    "meet-course-picker": "/cmpts/biz/meet_course_picker/meet_course_picker_cmpt"
   }
 }

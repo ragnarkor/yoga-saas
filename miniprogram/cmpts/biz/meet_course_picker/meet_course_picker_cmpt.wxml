@@ -1,0 +1,73 @@
+<view class="mcp-field field-class">
+  <view class="mcp-field-label">
+    <text>{{label}}</text>
+    <text wx:if="{{required}}" class="mcp-required">*</text>
+  </view>
+  <view class="mcp-field-body {{disabled ? 'mcp-field-body--disabled' : ''}}" bindtap="bindFieldTap">
+    <view wx:if="{{selectedCourse}}" class="mcp-selected">
+      <image
+        class="mcp-cover"
+        src="{{selectedCourse.cover}}"
+        mode="aspectFill"
+      />
+      <view class="mcp-info">
+        <view class="mcp-title">{{selectedCourse.title}}</view>
+        <view class="mcp-meta">
+          {{selectedCourse.typeName}}{{selectedCourse.typeName ? ' · ' : ''}}{{selectedCourse.durationText}}{{selectedCourse.teacherName ? ' · ' + selectedCourse.teacherName : ''}}
+        </view>
+        <view wx:if="{{selectedCourse.desc}}" class="mcp-desc">{{selectedCourse.desc}}</view>
+      </view>
+      <van-icon wx:if="{{!disabled}}" name="arrow" size="32rpx" color="#c8c9cc" />
+    </view>
+    <view wx:else class="mcp-placeholder">
+      <text>{{placeholder}}</text>
+      <van-icon wx:if="{{!disabled}}" name="arrow" size="32rpx" color="#c8c9cc" />
+    </view>
+  </view>
+</view>
+
+<van-popup
+  show="{{sheetShow}}"
+  position="bottom"
+  round
+  bind:close="bindCloseSheet"
+  custom-class="mcp-popup"
+>
+  <view class="mcp-sheet">
+    <view class="mcp-sheet-head">
+      <text class="mcp-sheet-title">{{sheetTitle}}</text>
+      <text class="mcp-sheet-sub">共 {{coursePickerList.length}} 门</text>
+    </view>
+    <view wx:if="{{loading}}" class="mcp-sheet-loading">
+      <van-loading size="40rpx" color="{{themeColor}}">加载中...</van-loading>
+    </view>
+    <scroll-view wx:else scroll-y class="mcp-sheet-scroll" enhanced show-scrollbar="{{false}}">
+      <van-empty wx:if="{{!coursePickerList.length}}" description="{{emptyText}}" />
+      <view
+        wx:for="{{coursePickerList}}"
+        wx:key="_id"
+        class="mcp-option {{value === item._id ? 'is-active' : ''}}"
+        data-id="{{item._id}}"
+        bindtap="bindCoursePick"
+        style="border-left-color: {{item.color}};"
+      >
+        <image class="mcp-option-cover" src="{{item.cover}}" mode="aspectFill" />
+        <view class="mcp-option-body">
+          <view class="mcp-option-title">{{item.title}}</view>
+          <view class="mcp-option-meta">
+            <text wx:if="{{item.typeName}}" class="mcp-option-tag">{{item.typeName}}</text>
+            <text>{{item.durationText}}</text>
+            <text wx:if="{{item.teacherName}}"> · {{item.teacherName}}</text>
+          </view>
+          <view wx:if="{{item.desc}}" class="mcp-option-desc">{{item.desc}}</view>
+        </view>
+        <van-icon
+          wx:if="{{value === item._id}}"
+          name="success"
+          size="40rpx"
+          color="{{themeColor}}"
+        />
+      </view>
+    </scroll-view>
+  </view>
+</van-popup>

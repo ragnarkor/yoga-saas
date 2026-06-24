@@ -39,15 +39,16 @@
         </view>
       </view>
 
-      <view class="course-edit-field course-edit-field--inline issue-form-row" bindtap="bindCoachTap">
-        <text class="course-edit-field-label-inline">归属教练</text>
-        <view class="course-edit-field-row course-edit-field-row--inline">
-          <text class="course-edit-field-value {{form.coachName ? '' : 'course-edit-field-value--placeholder'}}">
-            {{form.coachName || '请选择'}}
-          </text>
-          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-      </view>
+      <!-- [AI_START TIMESTAMP=2025-01-27 16:00:00] -->
+      <coach-picker
+        value="{{form.coachId}}"
+        default-coach-id="{{defaultCoachId}}"
+        theme-color="{{themeColor}}"
+        label="归属教练"
+        field-class="issue-form-row"
+        bind:pick="onCoachPick"
+      />
+      <!-- [AI_END LINES=9 TIMESTAMP=2025-01-27 16:00:00] -->
 
       <view class="course-edit-field issue-form-row issue-form-row--memo">
         <text class="course-edit-field-label-inline">备注</text>

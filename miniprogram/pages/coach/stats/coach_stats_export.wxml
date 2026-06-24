@@ -14,15 +14,13 @@
 
   <block wx:elif="{{isLoad}}">
     <van-cell-group custom-class="export-form-group">
-      <view class="course-edit-field course-edit-field--inline" bindtap="bindCourseTap">
-        <text class="course-edit-field-label-inline">课程</text>
-        <view class="course-edit-field-row course-edit-field-row--inline">
-          <text class="course-edit-field-value {{meetTitle ? '' : 'course-edit-field-value--placeholder'}}">
-            {{meetTitle || '请选择'}}
-          </text>
-          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-      </view>
+      <meet-course-picker
+        value="{{meetId}}"
+        theme-color="{{themeColor}}"
+        label="课程"
+        empty-text="暂无课程，请先在课程管理中创建"
+        bind:pick="onCoursePick"
+      />
 
       <view class="course-edit-field course-edit-field--inline">
         <text class="course-edit-field-label-inline">起始日期</text>
@@ -126,29 +124,4 @@
       >删除数据文件</van-button>
     </view>
   </block>
-
-  <van-popup
-    show="{{courseSheetShow}}"
-    position="bottom"
-    round
-    bind:close="bindCloseCourseSheet"
-    custom-class="course-edit-popup"
-  >
-    <view class="export-sheet">
-      <view class="export-sheet-title">选择课程</view>
-      <scroll-view scroll-y class="export-sheet-scroll">
-        <view
-          wx:for="{{courseList}}"
-          wx:key="_id"
-          class="export-sheet-item {{meetId === item._id ? 'active' : ''}}"
-          data-id="{{item._id}}"
-          data-title="{{item.MEET_TITLE}}"
-          bindtap="bindPickCourse"
-        >
-          <text>{{item.MEET_TITLE}}</text>
-          <van-icon wx:if="{{meetId === item._id}}" name="success" size="36rpx" color="{{themeColor}}" />
-        </view>
-      </scroll-view>
-    </view>
-  </van-popup>
 </view>

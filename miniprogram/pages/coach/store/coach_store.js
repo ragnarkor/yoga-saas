@@ -43,6 +43,38 @@ function buildMapMarkers(lat, lng, name) {
   ];
 }
 
+function splitCategoryViews(categories) {
+  const groupRows = [];
+  const privateRows = [];
+  (categories || []).forEach((c, idx) => {
+    const row = { ...c, _idx: idx };
+    if (c.isPrivate === true) privateRows.push(row);
+    else groupRows.push(row);
+  });
+  return { groupRows, privateRows };
+}
+
+function reorderCategories(categories) {
+  const group = (categories || []).filter((c) => c.isPrivate !== true);
+  const priv = (categories || []).filter((c) => c.isPrivate === true);
+  return group.concat(priv);
+}
+
+const CATE_ROW_RPX = 88;
+
+function getCateRowHeightPx() {
+  const { windowWidth } = wx.getSystemInfoSync();
+  return (windowWidth / 750) * CATE_ROW_RPX;
+}
+
+function withDragMeta(rows, rowH) {
+  return (rows || []).map((r, i) => ({
+    ...r,
+    dragY: i * rowH,
+    dragEnabled: false,
+  }));
+}
+
 Page({
   behaviors: [require('../../../behavior/coach_page_bh.js')],
 
@@ -69,6 +101,11 @@ Page({
     aboutPics: [],
     aboutFileList: [],
     categories: [],
+    groupRows: [],
+    privateRows: [],
+    groupAreaHeight: 0,
+    privateAreaHeight: 0,
+    cateRowHeight: 0,
     canEdit: false,
     themeColor: themeHelper.DEFAULT_THEME,
     themePickIndex: 0,
@@ -81,6 +118,7 @@ Page({
   },
 
   onLoad() {
+    this._rowHeightPx = getCateRowHeightPx();
     this._loadStore();
   },
 
@@ -101,6 +139,100 @@ Page({
       hasMapPoint: hasMapPoint(lat, lng),
       mapMarkers: buildMapMarkers(lat, lng, name),
     });
+  },
+
+  _applyCategories(categories) {
+    const ordered = reorderCategories(categories);
+    const views = splitCategoryViews(ordered);
+    const rowH = this._rowHeightPx || getCateRowHeightPx();
+    this._rowHeightPx = rowH;
+    const groupRows = withDragMeta(views.groupRows, rowH);
+    const privateRows = withDragMeta(views.privateRows, rowH);
+    this.setData({
+      categories: ordered,
+      groupRows,
+      privateRows,
+      groupAreaHeight: groupRows.length * rowH,
+      privateAreaHeight: privateRows.length * rowH,
+      cateRowHeight: rowH,
+    });
+  },
+
+  _syncSectionOrder(section, rows, dragId) {
+    const isPrivate = section === 'private';
+    const group = this.data.categories.filter((c) => c.isPrivate !== true);
+    const priv = this.data.categories.filter((c) => c.isPrivate === true);
+    const sorted = rows
+      .map((r) => {
+        const hit = this.data.categories.find((c) => c.id === r.id);
+        return hit ? { ...hit, name: r.name } : null;
+      })
+      .filter(Boolean);
+    const categories = isPrivate ? group.concat(sorted) : sorted.concat(priv);
+    const rowH = this._rowHeightPx;
+    const views = splitCategoryViews(categories);
+    const markDrag = (list) =>
+      withDragMeta(list, rowH).map((r) => ({
+        ...r,
+        dragEnabled: dragId ? r.id === dragId : false,
+      }));
+    this.setData({
+      categories,
+      groupRows: markDrag(views.groupRows),
+      privateRows: markDrag(views.privateRows),
+      groupAreaHeight: views.groupRows.length * rowH,
+      privateAreaHeight: views.privateRows.length * rowH,
+    });
+  },
+
+  bindCategoryDragChange(e) {
+    if (!this.data.canEdit) return;
+    if (e.detail.source !== 'touch' && e.detail.source !== 'touch-out-of-bounds') return;
+    const section = e.currentTarget.dataset.section;
+    const listIndex = Number(e.currentTarget.dataset.listIndex);
+    if (Number.isNaN(listIndex)) return;
+
+    const rowH = this._rowHeightPx;
+    const y = e.detail.y;
+    let targetIndex = Math.round(y / rowH);
+    const rowsKey = section === 'private' ? 'privateRows' : 'groupRows';
+    const rows = this.data[rowsKey];
+    targetIndex = Math.max(0, Math.min(rows.length - 1, targetIndex));
+    if (targetIndex === listIndex) return;
+
+    const newRows = rows.slice();
+    const [item] = newRows.splice(listIndex, 1);
+    newRows.splice(targetIndex, 0, item);
+    newRows.forEach((r, i) => {
+      r.dragY = i * rowH;
+    });
+    this._syncSectionOrder(section, newRows, item.id);
+  },
+
+  bindCateDragEnable(e) {
+    if (!this.data.canEdit) return;
+    const section = e.currentTarget.dataset.section;
+    const listIndex = Number(e.currentTarget.dataset.listIndex);
+    if (Number.isNaN(listIndex)) return;
+    const rowsKey = section === 'private' ? 'privateRows' : 'groupRows';
+    const rows = this.data[rowsKey].map((r, i) => ({
+      ...r,
+      dragEnabled: i === listIndex,
+    }));
+    wx.vibrateShort({ type: 'light' });
+    this.setData({ [rowsKey]: rows });
+  },
+
+  bindCategoryDragEnd(e) {
+    const section = e.currentTarget.dataset.section;
+    const rowsKey = section === 'private' ? 'privateRows' : 'groupRows';
+    const rowH = this._rowHeightPx;
+    const rows = this.data[rowsKey].map((r, i) => ({
+      ...r,
+      dragY: i * rowH,
+      dragEnabled: false,
+    }));
+    this.setData({ [rowsKey]: rows });
   },
 
   async _loadStore() {
@@ -139,7 +271,6 @@ Page({
         logoFileList: tenant.TENANT_LOGO ? toFileList([tenant.TENANT_LOGO]) : [],
         aboutPics: fmtPicList((res && res.aboutPics) || []),
         aboutFileList: toFileList((res && res.aboutPics) || []),
-        categories: (res && res.categories) || [],
         canEdit,
       };
       const ps = (res && res.privateSchedule) || {};
@@ -155,6 +286,7 @@ Page({
         );
       }
       this.setData(patch);
+      this._applyCategories((res && res.categories) || []);
       this._syncMapState({
         contactLatitude: patch.contactLatitude,
         contactLongitude: patch.contactLongitude,
@@ -182,9 +314,41 @@ Page({
   },
 
   bindCategoryNameInput(e) {
-    const idx = e.currentTarget.dataset.index;
-    const key = `categories[${idx}].name`;
-    this.setData({ [key]: e.detail.value || '' });
+    const idx = Number(e.currentTarget.dataset.idx);
+    if (Number.isNaN(idx)) return;
+    const name = e.detail.value || '';
+    const categories = this.data.categories.slice();
+    if (!categories[idx]) return;
+    categories[idx] = { ...categories[idx], name };
+    const groupRows = this.data.groupRows.map((r) =>
+      r._idx === idx ? { ...r, name } : r,
+    );
+    const privateRows = this.data.privateRows.map((r) =>
+      r._idx === idx ? { ...r, name } : r,
+    );
+    this.setData({ categories, groupRows, privateRows });
+  },
+
+  bindMoveToPrivate(e) {
+    if (!this.data.canEdit) return;
+    const idx = Number(e.currentTarget.dataset.idx);
+    if (Number.isNaN(idx)) return;
+    const categories = this.data.categories.slice();
+    const item = categories[idx];
+    if (!item || item.isPrivate === true) return;
+    categories[idx] = { ...item, isPrivate: true };
+    this._applyCategories(categories);
+  },
+
+  bindMoveToGroup(e) {
+    if (!this.data.canEdit) return;
+    const idx = Number(e.currentTarget.dataset.idx);
+    if (Number.isNaN(idx)) return;
+    const categories = this.data.categories.slice();
+    const item = categories[idx];
+    if (!item || item.isPrivate !== true) return;
+    categories[idx] = { ...item, isPrivate: false };
+    this._applyCategories(categories);
   },
 
   onStoreTabTap(e) {
@@ -273,25 +437,34 @@ Page({
     });
   },
 
-  bindAddCategory() {
+  bindAddGroupCategory() {
     const categories = this.data.categories.slice();
-    const nextId = String(categories.length + 1);
-    categories.push({ id: nextId, name: '' });
-    this.setData({ categories });
+    categories.push({ id: String(categories.length + 1), name: '', isPrivate: false });
+    this._applyCategories(categories);
+  },
+
+  bindAddPrivateCategory() {
+    const categories = this.data.categories.slice();
+    categories.push({ id: String(categories.length + 1), name: '', isPrivate: true });
+    this._applyCategories(categories);
   },
 
   bindRemoveCategory(e) {
-    const idx = e.currentTarget.dataset.index;
+    const idx = Number(e.currentTarget.dataset.idx);
+    if (Number.isNaN(idx)) return;
     const categories = this.data.categories.slice();
     if (categories.length <= 1) {
       wx.showToast({ title: '至少保留一个分类', icon: 'none' });
       return;
     }
+    const removing = categories[idx];
+    const groupCount = categories.filter((c) => c.isPrivate !== true).length;
+    if (removing && removing.isPrivate !== true && groupCount <= 1) {
+      wx.showToast({ title: '至少保留一个团课分类', icon: 'none' });
+      return;
+    }
     categories.splice(idx, 1);
-    categories.forEach((c, i) => {
-      c.id = String(i + 1);
-    });
-    this.setData({ categories });
+    this._applyCategories(categories);
   },
 
   bindThemePick(e) {
@@ -315,15 +488,21 @@ Page({
       return;
     }
 
-    const categories = this.data.categories
+    const ordered = reorderCategories(this.data.categories);
+    const categories = ordered
       .map((c, i) => ({
         id: String(i + 1),
         name: (c.name || '').trim(),
+        isPrivate: c.isPrivate === true,
       }))
       .filter((c) => c.name);
 
     if (!categories.length) {
       wx.showToast({ title: '请填写分类名称', icon: 'none' });
+      return;
+    }
+    if (!categories.some((c) => c.isPrivate !== true)) {
+      wx.showToast({ title: '请至少保留一个团课分类', icon: 'none' });
       return;
     }
 
@@ -415,7 +594,6 @@ Page({
         aboutFileList: toFileList(
           data.aboutPics !== undefined ? data.aboutPics : aboutPics,
         ),
-        categories: data.categories || categories,
         themeColor,
         themePickIndex: findThemePickIndex(
           themeColor,
@@ -423,6 +601,7 @@ Page({
         ),
         themeDirty: false,
       });
+      this._applyCategories(data.categories || categories);
       this._syncMapState({
         tenantName: data.TENANT_NAME || tenantName,
         contactLatitude: contact.latitude || this.data.contactLatitude,

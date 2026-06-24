@@ -1,0 +1,36 @@
+<!-- 会员持卡选择（代约/预约扣次用，与 card-tpl-picker 字段行同款） -->
+<view class="ucp-field field-class" bindtap="bindFieldTap">
+  <view class="ucp-field-label course-edit-field-label-inline {{required ? 'course-edit-field-label-inline--required' : ''}}">{{label}}</view>
+  <view class="ucp-field-value-wrap">
+    <view class="ucp-field-value {{selectedCard ? '' : 'ucp-field-value--placeholder'}}">
+      {{displayText}}
+    </view>
+    <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+  </view>
+</view>
+
+<van-popup show="{{sheetShow}}" position="bottom" round bind:close="bindCloseSheet" custom-class="ucp-popup">
+  <view class="ucp-sheet">
+    <view class="ucp-sheet-head">
+      <text class="ucp-sheet-title">选择会员卡</text>
+      <text wx:if="{{meetId}}" class="ucp-sheet-sub">仅显示适用于本课程的会员卡</text>
+    </view>
+    <scroll-view scroll-y class="ucp-sheet-scroll" enhanced show-scrollbar="{{false}}">
+      <view
+        class="ucp-card-item {{value === item.id ? 'is-active' : ''}}"
+        wx:for="{{cardList}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        data-name="{{item.name}}"
+        bindtap="bindCardPick"
+      >
+        <view class="ucp-card-main">
+          <text class="ucp-card-name">{{item.name}}</text>
+          <text class="ucp-card-sub">{{item.deductHint || item.balanceText || ''}}</text>
+        </view>
+        <van-icon wx:if="{{value === item.id}}" name="success" size="36rpx" color="{{themeColor}}" />
+      </view>
+      <van-empty wx:if="{{!loading && !cardList.length}}" description="{{emptyDesc}}" />
+    </scroll-view>
+  </view>
+</van-popup>

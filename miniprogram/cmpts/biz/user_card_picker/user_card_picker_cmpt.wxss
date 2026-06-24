@@ -1,0 +1,103 @@
+.ucp-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.ucp-field-label {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  line-height: 1.2;
+  font-size: var(--cell-font-size, 28rpx);
+  color: #646566;
+}
+
+.ucp-field-value-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8rpx;
+}
+
+.ucp-field-value {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  font-size: var(--cell-font-size, 28rpx);
+  line-height: 1.2;
+  color: #323233;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ucp-field-value--placeholder {
+  color: #969799;
+}
+
+.ucp-sheet {
+  padding: 24rpx 0 calc(24rpx + env(safe-area-inset-bottom));
+  max-height: 70vh;
+  box-sizing: border-box;
+}
+
+.ucp-sheet-head {
+  padding: 8rpx 32rpx 16rpx;
+}
+
+.ucp-sheet-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #323233;
+}
+
+.ucp-sheet-sub {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.ucp-sheet-scroll {
+  max-height: 52vh;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+.ucp-card-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 24rpx 20rpx;
+  margin-bottom: 12rpx;
+  border-radius: 16rpx;
+  background: #f7f8fa;
+}
+
+.ucp-card-item.is-active {
+  background: var(--projectColorLight, #e5f1ec);
+}
+
+.ucp-card-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.ucp-card-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #323233;
+}
+
+.ucp-card-sub {
+  font-size: 24rpx;
+  color: #969799;
+}

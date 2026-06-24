@@ -99,7 +99,22 @@ class UserCardService extends BaseService {
     await this._tryActivateCard(card, "checkin");
   }
 
-  _mapCardItem(card, now, tplColor) {
+  async _getCategoryNameMap() {
+    try {
+      const AdminTenantService = require("./admin/admin_tenant_service.js");
+      const store = await new AdminTenantService().getStore(this.getProjectId());
+      const map = {};
+      for (const c of (store && store.categories) || []) {
+        if (c && c.id != null) map[String(c.id)] = c.name || String(c.id);
+      }
+      return map;
+    } catch (err) {
+      console.error("[UserCardService] category map:", err.message);
+      return {};
+    }
+  }
+
+  _mapCardItem(card, now, tplColor, nameMap = {}) {
     const type = card.USER_CARD_TYPE || CardTplModel.TYPE.TIMES;
     const expired = this._isExpired(card, now);
     const pending = this._isPendingActivation(card);
@@ -138,7 +153,7 @@ class UserCardService extends BaseService {
     const activate = card.USER_CARD_ACTIVATE || UserCardModel.ACTIVATE.IMMEDIATE;
     const quota = Number(card.USER_CARD_QUOTA) || 0;
     const scope = cardScopeUtil.getCardScope(card);
-    const scopeDesc = cardScopeUtil.buildScopeDesc(scope, {});
+    const scopeDesc = cardScopeUtil.buildScopeDesc(scope, nameMap);
 
     return {
       id: card._id,
@@ -280,8 +295,9 @@ class UserCardService extends BaseService {
     }
 
     const now = timeUtil.time();
+    const nameMap = await this._getCategoryNameMap();
     let mapped = (list || []).map((c) =>
-      this._mapCardItem(c, now, colorMap[c.USER_CARD_TPL_ID]),
+      this._mapCardItem(c, now, colorMap[c.USER_CARD_TPL_ID], nameMap),
     );
     if (activeOnly) {
       mapped = mapped.filter((c) => {
@@ -307,7 +323,8 @@ class UserCardService extends BaseService {
 
     const color = await this._getCardTplColor(card.USER_CARD_TPL_ID);
     const now = timeUtil.time();
-    const detail = this._mapCardItem(card, now, color);
+    const nameMap = await this._getCategoryNameMap();
+    const detail = this._mapCardItem(card, now, color, nameMap);
 
     let logs = await UserCardLogModel.getAll(
       {
@@ -745,7 +762,8 @@ class UserCardService extends BaseService {
 
     const color = await this._getCardTplColor(card.USER_CARD_TPL_ID);
     const now = timeUtil.time();
-    const detail = this._mapCardItem(card, now, color);
+    const nameMap = await this._getCategoryNameMap();
+    const detail = this._mapCardItem(card, now, color, nameMap);
 
     let logs = await UserCardLogModel.getAll(
       {

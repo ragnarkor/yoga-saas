@@ -34,10 +34,6 @@ Page({
     userId: '',
     userName: '',
     courses: [],
-    coursePicker: [],
-    teachers: [],
-    teacherActions: [],
-    cards: [],
     bufferPresets: privateScheduleHelper.BUFFER_PRESETS,
     conflictText: '',
     blockText: '',
@@ -61,9 +57,6 @@ Page({
       bufferAfter: '15',
       memo: '',
     },
-    courseSheetShow: false,
-    teacherSheetShow: false,
-    cardSheetShow: false,
     datePickerShow: false,
     timePickerShow: false,
     timePickerField: 'start',
@@ -99,60 +92,56 @@ Page({
     }
     this.setData({ loading: true, metaLoadFailed: false });
     try {
-      const [metaRes, teacherRes] = await Promise.all([
+      const [metaRes] = await Promise.all([
         cloudHelper.callCloudData('admin/private_meta', {}, { hint: false }),
-        cloudHelper.callCloudData('admin/home_teacher_list', {}, { hint: false }),
       ]);
       if (!metaRes) {
-        this.setData({ loading: false, metaLoadFailed: true, courses: [], coursePicker: [] });
+        this.setData({ loading: false, metaLoadFailed: true, courses: [] });
         return;
       }
       const courses = (metaRes && metaRes.courses) || [];
       const presets = (metaRes && metaRes.bufferPresets) || [];
       const def = presets.find((p) => p.key === 'default') || { before: 15, after: 15 };
-      const teachers = (teacherRes && teacherRes.list) || [];
       this.setData({
         loading: false,
         courses,
-        coursePicker: courses,
         bufferPresets: presets.length ? presets : this.data.bufferPresets,
-        teachers,
-        teacherActions: teachers.map((t) => ({ name: t.TEACHER_NAME })),
         'form.bufferBefore': String(def.before != null ? def.before : 15),
         'form.bufferAfter': String(def.after != null ? def.after : 15),
       });
       if (courses.length === 1) {
         this._applyCourse(courses[0]);
       }
-      if (this.data.userId) {
-        await this._loadMemberCards();
-      }
       this._checkConflict();
     } catch (e) {
       console.error(e);
-      this.setData({ loading: false, metaLoadFailed: true, courses: [], coursePicker: [] });
+      this.setData({ loading: false, metaLoadFailed: true, courses: [] });
     }
   },
 
-  async _loadMemberCards() {
-    if (!this.data.userId) return;
-    try {
-      const res = await cloudHelper.callCloudData(
-        'admin/user_card_list',
-        { userId: this.data.userId },
-        { hint: false },
-      );
-      const cards = ((res && res.list) || []).filter((c) => c.isActive || c.canBook);
-      this.setData({ cards });
-      if (cards.length === 1) {
-        this.setData({
-          'form.cardId': cards[0].id,
-          'form.cardName': cards[0].name,
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
+  onCoursePick(e) {
+    const raw = (e.detail && e.detail.meet) || (e.detail && e.detail.course);
+    this._applyCourse(raw);
+  },
+
+  onUserCardPick(e) {
+    const { cardId, cardName } = e.detail || {};
+    this.setData({
+      'form.cardId': cardId || '',
+      'form.cardName': cardName || '',
+    });
+  },
+
+  onCoachPick(e) {
+    const { teacherId, teacherName } = e.detail || {};
+    this.setData({
+      'form.teacherId': teacherId || '',
+      'form.teacherName': teacherName || '',
+    }, () => this._checkConflict());
+  },
+
+  bindMemoChange(e) {
+    this.setData({ 'form.memo': e.detail });
   },
 
   _applyCourse(course) {
@@ -222,54 +211,6 @@ Page({
     wx.navigateTo({
       url: '/pages/coach/member/coach_member_list?pick=1',
     });
-  },
-
-  bindCourseTap() {
-    if (this.data.metaLoadFailed) {
-      wx.showToast({ title: '私教数据加载失败，请重试', icon: 'none' });
-      this._initPage();
-      return;
-    }
-    if (!this.data.coursePicker.length) {
-      wx.showToast({
-        title: '暂无私教课，请建分类名含「私教」的课程',
-        icon: 'none',
-      });
-      return;
-    }
-    this.setData({ courseSheetShow: true });
-  },
-
-  bindCoursePick(e) {
-    const id = e.currentTarget.dataset.id;
-    const course = this.data.courses.find((c) => c._id === id);
-    this.setData({ courseSheetShow: false });
-    this._applyCourse(course);
-  },
-
-  bindCloseCourseSheet() {
-    this.setData({ courseSheetShow: false });
-  },
-
-  bindTeacherTap() {
-    if (!this.data.teacherActions.length) {
-      wx.showToast({ title: '请先添加教练', icon: 'none' });
-      return;
-    }
-    this.setData({ teacherSheetShow: true });
-  },
-
-  bindTeacherSelect(e) {
-    const teacher = this.data.teachers.find((t) => t.TEACHER_NAME === e.detail.name);
-    this.setData({
-      teacherSheetShow: false,
-      'form.teacherId': teacher ? teacher._id : '',
-      'form.teacherName': teacher ? teacher.TEACHER_NAME : '',
-    }, () => this._checkConflict());
-  },
-
-  bindCloseTeacherSheet() {
-    this.setData({ teacherSheetShow: false });
   },
 
   bindDayTap() {
@@ -358,36 +299,6 @@ Page({
 
   bindBufferAfterChange(e) {
     this.setData({ 'form.bufferAfter': e.detail, 'form.bufferPreset': 'custom' }, () => this._checkConflict());
-  },
-
-  bindMemoChange(e) {
-    this.setData({ 'form.memo': e.detail });
-  },
-
-  bindCardTap() {
-    if (!this.data.userId) {
-      wx.showToast({ title: '请先选择会员', icon: 'none' });
-      return;
-    }
-    if (!this.data.cards.length) {
-      wx.showToast({ title: '该会员暂无可用会员卡', icon: 'none' });
-      return;
-    }
-    this.setData({ cardSheetShow: true });
-  },
-
-  bindCardPick(e) {
-    const id = e.currentTarget.dataset.id;
-    const name = e.currentTarget.dataset.name || '';
-    this.setData({
-      cardSheetShow: false,
-      'form.cardId': id,
-      'form.cardName': name,
-    });
-  },
-
-  bindCloseCardSheet() {
-    this.setData({ cardSheetShow: false });
   },
 
   async bindSubmitTap() {

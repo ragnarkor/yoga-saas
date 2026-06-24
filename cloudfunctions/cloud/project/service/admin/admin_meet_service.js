@@ -289,6 +289,38 @@ class AdminMeetService extends BaseAdminService {
 
     let meetService = new MeetService();
     await meetService.statJoinCnt(meetId, timeMark);
+    await this._setScheduleSlotStatus(meetId, timeMark, 0);
+  }
+
+  /** 更新排课时段 status（1=正常 0=已取消） */
+  async _setScheduleSlotStatus(meetId, timeMark, status) {
+    const meetService = new MeetService();
+    const day = meetService.getDayByTimeMark(timeMark);
+    const markStr = String(timeMark || "");
+    const dayRec = await DayModel.getOne(
+      { DAY_MEET_ID: meetId, day },
+      "times,_id",
+    );
+    if (!dayRec || !dayRec.times) return;
+
+    let times = dayRec.times || [];
+    let hit = false;
+    for (let j in times) {
+      if (String(times[j].mark) !== markStr) continue;
+      times[j] = { ...times[j], status: Number(status) };
+      hit = true;
+      break;
+    }
+    if (!hit) return;
+
+    await DayModel.edit(dayRec._id, { times });
+    await this._syncMeetDaysAfterChange(meetId);
+  }
+
+  /** 恢复已取消的排课时段（status 0 → 1） */
+  async restoreScheduleSlot(meetId, timeMark) {
+    if (!meetId || !timeMark) this.AppError("参数错误");
+    await this._setScheduleSlotStatus(meetId, timeMark, 1);
   }
 
   /**添加 */
@@ -411,6 +443,106 @@ class AdminMeetService extends BaseAdminService {
     return { urls };
   }
 
+  async _getScheduleConflictContext() {
+    const AdminTenantService = require("./admin_tenant_service.js");
+    const store = await new AdminTenantService().getStore(this.getProjectId());
+    const categories = store.categories || [];
+    return {
+      bufferConfig: store.privateSchedule || {},
+      privateCategoryIds: privateMeetUtil.getPrivateCategoryIds(categories),
+    };
+  }
+
+  _buildSlotBlock(meet, slot, tenantConfig, privateCategoryIds) {
+    if (!slot || slot.status === 0 || !slot.start || !slot.end) return null;
+    const style = meet.MEET_STYLE_SET || {};
+    const teacherId = slot.teacherId || style.teacherId || "";
+    if (!teacherId) return null;
+    const isPrivate =
+      slot.slotType === "private" ||
+      privateMeetUtil.isPrivateMeet(meet, privateCategoryIds);
+    const kind = isPrivate ? "private" : "group";
+    const buf = bufferUtil.resolveBufferForSlot(slot, kind, tenantConfig);
+    const block = bufferUtil.computeBlock(
+      slot.start,
+      slot.end,
+      buf.bufferBefore,
+      buf.bufferAfter,
+    );
+    return {
+      ...block,
+      teacherId: String(teacherId),
+      mark: slot.mark || "",
+      title: meet.MEET_TITLE || "",
+    };
+  }
+
+  async _validateDayTeacherTimes(meet, meetId, day, times, tenantConfig, privateCategoryIds) {
+    const AdminPrivateService = require("./admin_private_service.js");
+    const privateService = new AdminPrivateService();
+    const active = (times || []).filter(
+      (t) => t && t.status !== 0 && t.start && t.end,
+    );
+    const batchBlocks = [];
+
+    for (const slot of active) {
+      const candidate = this._buildSlotBlock(
+        meet,
+        slot,
+        tenantConfig,
+        privateCategoryIds,
+      );
+      if (!candidate) continue;
+
+      const existing = await privateService._loadTeacherBlocksForDay(
+        candidate.teacherId,
+        day,
+        "",
+        tenantConfig,
+        privateCategoryIds,
+      );
+      const external = existing.filter(
+        (b) => String(b.meetId) !== String(meetId),
+      );
+
+      for (const b of external) {
+        if (bufferUtil.blocksOverlap(candidate, b)) {
+          this.AppError(
+            "与教练已有排课冲突：「" +
+              (b.title || "课程") +
+              "」" +
+              bufferUtil.formatBlockLabel(b) +
+              "（占用 " +
+              b.blockStart +
+              "-" +
+              b.blockEnd +
+              "）",
+          );
+        }
+      }
+
+      for (const b of batchBlocks) {
+        if (b.teacherId !== candidate.teacherId) continue;
+        if (String(b.mark) === String(candidate.mark)) continue;
+        if (bufferUtil.blocksOverlap(candidate, b)) {
+          this.AppError(
+            "时段 " +
+              slot.start +
+              "-" +
+              slot.end +
+              " 与同日其他时段冲突（占用 " +
+              candidate.blockStart +
+              "-" +
+              candidate.blockEnd +
+              "）",
+          );
+        }
+      }
+
+      batchBlocks.push(candidate);
+    }
+  }
+
   /** 更新日期设置 */
   async _editDays(meetId, nowDay, daysSetData) {
     let whereOld = {
@@ -430,9 +562,25 @@ class AdminMeetService extends BaseAdminService {
       newDayMap[daysSetData[k].day] = daysSetData[k];
     }
 
+    const meet = await MeetModel.getOne(
+      { _id: meetId },
+      "MEET_TITLE,MEET_TYPE_ID,MEET_STYLE_SET",
+    );
+    if (!meet) this.AppError("课程不存在");
+    const conflictCtx = await this._getScheduleConflictContext();
+
     for (let dayStr in newDayMap) {
       let dayNode = newDayMap[dayStr];
       let times = this._normTimes(dayNode.times || [], dayStr);
+
+      await this._validateDayTeacherTimes(
+        meet,
+        meetId,
+        dayStr,
+        times,
+        conflictCtx.bufferConfig,
+        conflictCtx.privateCategoryIds,
+      );
 
       let oldDay = null;
       for (let j in oldList) {
@@ -790,6 +938,15 @@ class AdminMeetService extends BaseAdminService {
     adminType,
     admin,
   ) {
+    let privateCategoryIds = [];
+    if (excludePrivate) {
+      const AdminTenantService = require("./admin_tenant_service.js");
+      const store = await new AdminTenantService().getStore(this.getProjectId());
+      privateCategoryIds = privateMeetUtil.getPrivateCategoryIds(
+        (store && store.categories) || [],
+      );
+    }
+
     // 「我的课」过滤仅对教练生效；馆主/超管查看当前馆全量排课
     const applyOnlyMine =
       !!onlyMine && adminType === AdminModel.TYPE.TEACHER;
@@ -839,7 +996,7 @@ class AdminMeetService extends BaseAdminService {
       let meetEntry = meetMap[dayRecords[k].DAY_MEET_ID];
       let meet = meetEntry ? meetEntry.meet : null;
       if (!meet) continue;
-      if (excludePrivate && privateMeetUtil.isPrivateMeet(meet, null)) continue;
+      if (excludePrivate && privateMeetUtil.isPrivateMeet(meet, privateCategoryIds)) continue;
       if (typeId && typeId !== "0" && meet.MEET_TYPE_ID != typeId) continue;
 
       let style = meet.MEET_STYLE_SET || {};
@@ -865,7 +1022,7 @@ class AdminMeetService extends BaseAdminService {
 
         if (t.status == 1) timeSet.add(t.start);
         const isPrivate =
-          t.slotType === "private" || privateMeetUtil.isPrivateMeet(meet, null);
+          t.slotType === "private" || privateMeetUtil.isPrivateMeet(meet, privateCategoryIds);
         slots.push({
           day: dayRecords[k].day,
           start: t.start,
@@ -1057,7 +1214,12 @@ class AdminMeetService extends BaseAdminService {
 
     const meet = await MeetModel.getOne({ _id: meetId });
     if (!meet) this.AppError("课程不存在");
-    if (privateMeetUtil.isPrivateMeet(meet, null)) {
+    const AdminTenantService = require("./admin_tenant_service.js");
+    const store = await new AdminTenantService().getStore(this.getProjectId());
+    const privateCategoryIds = privateMeetUtil.getPrivateCategoryIds(
+      (store && store.categories) || [],
+    );
+    if (privateMeetUtil.isPrivateMeet(meet, privateCategoryIds)) {
       this.AppError("私教课请使用「私教」代约");
     }
 

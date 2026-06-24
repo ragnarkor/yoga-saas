@@ -15,7 +15,7 @@
 
   <block wx:else>
     <!-- 卡片视觉 -->
-    <view class="ucm-card" style="background: {{card.color}};">
+    <view class="ucm-card" style="background: {{card.color}};" bindlongpress="bindDeleteTap">
       <view class="ucm-card-type">{{card.typeLabel}}</view>
       <view class="ucm-card-name">{{card.name}}</view>
       <view class="ucm-card-info">

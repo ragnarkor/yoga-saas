@@ -8,6 +8,7 @@
     "van-empty": "@vant/weapp/empty/index",
     "van-icon": "@vant/weapp/icon/index",
     "van-button": "@vant/weapp/button/index",
-    "van-popup": "@vant/weapp/popup/index"
+    "van-popup": "@vant/weapp/popup/index",
+    "user-card-picker": "/cmpts/biz/user_card_picker/user_card_picker_cmpt"
   }
 }

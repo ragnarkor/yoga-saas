@@ -86,8 +86,11 @@ module.exports = {
   "admin/coach_member_list": "admin/admin_card_controller@getCoachMemberList",
   "admin/user_card_issue": "admin/admin_card_controller@issueUserCard#noDemo",
   "admin/user_card_list": "admin/admin_card_controller@getUserCardList",
+  "admin/user_join_card_options":
+    "admin/admin_card_controller@getUserJoinCardOptions",
   "admin/user_card_detail": "admin/admin_card_controller@getUserCardDetail",
   "admin/user_card_adjust": "admin/admin_card_controller@adjustUserCard#noDemo",
+  "admin/user_card_del": "admin/admin_card_controller@delUserCard#noDemo",
   "admin/private_meta": "admin/admin_private_controller@getMeta",
   "admin/private_list": "admin/admin_private_controller@listSessions",
   "admin/private_check": "admin/admin_private_controller@checkSlot",
@@ -160,6 +163,8 @@ module.exports = {
   "admin/meet_status": "admin/admin_meet_controller@statusMeet#noDemo",
   "admin/meet_cancel_time_join":
     "admin/admin_meet_controller@cancelJoinByTimeMark#noDemo",
+  "admin/meet_restore_time_slot":
+    "admin/admin_meet_controller@restoreScheduleSlot#noDemo",
   "admin/join_scan": "admin/admin_meet_controller@scanJoin#noDemo",
   "admin/join_checkin": "admin/admin_meet_controller@checkinJoin#noDemo",
   "admin/join_checkin_batch":

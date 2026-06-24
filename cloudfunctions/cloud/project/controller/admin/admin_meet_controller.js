@@ -500,6 +500,22 @@ class AdminMeetController extends BaseAdminController {
     );
   }
 
+  /** 恢复已取消的排课时段 */
+  async restoreScheduleSlot() {
+    await this.isAdmin();
+
+    let rules = {
+      meetId: "must|id",
+      timeMark: "must|string",
+    };
+
+    let input = this.validateData(rules);
+
+    let service = new AdminMeetService();
+    await service.restoreScheduleSlot(input.meetId, input.timeMark);
+    return { ok: true };
+  }
+
   /** 创建模板 */
   async insertTemp() {
     await this.isAdmin();

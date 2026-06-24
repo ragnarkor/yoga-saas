@@ -14,31 +14,15 @@
   <block wx:else>
 
     <van-cell-group title="排课信息" custom-class="schedule-edit-group">
-      <view class="schedule-course-field" bindtap="bindCourseTap">
-        <view class="schedule-course-field-label">
-          <text>课程</text>
-          <text class="schedule-course-required">*</text>
-        </view>
-        <view wx:if="{{selectedCourse}}" class="schedule-course-selected">
-          <image
-            class="schedule-course-cover"
-            src="{{selectedCourse.cover}}"
-            mode="aspectFill"
-          />
-          <view class="schedule-course-info">
-            <view class="schedule-course-title">{{selectedCourse.title}}</view>
-            <view class="schedule-course-meta">
-              {{selectedCourse.typeName}} · {{selectedCourse.durationText}} · {{selectedCourse.teacherName}}
-            </view>
-            <view wx:if="{{selectedCourse.desc}}" class="schedule-course-desc">{{selectedCourse.desc}}</view>
-          </view>
-          <van-icon wx:if="{{!isEdit}}" name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-        <view wx:else class="schedule-course-placeholder">
-          <text>请选择课程</text>
-          <van-icon wx:if="{{!isEdit}}" name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-      </view>
+      <meet-course-picker
+        value="{{formMeetId}}"
+        theme-color="{{themeColor}}"
+        label="课程"
+        required="{{true}}"
+        disabled="{{isEdit}}"
+        empty-text="请先在课程管理中添加课程"
+        bind:pick="onCoursePick"
+      />
       <van-cell
         title="上课日期"
         required
@@ -59,12 +43,14 @@
         value="{{formEndTime}}"
         label="按课程时长 {{duration}} 分钟自动计算"
       />
-      <van-cell
-        title="授课老师"
-        required
-        is-link
-        value="{{formTeacherName || '请选择'}}"
-        bind:click="bindTeacherTap"
+      <coach-picker
+        id-mode="teacher"
+        value="{{formTeacherId}}"
+        theme-color="{{themeColor}}"
+        label="授课老师"
+        required="{{true}}"
+        field-class="schedule-edit-coach-field"
+        bind:pick="onCoachPick"
       />
       <van-field
         label="人数上限"
@@ -90,56 +76,6 @@
       <van-button block plain type="danger" loading="{{saving}}" bind:click="bindDeleteTap">删除此排课</van-button>
     </view>
   </block>
-
-  <van-popup
-    show="{{courseSheetShow}}"
-    position="bottom"
-    round
-    bind:close="bindCloseCourseSheet"
-    custom-class="schedule-course-popup"
-  >
-    <view class="schedule-course-sheet">
-      <view class="schedule-course-sheet-head">
-        <text class="schedule-course-sheet-title">选择课程</text>
-        <text class="schedule-course-sheet-sub">共 {{coursePickerList.length}} 门</text>
-      </view>
-      <scroll-view scroll-y class="schedule-course-sheet-scroll" enhanced show-scrollbar="{{false}}">
-        <view
-          class="schedule-course-option {{formMeetId === item._id ? 'is-active' : ''}}"
-          wx:for="{{coursePickerList}}"
-          wx:key="_id"
-          data-id="{{item._id}}"
-          bindtap="bindCoursePick"
-          style="border-left-color: {{item.color}};"
-        >
-          <image class="schedule-course-option-cover" src="{{item.cover}}" mode="aspectFill" />
-          <view class="schedule-course-option-body">
-            <view class="schedule-course-option-title">{{item.title}}</view>
-            <view class="schedule-course-option-meta">
-              <text class="schedule-course-option-tag">{{item.typeName}}</text>
-              <text>{{item.durationText}}</text>
-              <text wx:if="{{item.teacherName}}"> · {{item.teacherName}}</text>
-            </view>
-            <view wx:if="{{item.desc}}" class="schedule-course-option-desc">{{item.desc}}</view>
-          </view>
-          <van-icon
-            wx:if="{{formMeetId === item._id}}"
-            name="success"
-            size="40rpx"
-            color="{{themeColor}}"
-          />
-        </view>
-      </scroll-view>
-    </view>
-  </van-popup>
-
-  <van-action-sheet
-    show="{{teacherSheetShow}}"
-    actions="{{teacherActions}}"
-    cancel-text="取消"
-    bind:select="bindTeacherSelect"
-    bind:close="bindCloseTeacherSheet"
-  />
 
   <van-popup
     show="{{datePickerShow}}"

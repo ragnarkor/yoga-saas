@@ -46,12 +46,13 @@ function resolveCategoryList(apiCategories) {
     return apiCategories.map((c) => ({
       id: String(c.id),
       name: c.name || "",
+      isPrivate: c.isPrivate === true,
     }));
   }
   const opts = dataHelper.getSelectOptions(getMeetTypeStr());
   return opts
     .filter((o) => o && o.val != null && o.label)
-    .map((o) => ({ id: String(o.val), name: o.label }));
+    .map((o) => ({ id: String(o.val), name: o.label, isPrivate: false }));
 }
 
 module.exports = {

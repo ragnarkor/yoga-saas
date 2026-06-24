@@ -13,6 +13,7 @@ Page({
     activateSheetShow: false,
     selectedTplId: "",
     selectedTpl: null,
+    defaultCoachId: "",
     activateOptions: cardActivateHelper.ACTIVATE_OPTIONS,
     form: {
       activate: "immediate",
@@ -31,8 +32,10 @@ Page({
     this.setData({ userId, userName, selectedTplId: tplId });
     const admin = AdminBiz.getAdminToken();
     if (admin && admin.name) {
+      const coachId = admin.id || admin.adminId || "";
       this.setData({
-        "form.coachId": admin.id || admin.adminId || "",
+        defaultCoachId: coachId,
+        "form.coachId": coachId,
         "form.coachName": admin.name,
       });
     }
@@ -56,6 +59,15 @@ Page({
   },
   // [AI_END LINES=6 TIMESTAMP=2025-01-27 16:00:00]
 
+  /** 归属教练选择器回调 */
+  onCoachPick(e) {
+    const { coachId, coachName } = e.detail || {};
+    this.setData({
+      "form.coachId": coachId || "",
+      "form.coachName": coachName || "",
+    });
+  },
+
   bindMemoInput(e) {
     this.setData({ "form.memo": e.detail.value || "" });
   },
@@ -77,10 +89,6 @@ Page({
       "form.activateLabel": label,
       activateSheetShow: false,
     });
-  },
-
-  bindCoachTap() {
-    wx.showToast({ title: "默认当前登录教练", icon: "none" });
   },
 
   async bindSubmitTap() {

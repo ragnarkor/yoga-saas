@@ -12,6 +12,11 @@
   overflow: hidden;
 }
 
+.mcp-in-section {
+  border-bottom: 1rpx solid #f3f3f3;
+  padding: 24rpx 28rpx;
+}
+
 .pb-field {
   display: flex;
   align-items: center;
@@ -22,6 +27,21 @@
 
 .pb-field:last-child {
   border-bottom: none;
+}
+
+.pb-field.coach-picker-field {
+  padding: 28rpx 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.pb-field.coach-picker-field .coach-picker-label {
+  width: 160rpx;
+  font-size: 28rpx;
+  color: #646566;
+}
+
+.pb-field.coach-picker-field .coach-picker-value-wrap {
+  flex: 1;
 }
 
 .pb-label {

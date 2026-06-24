@@ -1,95 +1,40 @@
-@import "../coach_common.wxss";
-
-.schedule-edit-page {
-  min-height: 100vh;
-  background: #f5f6f7;
-  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
-}
-
-.schedule-edit-loading {
-  /* 见 coach_common.wxss */
-}
-
-.schedule-edit-group {
-  margin-top: 24rpx !important;
-}
-
-.schedule-edit-coach-field.coach-picker-field {
-  padding: 24rpx 32rpx;
-  background: #fff;
-}
-
-.schedule-edit-coach-field.coach-picker-field .coach-picker-label {
-  width: 6.2em;
-  color: #646566;
-}
-
-.schedule-edit-coach-field.coach-picker-field .coach-picker-value-wrap {
-  flex: 1;
-}
-
-.schedule-edit-save {
-  margin: 48rpx 32rpx 0;
-}
-
-.schedule-edit-del {
-  margin: 24rpx 32rpx 0;
-}
-
-.schedule-edit-tip {
-  padding: 16rpx 32rpx 0;
-  font-size: 24rpx;
-  line-height: 1.5;
-  color: #969799;
-}
-
-.schedule-calendar-wrap {
-  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
-}
-
-.schedule-calendar-head {
-  padding: 28rpx 32rpx 8rpx;
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #323233;
-}
-
-.schedule-calendar-wrap .van-calendar {
-  height: 640rpx !important;
-}
-
-.schedule-course-field {
+.mcp-field {
   padding: 24rpx 32rpx;
   background: #fff;
   border-bottom: 1rpx solid #ebedf0;
+  box-sizing: border-box;
 }
 
-.schedule-course-field-label {
+.mcp-field-label {
   font-size: 28rpx;
   color: #646566;
   margin-bottom: 16rpx;
 }
 
-.schedule-course-required {
+.mcp-required {
   color: #ee0a24;
   margin-left: 4rpx;
 }
 
-.schedule-course-selected,
-.schedule-course-placeholder {
+.mcp-field-body--disabled {
+  opacity: 0.72;
+}
+
+.mcp-selected,
+.mcp-placeholder {
   display: flex;
   align-items: center;
   gap: 20rpx;
 }
 
-.schedule-course-placeholder {
+.mcp-placeholder {
   justify-content: space-between;
   font-size: 28rpx;
   color: #969799;
   padding: 8rpx 0;
 }
 
-.schedule-course-cover {
+.mcp-cover {
   width: 120rpx;
   height: 120rpx;
   border-radius: 16rpx;
@@ -97,12 +42,12 @@
   background: #f5f5f5;
 }
 
-.schedule-course-info {
+.mcp-info {
   flex: 1;
   min-width: 0;
 }
 
-.schedule-course-title {
+.mcp-title {
   font-size: 32rpx;
   font-weight: 600;
   color: #323233;
@@ -111,13 +56,13 @@
   white-space: nowrap;
 }
 
-.schedule-course-meta {
+.mcp-meta {
   margin-top: 8rpx;
   font-size: 24rpx;
   color: #969799;
 }
 
-.schedule-course-desc {
+.mcp-desc {
   margin-top: 8rpx;
   font-size: 24rpx;
   color: #c8c9cc;
@@ -129,14 +74,14 @@
   -webkit-box-orient: vertical;
 }
 
-.schedule-course-sheet {
+.mcp-sheet {
   max-height: 75vh;
   display: flex;
   flex-direction: column;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.schedule-course-sheet-head {
+.mcp-sheet-head {
   padding: 28rpx 32rpx 12rpx;
   display: flex;
   align-items: baseline;
@@ -144,24 +89,30 @@
   flex-shrink: 0;
 }
 
-.schedule-course-sheet-title {
+.mcp-sheet-title {
   font-size: 32rpx;
   font-weight: 700;
   color: #323233;
 }
 
-.schedule-course-sheet-sub {
+.mcp-sheet-sub {
   font-size: 24rpx;
   color: #969799;
 }
 
-.schedule-course-sheet-scroll {
+.mcp-sheet-loading {
+  padding: 48rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.mcp-sheet-scroll {
   max-height: calc(75vh - 100rpx);
   padding: 8rpx 24rpx 24rpx;
   box-sizing: border-box;
 }
 
-.schedule-course-option {
+.mcp-option {
   display: flex;
   align-items: center;
   gap: 20rpx;
@@ -173,11 +124,11 @@
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
-.schedule-course-option.is-active {
+.mcp-option.is-active {
   background: var(--projectColorLight, #e5f1ec);
 }
 
-.schedule-course-option-cover {
+.mcp-option-cover {
   width: 120rpx;
   height: 120rpx;
   border-radius: 16rpx;
@@ -185,12 +136,12 @@
   background: #f5f5f5;
 }
 
-.schedule-course-option-body {
+.mcp-option-body {
   flex: 1;
   min-width: 0;
 }
 
-.schedule-course-option-title {
+.mcp-option-title {
   font-size: 30rpx;
   font-weight: 600;
   color: #323233;
@@ -199,14 +150,14 @@
   white-space: nowrap;
 }
 
-.schedule-course-option-meta {
+.mcp-option-meta {
   margin-top: 8rpx;
   font-size: 24rpx;
   color: #969799;
   line-height: 1.5;
 }
 
-.schedule-course-option-tag {
+.mcp-option-tag {
   display: inline-block;
   margin-right: 8rpx;
   padding: 2rpx 12rpx;
@@ -216,7 +167,7 @@
   background: var(--projectColorLight, #e5f1ec);
 }
 
-.schedule-course-option-desc {
+.mcp-option-desc {
   margin-top: 8rpx;
   font-size: 24rpx;
   color: #c8c9cc;

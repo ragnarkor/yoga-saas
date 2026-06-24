@@ -18,7 +18,7 @@
 
 .main .down {
   margin-top: -130rpx;
-  z-index: 9999;
+  z-index: 3;
 }
 
 .avatar-wrap {

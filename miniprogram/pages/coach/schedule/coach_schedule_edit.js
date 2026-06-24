@@ -39,8 +39,6 @@ Page({
     isEdit: false,
     mark: '',
     formMeetId: '',
-    courseName: '',
-    selectedCourse: null,
     duration: 60,
     formDays: [],
     formDayDisplay: '',
@@ -49,12 +47,6 @@ Page({
     formTeacherId: '',
     formTeacherName: '',
     formLimit: '',
-    courseList: [],
-    coursePickerList: [],
-    teacherList: [],
-    teacherActions: [],
-    courseSheetShow: false,
-    teacherSheetShow: false,
     datePickerShow: false,
     timePickerShow: false,
     datePickerMin: new Date().getTime(),
@@ -93,67 +85,31 @@ Page({
       return;
     }
 
-    await Promise.all([this._loadCourses(), this._loadTeachers()]);
-
     if (this.data.isEdit && this.data.formMeetId && this.data.mark) {
       await this._loadEditSlot();
     } else if (this.data.formMeetId) {
-      this._applyCourseMeta(this.data.formMeetId);
+      await this._loadCourseMeta(this.data.formMeetId);
     }
 
     this.setData({ loading: false });
   },
 
+  async _loadCourseMeta(meetId) {
+    try {
+      const meet = await cloudHelper.callCloudData(
+        'admin/meet_detail',
+        { id: meetId },
+        { hint: false },
+      );
+      if (meet) this._applyCourseMeta(meet);
+    } catch (e) {
+      console.error(e);
+    }
+  },
+
   _meetDetailParams() {
     const fromDay = this.data.formDays[0] || '';
     return fromDay ? { id: this.data.formMeetId, fromDay } : { id: this.data.formMeetId };
-  },
-
-  _syncSelectedCourse(meetId) {
-    const item = this.data.coursePickerList.find((c) => c._id === meetId);
-    if (item) {
-      this.setData({ selectedCourse: item, courseName: item.title });
-    }
-  },
-
-  async _loadCourses() {
-    try {
-      const res = await cloudHelper.callCloudData(
-        'admin/meet_list',
-        { page: 1, size: 200 },
-        { hint: false },
-      );
-      const courseList = (res && res.list) || [];
-      const coursePickerList = courseList.map((m, idx) =>
-        scheduleSlotHelper.formatCoursePickerItem(m, idx),
-      );
-      this.setData({ courseList, coursePickerList });
-      if (this.data.formMeetId) {
-        this._syncSelectedCourse(this.data.formMeetId);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  },
-
-  async _loadTeachers() {
-    try {
-      const res = await cloudHelper.callCloudData(
-        'admin/home_teacher_list',
-        {},
-        { hint: false },
-      );
-      const teacherList = (res && res.list) || [];
-      this.setData({
-        teacherList,
-        teacherActions: teacherList.map((t) => ({
-          name: t.TEACHER_NAME,
-          id: t._id,
-        })),
-      });
-    } catch (e) {
-      console.error(e);
-    }
   },
 
   async _loadEditSlot() {
@@ -174,7 +130,6 @@ Page({
       const meta = scheduleSlotHelper.parseCourseMeta(meet);
       const style = meet.MEET_STYLE_SET || {};
       const patch = {
-        courseName: meet.MEET_TITLE,
         duration: meta.duration,
         formDayDisplay: formatDaysDisplay(this.data.formDays),
       };
@@ -192,23 +147,19 @@ Page({
               : '';
       }
 
-      this.setData(patch, () => {
-        this._recalcEndTime();
-        this._syncSelectedCourse(this.data.formMeetId);
-      });
+      this.setData(patch, () => this._recalcEndTime());
     } catch (e) {
       console.error(e);
     }
   },
 
-  _applyCourseMeta(meetId) {
-    const meet = this.data.courseList.find((m) => m._id === meetId);
-    if (!meet) return;
+  _applyCourseMeta(meet) {
+    if (!meet || !meet._id) return;
+    const meetId = meet._id;
     const meta = scheduleSlotHelper.parseCourseMeta(meet);
     const style = meet.MEET_STYLE_SET || {};
     const patch = {
       formMeetId: meetId,
-      courseName: meet.MEET_TITLE,
       duration: meta.duration,
     };
     if (!this.data.isEdit) {
@@ -218,10 +169,17 @@ Page({
         patch.formTeacherName = style.teacherName || '';
       }
     }
-    this.setData(patch, () => {
-      this._recalcEndTime();
-      this._syncSelectedCourse(meetId);
-    });
+    this.setData(patch, () => this._recalcEndTime());
+  },
+
+  onCoursePick(e) {
+    const { meet } = e.detail || {};
+    if (meet && meet.MEET_TITLE) {
+      this._applyCourseMeta(meet);
+      return;
+    }
+    const meetId = e.detail && e.detail.meetId;
+    if (meetId) this._loadCourseMeta(meetId);
   },
 
   _recalcEndTime() {
@@ -232,47 +190,12 @@ Page({
     this.setData({ formEndTime });
   },
 
-  bindCourseTap() {
-    if (this.data.isEdit) return;
-    if (!this.data.coursePickerList.length) {
-      wx.showToast({ title: '请先在课程管理中添加课程', icon: 'none' });
-      return;
-    }
-    this.setData({ courseSheetShow: true });
-  },
-
-  bindCoursePick(e) {
-    const id = e.currentTarget.dataset.id;
-    this.setData({ courseSheetShow: false });
-    if (!id) return;
-    this._applyCourseMeta(id);
-  },
-
-  bindCloseCourseSheet() {
-    this.setData({ courseSheetShow: false });
-  },
-
-  bindTeacherTap() {
-    if (!this.data.teacherActions.length) {
-      wx.showToast({ title: '请先在员工管理中添加教练', icon: 'none' });
-      return;
-    }
-    this.setData({ teacherSheetShow: true });
-  },
-
-  bindTeacherSelect(e) {
-    const teacher = this.data.teacherList.find(
-      (t) => t.TEACHER_NAME === e.detail.name,
-    );
+  onCoachPick(e) {
+    const { teacherId, teacherName } = e.detail || {};
     this.setData({
-      teacherSheetShow: false,
-      formTeacherId: teacher ? teacher._id : '',
-      formTeacherName: teacher ? teacher.TEACHER_NAME : '',
+      formTeacherId: teacherId || '',
+      formTeacherName: teacherName || '',
     });
-  },
-
-  bindCloseTeacherSheet() {
-    this.setData({ teacherSheetShow: false });
   },
 
   bindDayTap() {

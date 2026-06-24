@@ -3,6 +3,13 @@
  */
 
 function normalizeScope(scope) {
+  if (typeof scope === "string") {
+    try {
+      scope = JSON.parse(scope);
+    } catch (e) {
+      return { mode: "all", categoryIds: [] };
+    }
+  }
   if (!scope || typeof scope !== "object") {
     return { mode: "all", categoryIds: [] };
   }

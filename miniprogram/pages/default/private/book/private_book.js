@@ -49,8 +49,6 @@ Page({
     cardSheetShow: false,
     cardPickLoading: false,
     selectedCardId: '',
-    courseSheetShow: false,
-    teacherSheetShow: false,
     form: {
       meetId: '',
       courseName: '',
@@ -233,22 +231,12 @@ Page({
     }
   },
 
-  bindCourseTap() {
-    this.setData({ courseSheetShow: true });
-  },
-
-  bindCloseCourseSheet() {
-    this.setData({ courseSheetShow: false });
-  },
-
-  bindCoursePick(e) {
-    const id = e.currentTarget.dataset.id;
-    const course = this.data.courses.find((c) => String(c._id) === String(id));
+  onCoursePick(e) {
+    const course = (e.detail && e.detail.meet) || (e.detail && e.detail.course);
     if (!course) return;
     const patch = {
-      courseSheetShow: false,
       'form.meetId': course._id,
-      'form.courseName': course.title,
+      'form.courseName': course.title || course.MEET_TITLE || '',
       'form.duration': course.duration || 60,
       'form.start': '',
       'form.end': '',
@@ -264,22 +252,11 @@ Page({
     });
   },
 
-  bindTeacherTap() {
-    this.setData({ teacherSheetShow: true });
-  },
-
-  bindCloseTeacherSheet() {
-    this.setData({ teacherSheetShow: false });
-  },
-
-  bindTeacherPick(e) {
-    const id = e.currentTarget.dataset.id;
-    const teacher = this.data.teachers.find((t) => String(t._id) === String(id));
-    if (!teacher) return;
+  onCoachPick(e) {
+    const { teacherId, teacherName } = e.detail || {};
     this.setData({
-      teacherSheetShow: false,
-      'form.teacherId': teacher._id,
-      'form.teacherName': teacher.name,
+      'form.teacherId': teacherId || '',
+      'form.teacherName': teacherName || '',
       'form.start': '',
       'form.end': '',
     }, () => this._loadSlots());

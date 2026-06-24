@@ -31,6 +31,7 @@ class AdminCardController extends BaseAdminController {
       quota: "int",
       color: "string",
       order: "int",
+      scope: "object|false",
     };
     let input = this.validateData(rules);
     let service = new AdminCardService();
@@ -86,6 +87,17 @@ class AdminCardController extends BaseAdminController {
     return await service.getUserCardList(input.userId);
   }
 
+  async getUserJoinCardOptions() {
+    await this.isAdmin();
+    let rules = {
+      userId: "required|string",
+      meetId: "required|id",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminCardService();
+    return await service.getUserJoinCardOptions(input.userId, input.meetId);
+  }
+
   async getUserCardDetail() {
     await this.isAdmin();
     let rules = { cardId: "required|string" };
@@ -106,6 +118,15 @@ class AdminCardController extends BaseAdminController {
     let input = this.validateData(rules);
     let service = new AdminCardService();
     return await service.adjustUserCard(input);
+  }
+
+  async delUserCard() {
+    await this.isAdmin();
+    let rules = { cardId: "required|string" };
+    let input = this.validateData(rules);
+    let service = new AdminCardService();
+    await service.deleteUserCard(input.cardId);
+    return { ok: true };
   }
 }
 

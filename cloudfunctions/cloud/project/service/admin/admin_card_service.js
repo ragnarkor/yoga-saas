@@ -61,15 +61,30 @@ class AdminCardService extends BaseAdminService {
     return CardTplModel.TYPE_DESC[type] || "次数卡";
   }
 
-  _formatTpl(item) {
+  _formatTpl(item, nameMap = {}) {
     const scope = cardScopeUtil.normalizeScope(item.CARD_TPL_SCOPE);
     return {
       ...item,
       typeDesc: this._typeDesc(item.CARD_TPL_TYPE),
       metaText: this._buildTplMeta(item),
       scope,
-      scopeDesc: cardScopeUtil.buildScopeDesc(scope, {}),
+      scopeDesc: cardScopeUtil.buildScopeDesc(scope, nameMap),
     };
+  }
+
+  async _getMeetCategoryNameMap() {
+    try {
+      const AdminTenantService = require("./admin_tenant_service.js");
+      const store = await new AdminTenantService().getStore(this.getProjectId());
+      const map = {};
+      for (const c of (store && store.categories) || []) {
+        if (c && c.id != null) map[String(c.id)] = c.name || String(c.id);
+      }
+      return map;
+    } catch (err) {
+      console.error("[AdminCardService] category map:", err.message);
+      return {};
+    }
   }
 
   _buildTplMeta(item) {
@@ -93,14 +108,16 @@ class AdminCardService extends BaseAdminService {
       { CARD_TPL_ORDER: "asc", CARD_TPL_ADD_TIME: "desc" },
       200,
     );
-    return (list || []).map((item) => this._formatTpl(item));
+    const nameMap = await this._getMeetCategoryNameMap();
+    return (list || []).map((item) => this._formatTpl(item, nameMap));
   }
 
   async getCardTplDetail(id) {
     await this._ensureCardCollections();
     let item = await CardTplModel.getOne({ CARD_TPL_ID: id }, "*");
     if (!item) this.AppError("会员卡不存在");
-    return this._formatTpl(item);
+    const nameMap = await this._getMeetCategoryNameMap();
+    return this._formatTpl(item, nameMap);
   }
 
   async saveCardTpl(input, operatorType) {
@@ -349,8 +366,9 @@ class AdminCardService extends BaseAdminService {
 
     const cardService = new UserCardService();
     const now = timeUtil.time();
+    const nameMap = await cardService._getCategoryNameMap();
     const list = (cards || []).map((c) =>
-      cardService._mapCardItem(c, now, colorMap[c.USER_CARD_TPL_ID]),
+      cardService._mapCardItem(c, now, colorMap[c.USER_CARD_TPL_ID], nameMap),
     );
 
     return {
@@ -361,6 +379,27 @@ class AdminCardService extends BaseAdminService {
     };
   }
 
+  /** 教练代约：某会员在某课程下可用的会员卡（含适用范围过滤） */
+  async getUserJoinCardOptions(userId, meetId) {
+    await this._ensureCardCollections();
+    userId = (userId || "").trim();
+    meetId = (meetId || "").trim();
+    if (!userId) this.AppError("请选择会员");
+    if (!meetId) this.AppError("请先选择课程");
+
+    const MeetModel = require("../../model/meet_model.js");
+    const meet = await MeetModel.getOne(
+      { _id: meetId },
+      "MEET_STYLE_SET,MEET_TYPE_ID,MEET_TYPE_NAME",
+    );
+    if (!meet) this.AppError("课程不存在");
+
+    const cardService = new UserCardService();
+    const needTimes = cardService._getMeetCardTimes(meet);
+    const list = await cardService._listUsableCards(userId, needTimes, meet);
+    return { needTimes, list };
+  }
+
   async getUserCardDetail(cardId) {
     const cardService = new UserCardService();
     return await cardService.getCoachUserCardDetail(cardId);
@@ -369,6 +408,19 @@ class AdminCardService extends BaseAdminService {
   async adjustUserCard(input) {
     const cardService = new UserCardService();
     return await cardService.adjustCardManual(input);
+  }
+
+  /** 删除会员持卡（误发/测试卡等，保留流水记录） */
+  async deleteUserCard(cardId) {
+    await this._ensureCardCollections();
+    cardId = (cardId || "").trim();
+    if (!cardId) this.AppError("请选择会员卡");
+
+    const card = await UserCardModel.getOne({ _id: cardId }, "_id");
+    if (!card) this.AppError("会员卡不存在");
+
+    await UserCardModel.del({ _id: cardId });
+    return { cardId };
   }
 
   async getCardStats() {

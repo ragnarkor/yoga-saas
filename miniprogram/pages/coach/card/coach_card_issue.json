@@ -4,6 +4,7 @@
   "usingComponents": {
     "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt",
     "card-tpl-picker": "/cmpts/biz/card_tpl_picker/card_tpl_picker_cmpt",
+    "coach-picker": "/cmpts/biz/coach_picker/coach_picker_cmpt",
     "van-cell-group": "@vant/weapp/cell-group/index",
     "van-button": "@vant/weapp/button/index",
     "van-icon": "@vant/weapp/icon/index",

@@ -23,7 +23,9 @@
       wx:for="{{cardList}}"
       wx:key="id"
       data-id="{{item.id}}"
+      data-name="{{item.name}}"
       bindtap="bindCardTap"
+      bindlongpress="bindDeleteTap"
     >
       <view class="ucard-chip" style="background: {{item.color}};">
         <text>{{item.typeLabel}}</text>
@@ -33,7 +35,6 @@
         <view class="ucard-meta">{{item.balanceText}} · {{item.statusLabel}}</view>
         <view class="ucard-scope">{{item.scopeDesc || '全馆课程'}}</view>
       </view>
-      <van-icon name="arrow" size="32rpx" color="#ccc" />
     </view>
   </view>
 

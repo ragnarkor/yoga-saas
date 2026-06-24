@@ -3,6 +3,9 @@
   "navigationBarTitleText": "持卡管理",
   "enablePullDownRefresh": true,
   "usingComponents": {
-    "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt"
+    "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "van-button": "@vant/weapp/button/index"
   }
 }

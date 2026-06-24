@@ -37,6 +37,26 @@
   flex-shrink: 0;
 }
 
+.issue-form-row.coach-picker-field .coach-picker-label {
+  width: var(--issue-label-width);
+  max-width: var(--issue-label-width);
+  line-height: var(--cell-line-height, 48rpx);
+}
+
+.issue-form-row.coach-picker-field .coach-picker-value-wrap {
+  align-items: center;
+  min-height: var(--cell-line-height, 48rpx);
+}
+
+.issue-form-row.coach-picker-field .coach-picker-main {
+  justify-content: flex-end;
+}
+
+.issue-form-row.coach-picker-field .coach-picker-name {
+  line-height: var(--cell-line-height, 48rpx);
+  text-align: left;
+}
+
 .issue-form-row--memo {
   display: flex;
   align-items: flex-start;
@@ -50,6 +70,30 @@
 .issue-form-row--memo .course-edit-field-label-inline {
   margin-top: 4rpx;
   line-height: 1.4;
+}
+
+.issue-form-row.coach-picker-field {
+  align-items: center;
+}
+
+.issue-form-row.coach-picker-field .coach-picker-label {
+  width: var(--issue-label-width);
+  max-width: var(--issue-label-width);
+  line-height: var(--cell-line-height, 48rpx);
+}
+
+.issue-form-row.coach-picker-field .coach-picker-value-wrap {
+  align-items: center;
+  min-height: var(--cell-line-height, 48rpx);
+}
+
+.issue-form-row.coach-picker-field .coach-picker-main {
+  justify-content: flex-end;
+}
+
+.issue-form-row.coach-picker-field .coach-picker-name {
+  line-height: var(--cell-line-height, 48rpx);
+  text-align: left;
 }
 
 .issue-memo-input {

@@ -90,8 +90,10 @@ class AdminTenantService extends BaseAdminService {
       if (eq <= 0) continue;
       const id = seg.slice(0, eq).trim();
       const rest = seg.slice(eq + 1).trim();
-      const name = rest.split("|")[0].trim();
-      if (id && name) list.push({ id, name, isPrivate: name.indexOf("私教") >= 0 });
+      const segments = rest.split("|").map((s) => s.trim()).filter(Boolean);
+      const name = segments[0] || "";
+      const isPrivate = segments.includes("private");
+      if (id && name) list.push({ id, name, isPrivate });
     }
     return list;
   }
@@ -105,7 +107,9 @@ class AdminTenantService extends BaseAdminService {
         const id = String(c.id || idx + 1);
         const name = (c.name || "").trim();
         if (!name) return "";
-        return `${id}=${name}|leftbig3`;
+        const flags = ["leftbig3"];
+        if (c.isPrivate === true) flags.push("private");
+        return `${id}=${name}|${flags.join("|")}`;
       })
       .filter(Boolean)
       .join(",");

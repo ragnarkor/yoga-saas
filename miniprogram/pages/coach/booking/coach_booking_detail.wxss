@@ -507,6 +507,14 @@
   border-bottom: 1rpx solid #f0f0f0;
 }
 
+.bd-book-field.ucp-field .ucp-field-label {
+  width: 120rpx;
+}
+
+.bd-book-field.ucp-field .ucp-field-value-wrap {
+  flex: 1;
+}
+
 .bd-book-label {
   font-size: 28rpx;
   color: #646566;

@@ -177,35 +177,186 @@
       </view>
 
       <!-- 课程分类 -->
-      <view wx:if="{{activeTab === 2}}" class="store-panel store-panel--card">
+      <view wx:if="{{activeTab === 2}}" class="store-panel store-panel--card store-panel--categories">
+        <!-- 团课分类 -->
         <view class="store-section">
-          <view class="store-section-title">课程分类</view>
-          <view class="store-section-tip store-section-tip--inner">教练版「课程管理」顶部分类 Tab 由此配置</view>
+          <view class="store-section-title">团课分类</view>
+          <view class="store-section-tip store-section-tip--inner">课程管理 Tab；长按 ≡ 后可拖动排序</view>
 
-          <view class="store-cate-row" wx:for="{{categories}}" wx:key="id">
-            <text class="store-cate-id">{{item.id}}</text>
-            <input
-              wx:if="{{canEdit}}"
-              class="store-cate-input"
-              value="{{item.name}}"
-              placeholder="分类名称，如：特色课程"
-              data-index="{{index}}"
-              bindinput="bindCategoryNameInput"
-            />
-            <view wx:else class="store-cate-readonly">{{item.name}}</view>
-            <van-icon
-              wx:if="{{canEdit && categories.length > 1}}"
-              name="cross"
-              size="36rpx"
-              color="#999"
-              data-index="{{index}}"
-              bindtap="bindRemoveCategory"
-            />
+          <view wx:if="{{!groupRows.length}}" class="store-cate-empty">暂无团课分类</view>
+
+          <block wx:elif="{{canEdit && groupRows.length > 1}}">
+            <movable-area class="store-cate-area" style="height: {{groupAreaHeight}}px;">
+              <movable-view
+                wx:for="{{groupRows}}"
+                wx:key="id"
+                class="store-cate-mv {{item.dragEnabled ? 'is-dragging' : ''}}"
+                style="height: {{cateRowHeight}}px;"
+                direction="vertical"
+                disabled="{{!item.dragEnabled}}"
+                damping="40"
+                friction="2"
+                y="{{item.dragY}}"
+                data-section="group"
+                data-list-index="{{index}}"
+                bindchange="bindCategoryDragChange"
+                bindtouchend="bindCategoryDragEnd"
+              >
+                <view class="store-cate-row">
+                  <view
+                    class="store-cate-handle"
+                    data-section="group"
+                    data-list-index="{{index}}"
+                    catchlongpress="bindCateDragEnable"
+                  >
+                    <van-icon name="bars" size="32rpx" color="{{item.dragEnabled ? themeColor : '#c8c9cc'}}" />
+                  </view>
+                  <input
+                    class="store-cate-input"
+                    value="{{item.name}}"
+                    placeholder="分类名称"
+                    data-idx="{{item._idx}}"
+                    bindinput="bindCategoryNameInput"
+                  />
+                  <text class="store-cate-link" data-idx="{{item._idx}}" catchtap="bindMoveToPrivate">私教</text>
+                  <van-icon
+                    wx:if="{{categories.length > 1 && groupRows.length > 1}}"
+                    class="store-cate-del"
+                    name="cross"
+                    size="32rpx"
+                    color="#c8c9cc"
+                    data-idx="{{item._idx}}"
+                    catchtap="bindRemoveCategory"
+                  />
+                </view>
+              </movable-view>
+            </movable-area>
+          </block>
+
+          <block wx:else>
+            <view class="store-cate-row" wx:for="{{groupRows}}" wx:key="id">
+              <input
+                wx:if="{{canEdit}}"
+                class="store-cate-input"
+                value="{{item.name}}"
+                placeholder="分类名称"
+                data-idx="{{item._idx}}"
+                bindinput="bindCategoryNameInput"
+              />
+              <view wx:else class="store-cate-readonly">{{item.name}}</view>
+              <text wx:if="{{canEdit}}" class="store-cate-link" data-idx="{{item._idx}}" catchtap="bindMoveToPrivate">私教</text>
+              <van-icon
+                wx:if="{{canEdit && categories.length > 1 && groupRows.length > 1}}"
+                class="store-cate-del"
+                name="cross"
+                size="32rpx"
+                color="#c8c9cc"
+                data-idx="{{item._idx}}"
+                catchtap="bindRemoveCategory"
+              />
+            </view>
+          </block>
+
+          <view wx:if="{{canEdit}}" class="store-add" bindtap="bindAddGroupCategory">
+            <van-icon name="plus" size="28rpx" color="{{themeColor}}" />
+            <text>添加团课分类</text>
+          </view>
+        </view>
+
+        <!-- 私教分类 -->
+        <view class="store-section store-section--gap">
+          <view class="store-section-title">私教分类</view>
+          <view class="store-section-tip store-section-tip--inner">移入后出现在私教专区，支持灵活时间预约</view>
+
+          <view wx:if="{{!privateRows.length}}" class="store-cate-empty store-cate-empty--private">
+            <text>暂未设置私教分类</text>
+            <view wx:if="{{canEdit && groupRows.length}}" class="store-private-picks">
+              <text class="store-private-picks-label">从团课移入：</text>
+              <text
+                class="store-cate-link"
+                wx:for="{{groupRows}}"
+                wx:key="id"
+                data-idx="{{item._idx}}"
+                catchtap="bindMoveToPrivate"
+              >{{item.name || '未命名'}}</text>
+            </view>
           </view>
 
-          <view wx:if="{{canEdit}}" class="store-add" bindtap="bindAddCategory">
-            <van-icon name="plus" size="32rpx" color="{{themeColor}}" />
-            <text>添加分类</text>
+          <block wx:elif="{{canEdit && privateRows.length > 1}}">
+            <movable-area class="store-cate-area" style="height: {{privateAreaHeight}}px;">
+              <movable-view
+                wx:for="{{privateRows}}"
+                wx:key="id"
+                class="store-cate-mv {{item.dragEnabled ? 'is-dragging' : ''}}"
+                style="height: {{cateRowHeight}}px;"
+                direction="vertical"
+                disabled="{{!item.dragEnabled}}"
+                damping="40"
+                friction="2"
+                y="{{item.dragY}}"
+                data-section="private"
+                data-list-index="{{index}}"
+                bindchange="bindCategoryDragChange"
+                bindtouchend="bindCategoryDragEnd"
+              >
+                <view class="store-cate-row">
+                  <view
+                    class="store-cate-handle"
+                    data-section="private"
+                    data-list-index="{{index}}"
+                    catchlongpress="bindCateDragEnable"
+                  >
+                    <van-icon name="bars" size="32rpx" color="{{item.dragEnabled ? themeColor : '#c8c9cc'}}" />
+                  </view>
+                  <input
+                    class="store-cate-input"
+                    value="{{item.name}}"
+                    placeholder="私教分类名称"
+                    data-idx="{{item._idx}}"
+                    bindinput="bindCategoryNameInput"
+                  />
+                  <text class="store-cate-link store-cate-link--muted" data-idx="{{item._idx}}" catchtap="bindMoveToGroup">团课</text>
+                  <van-icon
+                    wx:if="{{categories.length > 1}}"
+                    class="store-cate-del"
+                    name="cross"
+                    size="32rpx"
+                    color="#c8c9cc"
+                    data-idx="{{item._idx}}"
+                    catchtap="bindRemoveCategory"
+                  />
+                </view>
+              </movable-view>
+            </movable-area>
+          </block>
+
+          <block wx:else>
+            <view class="store-cate-row" wx:for="{{privateRows}}" wx:key="id">
+              <input
+                wx:if="{{canEdit}}"
+                class="store-cate-input"
+                value="{{item.name}}"
+                placeholder="私教分类名称"
+                data-idx="{{item._idx}}"
+                bindinput="bindCategoryNameInput"
+              />
+              <view wx:else class="store-cate-readonly">{{item.name}}</view>
+              <text wx:if="{{canEdit}}" class="store-cate-link store-cate-link--muted" data-idx="{{item._idx}}" catchtap="bindMoveToGroup">团课</text>
+              <van-icon
+                wx:if="{{canEdit && categories.length > 1}}"
+                class="store-cate-del"
+                name="cross"
+                size="32rpx"
+                color="#c8c9cc"
+                data-idx="{{item._idx}}"
+                catchtap="bindRemoveCategory"
+              />
+            </view>
+          </block>
+
+          <view wx:if="{{canEdit}}" class="store-add" bindtap="bindAddPrivateCategory">
+            <van-icon name="plus" size="28rpx" color="{{themeColor}}" />
+            <text>添加私教分类</text>
           </view>
         </view>
       </view>

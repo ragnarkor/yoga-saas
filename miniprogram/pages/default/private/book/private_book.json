@@ -8,6 +8,8 @@
     "van-popup": "@vant/weapp/popup/index",
     "van-loading": "@vant/weapp/loading/index",
     "van-empty": "@vant/weapp/empty/index",
-    "van-button": "@vant/weapp/button/index"
+    "van-button": "@vant/weapp/button/index",
+    "coach-picker": "/cmpts/biz/coach_picker/coach_picker_cmpt",
+    "meet-course-picker": "/cmpts/biz/meet_course_picker/meet_course_picker_cmpt"
   }
 }

@@ -74,6 +74,26 @@ function formatCoursePickerItem(meet, index = 0) {
   };
 }
 
+function formatPrivateCoursePickerItem(course, index = 0) {
+  const duration = Number(course.duration) || 60;
+  const cover = defaultCoverHelper.pickDefaultCover(course._id);
+  const color = resolveCourseColor({}, course.typeId, index);
+  return {
+    _id: course._id,
+    title: course.title || '',
+    typeName: course.typeName || '',
+    typeId: course.typeId || '',
+    cover,
+    duration,
+    durationText: duration + '分钟',
+    teacherName: course.teacherName || '待定',
+    teacherId: course.teacherId || '',
+    desc: '',
+    color,
+    cardTimes: course.cardTimes,
+  };
+}
+
 function parseCourseMeta(meet, index = 0) {
   const styleSet = meet.MEET_STYLE_SET || {};
   const style = AdminMeetBiz.normalizeCourseStyleSet(styleSet);
@@ -175,6 +195,7 @@ module.exports = {
   buildDayDesc,
   resolveCourseColor,
   formatCoursePickerItem,
+  formatPrivateCoursePickerItem,
   parseCourseMeta,
   formatScheduleSlot,
   upsertTimeSlot,

@@ -7,7 +7,7 @@
     "van-loading": "@vant/weapp/loading/index",
     "van-button": "@vant/weapp/button/index",
     "van-cell-group": "@vant/weapp/cell-group/index",
-    "van-popup": "@vant/weapp/popup/index"
+    "meet-course-picker": "/cmpts/biz/meet_course_picker/meet_course_picker_cmpt"
   },
   "enablePullDownRefresh": true,
   "navigationStyle": "custom"

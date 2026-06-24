@@ -31,23 +31,55 @@ class UserProfileBiz {
     if (!formatted.startsWith("cloud://")) return formatted;
 
     try {
-      const tempUrlTask = wx.cloud
-        .getTempFileURL({ fileList: [formatted] })
-        .catch((err) => {
-          console.warn("[resolveAvatarUrl:getTempFileURL]", err);
-          return null;
-        });
-      const res = await Promise.race([
-        tempUrlTask,
-        new Promise((resolve) => setTimeout(() => resolve(null), 5000)),
-      ]);
-      if (!res) return formatted;
-      const item = res.fileList && res.fileList[0];
-      if (item && item.tempFileURL) return item.tempFileURL;
+      const map = await UserProfileBiz.resolveAvatarUrlMap([url]);
+      const resolved = map[url] || map[formatted] || "";
+      if (resolved && !resolved.startsWith("cloud://")) return resolved;
     } catch (err) {
       console.warn("[resolveAvatarUrl]", err);
     }
-    return formatted;
+    return "";
+  }
+
+  /** 批量解析 cloud:// 头像，避免列表页逐个请求超时 */
+  static async resolveAvatarUrlMap(urls) {
+    const map = {};
+    const unique = [...new Set((urls || []).filter(Boolean))];
+    const cloudItems = [];
+
+    for (const raw of unique) {
+      const formatted = pageHelper.fmtImgUrl(raw);
+      if (!formatted) continue;
+      if (
+        formatted.startsWith("http://") ||
+        formatted.startsWith("https://") ||
+        formatted.startsWith("wxfile://")
+      ) {
+        map[raw] = formatted;
+        continue;
+      }
+      if (formatted.startsWith("cloud://")) {
+        cloudItems.push({ raw, cloud: formatted });
+      }
+    }
+
+    for (let i = 0; i < cloudItems.length; i += 50) {
+      const chunk = cloudItems.slice(i, i + 50);
+      try {
+        const res = await wx.cloud.getTempFileURL({
+          fileList: chunk.map((c) => c.cloud),
+        });
+        for (const item of (res && res.fileList) || []) {
+          const hit = chunk.find((c) => c.cloud === item.fileID);
+          if (hit && item.tempFileURL) {
+            map[hit.raw] = item.tempFileURL;
+          }
+        }
+      } catch (err) {
+        console.warn("[resolveAvatarUrlMap]", err);
+      }
+    }
+
+    return map;
   }
 
   static hasAvatar(user, localAvatar) {

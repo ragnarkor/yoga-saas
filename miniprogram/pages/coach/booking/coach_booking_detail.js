@@ -32,10 +32,7 @@ Page({
     bookUserId: '',
     bookUserName: '',
     bookCardId: '',
-    bookCardName: '',
-    bookCards: [],
     bookMemo: '',
-    cardSheetShow: false,
   },
 
   onLoad(options) {
@@ -66,9 +63,6 @@ Page({
   },
 
   onShow() {
-    if (this.data.bookUserId && this.data.bookUserName) {
-      this._loadMemberCards();
-    }
     if (!this.data.loading && this.data.meetId) {
       this._loadRoster();
     }
@@ -95,22 +89,25 @@ Page({
       cancelled: groups.cancelled.length,
       total: groups.pending.length + groups.checked.length + groups.cancelled.length,
     };
+    const activeBooked = groups.pending.length + groups.checked.length;
+    const session = {
+      ...this.data.session,
+      booked: activeBooked,
+    };
     this.setData({
       sections: joinRosterHelper.buildSections(groups, this.data.activeFilter),
       displayList: joinRosterHelper.buildFlatList(groups, this.data.activeFilter),
       counts,
       capacityText: joinRosterHelper.buildCapacityText(
-        groups.pending.length + groups.checked.length,
+        activeBooked,
         this.data.session.limit,
       ),
       seatPercent: joinRosterHelper.buildSeatPercent(
-        groups.pending.length + groups.checked.length,
+        activeBooked,
         this.data.session.limit,
       ),
-      session: {
-        ...this.data.session,
-        booked: groups.pending.length + groups.checked.length,
-      },
+      session,
+      sessionStatus: joinRosterHelper.resolveSessionStatus(session),
     });
   },
 
@@ -157,10 +154,7 @@ Page({
 
       this._fullRawList = all;
       this._applyRoster();
-      this.setData({
-        loading: false,
-        sessionStatus: joinRosterHelper.resolveSessionStatus(this.data.session),
-      });
+      this.setData({ loading: false });
     } catch (e) {
       console.error(e);
       this.setData({ loading: false, sections: [], displayList: [] });
@@ -340,11 +334,44 @@ Page({
         { title: '取消中' },
       );
       wx.showToast({ title: '已取消本节', icon: 'success' });
-      this.setData({ cancelAllShow: false, activeFilter: 'cancelled' });
+      const session = { ...this.data.session, slotStatus: 0, booked: 0 };
+      this.setData({
+        cancelAllShow: false,
+        activeFilter: 'cancelled',
+        session,
+        sessionStatus: joinRosterHelper.resolveSessionStatus(session),
+      });
       this._loadRoster();
     } catch (e) {
       console.error(e);
     }
+  },
+
+  bindRestoreSlotTap() {
+    wx.showModal({
+      title: '恢复本节？',
+      content: '恢复后可继续代约，本节状态将变为可预约',
+      success: async (res) => {
+        if (!res.confirm) return;
+        const { meetId, mark } = this.data;
+        try {
+          await cloudHelper.callCloudSumbit(
+            'admin/meet_restore_time_slot',
+            { meetId, timeMark: mark },
+            { title: '恢复中' },
+          );
+          wx.showToast({ title: '已恢复本节', icon: 'success' });
+          const session = { ...this.data.session, slotStatus: 1 };
+          this.setData({
+            session,
+            sessionStatus: joinRosterHelper.resolveSessionStatus(session),
+          });
+          this._loadRoster();
+        } catch (err) {
+          console.error(err);
+        }
+      },
+    });
   },
 
   bindQrTap() {
@@ -386,50 +413,9 @@ Page({
     });
   },
 
-  async _loadMemberCards() {
-    if (!this.data.bookUserId) return;
-    try {
-      const res = await cloudHelper.callCloudData(
-        'admin/user_card_list',
-        { userId: this.data.bookUserId },
-        { hint: false },
-      );
-      const cards = ((res && res.list) || []).filter((c) => c.isActive || c.canBook);
-      const patch = { bookCards: cards };
-      if (cards.length === 1) {
-        patch.bookCardId = cards[0].id;
-        patch.bookCardName = cards[0].name;
-      }
-      this.setData(patch);
-    } catch (e) {
-      console.error(e);
-    }
-  },
-
-  bindCardTap() {
-    if (!this.data.bookUserId) {
-      wx.showToast({ title: '请先选择会员', icon: 'none' });
-      return;
-    }
-    if (!this.data.bookCards.length) {
-      wx.showToast({ title: '该会员暂无可用会员卡', icon: 'none' });
-      return;
-    }
-    this.setData({ cardSheetShow: true });
-  },
-
-  bindCardPick(e) {
-    const id = e.currentTarget.dataset.id;
-    const name = e.currentTarget.dataset.name || '';
-    this.setData({
-      cardSheetShow: false,
-      bookCardId: id,
-      bookCardName: name,
-    });
-  },
-
-  bindCloseCardSheet() {
-    this.setData({ cardSheetShow: false });
+  onBookCardPick(e) {
+    const { cardId } = e.detail || {};
+    this.setData({ bookCardId: cardId || '' });
   },
 
   bindBookMemoInput(e) {
@@ -467,8 +453,6 @@ Page({
         bookUserId: '',
         bookUserName: '',
         bookCardId: '',
-        bookCardName: '',
-        bookCards: [],
         bookMemo: '',
       });
       this._loadRoster();

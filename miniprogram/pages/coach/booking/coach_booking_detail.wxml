@@ -161,13 +161,14 @@
 
   <view class="bd-footer">
     <van-button
+      wx:if="{{session.slotStatus !== 0}}"
       round
       color="{{themeColor}}"
       custom-class="bd-footer-btn bd-footer-btn--primary"
       bind:click="bindBookTap"
     >代预约</van-button>
     <van-button
-      wx:if="{{counts.pending > 0}}"
+      wx:if="{{session.slotStatus !== 0 && counts.pending > 0}}"
       round
       color="{{themeColor}}"
       loading="{{batchCheckinLoading}}"
@@ -176,7 +177,21 @@
       bind:click="bindCheckinAllTap"
     >一键签到({{counts.pending}})</van-button>
     <van-button plain round color="{{themeColor}}" custom-class="bd-footer-btn" bind:click="bindQrTap">签到码</van-button>
-    <van-button plain round color="#969799" custom-class="bd-footer-btn" bind:click="bindCancelAllTap">取消本节</van-button>
+    <van-button
+      wx:if="{{session.slotStatus !== 0}}"
+      plain
+      round
+      color="#969799"
+      custom-class="bd-footer-btn"
+      bind:click="bindCancelAllTap"
+    >取消本节</van-button>
+    <van-button
+      wx:if="{{session.slotStatus === 0}}"
+      round
+      color="{{themeColor}}"
+      custom-class="bd-footer-btn bd-footer-btn--primary"
+      bind:click="bindRestoreSlotTap"
+    >恢复本节</van-button>
   </view>
 
   <!-- 取消单个预约弹窗 -->
@@ -231,13 +246,16 @@
             <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
           </view>
         </view>
-        <view class="bd-book-field" bindtap="bindCardTap">
-          <text class="bd-book-label">会员卡</text>
-          <view class="bd-book-value-row">
-            <text class="bd-book-value">{{bookCardName || '可选'}}</text>
-            <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
-          </view>
-        </view>
+        <user-card-picker
+          user-id="{{bookUserId}}"
+          meet-id="{{meetId}}"
+          value="{{bookCardId}}"
+          theme-color="{{themeColor}}"
+          label="会员卡"
+          placeholder="可选"
+          field-class="bd-book-field"
+          bind:pick="onBookCardPick"
+        />
         <view class="bd-book-memo">
           <textarea class="bd-sheet-textarea bd-book-memo-input" placeholder="备注（选填）" maxlength="50" value="{{bookMemo}}" bindinput="bindBookMemoInput" />
         </view>
@@ -245,18 +263,6 @@
       <view class="bd-sheet-btns bd-sheet-btns--book">
         <view class="bd-sheet-btn bd-sheet-btn--ghost" bindtap="bindCloseBookSheet">取消</view>
         <view class="bd-sheet-btn bd-sheet-btn--primary" bindtap="bindConfirmBookTap">{{bookSubmitting ? '提交中…' : '确认代约'}}</view>
-      </view>
-    </view>
-  </van-popup>
-
-  <van-popup show="{{cardSheetShow}}" position="bottom" round bind:close="bindCloseCardSheet" custom-class="bd-popup">
-    <view class="bd-sheet bd-sheet--book">
-      <text class="bd-sheet-title">选择会员卡</text>
-      <view class="bd-card-list">
-        <view class="bd-card-item" wx:for="{{bookCards}}" wx:key="id" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="bindCardPick">
-          <text>{{item.name}}</text>
-          <text class="bd-card-item-sub">{{item.balanceText}}</text>
-        </view>
       </view>
     </view>
   </van-popup>

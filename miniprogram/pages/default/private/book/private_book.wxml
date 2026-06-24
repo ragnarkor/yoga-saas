@@ -10,20 +10,25 @@
 
   <block wx:else>
     <view class="pb-section">
-      <view class="pb-field" bindtap="bindCourseTap">
-        <text class="pb-label">私教课程</text>
-        <view class="pb-value-row">
-          <text class="pb-value">{{form.courseName || '请选择'}}</text>
-          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-      </view>
-      <view class="pb-field" bindtap="bindTeacherTap">
-        <text class="pb-label">授课教练</text>
-        <view class="pb-value-row">
-          <text class="pb-value">{{form.teacherName || '请选择'}}</text>
-          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-      </view>
+      <meet-course-picker
+        value="{{form.meetId}}"
+        courses="{{courses}}"
+        load-from="none"
+        theme-color="{{themeColor}}"
+        label="私教课程"
+        sheet-title="选择私教课程"
+        placeholder="请选择"
+        field-class="mcp-in-section"
+        bind:pick="onCoursePick"
+      />
+      <coach-picker
+        id-mode="teacher"
+        value="{{form.teacherId}}"
+        theme-color="{{themeColor}}"
+        label="授课教练"
+        field-class="pb-field"
+        bind:pick="onCoachPick"
+      />
     </view>
 
     <view class="pb-section">
@@ -83,42 +88,6 @@
       </van-button>
     </view>
   </block>
-
-  <van-popup show="{{courseSheetShow}}" position="bottom" round bind:close="bindCloseCourseSheet">
-    <view class="pb-sheet">
-      <view class="pb-sheet-title">选择私教课程</view>
-      <scroll-view scroll-y class="pb-sheet-scroll">
-        <view
-          class="pb-sheet-item {{form.meetId === item._id ? 'is-active' : ''}}"
-          wx:for="{{courses}}"
-          wx:key="_id"
-          data-id="{{item._id}}"
-          bindtap="bindCoursePick"
-        >
-          <text>{{item.title}}</text>
-          <text class="pb-sheet-sub">{{item.duration}}分钟</text>
-        </view>
-      </scroll-view>
-    </view>
-  </van-popup>
-
-  <van-popup show="{{teacherSheetShow}}" position="bottom" round bind:close="bindCloseTeacherSheet">
-    <view class="pb-sheet">
-      <view class="pb-sheet-title">选择教练</view>
-      <scroll-view scroll-y class="pb-sheet-scroll">
-        <view
-          class="pb-sheet-item {{form.teacherId === item._id ? 'is-active' : ''}}"
-          wx:for="{{teachers}}"
-          wx:key="_id"
-          data-id="{{item._id}}"
-          bindtap="bindTeacherPick"
-        >
-          <text>{{item.name}}</text>
-          <text wx:if="{{item.specialty}}" class="pb-sheet-sub">{{item.specialty}}</text>
-        </view>
-      </scroll-view>
-    </view>
-  </van-popup>
 
   <van-popup show="{{cardSheetShow}}" position="bottom" round bind:close="bindCloseCardSheet">
     <view class="pb-card-sheet">

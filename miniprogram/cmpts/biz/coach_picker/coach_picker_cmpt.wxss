@@ -1,0 +1,129 @@
+.coach-picker-field.course-edit-field--inline {
+  display: flex;
+  align-items: center;
+}
+
+.coach-picker-label {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.coach-picker-value-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8rpx;
+}
+
+.coach-picker-main {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.coach-picker-avatar-wrap {
+  flex-shrink: 0;
+}
+
+.coach-picker-avatar {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: #f2f3f5;
+}
+
+.coach-picker-avatar--ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coach-picker-name {
+  flex: 0 1 auto;
+  min-width: 0;
+  text-align: left;
+  font-size: var(--cell-font-size, 28rpx);
+  line-height: 1.2;
+  color: #323233;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coach-picker-name--placeholder {
+  color: #969799;
+}
+
+.coach-picker-sheet {
+  padding: 24rpx 0 calc(24rpx + env(safe-area-inset-bottom));
+  max-height: 70vh;
+}
+
+.coach-picker-sheet-head {
+  padding: 8rpx 32rpx 16rpx;
+}
+
+.coach-picker-sheet-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #323233;
+}
+
+.coach-picker-scroll {
+  max-height: 52vh;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+.coach-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 12rpx;
+  border-radius: 16rpx;
+  background: #f7f8fa;
+}
+
+.coach-picker-item.is-active {
+  background: var(--projectColorLight, #e5f1ec);
+}
+
+.coach-picker-item-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #eee;
+}
+
+.coach-picker-item-avatar--ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coach-picker-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.coach-picker-item-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #323233;
+}
+
+.coach-picker-item-sub {
+  font-size: 24rpx;
+  color: #969799;
+}

@@ -1,5 +1,7 @@
 const cloudHelper = require("../../../helper/cloud_helper.js");
 const AdminWxBiz = require("../../../biz/admin_wx_biz.js");
+const cardScopeHelper = require("../../../helper/card_scope_helper.js");
+const meetCategoryHelper = require("../../../helper/meet_category_helper.js");
 
 // [AI_START TIMESTAMP=2025-01-27 16:00:00]
 /**
@@ -56,6 +58,7 @@ Component({
     selectedTpl: null,
     sheetShow: false,
     loading: true,
+    categories: [],
   },
 
   observers: {
@@ -78,15 +81,17 @@ Component({
           this.setData({ loading: false });
           return;
         }
-        const res = await cloudHelper.callCloudData(
-          "admin/card_tpl_list",
-          {},
-          { hint: false },
+        const [res, storeRes] = await Promise.all([
+          cloudHelper.callCloudData("admin/card_tpl_list", {}, { hint: false }),
+          cloudHelper.callCloudData("admin/tenant_store", {}, { hint: false }).catch(() => null),
+        ]);
+        const categories = meetCategoryHelper.resolveCategoryList(
+          (storeRes && storeRes.categories) || [],
         );
         const tplList = ((res && res.list) || []).map((item) =>
-          this._formatTplItem(item),
+          this._formatTplItem(item, categories),
         );
-        this.setData({ tplList, loading: false });
+        this.setData({ tplList, categories, loading: false });
         // 如果外部已传入 value，同步选中项
         if (this.data.value) {
           this._syncSelected(this.data.value);
@@ -97,7 +102,14 @@ Component({
       }
     },
 
-    _formatTplItem(item) {
+    _formatTplItem(item, categories) {
+      const cats = categories || this.data.categories || [];
+      const scope = cardScopeHelper.normalizeScope(
+        item.scope || item.CARD_TPL_SCOPE,
+      );
+      const scopeDesc =
+        item.scopeDesc ||
+        cardScopeHelper.buildScopeDesc(scope, cats);
       const metaTags = [];
       if (item.CARD_TPL_DAYS) {
         metaTags.push({
@@ -120,7 +132,14 @@ Component({
           value: "¥" + item.CARD_TPL_PRICE,
         });
       }
-      return { ...item, metaTags };
+      if (scopeDesc && scopeDesc !== "全馆课程") {
+        metaTags.push({
+          key: "scope",
+          label: "适用",
+          value: scopeDesc,
+        });
+      }
+      return { ...item, scope, scopeDesc, metaTags };
     },
 
     _syncSelected(tplId) {

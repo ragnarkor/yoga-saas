@@ -1,15 +1,10 @@
 /**
- * 私教分类识别
+ * 私教分类识别（仅显式 isPrivate / scheduleMode，不再按名称推断）
  */
-
-function isPrivateCategoryName(name) {
-  return String(name || "").indexOf("私教") >= 0;
-}
 
 function isPrivateCategory(cat) {
   if (!cat) return false;
-  if (cat.isPrivate === true) return true;
-  return isPrivateCategoryName(cat.name || cat.label || "");
+  return cat.isPrivate === true;
 }
 
 function filterPrivateCategories(categories) {
@@ -28,11 +23,10 @@ function isPrivateMeet(meet, privateCategoryIds) {
   if (privateCategoryIds && privateCategoryIds.length) {
     return privateCategoryIds.includes(typeId);
   }
-  return isPrivateCategoryName(meet.MEET_TYPE_NAME || "");
+  return false;
 }
 
 module.exports = {
-  isPrivateCategoryName,
   isPrivateCategory,
   filterPrivateCategories,
   getPrivateCategoryIds,

@@ -1,0 +1,53 @@
+<view class="coach-picker-field course-edit-field course-edit-field--inline field-class" bindtap="bindFieldTap">
+  <view class="coach-picker-label course-edit-field-label-inline {{required ? 'course-edit-field-label-inline--required' : ''}}">{{label}}</view>
+  <view class="coach-picker-value-wrap course-edit-field-row course-edit-field-row--inline">
+    <view class="coach-picker-main">
+      <view class="coach-picker-avatar-wrap">
+        <image
+          wx:if="{{selectedCoach && selectedCoach.avatarSrc}}"
+          class="coach-picker-avatar"
+          src="{{selectedCoach.avatarSrc}}"
+          mode="aspectFill"
+        />
+        <view wx:else class="coach-picker-avatar coach-picker-avatar--ph">
+          <van-icon name="user-o" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+      <view class="coach-picker-name {{selectedCoach ? '' : 'coach-picker-name--placeholder'}}">{{displayText}}</view>
+    </view>
+    <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+  </view>
+</view>
+
+<van-popup show="{{sheetShow}}" position="bottom" round bind:close="bindCloseSheet" custom-class="coach-picker-popup">
+  <view class="coach-picker-sheet">
+    <view class="coach-picker-sheet-head">
+      <text class="coach-picker-sheet-title">选择教练</text>
+    </view>
+    <scroll-view scroll-y class="coach-picker-scroll" enhanced show-scrollbar="{{false}}">
+      <view
+        class="coach-picker-item {{value === item.pickId ? 'is-active' : ''}}"
+        wx:for="{{coachList}}"
+        wx:key="pickId"
+        data-id="{{item.pickId}}"
+        bindtap="bindCoachPick"
+      >
+        <image
+          wx:if="{{item.avatarSrc}}"
+          class="coach-picker-item-avatar"
+          src="{{item.avatarSrc}}"
+          mode="aspectFill"
+        />
+        <view wx:else class="coach-picker-item-avatar coach-picker-item-avatar--ph">
+          <van-icon name="user-o" size="36rpx" color="#c8c9cc" />
+        </view>
+        <view class="coach-picker-item-info">
+          <text class="coach-picker-item-name">{{item.name}}</text>
+          <text wx:if="{{item.specialty}}" class="coach-picker-item-sub">{{item.specialty}}</text>
+        </view>
+        <van-icon wx:if="{{value === item.pickId}}" name="success" size="36rpx" color="{{themeColor}}" />
+      </view>
+      <van-empty wx:if="{{!loading && !coachList.length}}" description="暂无可用教练" />
+    </scroll-view>
+  </view>
+</van-popup>

@@ -57,15 +57,12 @@ Page({
       );
       const list = (res && res.list) || [];
       const total = (res && res.total) || list.length;
-      const memberList = await Promise.all(
-        list.map(async (item) => {
-          let avatarSrc = '';
-          if (item.USER_PIC) {
-            avatarSrc = await UserProfileBiz.resolveAvatarUrl(item.USER_PIC);
-          }
-          return { ...item, avatarSrc };
-        }),
-      );
+      const picUrls = list.map((item) => item.USER_PIC).filter(Boolean);
+      const avatarMap = await UserProfileBiz.resolveAvatarUrlMap(picUrls);
+      const memberList = list.map((item) => ({
+        ...item,
+        avatarSrc: item.USER_PIC ? avatarMap[item.USER_PIC] || '' : '',
+      }));
       this.setData({
         memberList,
         total,
@@ -124,15 +121,18 @@ Page({
     const pages = getCurrentPages();
     const prev = pages.length > 1 ? pages[pages.length - 2] : null;
     if (prev && typeof prev.setData === 'function') {
-      prev.setData({
+      const patch = {
         userId,
         userName,
         bookUserId: userId,
         bookUserName: userName,
-      });
-      if (typeof prev._loadMemberCards === 'function') {
-        prev._loadMemberCards();
+        bookCardId: '',
+      };
+      if (prev.data && prev.data.form) {
+        patch['form.cardId'] = '';
+        patch['form.cardName'] = '';
       }
+      prev.setData(patch);
     }
     wx.navigateBack();
   },
