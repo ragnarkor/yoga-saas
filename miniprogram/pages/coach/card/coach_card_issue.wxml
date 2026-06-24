@@ -12,11 +12,16 @@
   </view>
 
   <block wx:else>
-    <van-cell-group custom-class="course-edit-group">
-      <van-cell title="会员" value="{{userName || '—'}}" />
+    <van-cell-group custom-class="course-edit-group issue-form-group">
+      <view class="course-edit-field course-edit-field--inline issue-form-row">
+        <text class="course-edit-field-label-inline">会员</text>
+        <view class="course-edit-field-row course-edit-field-row--inline">
+          <text class="course-edit-field-value">{{userName || '—'}}</text>
+        </view>
+      </view>
 
-      <view class="course-edit-field course-edit-field--inline" bindtap="bindTplFieldTap">
-        <text class="course-edit-field-label-inline">会员卡<text class="course-edit-required">*</text></text>
+      <view class="course-edit-field course-edit-field--inline issue-form-row" bindtap="bindTplFieldTap">
+        <view class="course-edit-field-label-inline course-edit-field-label-inline--required">会员卡</view>
         <view class="course-edit-field-row course-edit-field-row--inline">
           <text class="course-edit-field-value {{selectedTpl ? '' : 'course-edit-field-value--placeholder'}}">
             {{selectedTpl ? selectedTpl.CARD_TPL_NAME : '请选择会员卡'}}
@@ -40,7 +45,7 @@
         </view>
       </view>
 
-      <view class="course-edit-field course-edit-field--inline" bindtap="bindActivateFieldTap">
+      <view class="course-edit-field course-edit-field--inline issue-form-row" bindtap="bindActivateFieldTap">
         <text class="course-edit-field-label-inline">激活方式</text>
         <view class="course-edit-field-row course-edit-field-row--inline">
           <text class="course-edit-field-value">{{form.activateLabel}}</text>
@@ -48,17 +53,27 @@
         </view>
       </view>
 
-      <van-cell title="归属教练" is-link value="{{form.coachName || '请选择'}}" bind:click="bindCoachTap" />
-      <van-field
-        label="备注"
-        type="textarea"
-        value="{{form.memo}}"
-        placeholder="选填（最多50字）"
-        maxlength="50"
-        autosize
-        bind:change="bindFieldChange"
-        data-field="memo"
-      />
+      <view class="course-edit-field course-edit-field--inline issue-form-row" bindtap="bindCoachTap">
+        <text class="course-edit-field-label-inline">归属教练</text>
+        <view class="course-edit-field-row course-edit-field-row--inline">
+          <text class="course-edit-field-value {{form.coachName ? '' : 'course-edit-field-value--placeholder'}}">
+            {{form.coachName || '请选择'}}
+          </text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
+      <view class="course-edit-field issue-form-row issue-form-row--memo">
+        <text class="course-edit-field-label-inline">备注</text>
+        <textarea
+          class="issue-memo-input"
+          value="{{form.memo}}"
+          placeholder="选填（最多50字）"
+          maxlength="50"
+          auto-height
+          bindinput="bindMemoInput"
+        />
+      </view>
     </van-cell-group>
   </block>
 

@@ -1,6 +1,48 @@
 @import "../coach_member_card.wxss";
 @import "../course/coach_course_edit.wxss";
 
+.issue-form-group {
+  --issue-label-width: 6.2em;
+}
+
+.issue-form-row {
+  box-sizing: border-box;
+}
+
+.issue-form-row .course-edit-field-label-inline {
+  width: var(--issue-label-width);
+  max-width: var(--issue-label-width);
+}
+
+.issue-form-row--memo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cell-horizontal-padding, 32rpx);
+  padding: var(--cell-vertical-padding, 24rpx) var(--cell-horizontal-padding, 32rpx);
+  background: #fff;
+  border-bottom: 1rpx solid var(--neutralBorder, #ebedf0);
+}
+
+.issue-form-row--memo .course-edit-field-label-inline {
+  margin-top: 4rpx;
+  line-height: 1.4;
+}
+
+.issue-memo-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 72rpx;
+  padding: 0;
+  font-size: var(--cell-font-size, 28rpx);
+  color: #323233;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.issue-memo-input::placeholder {
+  color: #969799;
+}
+
 .issue-loading {
   /* 见 coach_common.wxss */
 }
@@ -10,7 +52,8 @@
 }
 
 .issue-tpl-preview {
-  padding: 0 36rpx 24rpx;
+  padding: 0 var(--cell-horizontal-padding, 32rpx) 24rpx;
+  padding-left: calc(var(--cell-horizontal-padding, 32rpx) + var(--issue-label-width, 6.2em) + var(--cell-horizontal-padding, 32rpx));
   background: #fff;
   border-bottom: 1rpx solid #ebedf0;
 }

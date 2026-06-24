@@ -89,11 +89,8 @@ Page({
     this.setData({ selectedTplId: tplId, selectedTpl });
   },
 
-  bindFieldChange(e) {
-    const field = e.currentTarget.dataset.field;
-    const val = e.detail;
-    if (!field) return;
-    this.setData({ [`form.${field}`]: val });
+  bindMemoInput(e) {
+    this.setData({ 'form.memo': e.detail.value || '' });
   },
 
   bindTplFieldTap() {

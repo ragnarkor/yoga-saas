@@ -3,11 +3,11 @@
  */
 
 const DEFAULT_COVERS = [
-  "/images/default_cover_1.png",
-  "/images/default_cover_2.png",
-  "/images/default_cover_3.png",
-  "/images/default_cover_4.png",
-  "/images/default_cover_5.png",
+  "/images/default_cover_1.jpg",
+  "/images/default_cover_2.jpg",
+  "/images/default_cover_3.jpg",
+  "/images/default_cover_4.jpg",
+  "/images/default_cover_5.jpg",
 ];
 
 function hashStr(str) {
@@ -36,7 +36,7 @@ function isLegacyDefaultCover(url) {
   if (!url || typeof url !== "string") return true;
   const trimmed = url.trim();
   if (!trimmed) return true;
-  return /default_cover_pic\.(gif|png)/i.test(trimmed);
+  return /default_cover_pic\.(gif|png|jpg|jpeg)/i.test(trimmed);
 }
 
 /** 解析封面：空值、旧 gif、历史占位路径 → 按 seed 选一张本地图 */
