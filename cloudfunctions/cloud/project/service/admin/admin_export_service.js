@@ -10,11 +10,13 @@ const timeUtil = require("../../../framework/utils/time_util.js");
 const MeetModel = require("../../model/meet_model.js");
 const JoinModel = require("../../model/join_model.js");
 const UserModel = require("../../model/user_model.js");
+const AdminStatsService = require("./admin_stats_service.js");
 
 const DataService = require("./../data_service");
 
 const EXPORT_JOIN_DATA_KEY = "join_data";
 const EXPORT_USER_DATA_KEY = "user_data";
+const EXPORT_INCOME_DATA_KEY = "income_data";
 
 class AdminExportService extends BaseAdminService {
   /**获取报名数据 */
@@ -162,6 +164,74 @@ class AdminExportService extends BaseAdminService {
       EXPORT_USER_DATA_KEY,
       "客户数据",
       list.length,
+      data,
+    );
+  }
+
+  /** 获取耗卡收入导出文件 */
+  async getIncomeDataURL() {
+    let dataService = new DataService();
+    return await dataService.getExportDataURL(EXPORT_INCOME_DATA_KEY);
+  }
+
+  /** 删除耗卡收入导出文件 */
+  async deleteIncomeDataExcel() {
+    let dataService = new DataService();
+    return await dataService.deleteDataExcel(EXPORT_INCOME_DATA_KEY);
+  }
+
+  /** 导出耗卡收入明细 */
+  async exportIncomeDataExcel({ startDay, endDay }) {
+    let statsService = new AdminStatsService();
+    let entries = await statsService.buildIncomeEntries();
+    let filtered = entries.filter((item) =>
+      statsService._inDateRange(item.date, startDay, endDay),
+    );
+
+    let totalAmount = 0;
+    let data = [];
+    data.push([
+      "上课日期",
+      "会员",
+      "卡名称",
+      "卡类型",
+      "课程",
+      "说明",
+      "金额(元)",
+      "授课教练",
+    ]);
+
+    for (let item of filtered) {
+      totalAmount += item.amount;
+      data.push([
+        item.date,
+        item.userName,
+        item.cardName,
+        item.cardTypeLabel,
+        item.meetTitle,
+        item.subtitle,
+        item.amountText,
+        item.coachName || "",
+      ]);
+    }
+
+    data.push([]);
+    data.push([
+      "合计",
+      "",
+      "",
+      "",
+      "",
+      filtered.length + "条",
+      statsService._formatMoney(totalAmount),
+      "",
+    ]);
+
+    let dataService = new DataService();
+    return await dataService.exportDataExcel(
+      EXPORT_INCOME_DATA_KEY,
+      "耗卡收入",
+      filtered.length,
       data,
     );
   }

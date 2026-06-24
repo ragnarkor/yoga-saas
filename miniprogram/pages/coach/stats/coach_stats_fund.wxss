@@ -1,1 +1,213 @@
 @import "./coach_stats.wxss";
+@import "../course/coach_course_edit.wxss";
+@import "./coach_stats_export.wxss";
+
+.income-page {
+  padding-bottom: 48rpx;
+}
+
+.income-main-tabs {
+  display: flex;
+  margin: 20rpx 24rpx 0;
+  padding: 8rpx;
+  background: var(--neutralIconBg, #f2f3f5);
+  border-radius: 20rpx;
+}
+
+.income-main-tab {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: var(--neutralTextSecondary, #646a73);
+  border-radius: 16rpx;
+  transition: all 0.2s ease;
+}
+
+.income-main-tab.is-active {
+  background: var(--neutralSurface, #fff);
+  color: var(--themeColor, #5b8a72);
+  font-weight: 700;
+  box-shadow: 0 4rpx 16rpx rgba(31, 35, 41, 0.08);
+}
+
+.income-range-tabs {
+  display: flex;
+  margin: 20rpx 24rpx 0;
+  padding: 6rpx;
+  background: var(--neutralSurface, #fff);
+  border-radius: 18rpx;
+  box-shadow: var(--neutralShadow, 0 2rpx 12rpx rgba(31, 35, 41, 0.06));
+}
+
+.income-range-tab {
+  flex: 1;
+  height: 76rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--neutralTextSecondary, #646a73);
+  border-radius: 14rpx;
+  border: 2rpx solid transparent;
+  box-sizing: border-box;
+}
+
+.income-range-tab.is-active {
+  color: #fff;
+  font-weight: 700;
+}
+
+.income-metrics {
+  margin: 20rpx 24rpx 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.income-metric-card {
+  padding: 32rpx 28rpx;
+  background: var(--neutralSurface, #fff);
+  border-radius: var(--radius-xl, 24rpx);
+  box-shadow: var(--neutralShadow, 0 2rpx 12rpx rgba(31, 35, 41, 0.06));
+}
+
+.income-metric-card--primary {
+  background: linear-gradient(
+    145deg,
+    var(--projectColorLight, #e8f2ed) 0%,
+    var(--neutralSurface, #fff) 100%
+  );
+  border: 2rpx solid var(--projectColorLight, #e8f2ed);
+}
+
+.income-metric-label {
+  font-size: 26rpx;
+  color: var(--neutralTextTertiary, #8f959e);
+}
+
+.income-metric-num {
+  margin-top: 12rpx;
+  font-size: 52rpx;
+  font-weight: 700;
+  color: var(--themeColor, #5b8a72);
+  line-height: 1.15;
+}
+
+.income-metric-num--secondary {
+  font-size: 44rpx;
+  color: var(--neutralText, #1f2329);
+}
+
+.income-metric-sub {
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  color: var(--neutralTextSecondary, #646a73);
+  line-height: 1.5;
+}
+
+.income-hero-tip {
+  margin: 16rpx 24rpx 8rpx;
+  padding: 0 8rpx;
+  font-size: 22rpx;
+  color: var(--neutralTextTertiary, #8f959e);
+  line-height: 1.5;
+}
+
+.income-trend-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.income-trend-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 12rpx;
+  padding: 8rpx 24rpx 24rpx;
+  min-height: 240rpx;
+}
+
+.income-trend-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 72rpx;
+  flex-shrink: 0;
+}
+
+.income-trend-bar-wrap {
+  width: 100%;
+  height: 140rpx;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.income-trend-bar {
+  width: 28rpx;
+  min-height: 4rpx;
+  border-radius: 8rpx 8rpx 4rpx 4rpx;
+  transition: height 0.25s ease;
+}
+
+.income-trend-label {
+  margin-top: 10rpx;
+  font-size: 20rpx;
+  color: var(--neutralTextTertiary, #8f959e);
+  white-space: nowrap;
+}
+
+.income-trend-amt {
+  margin-top: 4rpx;
+  font-size: 18rpx;
+  color: var(--neutralTextSecondary, #646a73);
+  white-space: nowrap;
+}
+
+.income-list-row {
+  padding-top: 20rpx;
+  padding-bottom: 20rpx;
+}
+
+.income-list-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.income-list-head .stats-list-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.income-list-amount {
+  flex-shrink: 0;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--themeColor, #5b8a72);
+}
+
+.income-loading-more {
+  display: flex;
+  justify-content: center;
+  padding: 24rpx;
+}
+
+.income-export-intro {
+  margin: 20rpx 24rpx 0;
+  padding: 24rpx 28rpx;
+  background: var(--projectColorLight, #e8f2ed);
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  color: var(--neutralTextSecondary, #646a73);
+  line-height: 1.6;
+}
+
+.income-export-group {
+  margin: 0 !important;
+}

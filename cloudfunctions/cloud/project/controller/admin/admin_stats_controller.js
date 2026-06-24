@@ -31,10 +31,14 @@ class AdminStatsController extends BaseAdminController {
   async getFundDetails() {
     await this.isAdmin();
     let rules = {
+      range: "string|false|default=month",
       page: "required|int|default=1",
       size: "int|default=20",
     };
     let input = this.validateData(rules);
+    if (!["today", "month", "all"].includes(input.range)) {
+      input.range = "month";
+    }
     let service = new AdminStatsService();
     return await service.getFundDetails(input);
   }

@@ -1,5 +1,5 @@
 <page-meta page-style="{{themeStyle}}" />
-<view class="coach-page stats-page">
+<view class="coach-page stats-page income-page">
   <coach-tenant-switch
     title="{{navTitle}}"
     show-back="{{true}}"
@@ -8,27 +8,197 @@
     bind:change="bindCoachTenantChange"
   />
 
-  <view class="stats-summary-card">
-    <view class="stats-summary-item">
-      <view class="stats-summary-num">¥{{totalAmount}}</view>
-      <view class="stats-summary-label">累计发卡金额</view>
-    </view>
-    <view class="stats-summary-item">
-      <view class="stats-summary-num">¥{{monthAmount}}</view>
-      <view class="stats-summary-label">本月发卡金额</view>
+  <view class="income-main-tabs">
+    <view
+      class="income-main-tab {{pageTab === item.key ? 'is-active' : ''}}"
+      wx:for="{{mainTabs}}"
+      wx:key="key"
+      data-tab="{{item.key}}"
+      bindtap="bindMainTabTap"
+    >
+      {{item.label}}
     </view>
   </view>
 
-  <view class="stats-section">
-    <view class="stats-section-title">明细记录</view>
-    <view wx:if="{{loading && list.length === 0}}" class="stats-loading">
+  <block wx:if="{{pageTab === 'stats'}}">
+    <view class="income-range-tabs">
+      <view
+        class="income-range-tab {{range === item.key ? 'is-active' : ''}}"
+        wx:for="{{rangeTabs}}"
+        wx:key="key"
+        data-range="{{item.key}}"
+        bindtap="bindRangeTap"
+        style="{{range === item.key ? 'background:' + themeColor + ';border-color:' + themeColor + ';' : ''}}"
+      >
+        {{item.label}}
+      </view>
+    </view>
+
+    <view class="income-metrics">
+      <view class="income-metric-card income-metric-card--primary">
+        <view class="income-metric-label">{{rangeLabel}}耗卡收入</view>
+        <view class="income-metric-num">¥{{totalAmountText}}</view>
+        <view class="income-metric-sub">
+          次卡 ¥{{timesAmountText}} · 期限卡 ¥{{periodAmountText}}
+        </view>
+      </view>
+
+      <view class="income-metric-card">
+        <view class="income-metric-label">{{rangeLabel}}发卡金额</view>
+        <view class="income-metric-num income-metric-num--secondary">¥{{saleAmountText}}</view>
+        <view class="income-metric-sub">
+          共 {{saleCardCount}} 张 · 次卡 ¥{{saleTimesAmountText}} · 期限卡 ¥{{salePeriodAmountText}}
+        </view>
+      </view>
+    </view>
+
+    <view class="income-hero-tip">
+      耗卡收入按实际上课确认；发卡金额按售卡记录统计（预收款参考）
+    </view>
+
+    <view class="stats-section" wx:if="{{showTrend}}">
+      <view class="stats-section-title">{{range === 'month' ? '本月耗卡趋势' : '近12月耗卡趋势'}}</view>
+      <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="income-trend-scroll">
+        <view class="income-trend-bars">
+          <view class="income-trend-item" wx:for="{{trend}}" wx:key="day">
+            <view class="income-trend-bar-wrap">
+              <view
+                class="income-trend-bar"
+                style="height: {{item.barPct}}%; background: {{themeColor}};"
+              ></view>
+            </view>
+            <text class="income-trend-label">{{item.label}}</text>
+            <text class="income-trend-amt">¥{{item.amountText}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="stats-section">
+      <view class="stats-section-title">耗卡收入明细</view>
+      <view wx:if="{{loading && list.length === 0}}" class="stats-loading">
+        <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+      </view>
+      <view wx:elif="{{list.length === 0}}" class="stats-empty">暂无记录</view>
+      <view class="stats-list-row income-list-row" wx:for="{{list}}" wx:key="logId">
+        <view class="income-list-head">
+          <text class="stats-list-title">{{item.meetTitle || item.cardName}}</text>
+          <text class="income-list-amount">¥{{item.amountText}}</text>
+        </view>
+        <view class="stats-list-meta">{{item.userName}} · {{item.date}}</view>
+        <view class="stats-list-meta">
+          {{item.cardName}} · {{item.cardTypeLabel}} · {{item.subtitle}}
+        </view>
+        <view wx:if="{{item.coachName}}" class="stats-list-meta">授课 {{item.coachName}}</view>
+      </view>
+      <view wx:if="{{loading && list.length > 0}}" class="income-loading-more">
+        <van-loading size="36rpx" color="{{themeColor}}" />
+      </view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view wx:if="{{exportLoading}}" class="stats-loading">
       <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
     </view>
-    <view wx:elif="{{list.length === 0}}" class="stats-empty">暂无记录</view>
-    <view class="stats-list-row" wx:for="{{list}}" wx:key="index">
-      <view class="stats-list-title">{{item.cardName}}</view>
-      <view class="stats-list-meta">{{item.userName}} · {{item.date}}</view>
-      <view class="stats-list-meta">金额：<text style="color:var(--themeColor,#5b8a72);font-weight:600;">¥{{item.amount}}</text></view>
-    </view>
-  </view>
+
+    <block wx:else>
+      <view class="income-export-intro">
+        按上课日期导出耗卡收入明细（Excel）。日期范围默认跟随当前统计 Tab（今日/本月/累计），也可手动调整。
+      </view>
+
+      <van-cell-group custom-class="income-export-group">
+        <view class="course-edit-field course-edit-field--inline">
+          <text class="course-edit-field-label-inline">起始日期</text>
+          <cmpt-picker-time
+            mark="exportStartDay"
+            mode="day"
+            bind:select="url"
+            data-type="picker"
+            data-item="exportStartDay"
+            startYear="2021"
+            endYear="{{endYear}}"
+            item="{{exportStartDay}}"
+          >
+            <view class="course-edit-field-row course-edit-field-row--inline">
+              <text class="course-edit-field-value">{{exportStartDay || '请选择'}}</text>
+              <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+            </view>
+          </cmpt-picker-time>
+        </view>
+
+        <view class="course-edit-field course-edit-field--inline">
+          <text class="course-edit-field-label-inline">终止日期</text>
+          <cmpt-picker-time
+            mark="exportEndDay"
+            mode="day"
+            bind:select="url"
+            data-type="picker"
+            data-item="exportEndDay"
+            startYear="2021"
+            endYear="{{endYear}}"
+            item="{{exportEndDay}}"
+          >
+            <view class="course-edit-field-row course-edit-field-row--inline">
+              <text class="course-edit-field-value">{{exportEndDay || '请选择'}}</text>
+              <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+            </view>
+          </cmpt-picker-time>
+        </view>
+      </van-cell-group>
+
+      <view class="export-section-title">下载链接</view>
+      <van-cell-group custom-class="income-export-group">
+        <view class="export-link-head">
+          <text class="export-link-label">
+            数据文件
+            <text wx:if="{{exportTime}}" class="export-link-time">（{{exportTime}} 生成）</text>
+          </text>
+          <van-button
+            wx:if="{{exportUrl}}"
+            type="primary"
+            size="small"
+            plain
+            color="{{themeColor}}"
+            bind:click="url"
+            data-type="copy"
+            data-url="{{exportUrl}}"
+          >复制</van-button>
+        </view>
+        <view class="export-link-box" bindtap="url" data-type="copy" data-url="{{exportUrl}}">
+          <text class="export-link-text {{exportUrl ? '' : 'export-link-text--empty'}}">
+            {{exportUrl || '尚未生成，点击下方按钮生成 Excel 文件'}}
+          </text>
+        </view>
+        <view wx:if="{{exportUrl}}" class="export-tip">
+          <van-icon name="info-o" size="28rpx" color="#969799" />
+          <text>建议在电脑浏览器中打开链接下载；下载后请及时删除文件以保护隐私。</text>
+        </view>
+      </van-cell-group>
+
+      <view class="export-footer">
+        <van-button block round color="{{themeColor}}" bind:click="bindExportTap">
+          {{exportUrl ? '重新生成收入明细' : '生成收入明细'}} (Excel)
+        </van-button>
+        <van-button
+          wx:if="{{exportUrl}}"
+          block
+          round
+          plain
+          color="{{themeColor}}"
+          custom-class="export-footer-btn"
+          bind:click="bindOpenExportTap"
+        >直接打开数据文件</van-button>
+        <van-button
+          wx:if="{{exportUrl}}"
+          block
+          round
+          plain
+          type="danger"
+          custom-class="export-footer-btn"
+          bind:click="bindDelExportTap"
+        >删除数据文件</van-button>
+      </view>
+    </block>
+  </block>
 </view>

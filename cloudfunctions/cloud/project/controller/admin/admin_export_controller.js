@@ -114,6 +114,43 @@ class AdminExportController extends BaseAdminController {
 		return await service.deleteUserDataExcel();
 	}
 
+	/************** 耗卡收入导出 BEGIN ********************* */
+	async incomeDataGet() {
+		await this.isAdmin();
+
+		let rules = {
+			isDel: 'int|must',
+		};
+
+		let input = this.validateData(rules);
+		let service = new AdminExportService();
+
+		if (input.isDel === 1)
+			await service.deleteIncomeDataExcel();
+
+		return await service.getIncomeDataURL();
+	}
+
+	async incomeDataExport() {
+		await this.isAdmin();
+
+		let rules = {
+			startDay: 'date|must',
+			endDay: 'date|must',
+		};
+
+		let input = this.validateData(rules);
+		let service = new AdminExportService();
+		return await service.exportIncomeDataExcel(input);
+	}
+
+	async incomeDataDel() {
+		await this.isAdmin();
+		this.validateData({});
+		let service = new AdminExportService();
+		return await service.deleteIncomeDataExcel();
+	}
+
 
 }
 
