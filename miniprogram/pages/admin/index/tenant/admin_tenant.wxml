@@ -4,19 +4,19 @@
 	<view class="tenant-page-head bg-admin">
 		<view class="tenant-header">
 			<view class="pic"><van-icon name="manager-o" size="40rpx" color="#fff" /></view>
-			<view class="hint">??????????</view>
+			<view class="hint">请选择要管理的瑜伽馆</view>
 		</view>
 	</view>
 
 	<view wx:if="{{loading}}" class="loading-box">
-		<van-loading size="48rpx" type="spinner" color="#4a7c8c">???...</van-loading>
+		<van-loading size="48rpx" type="spinner" color="#4a7c8c">加载中...</van-loading>
 	</view>
 
 	<view wx:elif="{{tenantList.length === 0}}" class="empty-box">
-		<view class="empty-icon">??</view>
-		<view class="empty-text">??????</view>
-		<view class="empty-sub">??????????</view>
-		<van-button type="primary" size="small" bind:click="bindRefreshTap">??</van-button>
+		<van-icon name="shop-o" size="80rpx" color="#c8c9cc" custom-class="empty-icon" />
+		<view class="empty-text">暂无瑜伽馆</view>
+		<view class="empty-sub">请联系超管创建瑜伽馆，或点击下方刷新</view>
+		<van-button type="primary" size="small" bind:click="bindRefreshTap">刷新</van-button>
 	</view>
 
 	<view wx:else class="tenant-list">

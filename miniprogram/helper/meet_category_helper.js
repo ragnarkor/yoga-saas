@@ -40,7 +40,22 @@ function getMeetCategories(allLabel = "全部课程") {
   return tabs;
 }
 
+/** 门店 API 分类为空时回退皮肤/租户默认配置 */
+function resolveCategoryList(apiCategories) {
+  if (Array.isArray(apiCategories) && apiCategories.length) {
+    return apiCategories.map((c) => ({
+      id: String(c.id),
+      name: c.name || "",
+    }));
+  }
+  const opts = dataHelper.getSelectOptions(getMeetTypeStr());
+  return opts
+    .filter((o) => o && o.val != null && o.label)
+    .map((o) => ({ id: String(o.val), name: o.label }));
+}
+
 module.exports = {
   getMeetTypeStr,
   getMeetCategories,
+  resolveCategoryList,
 };

@@ -33,13 +33,14 @@
         </view>
       </view>
 
-      <view class="course-edit-field course-edit-field--inline" bindtap="bindScopeFieldTap">
-        <text class="course-edit-field-label-inline">适用课程</text>
-        <view class="course-edit-field-row course-edit-field-row--inline">
-          <text class="course-edit-field-value">{{scopeDescText}}</text>
-          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-      </view>
+      <meet-category-picker
+        mode="scope"
+        label="适用课程"
+        theme-color="{{themeColor}}"
+        scope-mode="{{scopeMode}}"
+        scope-category-ids="{{scopeCategoryIds}}"
+        bind:scopeChange="onScopeChange"
+      />
     </van-cell-group>
 
     <view class="card-edit-footer">
@@ -80,48 +81,6 @@
             color="{{themeColor}}"
           />
         </view>
-      </view>
-    </view>
-  </van-popup>
-
-  <van-popup
-    show="{{scopeSheetShow}}"
-    position="bottom"
-    round
-    bind:close="bindCloseScopeSheet"
-    custom-class="course-edit-popup"
-  >
-    <view class="course-edit-sheet">
-      <view class="course-edit-sheet-head">
-        <text class="course-edit-sheet-title">适用课程范围</text>
-        <text class="course-edit-sheet-sub">指定分类后，该卡仅可用于对应课程</text>
-      </view>
-      <view class="card-scope-list">
-        <view
-          class="card-scope-item {{scopeMode === 'all' ? 'is-active' : ''}}"
-          bindtap="bindScopeAllTap"
-        >
-          <text>全馆课程</text>
-          <van-icon wx:if="{{scopeMode === 'all'}}" name="success" size="36rpx" color="{{themeColor}}" />
-        </view>
-        <view
-          class="card-scope-item {{scopeMode === 'categories' && item.selected ? 'is-active' : ''}}"
-          wx:for="{{scopeCategories}}"
-          wx:key="id"
-          data-id="{{item.id}}"
-          bindtap="bindScopeCategoryTap"
-        >
-          <text>{{item.name}}</text>
-          <van-icon
-            wx:if="{{scopeMode === 'categories' && item.selected}}"
-            name="success"
-            size="36rpx"
-            color="{{themeColor}}"
-          />
-        </view>
-      </view>
-      <view class="card-scope-done">
-        <van-button block round color="{{themeColor}}" bind:click="bindScopeDoneTap">确定</van-button>
       </view>
     </view>
   </van-popup>

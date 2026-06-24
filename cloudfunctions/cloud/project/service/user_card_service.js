@@ -359,6 +359,36 @@ class UserCardService extends BaseService {
     return times > 0 ? times : 1;
   }
 
+  _resolveCardScopeSync(card, tplScopeMap) {
+    if (card && card.USER_CARD_SCOPE) {
+      return cardScopeUtil.normalizeScope(card.USER_CARD_SCOPE);
+    }
+    const tplId = card && card.USER_CARD_TPL_ID;
+    if (tplId && tplScopeMap && tplScopeMap[tplId]) {
+      return tplScopeMap[tplId];
+    }
+    return { mode: "all", categoryIds: [] };
+  }
+
+  async _loadTplScopeMap(tplIds) {
+    if (!tplIds || !tplIds.length) return {};
+    let tpls = await CardTplModel.getAll(
+      { CARD_TPL_ID: ["in", tplIds] },
+      "CARD_TPL_ID,CARD_TPL_SCOPE",
+      {},
+      tplIds.length,
+    );
+    const map = {};
+    for (let t of tpls || []) {
+      map[t.CARD_TPL_ID] = cardScopeUtil.normalizeScope(t.CARD_TPL_SCOPE);
+    }
+    return map;
+  }
+
+  _cardMatchesMeetScope(scope, meet) {
+    return cardScopeUtil.cardMatchesMeet(scope, meet);
+  }
+
   async _resolveCoachName(meet, timeMark) {
     if (!meet || !timeMark) return "";
     const style = meet.MEET_STYLE_SET || {};
@@ -428,15 +458,17 @@ class UserCardService extends BaseService {
       ...new Set((cards || []).map((c) => c.USER_CARD_TPL_ID).filter(Boolean)),
     ];
     let colorMap = {};
+    let scopeMap = {};
     if (tplIds.length) {
       let tpls = await CardTplModel.getAll(
         { CARD_TPL_ID: ["in", tplIds] },
-        "CARD_TPL_ID,CARD_TPL_COLOR",
+        "CARD_TPL_ID,CARD_TPL_COLOR,CARD_TPL_SCOPE",
         {},
         100,
       );
       for (let t of tpls || []) {
         colorMap[t.CARD_TPL_ID] = t.CARD_TPL_COLOR || "#F5A623";
+        scopeMap[t.CARD_TPL_ID] = cardScopeUtil.normalizeScope(t.CARD_TPL_SCOPE);
       }
     }
 
@@ -450,7 +482,8 @@ class UserCardService extends BaseService {
       const quota = Number(card.USER_CARD_QUOTA) || 0;
       if (type === CardTplModel.TYPE.TIMES && quota < needTimes) continue;
       if (pending && !this._canUsePendingForJoin(card)) continue;
-      if (meet && !cardScopeUtil.cardMatchesMeet(card, meet)) continue;
+      const scope = this._resolveCardScopeSync(card, scopeMap);
+      if (meet && !this._cardMatchesMeetScope(scope, meet)) continue;
 
       const afterQuota =
         type === CardTplModel.TYPE.PERIOD ? quota : Math.max(0, quota - needTimes);
@@ -496,7 +529,12 @@ class UserCardService extends BaseService {
     if (!this._isPendingActivation(card) && this._isExpired(card, now)) {
       this.AppError("会员卡已过期");
     }
-    if (meet && !cardScopeUtil.cardMatchesMeet(card, meet)) {
+    let scopeMap = {};
+    if (!card.USER_CARD_SCOPE && card.USER_CARD_TPL_ID) {
+      scopeMap = await this._loadTplScopeMap([card.USER_CARD_TPL_ID]);
+    }
+    const scope = this._resolveCardScopeSync(card, scopeMap);
+    if (meet && !this._cardMatchesMeetScope(scope, meet)) {
       this.AppError("该会员卡不适用于本课程分类");
     }
 
@@ -522,9 +560,6 @@ class UserCardService extends BaseService {
     if (!card) {
       this.AppError("暂无可用会员卡，请联系馆方发卡后再预约");
     }
-    if (meet && !cardScopeUtil.cardMatchesMeet(card, meet)) {
-      this.AppError("该会员卡不适用于本课程分类");
-    }
     return { cardId: card._id, needTimes, cardName: card.USER_CARD_NAME };
   }
 
@@ -540,12 +575,18 @@ class UserCardService extends BaseService {
       50,
     );
 
+    const tplIds = [
+      ...new Set((list || []).map((c) => c.USER_CARD_TPL_ID).filter(Boolean)),
+    ];
+    const scopeMap = tplIds.length ? await this._loadTplScopeMap(tplIds) : {};
+
     for (let k in list) {
       let card = list[k];
       const pending = this._isPendingActivation(card);
       if (!pending && this._isExpired(card, now)) continue;
       if (pending && !this._canUsePendingForJoin(card)) continue;
-      if (meet && !cardScopeUtil.cardMatchesMeet(card, meet)) continue;
+      const scope = this._resolveCardScopeSync(card, scopeMap);
+      if (meet && !this._cardMatchesMeetScope(scope, meet)) continue;
 
       if (card.USER_CARD_TYPE === CardTplModel.TYPE.PERIOD) {
         return card;
@@ -603,7 +644,7 @@ class UserCardService extends BaseService {
     if (!join) return;
 
     const needTimes = this._getMeetCardTimes(meet);
-    const card = await this._resolveCardForJoin(userId, needTimes, cardId, meet);
+    let card = await this._resolveCardForJoin(userId, needTimes, cardId, meet);
     if (!card) {
       if (cardId) this.AppError("会员卡划扣失败，请联系馆方");
       return;

@@ -129,12 +129,12 @@
         </view>
       </view>
       <view class="platform-hero-stats">
-        <view class="platform-hero-stat" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">
+        <view class="platform-hero-stat" bindtap="url" data-url="/pages/coach/booking/coach_booking">
           <text class="platform-hero-stat-num">{{data.meetCnt || 0}}</text>
           <text class="platform-hero-stat-label">预约活动</text>
         </view>
         <view class="platform-hero-divider"></view>
-        <view class="platform-hero-stat" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">
+        <view class="platform-hero-stat" bindtap="url" data-url="/pages/coach/booking/coach_booking">
           <text class="platform-hero-stat-num">{{data.joinCnt || 0}}</text>
           <text class="platform-hero-stat-label">预约数</text>
         </view>
@@ -159,7 +159,7 @@
         <text class="platform-section-title">快捷操作</text>
       </view>
       <view class="platform-action-grid">
-        <view class="platform-action-item" bindtap="url" data-url="/pages/admin/meet/list/admin_meet_list">
+        <view class="platform-action-item" bindtap="url" data-url="/pages/coach/booking/coach_booking">
           <view class="platform-action-icon"><van-icon name="calendar-o" size="40rpx" color="#4a7c8c" /></view>
           <text class="platform-action-text">预约管理</text>
         </view>

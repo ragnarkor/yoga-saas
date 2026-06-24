@@ -67,7 +67,8 @@
         "stats/coach_stats_fund",
         "stats/coach_stats_consume",
         "stats/coach_stats_join",
-        "stats/coach_stats_schedule"
+        "stats/coach_stats_schedule",
+        "stats/coach_stats_export"
       ]
     },
     {
@@ -79,21 +80,10 @@
         "platform/tenant_form/admin_tenant_form",
         "platform/mgr_form/admin_mgr_form",
         "platform/staff/admin_platform_staff",
-        "home/content/admin_home_content",
         "bind/admin_bind",
-        "mgr/bind/admin_mgr_bind",
         "content/admin_content",
-        "meet/content/admin_meet_content",
-        "meet/cover/admin_meet_cover",
-        "meet/edit/admin_meet_edit",
-        "meet/export/admin_join_export",
-        "meet/join/admin_meet_join",
-        "meet/list/admin_meet_list",
-        "meet/record/admin_record_list",
         "meet/scan/admin_meet_scan",
         "meet/self/admin_meet_self",
-        "meet/temp/admin_temp_select",
-        "meet/time/admin_meet_time",
         "mgr/log/admin_log_list",
         "news/list/admin_news_list",
         "news/add/admin_news_add",

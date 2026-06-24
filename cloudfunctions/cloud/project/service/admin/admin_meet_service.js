@@ -790,6 +790,10 @@ class AdminMeetService extends BaseAdminService {
     adminType,
     admin,
   ) {
+    // 「我的课」过滤仅对教练生效；馆主/超管查看当前馆全量排课
+    const applyOnlyMine =
+      !!onlyMine && adminType === AdminModel.TYPE.TEACHER;
+
     let meetWhere = { MEET_STATUS: MeetModel.STATUS.COMM };
     if (adminType === AdminModel.TYPE.TEACHER && !onlyMine) {
       meetWhere.MEET_ADMIN_ID = adminId;
@@ -797,7 +801,7 @@ class AdminMeetService extends BaseAdminService {
 
     const adminMongoId = (admin && admin._id) || "";
     let myTeacherId = "";
-    if (onlyMine && adminMongoId) {
+    if (applyOnlyMine && adminMongoId) {
       let teacher = await TeacherModel.getOne(
         { TEACHER_ADMIN_ID: adminMongoId },
         "_id",
@@ -845,7 +849,7 @@ class AdminMeetService extends BaseAdminService {
         if (t.status != 1 && !includeInactive) continue;
 
         const slotTeacherId = t.teacherId || style.teacherId || "";
-        if (onlyMine) {
+        if (applyOnlyMine) {
           const teacherMatch =
             myTeacherId && String(slotTeacherId) === String(myTeacherId);
           const meetOwnedByAdmin =

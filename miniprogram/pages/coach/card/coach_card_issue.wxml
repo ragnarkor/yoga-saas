@@ -17,33 +17,19 @@
         <text class="course-edit-field-label-inline">会员</text>
         <view class="course-edit-field-row course-edit-field-row--inline">
           <text class="course-edit-field-value">{{userName || '—'}}</text>
+          <view class="issue-field-icon-slot"></view>
         </view>
       </view>
-
-      <view class="course-edit-field course-edit-field--inline issue-form-row" bindtap="bindTplFieldTap">
-        <view class="course-edit-field-label-inline course-edit-field-label-inline--required">会员卡</view>
-        <view class="course-edit-field-row course-edit-field-row--inline">
-          <text class="course-edit-field-value {{selectedTpl ? '' : 'course-edit-field-value--placeholder'}}">
-            {{selectedTpl ? selectedTpl.CARD_TPL_NAME : '请选择会员卡'}}
-          </text>
-          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
-        </view>
-      </view>
-
-      <view wx:if="{{selectedTpl}}" class="issue-tpl-preview">
-        <view class="issue-tpl-chip" style="background: {{selectedTpl.CARD_TPL_COLOR}};">
-          <text>{{selectedTpl.typeDesc}}</text>
-        </view>
-        <view class="issue-tpl-meta-row">
-          <view class="issue-tpl-meta-tag" wx:for="{{selectedTpl.metaTags}}" wx:key="key">
-            <text class="issue-tpl-meta-label">{{item.label}}</text>
-            <text class="issue-tpl-meta-value">{{item.value}}</text>
-          </view>
-        </view>
-        <view wx:if="{{selectedTpl.scopeDesc && selectedTpl.scopeDesc !== '全馆课程'}}" class="issue-tpl-scope">
-          适用：{{selectedTpl.scopeDesc}}
-        </view>
-      </view>
+      <!-- [AI_START TIMESTAMP=2025-01-27 16:00:00] -->
+      <card-tpl-picker
+        value="{{selectedTplId}}"
+        theme-color="{{themeColor}}"
+        label="会员卡"
+        required="{{true}}"
+        field-class="issue-form-row"
+        bind:pick="onCardTplPick"
+      />
+      <!-- [AI_END LINES=7 TIMESTAMP=2025-01-27 16:00:00] -->
 
       <view class="course-edit-field course-edit-field--inline issue-form-row" bindtap="bindActivateFieldTap">
         <text class="course-edit-field-label-inline">激活方式</text>
@@ -80,50 +66,6 @@
   <view class="issue-footer">
     <van-button block round color="{{themeColor}}" bind:click="bindSubmitTap">确定发卡</van-button>
   </view>
-
-  <van-popup
-    show="{{tplSheetShow}}"
-    position="bottom"
-    round
-    bind:close="bindCloseTplSheet"
-    custom-class="course-edit-popup"
-  >
-    <view class="course-edit-sheet">
-      <view class="course-edit-sheet-head">
-        <text class="course-edit-sheet-title">选择会员卡</text>
-        <text class="course-edit-sheet-sub">基于已有卡模板发卡，规格与模板一致</text>
-      </view>
-      <scroll-view scroll-y class="course-edit-sheet-scroll" enhanced show-scrollbar="{{false}}">
-        <view
-          class="issue-tpl-option {{selectedTplId === item.CARD_TPL_ID ? 'is-active' : ''}}"
-          wx:for="{{tplList}}"
-          wx:key="CARD_TPL_ID"
-          data-id="{{item.CARD_TPL_ID}}"
-          bindtap="bindTplPick"
-        >
-          <view class="issue-tpl-chip issue-tpl-chip--sm" style="background: {{item.CARD_TPL_COLOR}};">
-            <text>{{item.typeDesc}}</text>
-          </view>
-          <view class="issue-tpl-option-body">
-            <view class="issue-tpl-option-title">{{item.CARD_TPL_NAME}}</view>
-            <view class="issue-tpl-meta-row issue-tpl-meta-row--compact">
-              <view class="issue-tpl-meta-tag" wx:for="{{item.metaTags}}" wx:for-item="tag" wx:key="key">
-                <text class="issue-tpl-meta-label">{{tag.label}}</text>
-                <text class="issue-tpl-meta-value">{{tag.value}}</text>
-              </view>
-            </view>
-          </view>
-          <van-icon
-            wx:if="{{selectedTplId === item.CARD_TPL_ID}}"
-            name="success"
-            size="40rpx"
-            color="{{themeColor}}"
-          />
-        </view>
-        <van-empty wx:if="{{!tplList.length}}" description="暂无会员卡模板，请先添加" />
-      </scroll-view>
-    </view>
-  </van-popup>
 
   <van-popup
     show="{{activateSheetShow}}"

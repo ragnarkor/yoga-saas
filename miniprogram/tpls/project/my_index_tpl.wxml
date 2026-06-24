@@ -1,6 +1,6 @@
 <!-- [AI_START TIMESTAMP=2025-01-25 14:50:00] -->
 <template name="myIndexTpl">
-	<view class="main {{skin.IS_SUB?'sub-margin-bottom':''}}">
+	<view class="main">
 
 		<!--top area begin-->
 		<view class="upside upside-shadow">
@@ -27,36 +27,61 @@
 
 		<!--down area begin-->
 		<view class="down padding-project">
-			<!-- 今日课程卡片 -->
-			<view class="comm-list menu today-card card-project shadow-project">
-				<view class="today">
-					<view class="title">我的今日{{skin.MEET_NAME}}</view>
-					<view class="list">
-						<view class="item" wx:if="{{myTodayLoading}}">
-							<van-loading size="32rpx" color="{{themeColor}}" custom-class="today-loading" />
-						</view>
-						<view wx:elif="{{!myTodayList || myTodayList.length==0}}" class="item">
-							<view class="text-normal text-grey" style="line-height:1!important">您今天没有{{skin.MEET_NAME}}哦~ </view>
-						</view>
-						<view class="item" bindtap="url" data-url="../join_detail/my_join_detail?id={{item._id}}" wx:for="{{myTodayList}}" wx:key="key">
-							<view class="time">
-								<text>{{item.JOIN_MEET_TIME_START}}~{{item.JOIN_MEET_TIME_END}}</text>
-
-								<text wx:if="{{item.JOIN_STATUS==1}}" class="text-green status">预约成功{{item.JOIN_IS_CHECKIN==1?'，已签到':''}}</text>
-								<text wx:elif="{{item.JOIN_STATUS==10}}" class="text-grey status">已取消</text>
-								<text wx:elif="{{item.JOIN_STATUS==99}}" class="text-orange status">系统取消</text>
-
-							</view>
-							<view class="project text-cut">{{item.JOIN_MEET_TITLE}}</view>
-						</view>
+			<!-- 今日约课 -->
+			<view class="today-card card-project shadow-project">
+				<view class="today-head">
+					<view class="today-head-main">
+						<text class="today-title">今日{{skin.MEET_NAME}}</text>
+						<text wx:if="{{!myTodayLoading && myTodayList.length}}" class="today-badge">{{myTodayList.length}}</text>
+					</view>
+					<view class="today-link" bindtap="url" data-type="switch" data-url="/pages/default/news/cate1/news_cate1">
+						<text>全部记录</text>
+						<van-icon name="arrow" size="24rpx" color="#969799" />
 					</view>
 				</view>
 
+				<view wx:if="{{myTodayLoading}}" class="today-state">
+					<van-loading size="32rpx" color="{{themeColor}}" custom-class="today-loading" />
+					<text class="today-state-text">加载中...</text>
+				</view>
+
+				<view wx:elif="{{!myTodayList || myTodayList.length==0}}" class="today-state">
+					<van-icon name="calendar-o" size="56rpx" color="#dcdee0" />
+					<text class="today-state-text">今天没有{{skin.MEET_NAME}}安排</text>
+					<text class="today-state-sub">去约课页看看近期课程吧</text>
+				</view>
+
+				<view wx:else class="today-list">
+					<view
+						class="today-item"
+						bindtap="url"
+						data-url="../join_detail/my_join_detail?id={{item._id}}"
+						wx:for="{{myTodayList}}"
+						wx:key="_id"
+					>
+						<view class="today-time-col">
+							<text class="today-time-start">{{item.JOIN_MEET_TIME_START}}</text>
+							<text class="today-time-end">{{item.JOIN_MEET_TIME_END}}</text>
+						</view>
+						<view class="today-info">
+							<text class="today-course-name">{{item.JOIN_MEET_TITLE}}</text>
+							<view class="today-tags">
+								<text wx:if="{{item.JOIN_STATUS==1}}" class="today-tag today-tag--book">预约成功</text>
+								<text wx:if="{{item.JOIN_STATUS==1 && item.JOIN_IS_CHECKIN==1}}" class="today-tag today-tag--checkin">已签到</text>
+								<text wx:elif="{{item.JOIN_STATUS==1}}" class="today-tag today-tag--wait">待签到</text>
+								<text wx:elif="{{item.JOIN_STATUS==10}}" class="today-tag today-tag--cancel">已取消</text>
+								<text wx:elif="{{item.JOIN_STATUS==99}}" class="today-tag today-tag--system">系统取消</text>
+								<text wx:elif="{{item.JOIN_STATUS==0}}" class="today-tag today-tag--pending">待确认</text>
+							</view>
+							<text wx:if="{{item.JOIN_STATUS==1 && item.JOIN_IS_CHECKIN!=1}}" class="today-hint">请准时到场，向工作人员出示预约码签到</text>
+						</view>
+						<van-icon name="arrow" size="28rpx" color="#c8c9cc" custom-class="today-arrow" />
+					</view>
+				</view>
 			</view>
 
 			<!-- VANT 菜单列表 -->
 			<van-cell-group inset custom-class="menu-group">
-				<van-cell custom-class="mi-cell mi-records" title="我的所有{{skin.MEET_NAME}}" is-link link-type="navigateTo" url="../join/my_join" icon="records" label="查看所有预约记录" />
 				<van-cell custom-class="mi-cell mi-card" title="我的卡包" is-link link-type="navigateTo" url="../card_pack/my_card_pack" icon="credit-pay" label="查看会员卡余额与到期" />
 				<van-cell custom-class="mi-cell mi-coach" title="切换到教练版" is-link bindtap="bindSwitchCoachTap" icon="manager-o" label="馆主/教练工作台" />
 			</van-cell-group>

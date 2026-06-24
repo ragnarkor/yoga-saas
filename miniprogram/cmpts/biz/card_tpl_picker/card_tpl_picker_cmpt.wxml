@@ -1,0 +1,73 @@
+<!-- [AI_START TIMESTAMP=2025-01-27 17:00:00] -->
+<!-- 字段行：field-class 由页面传入 issue-form-row，与相邻表单项共用样式 -->
+<view class="course-edit-field course-edit-field--inline field-class ctp-field" bindtap="bindFieldTap">
+  <view class="ctp-field-label course-edit-field-label-inline {{required ? 'course-edit-field-label-inline--required' : ''}}">{{label}}</view>
+  <view class="course-edit-field-row course-edit-field-row--inline ctp-field-value-wrap">
+    <view class="ctp-field-value course-edit-field-value {{selectedTpl ? '' : 'course-edit-field-placeholder-text'}}">
+      {{selectedTpl ? selectedTpl.CARD_TPL_NAME : placeholder}}
+    </view>
+    <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+  </view>
+</view>
+
+<!-- 已选卡预览（参照 my_card_pack 卡面样式） -->
+<view wx:if="{{selectedTpl}}" class="ctp-preview">
+  <view class="ctp-card">
+    <view class="ctp-card-visual" style="background: {{selectedTpl.CARD_TPL_COLOR}};">
+      <text class="ctp-card-vip">VIP CARD</text>
+      <text class="ctp-card-type">{{selectedTpl.typeDesc}}</text>
+    </view>
+    <view class="ctp-card-info">
+      <text class="ctp-card-name">{{selectedTpl.CARD_TPL_NAME}}</text>
+      <view class="ctp-card-meta">
+        <text wx:for="{{selectedTpl.metaTags}}" wx:key="key" class="ctp-card-tag">{{item.label}} {{item.value}}</text>
+      </view>
+      <text wx:if="{{selectedTpl.scopeDesc && selectedTpl.scopeDesc !== '全馆课程'}}" class="ctp-card-scope">适用：{{selectedTpl.scopeDesc}}</text>
+    </view>
+  </view>
+</view>
+
+<!-- 选择弹窗 -->
+<van-popup
+  show="{{sheetShow}}"
+  position="bottom"
+  round
+  bind:close="bindCloseSheet"
+  custom-class="ctp-popup"
+>
+  <view class="ctp-sheet">
+    <view class="ctp-sheet-head">
+      <text class="ctp-sheet-title">选择会员卡</text>
+      <text class="ctp-sheet-sub">基于已有卡模板发卡，规格与模板一致</text>
+    </view>
+    <scroll-view scroll-y class="ctp-sheet-scroll" enhanced show-scrollbar="{{false}}">
+      <view
+        class="ctp-card-item {{value === item.CARD_TPL_ID ? 'is-active' : ''}}"
+        wx:for="{{tplList}}"
+        wx:key="CARD_TPL_ID"
+        data-id="{{item.CARD_TPL_ID}}"
+        bindtap="bindTplPick"
+      >
+        <view class="ctp-card-visual" style="background: {{item.CARD_TPL_COLOR}};">
+          <text class="ctp-card-vip">VIP CARD</text>
+          <text class="ctp-card-type">{{item.typeDesc}}</text>
+        </view>
+        <view class="ctp-card-info">
+          <text class="ctp-card-name">{{item.CARD_TPL_NAME}}</text>
+          <view class="ctp-card-meta">
+            <text wx:for="{{item.metaTags}}" wx:for-item="tag" wx:key="key" class="ctp-card-tag">{{tag.label}} {{tag.value}}</text>
+          </view>
+        </view>
+        <van-icon
+          wx:if="{{value === item.CARD_TPL_ID}}"
+          name="success"
+          size="40rpx"
+          color="{{themeColor}}"
+          custom-class="ctp-card-check"
+        />
+      </view>
+      <van-empty wx:if="{{!tplList.length}}" description="暂无会员卡模板，请先添加" />
+    </scroll-view>
+  </view>
+</van-popup>
+<!-- [AI_END LINES=63 TIMESTAMP=2025-01-27 17:00:00] -->

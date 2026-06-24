@@ -1,0 +1,14 @@
+{
+  "usingComponents": {
+    "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt",
+    "cmpt-picker-time": "/cmpts/public/picker_time/picker_time_cmpt",
+    "cmpt-picker": "/cmpts/public/picker/picker_cmpt",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-cell-group": "@vant/weapp/cell-group/index",
+    "van-popup": "@vant/weapp/popup/index"
+  },
+  "enablePullDownRefresh": true,
+  "navigationStyle": "custom"
+}

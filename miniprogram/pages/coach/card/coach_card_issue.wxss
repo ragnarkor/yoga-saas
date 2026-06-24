@@ -9,16 +9,40 @@
   box-sizing: border-box;
 }
 
+.issue-form-row.course-edit-field--inline {
+  align-items: center;
+}
+
 .issue-form-row .course-edit-field-label-inline {
   width: var(--issue-label-width);
   max-width: var(--issue-label-width);
+  display: flex;
+  align-items: center;
+  line-height: var(--cell-line-height, 48rpx);
+}
+
+.issue-form-row .course-edit-field-row--inline {
+  align-items: center;
+  min-height: var(--cell-line-height, 48rpx);
+}
+
+.issue-form-row .course-edit-field-value,
+.issue-form-row .course-edit-field-placeholder-text {
+  line-height: var(--cell-line-height, 48rpx);
+}
+
+.issue-field-icon-slot {
+  width: 32rpx;
+  height: 32rpx;
+  flex-shrink: 0;
 }
 
 .issue-form-row--memo {
   display: flex;
   align-items: flex-start;
   gap: var(--cell-horizontal-padding, 32rpx);
-  padding: var(--cell-vertical-padding, 24rpx) var(--cell-horizontal-padding, 32rpx);
+  padding: var(--cell-vertical-padding, 24rpx)
+    var(--cell-horizontal-padding, 32rpx);
   background: #fff;
   border-bottom: 1rpx solid var(--neutralBorder, #ebedf0);
 }
@@ -50,98 +74,6 @@
 .course-edit-field-value--placeholder {
   color: #969799;
 }
-
-.issue-tpl-preview {
-  padding: 0 var(--cell-horizontal-padding, 32rpx) 24rpx;
-  padding-left: calc(var(--cell-horizontal-padding, 32rpx) + var(--issue-label-width, 6.2em) + var(--cell-horizontal-padding, 32rpx));
-  background: #fff;
-  border-bottom: 1rpx solid #ebedf0;
-}
-
-.issue-tpl-chip {
-  display: inline-flex;
-  align-items: flex-end;
-  min-width: 112rpx;
-  height: 72rpx;
-  padding: 10rpx 12rpx;
-  border-radius: 14rpx;
-  box-sizing: border-box;
-  color: #fff;
-  font-size: 22rpx;
-  font-weight: 600;
-  box-shadow: inset 0 0 0 1rpx rgba(255, 255, 255, 0.18);
-}
-
-.issue-tpl-chip--sm {
-  min-width: 96rpx;
-  height: 64rpx;
-  flex-shrink: 0;
-}
-
-.issue-tpl-meta-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10rpx;
-  margin-top: 16rpx;
-}
-
-.issue-tpl-meta-row--compact {
-  margin-top: 10rpx;
-}
-
-.issue-tpl-meta-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6rpx;
-  padding: 8rpx 16rpx;
-  border-radius: 10rpx;
-  background: #f5f6f8;
-  font-size: 22rpx;
-  line-height: 1.3;
-}
-
-.issue-tpl-meta-label {
-  color: #969799;
-}
-
-.issue-tpl-meta-value {
-  color: #323233;
-  font-weight: 500;
-}
-
-.issue-tpl-scope {
-  margin-top: 12rpx;
-  font-size: 24rpx;
-  color: #969799;
-  line-height: 1.45;
-}
-
-.issue-tpl-option {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
-  padding: 20rpx;
-  margin-bottom: 16rpx;
-  background: #fff;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
-}
-
-.issue-tpl-option.is-active {
-  background: var(--projectColorLight, #e5f1ec);
-}
-
-.issue-tpl-option-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.issue-tpl-option-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #323233;
-}
-
 .issue-activate-list {
   padding: 8rpx 24rpx 32rpx;
 }

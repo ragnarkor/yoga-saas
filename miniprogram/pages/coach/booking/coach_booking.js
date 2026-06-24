@@ -1,6 +1,7 @@
 const pageHelper = require('../../../helper/page_helper.js');
 const cloudHelper = require('../../../helper/cloud_helper.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
+const AdminBiz = require('../../../biz/admin_biz.js');
 const dataHelper = require('../../../helper/data_helper.js');
 const bookingWeekHelper = require('../../../helper/booking_week_helper.js');
 
@@ -21,7 +22,7 @@ Page({
     tabsReady: false,
     activeTab: 0,
     activeTypeId: '0',
-    emptyText: '本周暂无您的课程',
+    emptyText: '本周暂无课程',
   },
 
   onLoad() {
@@ -112,6 +113,11 @@ Page({
     this.setData({ loading: true });
     try {
       const { startDay, endDay, activeTypeId } = this.data;
+      const admin = AdminBiz.getAdminToken();
+      const onlyMine =
+        admin && admin.type === 'teacher' && !AdminWxBiz.isSuperSession()
+          ? 1
+          : 0;
       const res = await cloudHelper.callCloudData(
         'admin/schedule_week',
         {
@@ -119,7 +125,7 @@ Page({
           endDay,
           typeId: activeTypeId === '0' ? '' : activeTypeId,
           includeInactive: 1,
-          onlyMine: 1,
+          onlyMine,
         },
         { hint: false, title: 'bar' },
       );

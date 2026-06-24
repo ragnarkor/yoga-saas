@@ -1,0 +1,171 @@
+/* [AI_START TIMESTAMP=2025-01-27 17:00:00] */
+/* 字段行：组件内自管垂直对齐（text+flex:1 在组件里会 baseline 下沉） */
+.ctp-field.course-edit-field--inline {
+  display: flex;
+  align-items: center;
+}
+
+.ctp-field-label {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.ctp-field-value-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.ctp-field-value {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  font-size: var(--cell-font-size, 28rpx);
+  line-height: 1.2;
+  color: #323233;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ctp-field-value.course-edit-field-placeholder-text {
+  color: #969799;
+}
+
+/* ========== 已选预览（参照 my_card_pack 卡面） ========== */
+.ctp-preview {
+  padding: 20rpx 32rpx 24rpx;
+  background: #fff;
+  border-bottom: 1rpx solid var(--neutralBorder, #ebedf0);
+}
+/* ========== 卡片容器（预览 & 弹窗共用） ========== */
+.ctp-card,
+.ctp-card-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+
+.ctp-card-item {
+  margin-bottom: 20rpx;
+}
+
+.ctp-card-item:active {
+  opacity: 0.92;
+}
+
+.ctp-card-item.is-active {
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+  outline: 2rpx solid var(--themeColor, #5b8a72);
+  outline-offset: -2rpx;
+}
+
+/* ========== 卡面视觉（参照 card-pack-visual） ========== */
+.ctp-card-visual {
+  width: 140rpx;
+  height: 88rpx;
+  border-radius: 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+}
+
+.ctp-card-vip {
+  font-size: 18rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+}
+
+.ctp-card-type {
+  font-size: 22rpx;
+  margin-top: 4rpx;
+}
+
+/* ========== 卡片信息区 ========== */
+.ctp-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ctp-card-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #323233;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ctp-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.ctp-card-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  background: #f5f6f8;
+  font-size: 22rpx;
+  color: #646566;
+  line-height: 1.5;
+}
+
+.ctp-card-scope {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #969799;
+}
+
+.ctp-card-check {
+  flex-shrink: 0;
+}
+
+/* ========== 弹窗 ========== */
+.ctp-popup {
+  border-radius: 20rpx 20rpx 0 0 !important;
+}
+
+.ctp-sheet {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.ctp-sheet-head {
+  padding: 32rpx 32rpx 16rpx;
+}
+
+.ctp-sheet-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #323233;
+}
+
+.ctp-sheet-sub {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.ctp-sheet-scroll {
+  max-height: 70vh;
+  padding: 8rpx 24rpx 32rpx;
+}
+/* [AI_END LINES=107 TIMESTAMP=2025-01-27 17:00:00] */

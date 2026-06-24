@@ -3,11 +3,11 @@
   "navigationBarTitleText": "发卡",
   "usingComponents": {
     "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt",
+    "card-tpl-picker": "/cmpts/biz/card_tpl_picker/card_tpl_picker_cmpt",
     "van-cell-group": "@vant/weapp/cell-group/index",
     "van-button": "@vant/weapp/button/index",
     "van-icon": "@vant/weapp/icon/index",
     "van-loading": "@vant/weapp/loading/index",
-    "van-popup": "@vant/weapp/popup/index",
-    "van-empty": "@vant/weapp/empty/index"
+    "van-popup": "@vant/weapp/popup/index"
   }
 }

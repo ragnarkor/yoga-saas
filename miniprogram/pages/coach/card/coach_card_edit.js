@@ -18,15 +18,11 @@ Page({
     pageTitle: '新增会员卡',
     loading: false,
     cardId: '',
-    categories: [],
-    scopeCategories: [],
     colorOptions: COLOR_OPTIONS,
     colorSheetShow: false,
-    scopeSheetShow: false,
     selectedColorLabel: COLOR_OPTIONS[0].label,
     scopeMode: 'all',
     scopeCategoryIds: [],
-    scopeDescText: '全馆课程',
     form: {
       name: '',
       type: 'times',
@@ -45,23 +41,7 @@ Page({
       cardId: id,
       pageTitle: id ? '编辑会员卡' : '新增会员卡',
     });
-    this._loadCategories();
     if (id) this._loadDetail(id);
-  },
-
-  async _loadCategories() {
-    try {
-      const res = await cloudHelper.callCloudData(
-        'admin/tenant_store',
-        {},
-        { hint: false },
-      );
-      this.setData({ categories: (res && res.categories) || [] });
-      this._syncScopeCategories();
-      this._syncScopeDesc();
-    } catch (e) {
-      console.error(e);
-    }
   },
 
   async _loadDetail(id) {
@@ -89,8 +69,6 @@ Page({
           },
         });
         this._syncColorLabel();
-        this._syncScopeCategories();
-        this._syncScopeDesc();
       } else {
         this.setData({ loading: false });
       }
@@ -100,23 +78,12 @@ Page({
     }
   },
 
-  _syncScopeDesc() {
-    const scope = {
-      mode: this.data.scopeMode,
-      categoryIds: this.data.scopeCategoryIds,
-    };
+  onScopeChange(e) {
+    const { mode, categoryIds } = e.detail;
     this.setData({
-      scopeDescText: cardScopeHelper.buildScopeDesc(scope, this.data.categories),
+      scopeMode: mode,
+      scopeCategoryIds: categoryIds,
     });
-  },
-
-  _syncScopeCategories() {
-    const ids = this.data.scopeCategoryIds || [];
-    const scopeCategories = (this.data.categories || []).map((c) => ({
-      ...c,
-      selected: ids.includes(String(c.id)),
-    }));
-    this.setData({ scopeCategories });
   },
 
   bindFieldChange(e) {
@@ -164,45 +131,6 @@ Page({
 
   bindCloseColorSheet() {
     this.setData({ colorSheetShow: false });
-  },
-
-  bindScopeFieldTap() {
-    this.setData({ scopeSheetShow: true });
-  },
-
-  bindCloseScopeSheet() {
-    this.setData({ scopeSheetShow: false });
-  },
-
-  bindScopeAllTap() {
-    this.setData({ scopeMode: 'all', scopeCategoryIds: [] }, () => {
-      this._syncScopeCategories();
-      this._syncScopeDesc();
-    });
-  },
-
-  bindScopeCategoryTap(e) {
-    const id = String(e.currentTarget.dataset.id || '');
-    if (!id) return;
-    let ids = this.data.scopeCategoryIds.slice();
-    const idx = ids.indexOf(id);
-    if (idx >= 0) ids.splice(idx, 1);
-    else ids.push(id);
-    this.setData({
-      scopeMode: 'categories',
-      scopeCategoryIds: ids,
-    }, () => {
-      this._syncScopeCategories();
-      this._syncScopeDesc();
-    });
-  },
-
-  bindScopeDoneTap() {
-    if (this.data.scopeMode === 'categories' && !this.data.scopeCategoryIds.length) {
-      wx.showToast({ title: '请选择分类或选全馆', icon: 'none' });
-      return;
-    }
-    this.setData({ scopeSheetShow: false });
   },
 
   async bindSaveTap() {

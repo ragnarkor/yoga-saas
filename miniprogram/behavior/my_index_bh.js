@@ -30,13 +30,19 @@ module.exports = Behavior({
     _loadTodayList: async function () {
       this.setData({ myTodayLoading: true });
       try {
-        const list = await cloudHelper.callCloudData(
+        const raw = await cloudHelper.callCloudData(
           "my/my_join_someday",
           { day: timeHelper.time("Y-M-D") },
           { hint: false },
         );
+        const list = Array.isArray(raw) ? raw.slice() : [];
+        list.sort((a, b) =>
+          String(a.JOIN_MEET_TIME_START || "").localeCompare(
+            String(b.JOIN_MEET_TIME_START || ""),
+          ),
+        );
         this.setData({
-          myTodayList: Array.isArray(list) ? list : [],
+          myTodayList: list,
           myTodayLoading: false,
         });
       } catch (err) {

@@ -1,0 +1,116 @@
+@import "../coach_common.wxss";
+@import "../course/coach_course_edit.wxss";
+
+.export-page {
+  padding-bottom: 48rpx;
+}
+
+.export-loading {
+  padding: 120rpx 0;
+  display: flex;
+  justify-content: center;
+}
+
+.export-form-group {
+  margin: 0 !important;
+}
+
+.export-status-row {
+  align-items: center;
+}
+
+.export-section-title {
+  padding: 32rpx 32rpx 12rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--neutralTextSecondary, #646a73);
+}
+
+.export-link-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 32rpx 8rpx;
+}
+
+.export-link-label {
+  font-size: 28rpx;
+  color: #323233;
+  font-weight: 500;
+}
+
+.export-link-time {
+  font-size: 24rpx;
+  color: #969799;
+  font-weight: 400;
+}
+
+.export-link-box {
+  margin: 0 32rpx 16rpx;
+  padding: 20rpx 24rpx;
+  background: #f7f8fa;
+  border-radius: 12rpx;
+}
+
+.export-link-text {
+  font-size: 24rpx;
+  color: #323233;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+.export-link-text--empty {
+  color: #969799;
+}
+
+.export-tip {
+  display: flex;
+  gap: 12rpx;
+  padding: 0 32rpx 24rpx;
+  font-size: 24rpx;
+  color: #969799;
+  line-height: 1.5;
+}
+
+.export-footer {
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.export-footer-btn {
+  margin-top: 0 !important;
+}
+
+.export-sheet {
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.export-sheet-title {
+  padding: 32rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 1rpx solid #ebedf0;
+}
+
+.export-sheet-scroll {
+  max-height: 60vh;
+}
+
+.export-sheet-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 32rpx;
+  font-size: 30rpx;
+  color: #323233;
+  border-bottom: 1rpx solid #f2f3f5;
+}
+
+.export-sheet-item.active {
+  background: var(--projectColorLight, #e5f1ec);
+}

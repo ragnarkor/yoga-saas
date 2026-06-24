@@ -1,19 +1,66 @@
+<!-- [AI_START TIMESTAMP=2025-01-27 16:30:00] -->
 <view class="bind-page">
-  <view wx:if="{{loading}}" class="bind-center">
-    <van-loading size="48rpx">绑定中...</van-loading>
+  <!-- 顶部品牌区 -->
+  <view class="bind-hero">
+    <text class="bind-hero-title">瑜伽馆助手</text>
+    <view class="bind-hero-badge">
+      <van-icon name="link-o" size="56rpx" color="#fff" />
+    </view>
+    <text class="bind-hero-sub">微信账号绑定</text>
   </view>
 
-  <view wx:elif="{{success}}" class="bind-center">
-    <view class="bind-icon">✓</view>
-    <view class="bind-title">绑定成功</view>
-    <view class="bind-desc">您已以「{{roleLabel}}」身份绑定</view>
-    <view class="bind-desc" wx:if="{{tenantName}}">当前馆：{{tenantName}}</view>
-    <van-button type="primary" block custom-class="bind-btn" bind:click="bindGoCoach">进入教练版</van-button>
-    <van-button plain block custom-class="bind-btn" bind:click="bindGoHome">返回我的</van-button>
-  </view>
+  <!-- 状态卡片 -->
+  <view class="bind-card">
+    <!-- 加载中 -->
+    <view wx:if="{{loading}}" class="bind-status">
+      <view class="bind-status-loading">
+        <van-loading size="56rpx" color="#4a7c8c" />
+      </view>
+      <text class="bind-status-title">正在绑定</text>
+      <text class="bind-status-hint">请稍候，正在验证绑定码...</text>
+    </view>
 
-  <view wx:else class="bind-center">
-    <view class="bind-title fail">绑定失败</view>
-    <view class="bind-desc">{{errMsg}}</view>
+    <!-- 绑定成功 -->
+    <view wx:elif="{{success}}" class="bind-status">
+      <view class="bind-status-icon bind-status-icon--success">
+        <van-icon name="success" size="56rpx" color="#fff" />
+      </view>
+      <text class="bind-status-title">绑定成功</text>
+      <view class="bind-role" wx:if="{{roleLabel}}">
+        <text class="bind-role-label">身份</text>
+        <text class="bind-role-value">{{roleLabel}}</text>
+      </view>
+      <view class="bind-tenant" wx:if="{{tenantName}}">
+        <van-icon name="shop-o" size="28rpx" color="#969799" />
+        <text class="bind-tenant-name">{{tenantName}}</text>
+      </view>
+      <view class="bind-actions">
+        <van-button block round color="#4a7c8c" custom-class="bind-btn-primary" bind:click="bindGoCoach">
+          进入工作台
+        </van-button>
+        <van-button plain block round custom-class="bind-btn-secondary" bind:click="bindGoHome">
+          返回首页
+        </van-button>
+      </view>
+    </view>
+
+    <!-- 绑定失败 -->
+    <view wx:else class="bind-status">
+      <view class="bind-status-icon bind-status-icon--error">
+        <van-icon name="cross" size="56rpx" color="#fff" />
+      </view>
+      <text class="bind-status-title bind-status-title--error">绑定失败</text>
+      <text class="bind-status-desc">{{errMsg}}</text>
+      <view class="bind-tips">
+        <van-icon name="info-o" size="28rpx" color="#969799" />
+        <text class="bind-tips-text">请联系管理员重新获取绑定链接</text>
+      </view>
+      <view class="bind-actions">
+        <van-button plain block round custom-class="bind-btn-secondary" bind:click="bindGoHome">
+          返回首页
+        </van-button>
+      </view>
+    </view>
   </view>
 </view>
+<!-- [AI_END LINES=55 TIMESTAMP=2025-01-27 16:30:00] -->

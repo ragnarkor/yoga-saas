@@ -1,0 +1,154 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page export-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view wx:if="{{loading}}" class="export-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <block wx:elif="{{isLoad}}">
+    <van-cell-group custom-class="export-form-group">
+      <view class="course-edit-field course-edit-field--inline" bindtap="bindCourseTap">
+        <text class="course-edit-field-label-inline">课程</text>
+        <view class="course-edit-field-row course-edit-field-row--inline">
+          <text class="course-edit-field-value {{meetTitle ? '' : 'course-edit-field-value--placeholder'}}">
+            {{meetTitle || '请选择'}}
+          </text>
+          <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
+      <view class="course-edit-field course-edit-field--inline">
+        <text class="course-edit-field-label-inline">起始日期</text>
+        <cmpt-picker-time
+          mark="startDay"
+          mode="day"
+          bind:select="url"
+          data-type="picker"
+          data-item="startDay"
+          startYear="2021"
+          endYear="{{endYear}}"
+          item="{{startDay}}"
+        >
+          <view class="course-edit-field-row course-edit-field-row--inline">
+            <text class="course-edit-field-value">{{startDay || '请选择'}}</text>
+            <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+          </view>
+        </cmpt-picker-time>
+      </view>
+
+      <view class="course-edit-field course-edit-field--inline">
+        <text class="course-edit-field-label-inline">终止日期</text>
+        <cmpt-picker-time
+          mark="endDay"
+          mode="day"
+          bind:select="url"
+          data-type="picker"
+          data-item="endDay"
+          startYear="2021"
+          endYear="{{endYear}}"
+          item="{{endDay}}"
+        >
+          <view class="course-edit-field-row course-edit-field-row--inline">
+            <text class="course-edit-field-value">{{endDay || '请选择'}}</text>
+            <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+          </view>
+        </cmpt-picker-time>
+      </view>
+
+      <view class="course-edit-field course-edit-field--inline export-status-row">
+        <text class="course-edit-field-label-inline">数据类型</text>
+        <cmpt-picker
+          mark="status"
+          style="flex:1"
+          model:item="{{status}}"
+          sourceDataStr="1=预约成功名单,10=用户已取消名单,99=系统取消名单,999=所有名单"
+        />
+      </view>
+    </van-cell-group>
+
+    <view class="export-section-title">下载链接</view>
+    <van-cell-group custom-class="export-form-group">
+      <view class="export-link-head">
+        <text class="export-link-label">
+          数据文件
+          <text wx:if="{{time}}" class="export-link-time">（{{time}} 生成）</text>
+        </text>
+        <van-button
+          wx:if="{{url}}"
+          type="primary"
+          size="small"
+          plain
+          color="{{themeColor}}"
+          bind:click="url"
+          data-type="copy"
+          data-url="{{url}}"
+        >复制</van-button>
+      </view>
+      <view class="export-link-box" bindtap="url" data-type="copy" data-url="{{url}}">
+        <text class="export-link-text {{url ? '' : 'export-link-text--empty'}}">
+          {{url || '尚未生成，点击下方按钮生成 Excel 文件'}}
+        </text>
+      </view>
+      <view wx:if="{{url}}" class="export-tip">
+        <van-icon name="info-o" size="28rpx" color="#969799" />
+        <text>建议在电脑浏览器中打开链接下载；下载后请及时删除文件以保护隐私。</text>
+      </view>
+    </van-cell-group>
+
+    <view class="export-footer">
+      <van-button block round color="{{themeColor}}" bind:click="bindExportTap">
+        {{url ? '重新生成名单数据' : '生成名单数据'}} (Excel)
+      </van-button>
+      <van-button
+        wx:if="{{url}}"
+        block
+        round
+        plain
+        color="{{themeColor}}"
+        custom-class="export-footer-btn"
+        bind:click="bindOpenTap"
+      >直接打开数据文件</van-button>
+      <van-button
+        wx:if="{{url}}"
+        block
+        round
+        plain
+        type="danger"
+        custom-class="export-footer-btn"
+        bind:click="bindDelTap"
+      >删除数据文件</van-button>
+    </view>
+  </block>
+
+  <van-popup
+    show="{{courseSheetShow}}"
+    position="bottom"
+    round
+    bind:close="bindCloseCourseSheet"
+    custom-class="course-edit-popup"
+  >
+    <view class="export-sheet">
+      <view class="export-sheet-title">选择课程</view>
+      <scroll-view scroll-y class="export-sheet-scroll">
+        <view
+          wx:for="{{courseList}}"
+          wx:key="_id"
+          class="export-sheet-item {{meetId === item._id ? 'active' : ''}}"
+          data-id="{{item._id}}"
+          data-title="{{item.MEET_TITLE}}"
+          bindtap="bindPickCourse"
+        >
+          <text>{{item.MEET_TITLE}}</text>
+          <van-icon wx:if="{{meetId === item._id}}" name="success" size="36rpx" color="{{themeColor}}" />
+        </view>
+      </scroll-view>
+    </view>
+  </van-popup>
+</view>

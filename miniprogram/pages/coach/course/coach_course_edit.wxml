@@ -38,15 +38,11 @@
         bind:change="bindTitleChange"
       />
 
-      <van-cell
-        custom-class="course-edit-picker-cell"
-        title-class="course-edit-cell-title"
-        title="课程类型"
-        required
-        is-link
-        value="{{typeName || '请选择'}}"
-        value-class="{{typeName ? 'course-edit-cell-value' : 'course-edit-cell-placeholder'}}"
-        bind:click="bindTypeTap"
+      <meet-category-picker
+        value="{{formTypeId}}"
+        theme-color="{{themeColor}}"
+        required="{{true}}"
+        bind:pick="onTypePick"
       />
       <van-field
         label="时长(分钟)"
@@ -223,38 +219,6 @@
           />
         </view>
       </scroll-view>
-    </view>
-  </van-popup>
-
-  <van-popup
-    show="{{typeSheetShow}}"
-    position="bottom"
-    round
-    bind:close="bindCloseTypeSheet"
-    custom-class="course-edit-popup"
-  >
-    <view class="course-edit-sheet">
-      <!-- [AI_START TIMESTAMP=2025-01-25 17:30:00] -->
-      <view class="course-edit-sheet-head">
-        <text class="course-edit-sheet-title">选择课程类型</text>
-        <text class="course-edit-sheet-sub">课程类型用于排课分类与筛选</text>
-      </view>
-      <view class="course-edit-type-list">
-        <view
-          class="course-edit-type-item {{formTypeId === item.id ? 'is-active' : ''}}"
-          wx:for="{{categories}}"
-          wx:key="id"
-          data-id="{{item.id}}"
-          bindtap="bindTypePick"
-        >
-          <view class="course-edit-type-dot"></view>
-          <text class="course-edit-type-name">{{item.name}}</text>
-          <view class="course-edit-type-check" wx:if="{{formTypeId === item.id}}">
-            <van-icon name="success" size="32rpx" color="{{themeColor}}" />
-          </view>
-        </view>
-      </view>
-      <!-- [AI_END LINES=20 TIMESTAMP=2025-01-25 17:30:00] -->
     </view>
   </van-popup>
 

@@ -25,12 +25,10 @@ Page({
     pageTitle: '新增课程',
     id: '',
     typeName: '',
-    categories: [],
     templateList: [],
     templatePickerList: [],
     selectedTemplatePreview: null,
     templateSheetShow: false,
-    typeSheetShow: false,
     colorOptions: COLOR_OPTIONS,
     colorSheetShow: false,
     selectedColorLabel: '薄荷绿',
@@ -72,35 +70,12 @@ Page({
     const formFormSet = formSetHelper.defaultForm(skin.DEFAULT_FORMS);
     this.setData({ formFormSet });
 
-    await Promise.all([
-      this._loadCategories(),
-      this._loadTemplates(),
-    ]);
+    await this._loadTemplates();
 
     if (this.data.id) {
       await this._loadDetail();
     } else {
-      this._syncTypeName();
       this.setData({ loading: false });
-    }
-  },
-
-  async _loadCategories() {
-    try {
-      const res = await cloudHelper.callCloudData(
-        'admin/tenant_store',
-        {},
-        { hint: false },
-      );
-      const categories = (res && res.categories) || [];
-      this.setData({
-        categories,
-      });
-      this._syncTypeName();
-      this._syncSelectedTemplatePreview();
-      this._syncColorLabel();
-    } catch (e) {
-      console.error(e);
     }
   },
 
@@ -149,6 +124,7 @@ Page({
         loading: false,
         formTitle: meet.MEET_TITLE,
         formTypeId: meet.MEET_TYPE_ID,
+        typeName: meet.MEET_TYPE_NAME || AdminMeetBiz.getTypeName(meet.MEET_TYPE_ID),
         formOrder: meet.MEET_ORDER,
         formDaysSet: meet.MEET_DAYS_SET || [],
         formIsShowLimit: meet.MEET_IS_SHOW_LIMIT,
@@ -157,7 +133,6 @@ Page({
         thumbList: pic ? [{ url: pic, isImage: true }] : [],
         carouselList: carousel.map((url) => ({ url, isImage: true })),
       });
-      this._syncTypeName();
       this._syncSelectedTemplatePreview();
       this._syncColorLabel();
     } catch (e) {
@@ -189,17 +164,6 @@ Page({
         },
       });
     }
-  },
-
-  _syncTypeName() {
-    const { formTypeId, categories } = this.data;
-    const hit = categories.find((c) => c.id === formTypeId);
-    if (hit) {
-      this.setData({ typeName: hit.name });
-      return;
-    }
-    const name = AdminMeetBiz.getTypeName(formTypeId);
-    if (name) this.setData({ typeName: name });
   },
 
   bindTitleChange(e) {
@@ -322,27 +286,9 @@ Page({
     this.setData({ templateSheetShow: false });
   },
 
-  bindTypeTap() {
-    if (!this.data.categories.length) {
-      wx.showToast({ title: '请先在「我的门店」配置分类', icon: 'none' });
-      return;
-    }
-    this.setData({ typeSheetShow: true });
-  },
-
-  bindTypePick(e) {
-    const id = e.currentTarget.dataset.id;
-    const item = this.data.categories.find((c) => c.id === id);
-    if (!item) return;
-    this.setData({
-      typeSheetShow: false,
-      formTypeId: item.id,
-      typeName: item.name,
-    });
-  },
-
-  bindCloseTypeSheet() {
-    this.setData({ typeSheetShow: false });
+  onTypePick(e) {
+    const { typeId, typeName } = e.detail;
+    this.setData({ formTypeId: typeId, typeName: typeName || '' });
   },
 
   async bindSaveTap() {

@@ -66,10 +66,8 @@ function parseJoinMember(raw) {
   if (status === JOIN_STATUS_SUCC) {
     groupKey = checkin ? 'checked' : 'pending';
     statusLabel = checkin ? '已签到' : '未签到';
-  } else if (status === JOIN_STATUS_CANCEL) {
-    statusLabel = '用户取消';
-  } else if (status === JOIN_STATUS_ADMIN_CANCEL) {
-    statusLabel = '系统取消';
+  } else if (status === JOIN_STATUS_CANCEL || status === JOIN_STATUS_ADMIN_CANCEL) {
+    statusLabel = '已取消';
   }
 
   let cardText = '';

@@ -4,29 +4,3 @@
 .card-edit-page {
   padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
 }
-
-.card-scope-list {
-  padding: 8rpx 24rpx 16rpx;
-  max-height: 50vh;
-  overflow-y: auto;
-}
-
-.card-scope-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24rpx 20rpx;
-  margin-bottom: 12rpx;
-  border-radius: 16rpx;
-  background: #f7f8fa;
-  font-size: 30rpx;
-  color: #323233;
-}
-
-.card-scope-item.is-active {
-  background: var(--projectColorLight, #e5f1ec);
-}
-
-.card-scope-done {
-  padding: 16rpx 24rpx 32rpx;
-}

@@ -284,13 +284,13 @@ Page({
         'admin/join_status',
         {
           joinId: cancelTargetId,
-          status: 99,
+          status: 10,
           reason: (this.data.cancelReason || '').trim(),
         },
         { title: '处理中' },
       );
       wx.showToast({ title: '已取消', icon: 'success' });
-      this.setData({ cancelOneShow: false });
+      this.setData({ cancelOneShow: false, activeFilter: 'cancelled' });
       this._loadRoster();
     } catch (e) {
       console.error(e);
@@ -340,7 +340,7 @@ Page({
         { title: '取消中' },
       );
       wx.showToast({ title: '已取消本节', icon: 'success' });
-      this.setData({ cancelAllShow: false });
+      this.setData({ cancelAllShow: false, activeFilter: 'cancelled' });
       this._loadRoster();
     } catch (e) {
       console.error(e);

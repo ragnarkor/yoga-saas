@@ -97,19 +97,38 @@ class MeetService extends BaseService {
       DAY_MEET_ID: meetId,
       day: this.getDayByTimeMark(timeMark),
     };
-    let day = await DayModel.getOne(whereDay, "times");
+    let day = await DayModel.getOne(whereDay, "times,_id");
     if (!day) return;
 
-    let times = day.times;
+    let times = day.times || [];
+    const markStr = String(timeMark || "");
     for (let j in times) {
-      if (times[j].mark === timeMark) {
-        let data = {
-          ["times." + j + ".stat"]: stat,
-        };
-        await DayModel.edit(whereDay, data);
+      if (String(times[j].mark) !== markStr) continue;
+
+      // 私教时段为代约时动态创建，取消后无预约则移除，避免排课/约课仍显示「可预约」
+      if (stat.succCnt === 0 && times[j].slotType === "private") {
+        await this._removePrivateSlotRecord(day, Number(j), meetId);
         return;
       }
+
+      let data = {
+        ["times." + j + ".stat"]: stat,
+      };
+      await DayModel.edit(whereDay, data);
+      return;
     }
+  }
+
+  /** 私教动态时段在无有效预约时从 day 表删除 */
+  async _removePrivateSlotRecord(dayRec, timeIdx, meetId) {
+    const times = (dayRec.times || []).filter((_, i) => i !== timeIdx);
+    if (times.length === 0) {
+      await DayModel.del(dayRec._id);
+    } else {
+      await DayModel.edit(dayRec._id, { times });
+    }
+    const AdminMeetService = require("./admin/admin_meet_service.js");
+    await new AdminMeetService()._syncMeetDaysAfterChange(meetId);
   }
 
   // 预约前检测

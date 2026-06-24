@@ -530,11 +530,16 @@ module.exports = Behavior({
 					opts,
 				);
 				const joinId = res.data.joinId;
+				const cardWarning = res.data && res.data.cardWarning;
+				let content = '预约成功！';
+				if (cardWarning) {
+					content += '\n\n' + cardWarning;
+				}
 
 				wx.showModal({
 					title: '温馨提示',
 					showCancel: false,
-					content: '预约成功！',
+					content,
 					success() {
 						wx.reLaunch({
 							url: pageHelper.fmtURLByPID('/pages/my/join_detail/my_join_detail?flag=home&id=' + joinId),

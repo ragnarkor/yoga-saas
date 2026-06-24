@@ -1,9 +1,0 @@
-{
-	"usingComponents": {
-		"cmpt-picker-time": "../../../../cmpts/public/picker_time/picker_time_cmpt"
-	},
-	"navigationBarBackgroundColor": "#4a7c8c",
-	"navigationBarTextStyle": "white", 
-	"enablePullDownRefresh": true,  
-	"navigationBarTitleText": "预约名单导出"
-}

@@ -79,7 +79,6 @@
           catchtap="bindIssueTap"
         >
           <text>发卡</text>
-          <van-icon name="arrow" size="24rpx" color="#fff" />
         </view>
       </block>
     </view>
