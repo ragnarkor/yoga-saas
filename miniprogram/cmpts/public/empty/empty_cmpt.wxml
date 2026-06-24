@@ -1,0 +1,10 @@
+<van-empty-base
+  custom-class="custom-class"
+  image-class="image-class"
+  description-class="description-class"
+  image="{{image}}"
+  description="{{description}}"
+  image-size="{{imageSize}}"
+>
+  <slot />
+</van-empty-base>

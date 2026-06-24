@@ -8,7 +8,7 @@
     "van-tab": "@vant/weapp/tab/index",
     "van-button": "@vant/weapp/button/index",
     "van-loading": "@vant/weapp/loading/index",
-    "van-empty": "@vant/weapp/empty/index",
+    "van-empty": "/cmpts/public/empty/empty_cmpt",
     "van-popup": "@vant/weapp/popup/index",
     "van-action-sheet": "@vant/weapp/action-sheet/index",
     "van-tag": "@vant/weapp/tag/index",

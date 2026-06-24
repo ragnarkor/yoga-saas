@@ -6,7 +6,7 @@
     "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt",
     "cmpt-admin-login-panel": "/cmpts/biz/admin_login_panel/admin_login_panel_cmpt",
     "van-loading": "@vant/weapp/loading/index",
-    "van-empty": "@vant/weapp/empty/index",
+    "van-empty": "/cmpts/public/empty/empty_cmpt",
     "van-icon": "@vant/weapp/icon/index",
     "van-tag": "@vant/weapp/tag/index"
   }

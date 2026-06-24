@@ -1,6 +1,6 @@
 {
   "usingComponents": {
-    "van-empty": "@vant/weapp/empty/index",
+    "van-empty": "/cmpts/public/empty/empty_cmpt",
     "van-loading": "@vant/weapp/loading/index"
   },
   "enablePullDownRefresh": true,

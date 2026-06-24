@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "van-empty-base": "@vant/weapp/empty/index"
+  }
+}

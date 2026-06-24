@@ -1,0 +1,126 @@
+.card-pack-list {
+  padding: 16rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.card-pack-item {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+}
+
+.card-pack-item:active {
+  opacity: 0.92;
+}
+
+.card-pack-no-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.card-pack-no-label {
+  font-size: 24rpx;
+  color: #646566;
+}
+
+.card-pack-copy {
+  padding: 8rpx;
+}
+
+.card-pack-body {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  position: relative;
+}
+
+.card-pack-visual {
+  width: 140rpx;
+  height: 88rpx;
+  border-radius: 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+}
+
+.card-pack-vip {
+  font-size: 18rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+}
+
+.card-pack-type {
+  font-size: 22rpx;
+  margin-top: 4rpx;
+}
+
+.card-pack-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-pack-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #323233;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-pack-balance {
+  font-size: 26rpx;
+  color: #323233;
+  margin-bottom: 6rpx;
+}
+
+.card-pack-expire {
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.card-pack-scope {
+  font-size: 24rpx;
+  color: #969799;
+  margin-top: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-pack-stamp {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) rotate(-12deg);
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  border: 2rpx dashed #c8c9cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  color: #969799;
+  opacity: 0.85;
+}
+
+.card-pack-stamp.is-normal {
+  border-color: #91d5ff;
+  color: #1890ff;
+}
+
+.card-pack-stamp.is-invalid {
+  border-color: #d9d9d9;
+  color: #bfbfbf;
+}
