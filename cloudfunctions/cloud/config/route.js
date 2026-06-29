@@ -84,6 +84,8 @@ module.exports = {
   "admin/card_tpl_save": "admin/admin_card_controller@saveCardTpl#noDemo",
   "admin/card_tpl_del": "admin/admin_card_controller@delCardTpl#noDemo",
   "admin/coach_member_list": "admin/admin_card_controller@getCoachMemberList",
+  "admin/month_new_card_members":
+    "admin/admin_card_controller@getMonthNewCardMembers",
   "admin/user_card_issue": "admin/admin_card_controller@issueUserCard#noDemo",
   "admin/user_card_list": "admin/admin_card_controller@getUserCardList",
   "admin/user_join_card_options":

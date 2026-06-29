@@ -180,6 +180,150 @@ class AdminCardService extends BaseAdminService {
     await CardTplModel.del({ CARD_TPL_ID: id });
   }
 
+  async getMonthNewCardMembers({
+    search,
+    page = 1,
+    size = 50,
+  } = {}) {
+    await this._ensureCardCollections();
+    let monthStart = timeUtil.time2Timestamp(
+      timeUtil.time("Y-M") + "-01 00:00:00",
+    );
+
+    let cards = await this._safeGetAll(
+      UserCardModel,
+      { USER_CARD_ADD_TIME: [">=", monthStart] },
+      "*",
+      { USER_CARD_ADD_TIME: "desc" },
+      5000,
+    );
+
+    let groupMap = {};
+    for (let c of cards || []) {
+      let uid = (c.USER_CARD_USER_ID || "").trim();
+      if (!uid) continue;
+      if (!groupMap[uid]) {
+        groupMap[uid] = { userId: uid, cards: [], latestAddTime: 0 };
+      }
+      groupMap[uid].cards.push(c);
+      let addTime = Number(c.USER_CARD_ADD_TIME) || 0;
+      if (addTime > groupMap[uid].latestAddTime) {
+        groupMap[uid].latestAddTime = addTime;
+      }
+    }
+
+    let userIds = Object.keys(groupMap);
+    let userMap = {};
+    if (userIds.length) {
+      let users = await UserModel.getAll(
+        { USER_MINI_OPENID: ["in", userIds] },
+        "USER_MINI_OPENID,USER_NAME,USER_MOBILE,USER_PIC",
+        {},
+        userIds.length,
+      );
+      for (let u of users || []) {
+        userMap[u.USER_MINI_OPENID] = u;
+      }
+    }
+
+    const cardService = new UserCardService();
+    const nameMap = await cardService._getCategoryNameMap();
+    const now = timeUtil.time();
+    const tplIds = [
+      ...new Set((cards || []).map((c) => c.USER_CARD_TPL_ID).filter(Boolean)),
+    ];
+    let colorMap = {};
+    if (tplIds.length) {
+      let tpls = await CardTplModel.getAll(
+        { CARD_TPL_ID: ["in", tplIds] },
+        "CARD_TPL_ID,CARD_TPL_COLOR",
+        {},
+        tplIds.length,
+      );
+      for (let t of tpls || []) {
+        colorMap[t.CARD_TPL_ID] = t.CARD_TPL_COLOR || "#F5A623";
+      }
+    }
+
+    let list = userIds
+      .map((uid) => {
+        let g = groupMap[uid];
+        let u = userMap[uid] || {};
+        let mappedCards = g.cards
+          .map((c) => {
+            let item = cardService._mapCardItem(
+              c,
+              now,
+              colorMap[c.USER_CARD_TPL_ID],
+              nameMap,
+            );
+            let addTime = Number(c.USER_CARD_ADD_TIME) || 0;
+            return {
+              id: item.id,
+              name: item.name,
+              typeLabel: item.typeLabel,
+              price: item.price,
+              color: item.color,
+              balanceText: item.balanceText,
+              addTime,
+              addTimeDesc: timeUtil.timestamp2Time(addTime, "M-D"),
+            };
+          })
+          .sort((a, b) => b.addTime - a.addTime);
+
+        let names = mappedCards.map((c) => c.name);
+        let uniqueNames = [...new Set(names)];
+        let cardSummary =
+          uniqueNames.length <= 2
+            ? uniqueNames.join("、")
+            : uniqueNames.slice(0, 2).join("、") +
+              "等" +
+              mappedCards.length +
+              "张";
+
+        return {
+          userId: uid,
+          USER_NAME: u.USER_NAME || "未命名会员",
+          USER_MOBILE: u.USER_MOBILE || "",
+          USER_PIC: u.USER_PIC || "",
+          newCardCount: mappedCards.length,
+          latestAddTime: g.latestAddTime,
+          addTimeDesc: timeUtil.timestamp2Time(g.latestAddTime, "Y-M-D"),
+          cardSummary,
+          cards: mappedCards,
+        };
+      })
+      .sort((a, b) => b.latestAddTime - a.latestAddTime);
+
+    if (util.isDefined(search) && search) {
+      let kw = String(search).trim().toLowerCase();
+      list = list.filter(
+        (item) =>
+          (item.USER_NAME || "").toLowerCase().includes(kw) ||
+          (item.USER_MOBILE || "").includes(kw) ||
+          (item.cardSummary || "").toLowerCase().includes(kw),
+      );
+    }
+
+    let totalMembers = list.length;
+    let totalCards = (cards || []).length;
+    let start = (page - 1) * size;
+    let pageList = list.slice(start, start + size);
+
+    let month = timeUtil.time("Y-M");
+    return {
+      month,
+      monthText: month.replace("-", "年") + "月",
+      totalMembers,
+      totalCards,
+      list: pageList,
+      total: totalMembers,
+      page,
+      size,
+      count: pageList.length,
+    };
+  }
+
   async getMemberList({
     search,
     cardFilter = "all",
@@ -436,7 +580,6 @@ class AdminCardService extends BaseAdminService {
       USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,
     });
     let newCards = await this._safeCount(UserCardModel, {
-      USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,
       USER_CARD_ADD_TIME: [">=", monthStart],
     });
     let now = timeUtil.time();

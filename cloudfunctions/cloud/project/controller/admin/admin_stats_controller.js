@@ -14,7 +14,11 @@ class AdminStatsController extends BaseAdminController {
 
   async getClassStats() {
     await this.isAdmin();
-    let rules = { days: "int|false|default=30" };
+    let rules = {
+      startDay: "date|false",
+      endDay: "date|false",
+      coachId: "string|false|max:64",
+    };
     let input = this.validateData(rules);
     let service = new AdminStatsService();
     return await service.getClassStats(input);

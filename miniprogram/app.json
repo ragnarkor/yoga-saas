@@ -25,6 +25,7 @@
     "pages/default/teacher/detail/teacher_detail",
     "pages/default/private/book/private_book",
     "pages/default/announcement/detail/announcement_detail",
+    "pages/default/announcement/list/announcement_list",
 
     "projects/A00/index/default_index",
 
@@ -55,6 +56,7 @@
         "private/coach_private_list",
         "private/coach_private_book",
         "member/coach_member_list",
+        "member/coach_month_new_card",
         "card/coach_card_list",
         "card/coach_card_edit",
         "card/coach_card_issue",
@@ -115,7 +117,7 @@
     "backgroundColor": "#F5F6F8",
     "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#5B8A72",
-    "navigationBarTitleText": "瑜伽馆预约",
+    "navigationBarTitleText": "?????",
     "navigationBarTextStyle": "white"
   },
   "tabBar": {
@@ -126,25 +128,25 @@
     "list": [
       {
         "pagePath": "pages/default/index/default_index",
-        "text": "首页"
+        "text": "??"
       },
       {
         "pagePath": "pages/default/calendar/index/calendar_index",
-        "text": "约课"
+        "text": "??"
       },
       {
         "pagePath": "pages/default/news/cate1/news_cate1",
-        "text": "课程"
+        "text": "??"
       },
       {
         "pagePath": "pages/default/my/index/my_index",
-        "text": "我的"
+        "text": "??"
       }
     ]
   },
   "permission": {
     "scope.userLocation": {
-      "desc": "用于在地图上选择门店位置"
+      "desc": "????????????"
     }
   },
   "requiredPrivateInfos": ["chooseLocation"],

@@ -5,6 +5,8 @@
 const BaseAdminService = require("./base_admin_service.js");
 const timeUtil = require("../../../framework/utils/time_util.js");
 const util = require("../../../framework/utils/util.js");
+const dataUtil = require("../../../framework/utils/data_util.js");
+const tenantSetupHelper = require("../tenant_setup_helper.js");
 const JoinModel = require("../../model/join_model.js");
 const MeetModel = require("../../model/meet_model.js");
 const UserCardModel = require("../../model/user_card_model.js");
@@ -140,81 +142,233 @@ class AdminStatsService extends BaseAdminService {
     return { summary, detail };
   }
 
-  /** 上课统计 */
-  async getClassStats({ days = 30 } = {}) {
-    days = Math.min(Math.max(Number(days) || 30, 7), 90);
-    let today = timeUtil.time("Y-M-D");
-    let startDay = timeUtil.time("Y-M-D", -86400 * (days - 1));
-    let todayStart = timeUtil.time2Timestamp(today + " 00:00:00");
-    let todayEnd = timeUtil.time2Timestamp(today + " 23:59:59");
-    let monthStart = timeUtil.time2Timestamp(
-      timeUtil.time("Y-M") + "-01 00:00:00",
-    );
+  _resolveCoachFromMeet(meet, adminMap) {
+    let style =
+      meet && meet.MEET_STYLE_SET && typeof meet.MEET_STYLE_SET === "object"
+        ? meet.MEET_STYLE_SET
+        : {};
+    let coachId = (style.teacherId || meet.MEET_ADMIN_ID || "").trim();
+    let admin = coachId ? adminMap[coachId] : null;
+    let coachName =
+      (style.teacherName || "").trim() ||
+      (admin && admin.ADMIN_NAME) ||
+      "未指定教练";
+    return {
+      coachId: coachId || "unknown",
+      coachName,
+      avatar: "",
+    };
+  }
 
-    let [
-      totalJoin,
-      totalCheckin,
-      cancelCnt,
-      todayJoin,
-      monthJoin,
-      monthCheckin,
-      rangeJoins,
-    ] = await Promise.all([
-      JoinModel.count({ JOIN_STATUS: JoinModel.STATUS.SUCC }),
-      JoinModel.count({
-        JOIN_STATUS: JoinModel.STATUS.SUCC,
-        JOIN_IS_CHECKIN: 1,
-      }),
-      JoinModel.count({
-        JOIN_STATUS: ["in", [JoinModel.STATUS.CANCEL, JoinModel.STATUS.ADMIN_CANCEL]],
-      }),
-      JoinModel.count({
-        JOIN_STATUS: JoinModel.STATUS.SUCC,
-        JOIN_ADD_TIME: ["between", todayStart, todayEnd],
-      }),
-      JoinModel.count({
-        JOIN_STATUS: JoinModel.STATUS.SUCC,
-        JOIN_ADD_TIME: [">=", monthStart],
-      }),
-      JoinModel.count({
-        JOIN_STATUS: JoinModel.STATUS.SUCC,
-        JOIN_IS_CHECKIN: 1,
-        JOIN_ADD_TIME: [">=", monthStart],
-      }),
-      JoinModel.getAll(
-        {
-          JOIN_MEET_DAY: ["between", startDay, today],
-          JOIN_STATUS: JoinModel.STATUS.SUCC,
-        },
-        "JOIN_MEET_DAY,JOIN_IS_CHECKIN",
-        { JOIN_MEET_DAY: "asc" },
-        10000,
-      ),
-    ]);
-
-    let dayMap = {};
-    for (let j of rangeJoins || []) {
-      let d = j.JOIN_MEET_DAY;
-      if (!dayMap[d]) dayMap[d] = { day: d, joinCnt: 0, checkinCnt: 0 };
-      dayMap[d].joinCnt++;
-      if (j.JOIN_IS_CHECKIN === 1) dayMap[d].checkinCnt++;
+  _parseMeetCategoryNames(meetTypeStr) {
+    let opts = dataUtil.getSelectOptions(meetTypeStr || "");
+    let names = [];
+    for (let o of opts || []) {
+      let label = (o.label || o.val || "").trim();
+      if (!label) continue;
+      if (label.includes("|")) label = label.split("|")[0];
+      if (!names.includes(label)) names.push(label);
     }
-    let dailyTrend = Object.values(dayMap).sort((a, b) =>
-      a.day > b.day ? 1 : -1,
+    return names;
+  }
+
+  /** 上课统计（按签到、课程分类、教练） */
+  async getClassStats({ startDay, endDay, coachId } = {}) {
+    await this._ensureCardCollections();
+    let today = timeUtil.time("Y-M-D");
+    if (!startDay) startDay = timeUtil.time("Y-M") + "-01";
+    if (!endDay) endDay = today;
+    if (startDay > endDay) {
+      let tmp = startDay;
+      startDay = endDay;
+      endDay = tmp;
+    }
+    coachId = (coachId || "").trim();
+
+    let setup = await tenantSetupHelper.getSetupForPid(
+      global.PID,
+      "SETUP_MEET_TYPE",
     );
+    let categoryNames = this._parseMeetCategoryNames(
+      (setup && setup.SETUP_MEET_TYPE) || "",
+    );
+    let categoryMap = {};
+    for (let name of categoryNames) {
+      categoryMap[name] = {
+        typeName: name,
+        classCnt: 0,
+        consumeTimes: 0,
+        consumeAmount: 0,
+      };
+    }
+
+    let joins = await JoinModel.getAll(
+      {
+        JOIN_STATUS: JoinModel.STATUS.SUCC,
+        JOIN_IS_CHECKIN: 1,
+        JOIN_MEET_DAY: ["between", startDay, endDay],
+      },
+      "JOIN_MEET_ID,JOIN_MEET_TITLE,JOIN_MEET_DAY",
+      { JOIN_MEET_DAY: "asc", JOIN_ADD_TIME: "asc" },
+      10000,
+    );
+
+    let meetIds = [
+      ...new Set((joins || []).map((j) => j.JOIN_MEET_ID).filter(Boolean)),
+    ];
+    let meetMap = {};
+    if (meetIds.length) {
+      let meets = await MeetModel.getAll(
+        { _id: ["in", meetIds] },
+        "MEET_TITLE,MEET_TYPE_ID,MEET_TYPE_NAME,MEET_ADMIN_ID,MEET_STYLE_SET",
+        {},
+        meetIds.length,
+      );
+      for (let m of meets || []) {
+        meetMap[m._id] = m;
+      }
+    }
+
+    let admins = await AdminModel.getAll(
+      { ADMIN_STATUS: 1 },
+      "ADMIN_ID,ADMIN_NAME,ADMIN_TYPE",
+      {},
+      500,
+    );
+    let adminMap = {};
+    for (let a of admins || []) {
+      adminMap[a.ADMIN_ID] = a;
+    }
+
+    let coachOptions = (admins || [])
+      .filter((a) =>
+        [AdminModel.TYPE.OWNER, AdminModel.TYPE.TEACHER].includes(
+          a.ADMIN_TYPE,
+        ),
+      )
+      .map((a) => ({
+        coachId: a.ADMIN_ID,
+        coachName: a.ADMIN_NAME || "教练",
+      }))
+      .sort((a, b) => a.coachName.localeCompare(b.coachName, "zh-CN"));
+
+    let joinIds = (joins || []).map((j) => j._id);
+    let logByJoinId = {};
+    if (joinIds.length) {
+      let logs = [];
+      try {
+        logs = await UserCardLogModel.getAll(
+          {
+            CARD_LOG_JOIN_ID: ["in", joinIds],
+            CARD_LOG_STATUS: UserCardLogModel.STATUS.VALID,
+          },
+          "CARD_LOG_JOIN_ID,CARD_LOG_TIMES,CARD_LOG_ACTION,CARD_LOG_ID",
+          {},
+          joinIds.length,
+        );
+      } catch (e) {
+        logs = [];
+      }
+      for (let log of logs || []) {
+        if (!this._isIncomeLog(log)) continue;
+        logByJoinId[log.CARD_LOG_JOIN_ID] = log;
+      }
+    }
+
+    let incomeEntries = await this.buildIncomeEntries();
+    let amountByLogId = {};
+    for (let entry of incomeEntries) {
+      amountByLogId[entry.logId] = entry.amount;
+    }
+
+    let coachMap = {};
+
+    for (let join of joins || []) {
+      let meet = meetMap[join.JOIN_MEET_ID] || {};
+      let coachInfo = this._resolveCoachFromMeet(meet, adminMap);
+      if (coachId && coachInfo.coachId !== coachId) continue;
+
+      let typeName = (meet.MEET_TYPE_NAME || "未分类").trim();
+      if (typeName.includes("|")) typeName = typeName.split("|")[0];
+      if (!categoryMap[typeName]) {
+        categoryMap[typeName] = {
+          typeName,
+          classCnt: 0,
+          consumeTimes: 0,
+          consumeAmount: 0,
+        };
+      }
+
+      categoryMap[typeName].classCnt++;
+
+      let log = logByJoinId[join._id];
+      let times = log ? Number(log.CARD_LOG_TIMES) || 0 : 0;
+      let consumeTimes = times > 0 ? times : log ? 1 : 0;
+      let consumeAmount =
+        log && amountByLogId[log._id] != null ? amountByLogId[log._id] : 0;
+
+      categoryMap[typeName].consumeTimes += consumeTimes;
+      categoryMap[typeName].consumeAmount = this._roundMoney(
+        categoryMap[typeName].consumeAmount + consumeAmount,
+      );
+
+      let cKey = coachInfo.coachId;
+      if (!coachMap[cKey]) {
+        coachMap[cKey] = {
+          coachId: coachInfo.coachId,
+          coachName: coachInfo.coachName,
+          avatar: coachInfo.avatar,
+          totalClasses: 0,
+          courseMap: {},
+        };
+      }
+      coachMap[cKey].totalClasses++;
+
+      let courseKey = join.JOIN_MEET_ID || join.JOIN_MEET_TITLE;
+      if (!coachMap[cKey].courseMap[courseKey]) {
+        coachMap[cKey].courseMap[courseKey] = {
+          meetId: join.JOIN_MEET_ID || "",
+          title: meet.MEET_TITLE || join.JOIN_MEET_TITLE || "课程",
+          typeName,
+          classCnt: 0,
+        };
+      }
+      coachMap[cKey].courseMap[courseKey].classCnt++;
+    }
+
+    let categorySummary = Object.values(categoryMap).map((item) => ({
+      typeName: item.typeName,
+      classCnt: item.classCnt,
+      consumeTimes: item.consumeTimes,
+      consumeAmount: item.consumeAmount,
+      consumeAmountText: this._formatMoney(item.consumeAmount),
+    }));
+
+    let coaches = Object.values(coachMap)
+      .map((item) => ({
+        coachId: item.coachId,
+        coachName: item.coachName,
+        avatar: item.avatar,
+        totalClasses: item.totalClasses,
+        courses: Object.values(item.courseMap)
+          .sort((a, b) => b.classCnt - a.classCnt)
+          .map((c) => ({
+            meetId: c.meetId,
+            title: c.title,
+            typeName: c.typeName,
+            classCnt: c.classCnt,
+          })),
+      }))
+      .sort((a, b) => b.totalClasses - a.totalClasses);
 
     return {
-      totalJoin,
-      totalCheckin,
-      cancelCnt,
-      todayJoin,
-      monthJoin,
-      monthCheckin,
-      checkinRate:
-        totalJoin > 0
-          ? Math.round((totalCheckin / totalJoin) * 1000) / 10
-          : 0,
-      dailyTrend,
+      startDay,
+      endDay,
+      dateRangeText: startDay + "至" + endDay,
+      coachId,
+      coachOptions,
+      categorySummary,
+      coaches,
     };
   }
 

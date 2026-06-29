@@ -17,13 +17,21 @@ Page({
     filters: FILTERS,
     activeFilter: '',
     keyword: '',
+    dayStart: '',
+    dayEnd: '',
     list: [],
     page: 1,
     hasMore: true,
   },
 
-  onLoad() {
+  onLoad(options) {
     this._applyCoachTheme();
+    const patch = {};
+    if (options.sortType) patch.activeFilter = options.sortType;
+    if (options.search) patch.keyword = decodeURIComponent(options.search);
+    if (options.dayStart) patch.dayStart = options.dayStart;
+    if (options.dayEnd) patch.dayEnd = options.dayEnd;
+    if (Object.keys(patch).length) this.setData(patch);
     this._loadData(true);
   },
 
@@ -73,6 +81,8 @@ Page({
         search: this.data.keyword || '',
       };
       if (this.data.activeFilter) params.sortType = this.data.activeFilter;
+      if (this.data.dayStart) params.dayStart = this.data.dayStart;
+      if (this.data.dayEnd) params.dayEnd = this.data.dayEnd;
       const res = await cloudHelper.callCloudData(
         'admin/stats_join_query',
         params,

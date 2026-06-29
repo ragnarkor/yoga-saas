@@ -24,6 +24,7 @@ module.exports = Behavior({
     pageTitle: "约课中心",
     pageSubtitle: "选择课程，开启你的练习之旅",
     emptyText: "暂无预约课程",
+    showPrivateEntry: false,
   },
 
   methods: {
@@ -35,7 +36,7 @@ module.exports = Behavior({
       await this._syncTenantCategories();
       this._initTabs();
       this.setData({ isLoad: true });
-      await this._loadHasList();
+      await Promise.all([this._loadHasList(), this._loadPrivateMeta()]);
       await this._loadList();
     },
 
@@ -305,7 +306,7 @@ module.exports = Behavior({
       if (idx >= 0) activeTab = idx;
 
       this.setData({ activeTab: Number(activeTab) || 0 }, async () => {
-        await this._loadHasList();
+        await Promise.all([this._loadHasList(), this._loadPrivateMeta()]);
         await this._loadList();
       });
     },
@@ -315,7 +316,7 @@ module.exports = Behavior({
     onUnload: function () {},
 
     onPullDownRefresh: async function () {
-      await this._loadHasList();
+      await Promise.all([this._loadHasList(), this._loadPrivateMeta()]);
       await this._loadList();
       wx.stopPullDownRefresh();
     },
@@ -353,8 +354,30 @@ module.exports = Behavior({
     },
 
     bindReload: async function () {
-      await this._loadHasList();
+      await Promise.all([this._loadHasList(), this._loadPrivateMeta()]);
       await this._loadList();
+    },
+
+    _loadPrivateMeta: async function () {
+      try {
+        const meta = await cloudHelper.callCloudData(
+          "private/meta",
+          {},
+          { hint: false },
+        );
+        const hasPrivate =
+          meta && Array.isArray(meta.courses) && meta.courses.length > 0;
+        this.setData({ showPrivateEntry: !!hasPrivate });
+      } catch (err) {
+        console.warn("[calendar/private]", err);
+        this.setData({ showPrivateEntry: false });
+      }
+    },
+
+    bindPrivateBookTap: function () {
+      wx.navigateTo({
+        url: "/pages/default/private/book/private_book",
+      });
     },
 
     bindClickCmpt: async function (e) {

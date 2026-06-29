@@ -1,5 +1,5 @@
 <page-meta page-style="{{themeStyle}}" />
-<view class="coach-page stats-page">
+<view class="coach-page stats-page class-stats-page">
   <coach-tenant-switch
     title="{{navTitle}}"
     show-back="{{true}}"
@@ -8,51 +8,132 @@
     bind:change="bindCoachTenantChange"
   />
 
+  <view class="cs-date-bar">
+    <text class="cs-date-text">{{dateRangeText || (startDay + '至' + endDay)}}</text>
+    <view class="cs-filter-btn" bindtap="bindFilterOpenTap">
+      <van-icon name="filter-o" size="32rpx" color="{{themeColor}}" />
+      <text style="color: {{themeColor}}">筛选</text>
+    </view>
+  </view>
+
   <view wx:if="{{loading}}" class="stats-loading">
     <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
   </view>
 
   <block wx:else>
-    <view class="stats-summary-card">
-      <view class="stats-summary-item">
-        <view class="stats-summary-num">{{stats.totalJoin || 0}}</view>
-        <view class="stats-summary-label">累计预约</view>
+    <view class="cs-summary-card">
+      <view class="cs-table-head">
+        <view class="cs-col-type"></view>
+        <view class="cs-col-num">上课节数</view>
+        <view class="cs-col-num">耗卡次数</view>
+        <view class="cs-col-amt">耗卡金额</view>
       </view>
-      <view class="stats-summary-item">
-        <view class="stats-summary-num">{{stats.totalCheckin || 0}}</view>
-        <view class="stats-summary-label">累计签到</view>
-      </view>
-      <view class="stats-summary-item">
-        <view class="stats-summary-num">{{stats.todayJoin || 0}}</view>
-        <view class="stats-summary-label">今日预约</view>
-      </view>
-      <view class="stats-summary-item">
-        <view class="stats-summary-num">{{stats.monthJoin || 0}}</view>
-        <view class="stats-summary-label">本月预约</view>
-      </view>
-      <view class="stats-summary-item">
-        <view class="stats-summary-num">{{stats.monthCheckin || 0}}</view>
-        <view class="stats-summary-label">本月签到</view>
-      </view>
-      <view class="stats-summary-item">
-        <view class="stats-summary-num">{{stats.checkinRate || 0}}%</view>
-        <view class="stats-summary-label">签到率</view>
+      <view wx:if="{{!categorySummary.length}}" class="stats-empty">暂无分类配置</view>
+      <view class="cs-table-row" wx:for="{{categorySummary}}" wx:key="typeName">
+        <view class="cs-col-type">{{item.typeName}}</view>
+        <view class="cs-col-num cs-num">{{item.classCnt}}节</view>
+        <view class="cs-col-num cs-num">{{item.consumeTimes}}次</view>
+        <view class="cs-col-amt cs-num">{{item.consumeAmountText}}元</view>
       </view>
     </view>
 
-    <view class="stats-section">
-      <view class="stats-section-title">近30日趋势</view>
-      <view class="stats-table-head">
-        <view class="stats-col-name">日期</view>
-        <view class="stats-col-num">预约</view>
-        <view class="stats-col-amt">签到</view>
+    <view wx:if="{{!coaches.length}}" class="stats-empty cs-coach-empty">该时段暂无上课记录</view>
+
+    <view class="cs-coach-block" wx:for="{{coaches}}" wx:key="coachId" wx:for-item="coachItem">
+      <view class="cs-coach-head">
+        <view class="cs-coach-info">
+          <view class="cs-coach-avatar">
+            <image wx:if="{{coachItem.avatar}}" src="{{coachItem.avatar}}" mode="aspectFill" />
+            <text wx:else>{{coachItem.coachInitial}}</text>
+          </view>
+          <text class="cs-coach-name">{{coachItem.coachName}}</text>
+        </view>
+        <text class="cs-coach-total">共计: {{coachItem.totalClasses}}节</text>
       </view>
-      <view wx:if="{{dailyTrend.length === 0}}" class="stats-empty">暂无数据</view>
-      <view class="stats-table-row" wx:for="{{dailyTrend}}" wx:key="day">
-        <view class="stats-col-name">{{item.day}}</view>
-        <view class="stats-col-num">{{item.joinCnt}}</view>
-        <view class="stats-col-amt">{{item.checkinCnt}}</view>
+      <view
+        class="cs-course-row"
+        wx:for="{{coachItem.courses}}"
+        wx:key="meetId"
+        wx:for-item="courseItem"
+        data-meet-id="{{courseItem.meetId}}"
+        data-title="{{courseItem.title}}"
+        bindtap="bindCourseTap"
+      >
+        <text class="cs-course-title">{{courseItem.title}} ({{courseItem.typeName}})</text>
+        <view class="cs-course-right">
+          <text class="cs-course-cnt">{{courseItem.classCnt}}节</text>
+          <van-icon name="arrow" size="28rpx" color="#c8c9cc" />
+        </view>
       </view>
     </view>
   </block>
+
+  <van-popup show="{{filterShow}}" position="bottom" round bind:close="bindFilterCloseTap">
+    <view class="cs-filter-sheet">
+      <view class="cs-filter-title">筛选条件</view>
+
+      <view class="cs-filter-field">
+        <text class="cs-filter-label">起始日期</text>
+        <cmpt-picker-time
+          mark="filterStartDay"
+          mode="day"
+          bind:select="url"
+          data-type="picker"
+          data-item="filterStartDay"
+          startYear="2021"
+          endYear="{{endYear}}"
+          item="{{filterStartDay}}"
+        >
+          <view class="cs-filter-value-row">
+            <text>{{filterStartDay || '请选择'}}</text>
+            <van-icon name="arrow" size="28rpx" color="#c8c9cc" />
+          </view>
+        </cmpt-picker-time>
+      </view>
+
+      <view class="cs-filter-field">
+        <text class="cs-filter-label">终止日期</text>
+        <cmpt-picker-time
+          mark="filterEndDay"
+          mode="day"
+          bind:select="url"
+          data-type="picker"
+          data-item="filterEndDay"
+          startYear="2021"
+          endYear="{{endYear}}"
+          item="{{filterEndDay}}"
+        >
+          <view class="cs-filter-value-row">
+            <text>{{filterEndDay || '请选择'}}</text>
+            <van-icon name="arrow" size="28rpx" color="#c8c9cc" />
+          </view>
+        </cmpt-picker-time>
+      </view>
+
+      <view class="cs-filter-field cs-filter-field--coach">
+        <text class="cs-filter-label">授课教练</text>
+        <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="cs-coach-scroll">
+          <view
+            class="cs-coach-chip {{!filterCoachId ? 'is-active' : ''}}"
+            data-id=""
+            bindtap="bindFilterCoachTap"
+            style="{{!filterCoachId ? 'background:' + themeColor + ';border-color:' + themeColor + ';' : ''}}"
+          >全部</view>
+          <view
+            class="cs-coach-chip {{filterCoachId === item.coachId ? 'is-active' : ''}}"
+            wx:for="{{coachOptions}}"
+            wx:key="coachId"
+            data-id="{{item.coachId}}"
+            bindtap="bindFilterCoachTap"
+            style="{{filterCoachId === item.coachId ? 'background:' + themeColor + ';border-color:' + themeColor + ';' : ''}}"
+          >{{item.coachName}}</view>
+        </scroll-view>
+      </view>
+
+      <view class="cs-filter-actions">
+        <van-button block round plain color="{{themeColor}}" bind:click="bindFilterResetTap">重置</van-button>
+        <van-button block round color="{{themeColor}}" bind:click="bindFilterConfirmTap">确定</van-button>
+      </view>
+    </view>
+  </van-popup>
 </view>

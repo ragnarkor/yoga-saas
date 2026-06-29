@@ -219,6 +219,12 @@ module.exports = Behavior({
       });
     },
 
+    bindAnnounceEntryTap: function () {
+      wx.navigateTo({
+        url: "/pages/default/announcement/list/announcement_list",
+      });
+    },
+
     onPullDownRefresh: async function () {
       await this._loadTodayList();
       await this._loadUser();

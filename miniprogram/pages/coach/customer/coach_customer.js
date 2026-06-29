@@ -82,12 +82,22 @@ Page({
 
   async onCardTap(e) {
     const key = e.currentTarget.dataset.key;
-    if (key === "totalCards" || key === "newCard") {
+    if (key === "totalCards") {
       if (
         !(await this._coachBeforeAdmin("/pages/coach/card/coach_card_list"))
       )
         return;
       wx.navigateTo({ url: "/pages/coach/card/coach_card_list" });
+      return;
+    }
+    if (key === "newCard") {
+      if (
+        !(await this._coachBeforeAdmin(
+          "/pages/coach/member/coach_month_new_card",
+        ))
+      )
+        return;
+      wx.navigateTo({ url: "/pages/coach/member/coach_month_new_card" });
       return;
     }
     if (

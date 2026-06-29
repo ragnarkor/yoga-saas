@@ -1,0 +1,28 @@
+<page-meta page-style="{{pageStyle}}" />
+<view class="theme-scope announce-list-page" style="{{pageStyle}}">
+  <cmpt-tenant-switch title="公告通知" show-back="{{true}}" theme-color="{{themeColor}}" />
+
+  <view wx:if="{{loading}}" class="announce-list-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <view wx:elif="{{!list.length}}" class="announce-list-empty">
+    <van-empty description="暂无公告" />
+  </view>
+
+  <view wx:else class="announce-list">
+    <view
+      class="announce-list-item"
+      wx:for="{{list}}"
+      wx:key="_id"
+      data-id="{{item._id}}"
+      bindtap="bindItemTap"
+    >
+      <view class="announce-list-item-main">
+        <text class="announce-list-title text-cut">{{item.title}}</text>
+        <text wx:if="{{item.desc}}" class="announce-list-desc text-cut">{{item.desc}}</text>
+      </view>
+      <van-icon name="arrow" size="28rpx" color="#c8c9cc" />
+    </view>
+  </view>
+</view>

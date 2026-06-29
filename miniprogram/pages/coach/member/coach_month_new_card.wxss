@@ -1,0 +1,80 @@
+@import "../coach_member_card.wxss";
+
+.month-new-card-page {
+  padding-bottom: 48rpx;
+}
+
+.mnc-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8rpx;
+  padding: 20rpx 32rpx;
+  background: var(--neutralSurface, #fff);
+  border-bottom: 1rpx solid var(--neutralBorder, #e8e9eb);
+  font-size: 26rpx;
+  color: var(--neutralTextSecondary, #646a73);
+}
+
+.mnc-summary-dot {
+  color: var(--neutralBorder, #c8c9cc);
+}
+
+.mnc-row {
+  align-items: flex-start;
+}
+
+.mnc-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--neutralTextSecondary, #646a73);
+}
+
+.mnc-card-count {
+  color: var(--themeColor, #5b8a72);
+  font-weight: 600;
+}
+
+.mnc-card-dot {
+  color: var(--neutralBorder, #c8c9cc);
+}
+
+.mnc-card-summary {
+  min-width: 0;
+}
+
+.mnc-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 12rpx;
+}
+
+.mnc-card-tag {
+  max-width: 100%;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mnc-add-time {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--neutralTextSecondary, #999);
+}
+
+.member-loading,
+.member-empty {
+  padding: 80rpx 32rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: var(--neutralTextSecondary, #999);
+}

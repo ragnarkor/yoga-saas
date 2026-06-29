@@ -1,7 +1,13 @@
+.loading-wrap {
+  padding: 120rpx 32rpx;
+  display: flex;
+  justify-content: center;
+}
+
 .announce-detail {
   padding: 32rpx;
   background: #fff;
-  min-height: 100vh;
+  min-height: calc(100vh - 120rpx);
 }
 
 .title {

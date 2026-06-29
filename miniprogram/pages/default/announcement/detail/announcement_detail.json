@@ -1,4 +1,4 @@
 {
-  "navigationBarTitleText": "公告详情",
-  "usingComponents": {}
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "公告详情"
 }

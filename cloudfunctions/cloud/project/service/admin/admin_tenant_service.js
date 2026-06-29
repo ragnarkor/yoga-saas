@@ -492,7 +492,7 @@ class AdminTenantService extends BaseAdminService {
     return {
       totalMembers,
       totalCards: cardStats.totalCardTpls || 0,
-      newCard: cardStats.newCardTpls ?? 0,
+      newCard: cardStats.newCards ?? 0,
       monthBirthday: 0,
       monthNew,
       inactive30,
