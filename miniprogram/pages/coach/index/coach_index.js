@@ -19,7 +19,7 @@ Page({
     isSuperAdmin: false,
     quickTools: [
       { name: '邀请会员', icon: 'star-o', color: '#ffb74d', action: 'invite' },
-      { name: '签到码', icon: 'qr', color: '#81c784', url: '/pages/admin/meet/scan/admin_meet_scan' },
+      { name: '签到码', icon: 'qr', color: '#81c784', url: '/pages/coach/checkin/coach_checkin_list' },
     ],
     menus: [
       { name: '预约', icon: 'clock-o', color: '#f48fb1', url: '/pages/coach/booking/coach_booking' },

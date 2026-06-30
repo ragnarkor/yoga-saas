@@ -60,6 +60,19 @@ class AdminTenantController extends BaseAdminController {
     return await service.getMemberStats(pid);
   }
 
+  async getAttentionMembers() {
+    await this.isAdmin();
+    let rules = {
+      type: "required|string|name=关注类型",
+      search: "string|false|max:30|name=搜索条件",
+      page: "required|int|default=1",
+      size: "int|default=100",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminTenantService();
+    return await service.getAttentionMembers(input);
+  }
+
   /** 超管：平台概览 */
   async getPlatformOverview() {
     await this.isSuperAdmin();

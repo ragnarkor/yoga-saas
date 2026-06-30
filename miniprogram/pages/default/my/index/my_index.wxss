@@ -9,7 +9,7 @@
 /*投影*/
 .main .upside {
   height: 450rpx;
-  padding: 0 0 0rpx 0;
+  padding: 0;
 }
 
 .main .upside .user-bar .detail .desc {
@@ -126,6 +126,7 @@
 .main .upside .user-bar {
   align-items: center;
   padding-right: 32rpx;
+  z-index: 2;
 }
 
 /* 菜单列表图标：统一主题色，次要项略降透明度 */
@@ -187,6 +188,27 @@
   gap: 4rpx;
   font-size: 24rpx;
   color: #969799;
+}
+
+.today-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.today-scan {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: var(--projectColorLight, #e8f2ed);
+  font-size: 24rpx;
+  color: var(--themeColor, #5b8a72);
+}
+
+.today-scan:active {
+  opacity: 0.85;
 }
 
 .today-state {

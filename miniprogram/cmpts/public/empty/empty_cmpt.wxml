@@ -1,10 +1,16 @@
-<van-empty-base
-  custom-class="custom-class"
-  image-class="image-class"
-  description-class="description-class"
-  image="{{image}}"
-  description="{{description}}"
-  image-size="{{imageSize}}"
->
-  <slot />
-</van-empty-base>
+<view class="empty-cmpt custom-class">
+  <view class="empty-cmpt__image-wrap" style="{{imageSize ? 'width:' + imageSize + ';height:' + imageSize : ''}}">
+    <image
+      class="empty-cmpt__image image-class"
+      src="{{displayImage}}"
+      mode="aspectFit"
+      lazy-load="{{false}}"
+    />
+  </view>
+  <view wx:if="{{description}}" class="empty-cmpt__desc description-class">
+    {{description}}
+  </view>
+  <view class="empty-cmpt__bottom">
+    <slot />
+  </view>
+</view>

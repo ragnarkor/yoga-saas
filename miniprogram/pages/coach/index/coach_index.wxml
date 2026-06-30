@@ -2,13 +2,17 @@
 <view class="coach-page coach-home">
   <coach-tenant-switch title="工作台" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" bind:change="bindCoachTenantChange" />
 
-  <view class="coach-home-body">
-    <view class="coach-welcome">
-      <text class="coach-welcome-title">{{tenantName || '瑜伽馆'}}</text>
-      <text class="coach-welcome-sub">今日经营概览</text>
+  <view class="coach-hero">
+    <image class="coach-hero-bg" src="/pages/coach/images/coach_home_hero.jpg?v=5" mode="aspectFill" />
+    <view class="coach-hero-overlay"></view>
+    <view class="coach-hero-text">
+      <text class="coach-hero-title">{{tenantName || '瑜伽馆'}}</text>
+      <text class="coach-hero-sub">今日经营概览</text>
     </view>
+  </view>
 
-    <view class="coach-stats-card">
+  <view class="coach-home-body">
+    <view class="coach-stats-card coach-stats-card--hero">
       <view class="coach-stat-item">
         <view class="coach-stat-num">{{stats.todayJoin}}</view>
         <view class="coach-stat-label">今日预约</view>

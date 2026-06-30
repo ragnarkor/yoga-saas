@@ -5,6 +5,7 @@ const defaultCoverHelper = require("../helper/default_cover_helper.js");
 const UserProfileBiz = require("../biz/user_profile_biz.js");
 const setting = require("../setting/setting.js");
 const timeHelper = require("../helper/time_helper.js");
+const emptyImageHelper = require("../helper/empty_image_helper.js");
 
 module.exports = Behavior({
   data: {
@@ -21,9 +22,10 @@ module.exports = Behavior({
 
     dateList: [],
 
-    pageTitle: "约课中心",
+    pageTitle: "瑜伽馆",
     pageSubtitle: "选择课程，开启你的练习之旅",
     emptyText: "暂无预约课程",
+    emptyImage: emptyImageHelper.pickEmptyImage(),
     showPrivateEntry: false,
   },
 
@@ -31,6 +33,7 @@ module.exports = Behavior({
     onLoad: async function (options) {
       if (setting.IS_SUB) wx.hideHomeButton();
 
+      this.setData({ emptyImage: emptyImageHelper.pickEmptyImage() });
       this._skipShowRefresh = true;
       this._initDateList();
       await this._syncTenantCategories();
@@ -52,17 +55,21 @@ module.exports = Behavior({
         if (res?.tenant) {
           pageHelper.mergeTenantInfo(res.tenant);
         }
+        this._applyPageHeader();
       } catch (err) {
         console.error(err);
       }
     },
 
+    _applyPageHeader: function () {
+      const tenantName = pageHelper.getTenantName() || "瑜伽馆";
+      this.setData({
+        pageTitle: tenantName,
+      });
+    },
+
     _initTabs: function () {
       const tabs = meetCategoryHelper.getMeetCategories("全部课程");
-
-      let now = new Date();
-      let month = now.getMonth() + 1;
-      let pageTitle = month + "月瑜伽·普拉提";
 
       let activeTab = this.data.activeTab || 0;
       const prevTabId =
@@ -73,9 +80,9 @@ module.exports = Behavior({
       if (nextIdx >= 0) activeTab = nextIdx;
       else if (activeTab >= tabs.length) activeTab = 0;
 
+      this._applyPageHeader();
       this.setData({
         tabs,
-        pageTitle,
         activeTab: Number(activeTab) || 0,
       });
     },

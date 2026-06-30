@@ -180,24 +180,7 @@ class AdminCardService extends BaseAdminService {
     await CardTplModel.del({ CARD_TPL_ID: id });
   }
 
-  async getMonthNewCardMembers({
-    search,
-    page = 1,
-    size = 50,
-  } = {}) {
-    await this._ensureCardCollections();
-    let monthStart = timeUtil.time2Timestamp(
-      timeUtil.time("Y-M") + "-01 00:00:00",
-    );
-
-    let cards = await this._safeGetAll(
-      UserCardModel,
-      { USER_CARD_ADD_TIME: [">=", monthStart] },
-      "*",
-      { USER_CARD_ADD_TIME: "desc" },
-      5000,
-    );
-
+  async _buildMemberCardGroupList(cards, { search, page = 1, size = 50 } = {}) {
     let groupMap = {};
     for (let c of cards || []) {
       let uid = (c.USER_CARD_USER_ID || "").trim();
@@ -265,6 +248,7 @@ class AdminCardService extends BaseAdminService {
               price: item.price,
               color: item.color,
               balanceText: item.balanceText,
+              statusLabel: item.statusLabel,
               addTime,
               addTimeDesc: timeUtil.timestamp2Time(addTime, "M-D"),
             };
@@ -281,12 +265,14 @@ class AdminCardService extends BaseAdminService {
               mappedCards.length +
               "张";
 
+        let cardCount = mappedCards.length;
         return {
           userId: uid,
           USER_NAME: u.USER_NAME || "未命名会员",
           USER_MOBILE: u.USER_MOBILE || "",
           USER_PIC: u.USER_PIC || "",
-          newCardCount: mappedCards.length,
+          cardCount,
+          newCardCount: cardCount,
           latestAddTime: g.latestAddTime,
           addTimeDesc: timeUtil.timestamp2Time(g.latestAddTime, "Y-M-D"),
           cardSummary,
@@ -310,10 +296,7 @@ class AdminCardService extends BaseAdminService {
     let start = (page - 1) * size;
     let pageList = list.slice(start, start + size);
 
-    let month = timeUtil.time("Y-M");
     return {
-      month,
-      monthText: month.replace("-", "年") + "月",
       totalMembers,
       totalCards,
       list: pageList,
@@ -322,6 +305,52 @@ class AdminCardService extends BaseAdminService {
       size,
       count: pageList.length,
     };
+  }
+
+  async getMonthNewCardMembers({
+    search,
+    page = 1,
+    size = 50,
+  } = {}) {
+    await this._ensureCardCollections();
+    let monthStart = timeUtil.time2Timestamp(
+      timeUtil.time("Y-M") + "-01 00:00:00",
+    );
+
+    let cards = await this._safeGetAll(
+      UserCardModel,
+      { USER_CARD_ADD_TIME: [">=", monthStart] },
+      "*",
+      { USER_CARD_ADD_TIME: "desc" },
+      5000,
+    );
+
+    let month = timeUtil.time("Y-M");
+    return {
+      month,
+      monthText: month.replace("-", "年") + "月",
+      ...(await this._buildMemberCardGroupList(cards || [], {
+        search,
+        page,
+        size,
+      })),
+    };
+  }
+
+  async getCardHolderMembers({
+    search,
+    page = 1,
+    size = 50,
+  } = {}) {
+    await this._ensureCardCollections();
+    let cards = await this._safeGetAll(
+      UserCardModel,
+      { USER_CARD_STATUS: UserCardModel.STATUS.NORMAL },
+      "*",
+      { USER_CARD_ADD_TIME: "desc" },
+      10000,
+    );
+    return this._buildMemberCardGroupList(cards || [], { search, page, size });
   }
 
   async getMemberList({
@@ -601,11 +630,24 @@ class AdminCardService extends BaseAdminService {
       USER_CARD_TYPE: CardTplModel.TYPE.TIMES,
       USER_CARD_QUOTA: ["<=", 3],
     });
+    let holderRows = await this._safeGetAll(
+      UserCardModel,
+      { USER_CARD_STATUS: UserCardModel.STATUS.NORMAL },
+      "USER_CARD_USER_ID",
+      {},
+      10000,
+    );
+    let cardHolderSet = new Set();
+    for (let c of holderRows || []) {
+      if (c.USER_CARD_USER_ID) cardHolderSet.add(c.USER_CARD_USER_ID);
+    }
+    let cardHolderCount = cardHolderSet.size;
     return {
       totalCardTpls,
       newCardTpls,
       totalCards,
       newCards,
+      cardHolderCount,
       expiringSoon,
       lowTimes,
     };

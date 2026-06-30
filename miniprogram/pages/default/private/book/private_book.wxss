@@ -1,7 +1,8 @@
 .private-book-page {
   min-height: 100vh;
   background: #f7f8fa;
-  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(180rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
@@ -179,10 +180,12 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 16rpx 32rpx calc(16rpx + env(safe-area-inset-bottom));
+  padding: 16rpx 32rpx;
+  padding-bottom: calc(24rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
   background: #fff;
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
-  z-index: 100;
+  z-index: 10;
 }
 
 .pb-card-hint {
@@ -238,10 +241,14 @@
 
 .pb-sheet-actions {
   padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
 }
 
 .pb-card-sheet {
-  padding: 24rpx 24rpx calc(24rpx + env(safe-area-inset-bottom));
+  padding: 24rpx 24rpx 0;
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .pb-card-sheet-head {

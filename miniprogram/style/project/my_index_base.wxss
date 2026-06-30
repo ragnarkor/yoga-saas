@@ -7,8 +7,8 @@
 .main .upside {
   background: linear-gradient(
     135deg,
-    var(--projectColor, #5b8a72) 0%,
-    var(--projectColorDark, #4a7160) 100%
+    var(--projectColorDark, #4a7160) 0%,
+    var(--projectColor, #5b8a72) 100%
   );
   height: 250rpx;
   width: 100%;

@@ -1,0 +1,88 @@
+@import "../coach_common.wxss";
+
+.ci-page {
+  min-height: 100vh;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+  background: #f5f6f8;
+}
+
+.ci-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  margin: 16rpx 24rpx;
+  padding: 20rpx 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  color: #646a73;
+  line-height: 1.5;
+}
+
+.ci-loading {
+  display: flex;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.ci-list {
+  margin: 0 24rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.ci-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 28rpx 24rpx;
+  border-bottom: 1rpx solid #f0f1f3;
+}
+
+.ci-item:last-child {
+  border-bottom: none;
+}
+
+.ci-item:active {
+  background: #fafafa;
+}
+
+.ci-item-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2329;
+}
+
+.ci-item-meta {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: #646a73;
+}
+
+.ci-item-sub {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.ci-item-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  font-size: 26rpx;
+  color: var(--themeColor, #5b8a72);
+}
+
+.ci-footer-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  margin: 32rpx 24rpx 0;
+  padding: 24rpx;
+  font-size: 28rpx;
+  color: var(--themeColor, #5b8a72);
+}

@@ -15,9 +15,15 @@ module.exports = Behavior({
 		 * 生命周期函数--监听页面加载
 		 */
 		onLoad: async function (options) {
-			if (options && options.scene) {
+			const timeMark =
+				(options && options.scene) ||
+				(options && options.timeMark) ||
+				(options && options.mark) ||
+				'';
+
+			if (timeMark) {
 				let params = {
-					timeMark: options.scene
+					timeMark: decodeURIComponent(timeMark)
 				};
 				let opts = {
 					title: 'bar'
@@ -35,7 +41,7 @@ module.exports = Behavior({
 					console.error(err);
 				}
 			} else {
-				pageHelper.showModal('签到码扫描错误，请关闭本小程序，使用「微信›扫一扫」重新扫码');
+				pageHelper.showModal('签到码无效，请扫描场馆出示的签到码，或使用「我的」页扫码签到');
 			}
 		},
 

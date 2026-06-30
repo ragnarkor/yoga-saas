@@ -65,6 +65,7 @@ Page({
     cardHint: '',
     cardNeedTimes: 1,
     submitBtnText: '请先选择时段',
+    pickerSheetOpen: false,
   },
 
   onLoad(options) {
@@ -260,6 +261,10 @@ Page({
       'form.start': '',
       'form.end': '',
     }, () => this._loadSlots());
+  },
+
+  onPickerSheetChange(e) {
+    this.setData({ pickerSheetOpen: !!(e.detail && e.detail.show) });
   },
 
   bindDayTap(e) {

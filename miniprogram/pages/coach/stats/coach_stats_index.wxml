@@ -21,9 +21,4 @@
       <text class="stats-grid-text">{{item.name}}</text>
     </view>
   </view>
-
-  <view class="stats-tip">
-    <van-icon name="info-o" size="32rpx" color="#bbb" />
-    <text>预约查询和排课查询已经合并为「上课统计」，它们可能在后续的版本迭代中移除。</text>
-  </view>
 </view>

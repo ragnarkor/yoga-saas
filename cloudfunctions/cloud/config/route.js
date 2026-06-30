@@ -70,6 +70,7 @@ module.exports = {
   "admin/tenant_store_save":
     "admin/admin_tenant_controller@saveMeetCategories#noDemo",
   "admin/member_stats": "admin/admin_tenant_controller@getMemberStats",
+  "admin/attention_members": "admin/admin_tenant_controller@getAttentionMembers",
   "admin/platform_overview":
     "admin/admin_tenant_controller@getPlatformOverview",
   "admin/platform_staff_list": "admin/admin_home_controller@listPlatformStaff",
@@ -86,6 +87,8 @@ module.exports = {
   "admin/coach_member_list": "admin/admin_card_controller@getCoachMemberList",
   "admin/month_new_card_members":
     "admin/admin_card_controller@getMonthNewCardMembers",
+  "admin/card_holder_members":
+    "admin/admin_card_controller@getCardHolderMembers",
   "admin/user_card_issue": "admin/admin_card_controller@issueUserCard#noDemo",
   "admin/user_card_list": "admin/admin_card_controller@getUserCardList",
   "admin/user_join_card_options":

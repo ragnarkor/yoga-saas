@@ -20,6 +20,7 @@
         placeholder="请选择"
         field-class="mcp-in-section"
         bind:pick="onCoursePick"
+        bind:sheetchange="onPickerSheetChange"
       />
       <coach-picker
         id-mode="teacher"
@@ -28,6 +29,7 @@
         label="授课教练"
         field-class="pb-field"
         bind:pick="onCoachPick"
+        bind:sheetchange="onPickerSheetChange"
       />
     </view>
 
@@ -71,7 +73,7 @@
       </view>
     </view>
 
-    <view class="pb-footer">
+    <view class="pb-footer" wx:if="{{!cardSheetShow && !pickerSheetOpen}}">
       <view wx:if="{{cardHint}}" class="pb-card-hint">
         <van-icon name="info-o" size="28rpx" color="#969799" />
         <text>{{cardHint}}</text>

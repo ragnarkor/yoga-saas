@@ -71,6 +71,18 @@ class AdminCardController extends BaseAdminController {
     return await service.getMonthNewCardMembers(input);
   }
 
+  async getCardHolderMembers() {
+    await this.isAdmin();
+    let rules = {
+      search: "string|false|max:30|name=搜索条件",
+      page: "required|int|default=1",
+      size: "int|default=100",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminCardService();
+    return await service.getCardHolderMembers(input);
+  }
+
   async issueUserCard() {
     await this.isAdmin();
     let rules = {

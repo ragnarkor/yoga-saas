@@ -1,0 +1,2 @@
+@import "../coach_member_card.wxss";
+@import "./coach_month_new_card.wxss";

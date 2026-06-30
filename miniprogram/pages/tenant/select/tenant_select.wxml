@@ -10,9 +10,8 @@
 		<text class="text-xl margin-left-s header-title">选择瑜伽馆</text>
 	</view>
 
-	<view wx:if="{{list.length==0}}" class="empty-tip">
-		<van-icon name="notes-o" size="32rpx" color="#999999" custom-class="text-gray"  />
-		<view class="text-grey margin-top">暂无可用瑜伽馆</view>
+	<view wx:if="{{list.length==0}}" class="tenant-empty">
+		<van-empty description="暂无可用瑜伽馆" />
 	</view>
 
 	<view class="tenant-list" wx:if="{{list.length>0}}">
@@ -26,11 +25,11 @@
 
 			<view class="tenant-info">
 				<view class="tenant-name text-lg">{{item.TENANT_NAME}}</view>
-				<view class="tenant-desc text-s text-grey" wx:if="{{item.TENANT_DESC}}">{{item.TENANT_DESC}}</view>
+				<view class="tenant-desc text-s" wx:if="{{item.TENANT_DESC}}">{{item.TENANT_DESC}}</view>
 			</view>
 
 			<view class="tenant-arrow">
-				<van-icon name="arrow" size="32rpx" color="#999999" custom-class="text-grey"  />
+				<van-icon name="arrow" size="32rpx" color="{{themeColor}}" custom-class="tenant-arrow-icon" />
 			</view>
 		</view>
 	</view>

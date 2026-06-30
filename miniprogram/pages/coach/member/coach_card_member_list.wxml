@@ -1,0 +1,87 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page member-page month-new-card-page">
+  <coach-tenant-switch
+    title="{{navTitle}}"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view class="mnc-summary" wx:if="{{totalMembers || totalCards}}">
+    <text>{{totalMembers}}位会员</text>
+    <text class="mnc-summary-dot">·</text>
+    <text>{{totalCards}}张有效卡</text>
+  </view>
+
+  <view class="member-toolbar">
+    <view class="member-search">
+      <van-icon name="search" size="32rpx" color="{{themeColor}}" />
+      <input
+        class="member-search-input"
+        placeholder="搜索姓名、手机号或卡名"
+        value="{{keyword}}"
+        confirm-type="search"
+        bindinput="bindSearchInput"
+        bindconfirm="bindSearchConfirm"
+      />
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="member-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <view wx:elif="{{!memberList.length}}" class="member-empty">暂无持卡会员</view>
+
+  <view wx:else class="member-list">
+    <view
+      class="member-row mnc-row"
+      wx:for="{{memberList}}"
+      wx:key="userId"
+    >
+      <view class="member-avatar">
+        <image wx:if="{{item.avatarSrc}}" src="{{item.avatarSrc}}" mode="aspectFill" />
+        <view wx:else class="member-avatar-placeholder">
+          <van-icon name="user-o" size="48rpx" color="{{themeColor}}" />
+        </view>
+      </view>
+      <view class="member-info">
+        <view class="member-name">{{item.USER_NAME || '未命名会员'}}</view>
+        <view class="member-phone">{{item.USER_MOBILE || '未绑定手机'}}</view>
+        <view class="mnc-card-meta">
+          <text class="mnc-card-count">持卡 {{item.cardCount}} 张</text>
+          <text class="mnc-card-dot">·</text>
+          <text class="mnc-card-summary">{{item.cardSummary}}</text>
+        </view>
+        <view class="mnc-card-tags" wx:if="{{item.cards.length}}">
+          <view
+            class="mnc-card-tag"
+            wx:for="{{item.cards}}"
+            wx:key="id"
+            wx:for-item="cardItem"
+            style="background: {{cardItem.color}};"
+          >
+            <text>{{cardItem.name}}</text>
+          </view>
+        </view>
+      </view>
+      <view
+        class="member-issue-btn member-cards-btn"
+        data-id="{{item.userId}}"
+        data-name="{{item.USER_NAME}}"
+        catchtap="bindCardsTap"
+      >
+        <text>持卡</text>
+      </view>
+      <view
+        class="member-issue-btn"
+        data-id="{{item.userId}}"
+        data-name="{{item.USER_NAME}}"
+        catchtap="bindIssueTap"
+      >
+        <text>发卡</text>
+      </view>
+    </view>
+  </view>
+</view>

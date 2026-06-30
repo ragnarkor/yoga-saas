@@ -1,0 +1,9 @@
+@import "../coach_member_card.wxss";
+@import "./coach_month_new_card.wxss";
+
+.mnc-attention-hint {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #ed6a0c;
+  line-height: 1.45;
+}

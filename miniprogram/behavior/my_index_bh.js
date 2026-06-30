@@ -7,6 +7,7 @@ const UserProfileBiz = require("../biz/user_profile_biz.js");
 const AdminWxBiz = require("../biz/admin_wx_biz.js");
 const AdminBiz = require("../biz/admin_biz.js");
 const setting = require("../setting/setting.js");
+const checkinScanHelper = require("../helper/checkin_scan_helper.js");
 
 module.exports = Behavior({
   data: {
@@ -237,6 +238,16 @@ module.exports = Behavior({
 
     url: function (e) {
       pageHelper.url(e, this);
+    },
+
+    bindScanCheckinTap: function () {
+      checkinScanHelper.scanAndCheckin({
+        onSuccess: (msg) => {
+          pageHelper.showModal(msg, "签到结果", () => {
+            this._loadTodayList();
+          });
+        },
+      });
     },
 
     bindSetTap: function (e) {

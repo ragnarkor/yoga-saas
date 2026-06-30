@@ -491,7 +491,7 @@ class AdminTenantService extends BaseAdminService {
 
     return {
       totalMembers,
-      totalCards: cardStats.totalCardTpls || 0,
+      totalCards: cardStats.cardHolderCount ?? 0,
       newCard: cardStats.newCards ?? 0,
       monthBirthday: 0,
       monthNew,
@@ -500,6 +500,189 @@ class AdminTenantService extends BaseAdminService {
       lowTimes: cardStats.lowTimes || 0,
       lowBalance: 0,
       expiringSoon: cardStats.expiringSoon || 0,
+    };
+  }
+
+  /** 需关注 / 概况会员明细（与 getMemberStats 统计口径一致） */
+  async getAttentionMembers({ type, search, page = 1, size = 100 } = {}) {
+    type = (type || "").trim();
+    const TYPE_META = {
+      inactive30: { title: "30天未上课", empty: "暂无30天未上课会员" },
+      churn: { title: "流失会员", empty: "暂无流失会员" },
+      expiringSoon: { title: "即将到期", empty: "暂无即将到期会员" },
+      lowTimes: { title: "次数不足", empty: "暂无次数不足会员" },
+      lowBalance: { title: "储蓄不足", empty: "暂无储蓄不足会员" },
+      monthNew: { title: "本月新增会员", empty: "本月暂无新增会员" },
+      monthBirthday: { title: "本月生日", empty: "本月暂无生日会员" },
+    };
+    if (!TYPE_META[type]) this.AppError("无效的关注类型");
+
+    const now = timeUtil.time();
+    const day30 = now - 86400 * 30;
+    const day90 = now - 86400 * 90;
+    const monthStart = timeUtil.time2Timestamp(
+      timeUtil.time("Y-M") + "-01 00:00:00",
+    );
+
+    let where = { and: { _pid: this.getProjectId() } };
+    let allUsers = await UserModel.getAll(
+      where,
+      "USER_MINI_OPENID,USER_NAME,USER_MOBILE,USER_PIC,USER_ADD_TIME",
+      { USER_ADD_TIME: "desc" },
+      2000,
+    );
+
+    let hintsByUser = {};
+    let targetIds = null;
+
+    if (type === "monthNew") {
+      targetIds = new Set(
+        (allUsers || [])
+          .filter((u) => Number(u.USER_ADD_TIME) >= monthStart)
+          .map((u) => u.USER_MINI_OPENID)
+          .filter(Boolean),
+      );
+      for (let uid of targetIds) {
+        hintsByUser[uid] = "本月新注册";
+      }
+    } else if (type === "monthBirthday" || type === "lowBalance") {
+      targetIds = new Set();
+    } else if (type === "inactive30") {
+      let activeRows = await JoinModel.getAll(
+        {
+          JOIN_STATUS: JoinModel.STATUS.SUCC,
+          JOIN_ADD_TIME: [">=", day30],
+        },
+        "JOIN_USER_ID",
+        {},
+        5000,
+      );
+      let activeIds = new Set(
+        (activeRows || []).map((r) => r.JOIN_USER_ID).filter(Boolean),
+      );
+      targetIds = new Set(
+        (allUsers || [])
+          .map((u) => u.USER_MINI_OPENID)
+          .filter((uid) => uid && !activeIds.has(uid)),
+      );
+      for (let uid of targetIds) hintsByUser[uid] = "近30天未成功约课";
+    } else if (type === "churn") {
+      let allJoins = await JoinModel.getAll(
+        { JOIN_STATUS: JoinModel.STATUS.SUCC },
+        "JOIN_USER_ID,JOIN_ADD_TIME",
+        {},
+        10000,
+      );
+      let lastJoinByUser = {};
+      for (let j of allJoins || []) {
+        if (
+          !lastJoinByUser[j.JOIN_USER_ID] ||
+          j.JOIN_ADD_TIME > lastJoinByUser[j.JOIN_USER_ID]
+        ) {
+          lastJoinByUser[j.JOIN_USER_ID] = j.JOIN_ADD_TIME;
+        }
+      }
+      targetIds = new Set();
+      for (let uid in lastJoinByUser) {
+        if (lastJoinByUser[uid] < day90) {
+          targetIds.add(uid);
+          hintsByUser[uid] =
+            "最近上课 " +
+            timeUtil.timestamp2Time(lastJoinByUser[uid], "Y-M-D");
+        }
+      }
+    } else {
+      const UserCardModel = require("../../model/user_card_model.js");
+      const CardTplModel = require("../../model/card_tpl_model.js");
+      const AdminCardService = require("./admin_card_service.js");
+      const cardSvc = new AdminCardService();
+      await cardSvc._ensureCardCollections();
+
+      if (type === "expiringSoon") {
+        let rows = await cardSvc._safeGetAll(
+          UserCardModel,
+          {
+            USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,
+            USER_CARD_END_TIME: [">", now],
+          },
+          "USER_CARD_USER_ID,USER_CARD_NAME,USER_CARD_END_TIME",
+          {},
+          5000,
+        );
+        targetIds = new Set();
+        for (let c of rows || []) {
+          if (c.USER_CARD_END_TIME <= now + 86400 * 7) {
+            let uid = c.USER_CARD_USER_ID;
+            if (!uid) continue;
+            targetIds.add(uid);
+            hintsByUser[uid] =
+              (c.USER_CARD_NAME || "会员卡") +
+              " " +
+              timeUtil.timestamp2Time(c.USER_CARD_END_TIME, "Y-M-D") +
+              " 到期";
+          }
+        }
+      } else if (type === "lowTimes") {
+        let rows = await cardSvc._safeGetAll(
+          UserCardModel,
+          {
+            USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,
+            USER_CARD_TYPE: CardTplModel.TYPE.TIMES,
+            USER_CARD_QUOTA: ["<=", 3],
+          },
+          "USER_CARD_USER_ID,USER_CARD_NAME,USER_CARD_QUOTA",
+          {},
+          5000,
+        );
+        targetIds = new Set();
+        for (let c of rows || []) {
+          let uid = c.USER_CARD_USER_ID;
+          if (!uid) continue;
+          targetIds.add(uid);
+          hintsByUser[uid] =
+            (c.USER_CARD_NAME || "次卡") +
+            " 剩余" +
+            (Number(c.USER_CARD_QUOTA) || 0) +
+            "次";
+        }
+      }
+    }
+
+    let list = (allUsers || []).filter((u) =>
+      targetIds.has(u.USER_MINI_OPENID),
+    );
+
+    if (search) {
+      let kw = String(search).trim().toLowerCase();
+      list = list.filter(
+        (u) =>
+          (u.USER_NAME || "").toLowerCase().includes(kw) ||
+          (u.USER_MOBILE || "").includes(kw) ||
+          (hintsByUser[u.USER_MINI_OPENID] || "").toLowerCase().includes(kw),
+      );
+    }
+
+    let enriched = list.map((u) => ({
+      userId: u.USER_MINI_OPENID,
+      USER_NAME: u.USER_NAME || "未命名会员",
+      USER_MOBILE: u.USER_MOBILE || "",
+      USER_PIC: u.USER_PIC || "",
+      attentionHint: hintsByUser[u.USER_MINI_OPENID] || TYPE_META[type].title,
+    }));
+
+    let total = enriched.length;
+    let start = (page - 1) * size;
+    let pageList = enriched.slice(start, start + size);
+
+    return {
+      type,
+      title: TYPE_META[type].title,
+      emptyText: TYPE_META[type].empty,
+      total,
+      list: pageList,
+      page,
+      size,
+      count: pageList.length,
     };
   }
 }

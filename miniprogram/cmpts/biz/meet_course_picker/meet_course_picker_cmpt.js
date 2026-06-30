@@ -145,10 +145,12 @@ Component({
         return;
       }
       this.setData({ sheetShow: true });
+      this.triggerEvent("sheetchange", { show: true });
     },
 
     bindCloseSheet() {
       this.setData({ sheetShow: false });
+      this.triggerEvent("sheetchange", { show: false });
     },
 
     bindCoursePick(e) {
@@ -161,6 +163,7 @@ Component({
       const meet = index >= 0 ? this.data.rawCourseList[index] : null;
       if (!course) return;
       this.setData({ sheetShow: false, selectedCourse: course });
+      this.triggerEvent("sheetchange", { show: false });
       this.triggerEvent("pick", {
         meetId: course._id,
         course,

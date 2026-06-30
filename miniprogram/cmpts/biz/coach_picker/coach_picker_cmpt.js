@@ -131,10 +131,12 @@ Component({
         return;
       }
       this.setData({ sheetShow: true });
+      this.triggerEvent("sheetchange", { show: true });
     },
 
     bindCloseSheet() {
       this.setData({ sheetShow: false });
+      this.triggerEvent("sheetchange", { show: false });
     },
 
     bindCoachPick(e) {
@@ -142,6 +144,7 @@ Component({
       const hit = this.data.coachList.find((c) => c.pickId === pickId);
       if (!hit) return;
       this.setData({ sheetShow: false });
+      this.triggerEvent("sheetchange", { show: false });
       this._emitPick(hit);
     },
 

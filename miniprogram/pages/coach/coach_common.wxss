@@ -42,7 +42,6 @@
   text-align: center;
 }
 
-/* ==================== 首页 ==================== */
 .coach-home-body {
   padding: 24rpx 24rpx 0;
 }

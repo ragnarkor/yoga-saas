@@ -84,10 +84,12 @@ Page({
     const key = e.currentTarget.dataset.key;
     if (key === "totalCards") {
       if (
-        !(await this._coachBeforeAdmin("/pages/coach/card/coach_card_list"))
+        !(await this._coachBeforeAdmin(
+          "/pages/coach/member/coach_card_member_list",
+        ))
       )
         return;
-      wx.navigateTo({ url: "/pages/coach/card/coach_card_list" });
+      wx.navigateTo({ url: "/pages/coach/member/coach_card_member_list" });
       return;
     }
     if (key === "newCard") {
@@ -98,6 +100,27 @@ Page({
       )
         return;
       wx.navigateTo({ url: "/pages/coach/member/coach_month_new_card" });
+      return;
+    }
+    const ATTENTION_TYPES = [
+      "inactive30",
+      "churn",
+      "expiringSoon",
+      "lowTimes",
+      "lowBalance",
+      "monthNew",
+      "monthBirthday",
+    ];
+    if (ATTENTION_TYPES.includes(key)) {
+      if (
+        !(await this._coachBeforeAdmin(
+          "/pages/coach/member/coach_attention_list",
+        ))
+      )
+        return;
+      wx.navigateTo({
+        url: `/pages/coach/member/coach_attention_list?type=${key}`,
+      });
       return;
     }
     if (

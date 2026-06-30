@@ -1,0 +1,43 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page cq-page">
+  <coach-tenant-switch
+    title="本节签到码"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+  />
+
+  <view class="cq-card">
+    <view class="cq-course-title">{{title}}</view>
+    <view class="cq-course-time">{{timeText}}</view>
+
+    <view class="cq-notice">
+      <van-icon name="scan" size="32rpx" color="{{themeColor}}" />
+      <text>会员扫码即可完成本节签到</text>
+    </view>
+
+    <view class="cq-rules">
+      <text class="cq-rules-title">签到规则</text>
+      <text>1. 仅限预约当天扫码有效</text>
+      <text>2. 须已预约本节课程</text>
+      <text>3. 可将签到码投屏或打印展示在前台</text>
+    </view>
+
+    <view wx:if="{{!isLoad}}" class="cq-loading">
+      <van-loading size="48rpx" color="{{themeColor}}">生成中...</van-loading>
+    </view>
+
+    <block wx:elif="{{qrUrl}}">
+      <image
+        class="cq-qr"
+        src="{{qrUrl}}"
+        mode="aspectFit"
+        show-menu-by-longpress="{{true}}"
+        bindtap="bindPreviewTap"
+      />
+      <view class="cq-hint">长按保存 · 点击放大</view>
+    </block>
+
+    <view wx:else class="cq-empty">签到码生成失败，请下拉刷新重试</view>
+  </view>
+</view>

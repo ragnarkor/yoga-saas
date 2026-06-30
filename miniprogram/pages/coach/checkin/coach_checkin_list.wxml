@@ -1,0 +1,52 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page ci-page">
+  <coach-tenant-switch
+    title="签到码"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+  />
+
+  <view class="ci-tip">
+    <van-icon name="info-o" size="28rpx" color="{{themeColor}}" />
+    <text>选择今日课程，生成签到码供会员扫码签到</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="ci-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <van-empty wx:elif="{{!sessionList.length}}" description="今日暂无可用课程" />
+
+  <view wx:else class="ci-list">
+    <view
+      class="ci-item"
+      wx:for="{{sessionList}}"
+      wx:key="mark"
+      data-mark="{{item.mark}}"
+      data-title="{{item.title}}"
+      data-day="{{today}}"
+      data-start="{{item.start}}"
+      data-end="{{item.end}}"
+      bindtap="bindSessionTap"
+    >
+      <view class="ci-item-main">
+        <view class="ci-item-title">{{item.title}}</view>
+        <view class="ci-item-meta">
+          <text>{{item.timeText}}</text>
+          <text wx:if="{{item.teacherName}}"> · {{item.teacherName}}</text>
+        </view>
+        <view class="ci-item-sub">已预约 {{item.booked}} 人</view>
+      </view>
+      <view class="ci-item-action">
+        <text>生成码</text>
+        <van-icon name="arrow" size="24rpx" color="{{themeColor}}" />
+      </view>
+    </view>
+  </view>
+
+  <view class="ci-footer-link" bindtap="bindScanMemberTap">
+    <van-icon name="scan" size="28rpx" color="{{themeColor}}" />
+    <text>扫描会员预约码核销</text>
+  </view>
+</view>

@@ -5,6 +5,7 @@ module.exports = {
   IMG_ROOT: "/pages/default/skin/images",
   IMG_DEFAULT_INDEX_BG: "/pages/default/skin/images/default_index_bg.jpg",
   IMG_UPIMG: "/pages/default/skin/images/upimg.jpg",
+  IMG_COACH_HOME_HERO: "/pages/coach/images/coach_home_hero.jpg",
   IMG_DEFAULT_COVER: "/images/default_cover_1.jpg",
   IMG_DEFAULT_COVERS: [
     "/images/default_cover_1.jpg",

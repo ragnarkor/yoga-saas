@@ -11,7 +11,7 @@
 		<view class="page-header">
 			<view class="page-header-bg"></view>
 			<view class="page-header-content">
-				<view class="page-title">{{pageTitle}}</view>
+				<view class="page-title text-cut">{{pageTitle}}</view>
 				<view class="page-subtitle">{{pageSubtitle}}</view>
 				<view
 					wx:if="{{showPrivateEntry}}"
@@ -19,8 +19,11 @@
 					hover-class="page-header-private--active"
 					bindtap="bindPrivateBookTap"
 				>
-					<text>私教预约</text>
-					<van-icon name="arrow" size="22rpx" color="rgba(255,255,255,0.85)" />
+					<view class="page-header-private-icon">
+						<van-icon name="clock-o" size="24rpx" color="rgba(255,255,255,0.95)" />
+					</view>
+					<text class="page-header-private-text">私教预约</text>
+					<van-icon name="arrow" size="20rpx" color="rgba(255,255,255,0.75)" custom-class="page-header-private-arrow" />
 				</view>
 			</view>
 		</view>
@@ -123,7 +126,7 @@
 		<!-- 空状态 -->
 		<view class="empty-state" wx:if="{{!courseList || courseList.length === 0}}">
 			<view class="empty-illustration">
-				<image class="empty-image" src="/images/empty_yoga.png" mode="aspectFit" />
+				<image class="empty-image" src="{{emptyImage}}" mode="aspectFit" />
 			</view>
 			<view class="empty-text">{{emptyText}}</view>
 			<van-button size="small" round bindtap="bindReload" custom-style="margin-top: 30rpx; padding: 0 40rpx;">

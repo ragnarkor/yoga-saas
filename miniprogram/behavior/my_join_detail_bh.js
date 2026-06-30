@@ -3,6 +3,7 @@ const cloudHelper = require('../helper/cloud_helper.js');
 const timeHelper = require('../helper/time_helper.js');
 const qrcodeLib = require('../lib/tools/qrcode_lib.js');
 const MeetBiz = require('../biz/meet_biz.js');
+const checkinScanHelper = require('../helper/checkin_scan_helper.js');
 
 module.exports = Behavior({
 
@@ -136,6 +137,16 @@ module.exports = Behavior({
 
 		url: function (e) {
 			pageHelper.url(e, this);
+		},
+
+		bindScanCheckinTap: function () {
+			checkinScanHelper.scanAndCheckin({
+				onSuccess: (msg) => {
+					pageHelper.showModal(msg, '签到结果', () => {
+						this._loadDetail();
+					});
+				},
+			});
 		},
 
 		bindNoticeTap: function (e) {

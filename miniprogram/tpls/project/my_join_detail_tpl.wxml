@@ -27,7 +27,7 @@
 						<van-icon name="clock-o" size="28rpx" color="#999" />
 						<text>{{join.JOIN_MEET_DAY}} {{join.JOIN_MEET_TIME_START}}～{{join.JOIN_MEET_TIME_END}}</text>
 					</view>
-					<view class="jd-course-hint" wx:if="{{join.JOIN_STATUS==1 && join.JOIN_IS_CHECKIN!=1}}">请准时到场签到</view>
+					<view class="jd-course-hint" wx:if="{{join.JOIN_STATUS==1 && join.JOIN_IS_CHECKIN!=1}}">到场后扫描场馆签到码完成签到</view>
 					<view class="jd-course-reason" wx:if="{{join.JOIN_STATUS==99 && join.JOIN_REASON}}">{{join.JOIN_REASON}}</view>
 				</view>
 				<view class="jd-course-arrow">
@@ -49,6 +49,7 @@
 
 		<!-- 操作按钮 -->
 		<view class="jd-actions" wx:if="{{join.JOIN_STATUS==0 || join.JOIN_STATUS==1}}">
+			<view class="jd-btn jd-btn--primary" wx:if="{{join.JOIN_STATUS==1 && join.JOIN_IS_CHECKIN!=1}}" bindtap="bindScanCheckinTap">扫码签到</view>
 			<view class="jd-btn jd-btn--ghost" wx:if="{{join.JOIN_IS_CHECKIN==0}}" bindtap="bindCancelTap">取消预约</view>
 			<view class="jd-btn jd-btn--ghost" wx:if="{{isShowHome}}" bindtap="url" data-url="../../my/index/my_index" data-type="relaunch">返回首页</view>
 			<view class="jd-btn jd-btn--primary" bindtap="bindCalendarTap">加入手机日程</view>
