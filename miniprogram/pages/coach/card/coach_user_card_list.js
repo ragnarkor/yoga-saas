@@ -1,5 +1,6 @@
 const cloudHelper = require('../../../helper/cloud_helper.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
+const cardFaceHelper = require('../../../helper/card_face_helper.js');
 
 Page({
   behaviors: [require('../../../behavior/coach_page_bh.js')],
@@ -22,6 +23,12 @@ Page({
       navTitle: userName ? `${userName} · 持卡` : '持卡管理',
     });
     this._loadCards();
+  },
+
+  onShow() {
+    if (this.data.userId && !this.data.loading) {
+      this._loadCards();
+    }
   },
 
   onPullDownRefresh() {
@@ -47,7 +54,9 @@ Page({
         { hint: false, title: 'bar' },
       );
       this.setData({
-        cardList: (res && res.list) || [],
+        cardList: ((res && res.list) || []).map((item) =>
+          cardFaceHelper.enrichCardVisual(item),
+        ),
         loading: false,
         userName: (res && res.userName) || this.data.userName,
         navTitle: (res && res.userName)

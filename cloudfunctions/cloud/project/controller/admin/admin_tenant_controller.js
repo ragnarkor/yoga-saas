@@ -87,6 +87,7 @@ class AdminTenantController extends BaseAdminController {
       name: "must|string|min:1|max:30|name=瑜伽馆名称",
       desc: "string|max:200|name=简介",
       template: "string|default=default|name=页面模板",
+      expireDay: "string|false|name=到期日期",
     };
     let input = this.validateData(rules);
     let service = new AdminTenantService();
@@ -94,6 +95,32 @@ class AdminTenantController extends BaseAdminController {
       input.name,
       input.desc,
       input.template,
+      this._admin,
+      input.expireDay,
+    );
+  }
+
+  /** 超管：租户有效期详情 */
+  async getTenantExpireDetail() {
+    await this.isSuperAdmin();
+    let rules = { pid: "must|string|name=租户ID" };
+    let input = this.validateData(rules);
+    let service = new AdminTenantService();
+    return await service.getTenantExpireDetail(input.pid);
+  }
+
+  /** 超管：保存租户有效期 */
+  async saveTenantExpire() {
+    await this.isSuperAdmin();
+    let rules = {
+      pid: "must|string|name=租户ID",
+      expireDay: "string|false|name=到期日期",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminTenantService();
+    return await service.saveTenantExpire(
+      input.pid,
+      input.expireDay,
       this._admin,
     );
   }

@@ -485,15 +485,31 @@
 }
 
 .md-card-option-visual {
+	position: relative;
 	width: 88rpx;
 	height: 56rpx;
 	border-radius: 10rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	overflow: hidden;
 	flex-shrink: 0;
+}
+
+.md-card-option-img,
+.md-card-option-solid {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+.md-card-option-type {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 6rpx;
+	text-align: center;
 	color: #fff;
 	font-size: 20rpx;
+	font-weight: 600;
+	text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.28);
 }
 
 .md-card-option-body {

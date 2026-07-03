@@ -8,6 +8,7 @@ module.exports = {
   // 租户（多馆）相关
   "tenant/list": "tenant_controller@getTenantList",
   "tenant/detail": "tenant_controller@getTenantDetail",
+  "tenant/check_access": "tenant_controller@checkTenantAccess",
 
   "home/setup_all": "home_controller@getSetupAll", //获取全局配置(所有)
   "home/index": "home_controller@getHomeIndex",
@@ -75,6 +76,10 @@ module.exports = {
     "admin/admin_tenant_controller@getPlatformOverview",
   "admin/platform_staff_list": "admin/admin_home_controller@listPlatformStaff",
   "admin/tenant_insert": "admin/admin_tenant_controller@insertTenant#noDemo",
+  "admin/tenant_expire_detail":
+    "admin/admin_tenant_controller@getTenantExpireDetail",
+  "admin/tenant_expire_save":
+    "admin/admin_tenant_controller@saveTenantExpire#noDemo",
   "admin/mgr_list": "admin/admin_mgr_controller@getAdminList",
   "admin/mgr_insert": "admin/admin_mgr_controller@insertAdmin#noDemo",
   "admin/staff_insert": "admin/admin_mgr_controller@insertStaff#noDemo",

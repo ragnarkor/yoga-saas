@@ -2,6 +2,7 @@
   "lazyCodeLoading": "requiredComponents",
   "pages": [
     "pages/tenant/select/tenant_select",
+    "pages/tenant/expired/tenant_expired_hint",
 
     "pages/default/index/default_index",
     "pages/default/about/index/about_index",
@@ -46,7 +47,6 @@
         "home/coach_home_content",
         "staff/coach_staff",
         "profile/coach_profile",
-        "platform/coach_platform",
         "course/coach_course_list",
         "course/coach_course_edit",
         "schedule/coach_schedule",
@@ -84,6 +84,7 @@
         "index/tenant/admin_tenant",
         "index/home/admin_home",
         "platform/tenant_form/admin_tenant_form",
+        "platform/tenant_expire/admin_tenant_expire",
         "platform/mgr_form/admin_mgr_form",
         "platform/staff/admin_platform_staff",
         "bind/admin_bind",

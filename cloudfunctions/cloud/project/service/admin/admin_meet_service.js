@@ -1233,7 +1233,7 @@ class AdminMeetService extends BaseAdminService {
 
     if (cardId) {
       const cardService = new UserCardService();
-      await cardService.checkCardForJoin(userId, meetId, cardId);
+      await cardService.checkCardForJoin(userId, meetId, cardId, timeMark);
     }
 
     const meetService = new MeetService();

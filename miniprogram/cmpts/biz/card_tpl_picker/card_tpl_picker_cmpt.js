@@ -1,6 +1,7 @@
 const cloudHelper = require("../../../helper/cloud_helper.js");
 const AdminWxBiz = require("../../../biz/admin_wx_biz.js");
 const cardScopeHelper = require("../../../helper/card_scope_helper.js");
+const cardFaceHelper = require("../../../helper/card_face_helper.js");
 const meetCategoryHelper = require("../../../helper/meet_category_helper.js");
 
 // [AI_START TIMESTAMP=2025-01-27 16:00:00]
@@ -139,7 +140,7 @@ Component({
           value: scopeDesc,
         });
       }
-      return { ...item, scope, scopeDesc, metaTags };
+      return cardFaceHelper.enrichCardVisual({ ...item, scope, scopeDesc, metaTags });
     },
 
     _syncSelected(tplId) {

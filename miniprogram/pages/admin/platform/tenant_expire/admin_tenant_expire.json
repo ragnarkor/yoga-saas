@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "配置有效期",
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index"
+  }
+}

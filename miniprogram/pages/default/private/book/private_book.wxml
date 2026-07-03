@@ -108,7 +108,18 @@
           data-id="{{item.id}}"
           bindtap="bindCardPick"
         >
-          <view class="pb-card-option-visual" style="background: {{item.color}};">
+          <view class="pb-card-option-visual">
+            <image
+              wx:if="{{item.coverUrl}}"
+              class="pb-card-option-img"
+              src="{{item.coverUrl}}"
+              mode="aspectFill"
+            />
+            <view
+              wx:else
+              class="pb-card-option-solid"
+              style="background: {{item.color}};"
+            ></view>
             <text class="pb-card-option-type">{{item.typeLabel}}</text>
           </view>
           <view class="pb-card-option-body">

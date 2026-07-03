@@ -1,6 +1,7 @@
 const pageHelper = require('../helper/page_helper.js');
 const AdminWxBiz = require('../biz/admin_wx_biz.js');
 const themeHelper = require('../helper/theme_helper.js');
+const tenantAccessHelper = require('../helper/tenant_access_helper.js');
 
 module.exports = Behavior({
   data: {
@@ -34,6 +35,9 @@ module.exports = Behavior({
 
     async _coachOnShow() {
       await AdminWxBiz.ensureSession();
+      if (!AdminWxBiz.isSuperSession()) {
+        await tenantAccessHelper.ensureTenantAccess('coach');
+      }
       this.setData({ tenantName: pageHelper.getTenantName() || '瑜伽馆' });
     },
 

@@ -1,11 +1,15 @@
 const AdminBiz = require('../../../../biz/admin_biz.js');
 const cloudHelper = require('../../../../helper/cloud_helper.js');
 const pageHelper = require('../../../../helper/page_helper.js');
+const tenantExpireHelper = require('../../../../helper/tenant_expire_helper.js');
 
 Page({
   data: {
     name: '',
     desc: '',
+    expireMode: 'long',
+    expireDay: '',
+    minExpireDay: tenantExpireHelper.todayYMD(),
     submitting: false,
   },
 
@@ -19,6 +23,19 @@ Page({
   bindInput(e) {
     const field = e.currentTarget.dataset.field;
     this.setData({ [field]: e.detail.value });
+  },
+
+  bindExpireModeTap(e) {
+    const mode = e.currentTarget.dataset.mode;
+    if (!mode || mode === this.data.expireMode) return;
+    this.setData({
+      expireMode: mode,
+      expireDay: mode === 'date' ? tenantExpireHelper.todayYMD() : '',
+    });
+  },
+
+  bindExpireDayChange(e) {
+    this.setData({ expireDay: e.detail.value });
   },
 
   async bindSubmit() {
@@ -36,6 +53,8 @@ Page({
           name,
           desc: (this.data.desc || '').trim(),
           template: 'default',
+          expireDay:
+            this.data.expireMode === 'long' ? 'long' : this.data.expireDay,
         },
         { title: '创建中' },
       );

@@ -4,3 +4,124 @@
 .card-edit-page {
   padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
 }
+
+.card-cover-thumb {
+  width: 72rpx;
+  height: 44rpx;
+  border-radius: 10rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.card-cover-thumb-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.card-edit-preview {
+  padding: 8rpx 32rpx 24rpx;
+}
+
+.card-edit-preview-label {
+  font-size: 24rpx;
+  color: #969799;
+  margin-bottom: 12rpx;
+}
+
+.card-edit-preview-chip {
+  position: relative;
+  width: 220rpx;
+  height: 132rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 6rpx 20rpx rgba(31, 35, 41, 0.1);
+}
+
+.card-edit-preview-img,
+.card-edit-preview-solid {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.card-edit-preview-type {
+  position: absolute;
+  left: 12rpx;
+  bottom: 10rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.28);
+}
+
+.card-cover-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 0 24rpx 32rpx;
+}
+
+.card-cover-item {
+  position: relative;
+  width: calc(50% - 8rpx);
+  border-radius: 16rpx;
+  overflow: hidden;
+  background: #f7f8fa;
+  border: 2rpx solid transparent;
+  box-sizing: border-box;
+}
+
+.card-cover-item.active {
+  border-color: var(--themeColor, #5b8a72);
+  background: var(--projectColorLight, #e5f1ec);
+}
+
+.card-cover-item-img-wrap,
+.card-cover-item-solid {
+  width: 100%;
+  height: 120rpx;
+}
+
+.card-cover-item-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.card-cover-item-label {
+  display: block;
+  padding: 12rpx 16rpx 16rpx;
+  font-size: 24rpx;
+  color: #323233;
+}
+
+.card-cover-item-check {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+}
+
+.card-style-color-divider {
+  padding: 8rpx 32rpx 16rpx;
+  border-top: 1rpx solid #ebedf0;
+  margin-top: 8rpx;
+}
+
+.card-style-color-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #323233;
+}
+
+.card-style-color-sub {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #969799;
+}
+
+.card-style-sheet-footer {
+  padding: 8rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
+}

@@ -326,7 +326,7 @@ class MeetService extends BaseService {
     // 会员卡次数/期限校验（提交预约时传入 cardId）
     if (cardId) {
       let cardService = new UserCardService();
-      await cardService.checkCardForJoin(userId, meetId, cardId);
+      await cardService.checkCardForJoin(userId, meetId, cardId, timeMark);
     }
   }
 

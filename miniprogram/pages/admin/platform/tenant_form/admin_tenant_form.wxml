@@ -8,6 +8,30 @@
       <text class="label">简介（选填）</text>
       <textarea class="textarea" placeholder="一句话介绍" maxlength="200" value="{{desc}}" data-field="desc" bindinput="bindInput" />
     </view>
+    <view class="field">
+      <text class="label">有效期</text>
+      <view class="expire-mode-row">
+        <view
+          class="expire-mode {{expireMode === 'long' ? 'is-active' : ''}}"
+          data-mode="long"
+          bindtap="bindExpireModeTap"
+        >长期有效</view>
+        <view
+          class="expire-mode {{expireMode === 'date' ? 'is-active' : ''}}"
+          data-mode="date"
+          bindtap="bindExpireModeTap"
+        >指定到期日</view>
+      </view>
+      <picker
+        wx:if="{{expireMode === 'date'}}"
+        mode="date"
+        value="{{expireDay}}"
+        start="{{minExpireDay}}"
+        bindchange="bindExpireDayChange"
+      >
+        <view class="expire-day-pick">{{expireDay || '请选择到期日'}}</view>
+      </picker>
+    </view>
   </view>
   <view class="form-tip">创建后可在列表中进入教练版管理该馆</view>
   <button class="submit-btn" loading="{{submitting}}" disabled="{{submitting}}" bindtap="bindSubmit">创建瑜伽馆</button>

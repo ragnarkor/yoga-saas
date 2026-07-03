@@ -12,6 +12,7 @@ const UserModel = require("../../model/user_model.js");
 const AdminModel = require("../../model/admin_model.js");
 const UserCardService = require("../user_card_service.js");
 const cardScopeUtil = require("../../utils/card_scope_util.js");
+const cardCoverUtil = require("../../utils/card_cover_util.js");
 
 const DEFAULT_TPL_COLORS = ["#F5A623", "#4A90A4", "#E57373", "#81C784"];
 const CARD_COLLECTIONS = ["ax_card_tpl", "ax_user_card", "ax_user_card_log"];
@@ -63,8 +64,11 @@ class AdminCardService extends BaseAdminService {
 
   _formatTpl(item, nameMap = {}) {
     const scope = cardScopeUtil.normalizeScope(item.CARD_TPL_SCOPE);
+    const coverId = cardCoverUtil.normalizeCover(item.CARD_TPL_COVER);
     return {
       ...item,
+      CARD_TPL_COVER: coverId,
+      coverId,
       typeDesc: this._typeDesc(item.CARD_TPL_TYPE),
       metaText: this._buildTplMeta(item),
       scope,
@@ -144,6 +148,7 @@ class AdminCardService extends BaseAdminService {
     if (scope.mode === "categories" && !scope.categoryIds.length) {
       this.AppError("请选择适用课程分类");
     }
+    let cover = cardCoverUtil.normalizeCover(input.cover);
 
     let data = {
       CARD_TPL_NAME: name,
@@ -152,6 +157,7 @@ class AdminCardService extends BaseAdminService {
       CARD_TPL_PRICE: price,
       CARD_TPL_QUOTA: quota,
       CARD_TPL_COLOR: color,
+      CARD_TPL_COVER: cover,
       CARD_TPL_SCOPE: scope,
       CARD_TPL_EDIT_TIME: timeUtil.time(),
     };
@@ -216,16 +222,13 @@ class AdminCardService extends BaseAdminService {
       ...new Set((cards || []).map((c) => c.USER_CARD_TPL_ID).filter(Boolean)),
     ];
     let colorMap = {};
+    let typeMap = {};
+    let daysMap = {};
     if (tplIds.length) {
-      let tpls = await CardTplModel.getAll(
-        { CARD_TPL_ID: ["in", tplIds] },
-        "CARD_TPL_ID,CARD_TPL_COLOR",
-        {},
-        tplIds.length,
-      );
-      for (let t of tpls || []) {
-        colorMap[t.CARD_TPL_ID] = t.CARD_TPL_COLOR || "#F5A623";
-      }
+      const maps = await cardService._loadTplVisualMaps(tplIds);
+      colorMap = maps.colorMap;
+      typeMap = maps.typeMap;
+      daysMap = maps.daysMap;
     }
 
     let list = userIds
@@ -239,6 +242,9 @@ class AdminCardService extends BaseAdminService {
               now,
               colorMap[c.USER_CARD_TPL_ID],
               nameMap,
+              "",
+              typeMap,
+              daysMap,
             );
             let addTime = Number(c.USER_CARD_ADD_TIME) || 0;
             return {
@@ -459,7 +465,8 @@ class AdminCardService extends BaseAdminService {
     if (!name) this.AppError("卡模板名称无效");
 
     let type = tpl.CARD_TPL_TYPE;
-    let days = Number(tpl.CARD_TPL_DAYS) || 365;
+    let days = Number(input.days) || Number(tpl.CARD_TPL_DAYS) || 0;
+    if (days <= 0) this.AppError("请先在卡模板中配置有效期天数");
     let price = Number(tpl.CARD_TPL_PRICE) || 0;
     let quota =
       type === CardTplModel.TYPE.PERIOD
@@ -477,7 +484,7 @@ class AdminCardService extends BaseAdminService {
     let endTime = 0;
     if (activate === UserCardModel.ACTIVATE.IMMEDIATE) {
       startTime = now;
-      endTime = now + days * 86400;
+      endTime = now + days * 86400 * 1000;
     }
 
     let scope = cardScopeUtil.normalizeScope(tpl.CARD_TPL_SCOPE);
@@ -525,23 +532,34 @@ class AdminCardService extends BaseAdminService {
       ...new Set((cards || []).map((c) => c.USER_CARD_TPL_ID).filter(Boolean)),
     ];
     let colorMap = {};
+    let coverMap = {};
+    let typeMap = {};
+    let daysMap = {};
     if (tplIds.length) {
-      let tpls = await CardTplModel.getAll(
-        { CARD_TPL_ID: ["in", tplIds] },
-        "CARD_TPL_ID,CARD_TPL_COLOR",
-        {},
-        100,
-      );
-      for (let t of tpls || []) {
-        colorMap[t.CARD_TPL_ID] = t.CARD_TPL_COLOR || "#F5A623";
-      }
+      const maps = await new UserCardService()._loadTplVisualMaps(tplIds);
+      colorMap = maps.colorMap;
+      coverMap = maps.coverMap;
+      typeMap = maps.typeMap;
+      daysMap = maps.daysMap;
     }
 
     const cardService = new UserCardService();
     const now = timeUtil.time();
     const nameMap = await cardService._getCategoryNameMap();
+    for (let c of cards || []) {
+      await cardService._selfHealCardEndTime(c, daysMap);
+      await cardService._selfHealPeriodCardRecord(c, typeMap);
+    }
     const list = (cards || []).map((c) =>
-      cardService._mapCardItem(c, now, colorMap[c.USER_CARD_TPL_ID], nameMap),
+      cardService._mapCardItem(
+        c,
+        now,
+        colorMap[c.USER_CARD_TPL_ID],
+        nameMap,
+        coverMap[c.USER_CARD_TPL_ID],
+        typeMap,
+        daysMap,
+      ),
     );
 
     return {
@@ -553,7 +571,7 @@ class AdminCardService extends BaseAdminService {
   }
 
   /** 教练代约：某会员在某课程下可用的会员卡（含适用范围过滤） */
-  async getUserJoinCardOptions(userId, meetId) {
+  async getUserJoinCardOptions(userId, meetId, timeMark = "") {
     await this._ensureCardCollections();
     userId = (userId || "").trim();
     meetId = (meetId || "").trim();
@@ -569,8 +587,14 @@ class AdminCardService extends BaseAdminService {
 
     const cardService = new UserCardService();
     const needTimes = cardService._getMeetCardTimes(meet);
-    const list = await cardService._listUsableCards(userId, needTimes, meet);
-    return { needTimes, list };
+    const meetDay = cardService._meetDayFromTimeMark(timeMark);
+    const list = await cardService._listUsableCards(
+      userId,
+      needTimes,
+      meet,
+      meetDay,
+    );
+    return { needTimes, list, meetDay };
   }
 
   async getUserCardDetail(cardId) {
@@ -623,7 +647,7 @@ class AdminCardService extends BaseAdminService {
       5000,
     );
     let expiringSoon = (expiringRows || []).filter(
-      (c) => c.USER_CARD_END_TIME <= now + 86400 * 7,
+      (c) => c.USER_CARD_END_TIME <= now + 86400 * 7 * 1000,
     ).length;
     let lowTimes = await this._safeCount(UserCardModel, {
       USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,

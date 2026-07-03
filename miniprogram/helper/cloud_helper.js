@@ -11,6 +11,7 @@
  const setting = require('../setting/setting.js');
  const contentCheckHelper = require('../helper/content_check_helper.js');
  const pageHelper = require('../helper/page_helper.js');
+ const tenantAccessHelper = require('../helper/tenant_access_helper.js');
 
  const CODE = {
  	SUCC: 200,
@@ -120,6 +121,16 @@
  			success: function (res) {
  				if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA) {
  					console.log(res)
+ 					if (
+ 						res.result.code == CODE.LOGIC &&
+ 						tenantAccessHelper.isTenantExpiredMsg(res.result.msg)
+ 					) {
+ 						if (title == 'bar') wx.hideNavigationBarLoading();
+ 						else wx.hideLoading();
+ 						tenantAccessHelper.handleCloudTenantExpired(route);
+ 						reject(res.result);
+ 						return;
+ 					}
  					// 逻辑错误&数据校验错误 
  					if (hint) {
  						wx.showModal({

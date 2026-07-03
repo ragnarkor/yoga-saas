@@ -1,6 +1,7 @@
 {
 	"usingComponents": {
 		"cmpt-tenant-switch": "/cmpts/biz/tenant_switch/tenant_switch_cmpt",
+		"cmpt-user-profile-guide": "/cmpts/biz/user_profile_guide/user_profile_guide_cmpt",
 		"van-loading": "@vant/weapp/loading/index",
 		"van-icon": "@vant/weapp/icon/index"
 	},

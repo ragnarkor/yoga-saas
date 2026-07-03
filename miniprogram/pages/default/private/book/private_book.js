@@ -4,6 +4,7 @@ const MeetBiz = require('../../../../biz/meet_biz.js');
 const privateScheduleHelper = require('../../../../helper/private_schedule_helper.js');
 const themeHelper = require('../../../../helper/theme_helper.js');
 const themeBh = require('../../../../behavior/theme_bh.js');
+const cardFaceHelper = require('../../../../helper/card_face_helper.js');
 
 const WEEK_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
@@ -313,10 +314,12 @@ Page({
     try {
       const res = await cloudHelper.callCloudData(
         'meet/join_card_options',
-        { meetId: form.meetId },
+        { meetId: form.meetId, meetDay: form.day || '' },
         { title: 'bar' },
       );
-      const list = (res && res.list) || [];
+      const list = ((res && res.list) || []).map((item) =>
+        cardFaceHelper.enrichCardVisual(item),
+      );
       if (!list.length) {
         this.setData({ cardSheetShow: false, cardPickLoading: false });
         wx.showModal({

@@ -100,6 +100,15 @@ Page({
     this.setData({ platformTab: 1 });
   },
 
+  bindTenantExpireTap: function (e) {
+    const pid = e.currentTarget.dataset.pid;
+    const name = e.currentTarget.dataset.name || '';
+    if (!pid) return;
+    wx.navigateTo({
+      url: `/pages/admin/platform/tenant_expire/admin_tenant_expire?pid=${pid}&name=${encodeURIComponent(name)}`,
+    });
+  },
+
   bindAdminLoginCloseTap: function () {
     this.setData({ adminLoginShow: false });
     if (!AdminBiz.getAdminToken()) {

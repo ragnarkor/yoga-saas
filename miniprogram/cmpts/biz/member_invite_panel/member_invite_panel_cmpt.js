@@ -1,7 +1,8 @@
 const pageHelper = require('../../../helper/page_helper.js');
 const cloudHelper = require('../../../helper/cloud_helper.js');
-const picHelper = require('../../../helper/pic_helper.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
+const themeHelper = require('../../../helper/theme_helper.js');
+const invitePosterHelper = require('../../../helper/member_invite_poster_helper.js');
 
 Component({
   properties: {
@@ -20,13 +21,26 @@ Component({
     qrUrl: '',
     tenantName: '',
     sharePath: '',
+    slogan: '',
     accentColor: pageHelper.getThemeColor(),
+    accentLight: themeHelper.getThemeLight(pageHelper.getThemeColor()),
+    accentDark: themeHelper.getThemeDark(pageHelper.getThemeColor()),
   },
 
   observers: {
     show(val) {
       if (!val) return;
-      this.setData({ accentColor: this.properties.themeColor || pageHelper.getThemeColor() });
+      const accent = themeHelper.normalizeHex(
+        this.properties.themeColor || pageHelper.getThemeColor(),
+      );
+      const skin = pageHelper.getSkin();
+      const meetName = (skin && skin.MEET_NAME) || '约课';
+      this.setData({
+        accentColor: accent,
+        accentLight: themeHelper.getThemeLight(accent),
+        accentDark: themeHelper.getThemeDark(accent),
+        slogan: `邀你加入 · 随时${meetName}`,
+      });
       this._loadInvite();
     },
   },
@@ -67,39 +81,26 @@ Component({
       this.triggerEvent('close');
     },
 
-    bindSaveTap() {
-      const url = this.data.qrUrl;
-      if (!url) return;
+    async bindSaveTap() {
+      const { qrUrl, tenantName, accentColor, slogan } = this.data;
+      if (!qrUrl) return;
 
       wx.showLoading({ title: '保存中', mask: true });
-      wx.downloadFile({
-        url,
-        success: (res) => {
-          if (res.statusCode !== 200) {
-            wx.hideLoading();
-            wx.showToast({ title: '下载失败', icon: 'none' });
-            return;
-          }
-          const callback = () => {
-            wx.saveImageToPhotosAlbum({
-              filePath: res.tempFilePath,
-              success: () => {
-                wx.hideLoading();
-                wx.showToast({ title: '已保存到相册', icon: 'success' });
-              },
-              fail: () => {
-                wx.hideLoading();
-                wx.showToast({ title: '保存失败', icon: 'none' });
-              },
-            });
-          };
-          picHelper.getWritePhotosAlbum(callback);
-        },
-        fail: () => {
-          wx.hideLoading();
-          wx.showToast({ title: '下载失败', icon: 'none' });
-        },
-      });
+      try {
+        const filePath = await invitePosterHelper.exportInvitePoster(this, {
+          qrUrl,
+          tenantName,
+          themeColor: accentColor,
+          slogan,
+        });
+        await invitePosterHelper.saveToAlbum(filePath);
+        wx.hideLoading();
+        wx.showToast({ title: '已保存到相册', icon: 'success' });
+      } catch (e) {
+        console.error(e);
+        wx.hideLoading();
+        wx.showToast({ title: '保存失败', icon: 'none' });
+      }
     },
   },
 });

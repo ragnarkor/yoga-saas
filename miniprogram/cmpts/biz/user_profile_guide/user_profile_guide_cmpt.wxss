@@ -1,0 +1,111 @@
+.profile-guide-popup {
+  border-radius: 32rpx 32rpx 0 0 !important;
+  overflow: hidden;
+}
+
+.profile-guide-sheet {
+  padding: 32rpx 40rpx calc(32rpx + env(safe-area-inset-bottom));
+}
+
+.profile-guide-head {
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+.profile-guide-title {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #323233;
+}
+
+.profile-guide-sub {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #969799;
+  line-height: 1.5;
+}
+
+.profile-guide-avatar-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32rpx;
+}
+
+.profile-guide-avatar-box {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f7f8fa;
+  box-shadow: 0 8rpx 24rpx rgba(31, 35, 41, 0.08);
+}
+
+.profile-guide-avatar-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.profile-guide-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  font-size: 22rpx;
+  color: #969799;
+}
+
+.profile-guide-avatar-btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.profile-guide-name {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 24rpx 28rpx;
+  background: #f7f8fa;
+  border-radius: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.profile-guide-name-label {
+  flex-shrink: 0;
+  font-size: 28rpx;
+  color: #646566;
+}
+
+.profile-guide-name-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 28rpx;
+  color: #323233;
+  text-align: right;
+}
+
+.profile-guide-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.profile-guide-skip {
+  text-align: center;
+  font-size: 26rpx;
+  color: #969799;
+  padding: 8rpx 0;
+}

@@ -63,3 +63,38 @@
 .submit-btn::after {
   border: none;
 }
+
+.expire-mode-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+.expire-mode {
+  flex: 1;
+  height: 72rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid var(--adminBorder);
+  background: var(--adminPageBg);
+  color: var(--adminTextSecondary);
+  font-size: 26rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expire-mode.is-active {
+  color: var(--adminColor);
+  border-color: var(--adminColor);
+  background: var(--adminIconBg);
+  font-weight: 500;
+}
+
+.expire-day-pick {
+  margin-top: 16rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 12rpx;
+  background: var(--adminPageBg);
+  border: 1rpx solid var(--adminBorder);
+  font-size: 28rpx;
+  color: var(--adminText);
+}

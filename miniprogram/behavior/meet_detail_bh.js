@@ -7,6 +7,7 @@ const formSetHelper = require('../cmpts/public/form/form_set_helper.js');
 const UserProfileBiz = require('../biz/user_profile_biz.js');
 const setting = require('../setting/setting.js');
 const defaultCoverHelper = require('../helper/default_cover_helper.js');
+const cardFaceHelper = require('../helper/card_face_helper.js');
 
 const BOOK_NOTES = [
 	'请提前 10–15 分钟到场签到，迟到可能影响入场。',
@@ -109,9 +110,11 @@ module.exports = Behavior({
 				const canBook = !!(summary && summary.canBook);
 				let cardHint = '';
 				if (!canBook) {
-					cardHint = '预约需可用会员卡次数，请联系馆方发卡';
+					cardHint = '预约需可用会员卡，请联系馆方发卡';
+				} else if (summary.hasPeriod && !summary.timesTotal) {
+					cardHint = '当前期限内卡可畅练，本课不扣次';
 				} else if (summary.hasPeriod) {
-					cardHint = '当前期限内卡可畅练';
+					cardHint = '可用期限卡或次卡预约';
 				} else if (summary.timesTotal > 0) {
 					cardHint = `可用次数合计 ${summary.timesTotal} 次`;
 				}
@@ -334,7 +337,7 @@ module.exports = Behavior({
 			if (!this.data.cardCanBook) {
 				wx.showModal({
 					title: '提示',
-					content: `预约本课程需扣除 ${this.data.cardNeedTimes || 1} 次会员卡，您暂无可用会员卡，请联系馆方发卡。`,
+					content: '您暂无可用会员卡，请联系馆方发卡后再预约。',
 					confirmText: '我的卡包',
 					cancelText: '知道了',
 					success(res) {
@@ -366,10 +369,14 @@ module.exports = Behavior({
 			try {
 				const res = await cloudHelper.callCloudData(
 					'meet/join_card_options',
-					{ meetId },
+					{ meetId, timeMark: this.data.timeMark || '' },
 					{ title: 'bar' },
 				);
-				const list = (res && res.list) || [];
+				console.log('[meet_detail_bh] join_card_options res:', res && res.list);
+				const list = ((res && res.list) || []).map((item) =>
+					cardFaceHelper.enrichCardVisual(item),
+				);
+				console.log('[meet_detail_bh] mapped joinCardOptions:', list);
 				if (!list.length) {
 					this.setData({ cardSheetShow: false, cardPickLoading: false });
 					wx.showModal({
@@ -535,6 +542,8 @@ module.exports = Behavior({
 				if (cardWarning) {
 					content += '\n\n' + cardWarning;
 				}
+
+				await this._loadDetail();
 
 				wx.showModal({
 					title: '温馨提示',

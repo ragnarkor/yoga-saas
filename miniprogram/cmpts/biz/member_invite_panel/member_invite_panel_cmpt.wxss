@@ -15,7 +15,7 @@
 .panel-title {
   font-size: 34rpx;
   font-weight: 600;
-  color: #333;
+  color: #1f2329;
 }
 
 .panel-close {
@@ -29,79 +29,136 @@
 }
 
 .invite-poster {
-  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 45%);
-  border-radius: 24rpx;
+  width: 100%;
+  border-radius: 28rpx;
   overflow: hidden;
+  box-shadow: 0 12rpx 40rpx rgba(31, 35, 41, 0.12);
 }
 
-.invite-poster-head {
-  padding: 32rpx 32rpx 12rpx;
-  text-align: center;
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #6366f1;
+.invite-poster-main {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 750 / 864;
+  min-height: 792rpx;
+}
+
+.invite-poster-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.invite-poster-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.04) 42%,
+    rgba(0, 0, 0, 0.12) 100%
+  );
+  pointer-events: none;
 }
 
 .invite-poster-body {
+  position: relative;
+  z-index: 1;
+  height: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  padding: 12rpx 32rpx 8rpx;
+  padding: 48rpx 32rpx;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.invite-poster-head {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1rpx;
+  text-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.28);
+}
+
+.invite-qr-shell {
+  width: 280rpx;
+  height: 280rpx;
+  margin: 32rpx 0 28rpx;
+  padding: 12rpx;
+  border-radius: 50%;
+  background: #fff;
+  box-sizing: border-box;
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.18);
 }
 
 .invite-qr {
-  width: 320rpx;
-  height: 320rpx;
-  background: #fff;
-  border-radius: 16rpx;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
 }
 
 .invite-qr-placeholder {
-  width: 320rpx;
-  height: 320rpx;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #999;
-  font-size: 28rpx;
+  font-size: 24rpx;
 }
 
 .invite-poster-hint {
-  text-align: center;
-  font-size: 24rpx;
-  color: #666;
-  padding: 8rpx 32rpx 20rpx;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.55;
+  text-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.25);
 }
 
 .invite-poster-foot {
-  background: #6366f1;
-  color: #fff;
+  width: 100%;
+  padding: 28rpx 32rpx;
+  box-sizing: border-box;
   text-align: center;
-  font-size: 28rpx;
-  padding: 18rpx 32rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 1rpx;
+  line-height: 1.4;
 }
 
 .invite-actions {
   display: flex;
-  justify-content: center;
-  gap: 80rpx;
+  gap: 20rpx;
   padding: 28rpx 0 12rpx;
 }
 
 .invite-action-btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 16rpx;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12rpx;
-  font-size: 24rpx;
-  color: #666;
-  background: transparent;
-  border: none;
+  justify-content: center;
+  gap: 10rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 1;
+  border: 1rpx solid transparent;
   padding: 0;
-  line-height: 1.2;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .invite-action-btn::after {
   border: none;
+}
+
+.invite-action-btn--primary {
+  color: #fff;
 }
 
 .invite-tip {
@@ -109,4 +166,13 @@
   font-size: 24rpx;
   color: #999;
   padding-bottom: 8rpx;
+}
+
+.invite-canvas {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  width: 750px;
+  height: 960px;
+  pointer-events: none;
 }

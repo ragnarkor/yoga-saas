@@ -19,17 +19,35 @@
       <van-field label="售价(元)" type="number" value="{{form.price}}" bind:change="bindFieldChange" data-field="price" />
       <van-field wx:if="{{form.type === 'times'}}" label="额度(次)" type="number" value="{{form.quota}}" bind:change="bindFieldChange" data-field="quota" />
 
-      <view class="course-edit-field course-edit-field--inline" bindtap="bindColorFieldTap">
-        <text class="course-edit-field-label-inline">卡面颜色</text>
+      <view class="course-edit-field course-edit-field--inline" bindtap="bindStyleFieldTap">
+        <text class="course-edit-field-label-inline">卡面样式</text>
         <view class="course-edit-field-row course-edit-field-row--inline">
           <view class="course-edit-color-inline">
-            <view
-              class="course-color-dot course-color-dot--md"
-              style="background: {{form.color}};"
-            ></view>
-            <text class="course-edit-field-value">{{selectedColorLabel}}</text>
+            <view wx:if="{{coverPreviewUrl}}" class="card-cover-thumb">
+              <image class="card-cover-thumb-img" src="{{coverPreviewUrl}}" mode="aspectFill" />
+            </view>
+            <view wx:else class="course-color-dot course-color-dot--md" style="background: {{form.color}};"></view>
+            <text class="course-edit-field-value">{{selectedStyleLabel}}</text>
           </view>
           <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+        </view>
+      </view>
+
+      <view class="card-edit-preview" wx:if="{{coverPreviewUrl || form.color}}">
+        <view class="card-edit-preview-label">预览</view>
+        <view class="card-edit-preview-chip">
+          <image
+            wx:if="{{coverPreviewUrl}}"
+            class="card-edit-preview-img"
+            src="{{coverPreviewUrl}}"
+            mode="aspectFill"
+          />
+          <view
+            wx:else
+            class="card-edit-preview-solid"
+            style="background: {{form.color}};"
+          ></view>
+          <text class="card-edit-preview-type">{{form.typeLabel}}</text>
         </view>
       </view>
 
@@ -49,38 +67,41 @@
   </block>
 
   <van-popup
-    show="{{colorSheetShow}}"
+    show="{{styleSheetShow}}"
     position="bottom"
     round
-    bind:close="bindCloseColorSheet"
+    bind:close="bindCloseStyleSheet"
     custom-class="course-edit-popup"
   >
     <view class="course-edit-sheet">
       <view class="course-edit-sheet-head">
-        <text class="course-edit-sheet-title">选择卡面颜色</text>
-        <text class="course-edit-sheet-sub">会员卡列表将显示此颜色</text>
+        <text class="course-edit-sheet-title">选择卡面样式</text>
+        <text class="course-edit-sheet-sub">5 款纯色与 5 款插图，同一网格选择</text>
       </view>
-      <view class="course-edit-color-list">
+      <view class="card-cover-grid">
         <view
-          class="course-edit-color-item {{form.color === item.value ? 'active' : ''}}"
-          wx:for="{{colorOptions}}"
-          wx:key="value"
-          data-color="{{item.value}}"
-          data-label="{{item.label}}"
-          bindtap="bindColorTap"
+          class="card-cover-item {{selectedStyleKey === item.pickerKey ? 'active' : ''}}"
+          wx:for="{{styleOptions}}"
+          wx:key="pickerKey"
+          data-key="{{item.pickerKey}}"
+          bindtap="bindStyleTap"
         >
-          <view class="course-edit-color-dot" style="background: {{item.value}};"></view>
-          <view class="course-edit-color-item-info">
-            <text class="course-edit-color-label">{{item.label}}</text>
-            <text class="course-edit-color-hex">{{item.value}}</text>
+          <view wx:if="{{item.url}}" class="card-cover-item-img-wrap">
+            <image class="card-cover-item-img" src="{{item.url}}" mode="aspectFill" />
           </view>
+          <view wx:else class="card-cover-item-solid" style="background: {{item.solidColor}};"></view>
+          <text class="card-cover-item-label">{{item.label}}</text>
           <van-icon
-            wx:if="{{form.color === item.value}}"
+            wx:if="{{selectedStyleKey === item.pickerKey}}"
             name="success"
-            size="36rpx"
+            size="32rpx"
             color="{{themeColor}}"
+            custom-class="card-cover-item-check"
           />
         </view>
+      </view>
+      <view class="card-style-sheet-footer">
+        <van-button block round color="{{themeColor}}" bind:click="bindCloseStyleSheet">完成</van-button>
       </view>
     </view>
   </van-popup>

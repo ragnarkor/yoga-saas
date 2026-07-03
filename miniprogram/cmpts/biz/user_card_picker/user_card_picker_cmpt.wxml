@@ -24,6 +24,20 @@
         data-name="{{item.name}}"
         bindtap="bindCardPick"
       >
+        <view class="ucp-card-visual">
+          <image
+            wx:if="{{item.coverUrl}}"
+            class="ucp-card-visual-img"
+            src="{{item.coverUrl}}"
+            mode="aspectFill"
+          />
+          <view
+            wx:else
+            class="ucp-card-visual-solid"
+            style="background: {{item.color}};"
+          ></view>
+          <text class="ucp-card-type">{{item.typeLabel}}</text>
+        </view>
         <view class="ucp-card-main">
           <text class="ucp-card-name">{{item.name}}</text>
           <text class="ucp-card-sub">{{item.deductHint || item.balanceText || ''}}</text>

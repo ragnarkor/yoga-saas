@@ -85,6 +85,7 @@ async function app(event, context) {
 			'home/teacher_detail': 1,
 			'tenant/list': 1,
 			'tenant/detail': 1,
+			'tenant/check_access': 1,
 			'passport/my_detail': 1,
 			'passport/my_tenants': 1,
 			'passport/sync_profile': 1,
@@ -103,6 +104,30 @@ async function app(event, context) {
 		};
 		if (!FAST_ROUTES[r]) {
 			await controller['initSetup']();
+		}
+
+		const TENANT_ACCESS_SKIP = {
+			'tenant/list': 1,
+			'tenant/detail': 1,
+			'tenant/check_access': 1,
+			'admin/platform_overview': 1,
+			'admin/tenant_insert': 1,
+			'admin/tenant_expire_detail': 1,
+			'admin/tenant_expire_save': 1,
+			'admin/login': 1,
+			'admin/wx_session': 1,
+			'admin/wx_bind': 1,
+			'admin/wx_tenant_list': 1,
+			'passport/my_detail': 1,
+			'passport/my_tenants': 1,
+			'passport/sync_profile': 1,
+			'passport/phone': 1,
+		};
+		if (global.PID && !TENANT_ACCESS_SKIP[r]) {
+			const TenantAccessService = require('../../project/service/tenant_access_service.js');
+			await new TenantAccessService().assertActive(global.PID, {
+				token: event.token || '',
+			});
 		}
 
 		let result = await controller[actionName]();

@@ -30,6 +30,7 @@ class AdminCardController extends BaseAdminController {
       price: "int",
       quota: "int",
       color: "string",
+      cover: "string|false",
       order: "int",
       scope: "object|false",
     };
@@ -116,10 +117,15 @@ class AdminCardController extends BaseAdminController {
     let rules = {
       userId: "required|string",
       meetId: "required|id",
+      timeMark: "string",
     };
     let input = this.validateData(rules);
     let service = new AdminCardService();
-    return await service.getUserJoinCardOptions(input.userId, input.meetId);
+    return await service.getUserJoinCardOptions(
+      input.userId,
+      input.meetId,
+      input.timeMark || "",
+    );
   }
 
   async getUserCardDetail() {

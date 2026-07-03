@@ -17,6 +17,7 @@ const UserModel = require("../../model/user_model.js");
 const NewsModel = require("../../model/news_model.js");
 const LogModel = require("../../model/log_model.js");
 const tenantSetupHelper = require("../tenant_setup_helper.js");
+const tenantExpireUtil = require("../../utils/tenant_expire_util.js");
 const teacherAdminHelper = require("../teacher_admin_helper.js");
 
 const BIND_CODE_TTL = 86400; // 24h
@@ -136,7 +137,7 @@ class AdminWxService extends BaseAdminService {
         _pid: ["in", pidList],
         TENANT_STATUS: TenantModel.STATUS.OPEN,
       },
-      "_pid,TENANT_ID,TENANT_NAME,TENANT_LOGO,TENANT_TEMPLATE,TENANT_MEET_TYPE,TENANT_MEET_NAME,TENANT_THEME_COLOR",
+      "_pid,TENANT_ID,TENANT_NAME,TENANT_LOGO,TENANT_TEMPLATE,TENANT_MEET_TYPE,TENANT_MEET_NAME,TENANT_THEME_COLOR,TENANT_EXPIRE_TIME",
       { TENANT_ADD_TIME: "asc" },
       100,
       false,
@@ -149,6 +150,7 @@ class AdminWxService extends BaseAdminService {
     for (let a of admins) {
       let t = tenantMap[a._pid];
       if (!t) continue;
+      if (tenantExpireUtil.isExpired(t.TENANT_EXPIRE_TIME)) continue;
       t = await tenantSetupHelper.getMergedTenant(a._pid, t);
       list.push({
         ...t,

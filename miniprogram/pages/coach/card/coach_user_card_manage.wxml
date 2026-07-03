@@ -15,7 +15,19 @@
 
   <block wx:else>
     <!-- 卡片视觉 -->
-    <view class="ucm-card" style="background: {{card.color}};" bindlongpress="bindDeleteTap">
+    <view class="ucm-card" bindlongpress="bindDeleteTap">
+      <image
+        wx:if="{{card.coverUrl}}"
+        class="ucm-card-bg"
+        src="{{card.coverUrl}}"
+        mode="aspectFill"
+      />
+      <view
+        wx:else
+        class="ucm-card-bg ucm-card-bg--solid"
+        style="background: {{card.color}};"
+      ></view>
+      <view class="ucm-card-shade"></view>
       <view class="ucm-card-type">{{card.typeLabel}}</view>
       <view class="ucm-card-name">{{card.name}}</view>
       <view class="ucm-card-info">

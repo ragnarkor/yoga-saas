@@ -1,6 +1,6 @@
 {
   "navigationStyle": "custom",
-  "navigationBarTitleText": "客户管理",
+  "navigationBarTitleText": "会员管理",
   "navigationBarBackgroundColor": "#c4b5fd",
   "navigationBarTextStyle": "white",
   "usingComponents": {

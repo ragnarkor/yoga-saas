@@ -1,5 +1,11 @@
 <template name="myCourseTpl">
   <view class="my-course-page">
+    <view class="course-hero">
+      <image class="course-hero-bg" src="{{skin.IMG_MY_COURSE_BG}}?v=2" mode="widthFix" />
+      <view class="course-hero-overlay"></view>
+      <view class="course-hero-caption">记录你的练习时光</view>
+    </view>
+
     <view class="filter-bar">
       <view
         class="filter-pill {{activeFilter === item.type ? 'active' : ''}}"

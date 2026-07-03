@@ -361,10 +361,17 @@ class MeetController extends BaseController {
 		await FeatureGate.check('booking');
 		let rules = {
 			meetId: 'must|id',
+			timeMark: 'string',
+			meetDay: 'string',
 		};
 		let input = this.validateData(rules);
 		let service = new UserCardService();
-		return await service.getJoinCardOptions(this._userId, input.meetId);
+		return await service.getJoinCardOptions(
+			this._userId,
+			input.meetId,
+			input.timeMark || '',
+			input.meetDay || '',
+		);
 	}
 
 	/** 预约前检测 */

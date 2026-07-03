@@ -28,6 +28,10 @@
   padding-right: 28rpx;
 }
 
+.tenant-top--center {
+  justify-content: center;
+}
+
 .tenant-back {
   flex-shrink: 0;
   width: 64rpx;

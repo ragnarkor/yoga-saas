@@ -6,8 +6,15 @@
   <!-- 超管：平台控制台 -->
   <block wx:if="{{admin.type=='super'}}">
     <!-- [AI_START TIMESTAMP=2025-01-27 10:40:00] -->
-    <!-- Hero 渐变头：标题 + 身份 + 核心数据 -->
-    <view class="platform-hero">
+    <!-- Hero：插画 + 标题 + 核心数据 -->
+    <view class="platform-hero platform-hero--illustrated">
+      <image
+        class="platform-hero-bg"
+        src="/pages/admin/images/admin_platform_hero.jpg?v=1"
+        mode="widthFix"
+      />
+      <view class="platform-hero-overlay"></view>
+      <view class="platform-hero-inner">
       <view class="platform-hero-top">
         <view class="platform-hero-info">
           <view class="platform-hero-title">平台管理</view>
@@ -28,6 +35,7 @@
           <text class="platform-hero-stat-num">{{data.adminCount || 0}}</text>
           <text class="platform-hero-stat-label">管理员</text>
         </view>
+      </view>
       </view>
     </view>
 <!-- [AI_START TIMESTAMP=2025-01-27 11:10:00] -->
@@ -101,8 +109,17 @@
       <view class="tenant-row-main">
         <text class="tenant-row-name">{{item.TENANT_NAME}}</text>
         <text class="tenant-row-desc" wx:if="{{item.TENANT_DESC}}">{{item.TENANT_DESC}}</text>
+        <text class="tenant-row-meta {{item.isExpired ? 'tenant-row-meta--warn' : (item.isExpiringSoon ? 'tenant-row-meta--soon' : '')}}">{{item.expireDesc}}</text>
       </view>
-      <view class="tenant-row-btn" data-item="{{item}}" bindtap="bindEnterCoachTap">管理</view>
+      <view class="tenant-row-actions">
+        <view
+          class="tenant-row-btn tenant-row-btn--ghost"
+          data-pid="{{item._pid}}"
+          data-name="{{item.TENANT_NAME}}"
+          bindtap="bindTenantExpireTap"
+        >有效期</view>
+        <view class="tenant-row-btn" data-item="{{item}}" bindtap="bindEnterCoachTap">管理</view>
+      </view>
     </view>
   </view>
 </block>

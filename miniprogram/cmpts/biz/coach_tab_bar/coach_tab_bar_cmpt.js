@@ -13,7 +13,7 @@ Component({
   data: {
     tabs: [
       { key: 'home', text: '首页', icon: 'home-o', path: '/pages/coach/index/coach_index' },
-      { key: 'customer', text: '客户', icon: 'friends-o', path: '/pages/coach/customer/coach_customer' },
+      { key: 'customer', text: '会员', icon: 'friends-o', path: '/pages/coach/customer/coach_customer' },
       { key: 'marketing', text: '营销', icon: 'gift-o', path: '/pages/coach/marketing/coach_marketing' },
       { key: 'my', text: '我的', icon: 'smile-o', path: '/pages/coach/my/coach_my' },
     ],

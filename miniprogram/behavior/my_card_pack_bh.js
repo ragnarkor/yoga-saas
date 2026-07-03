@@ -1,5 +1,6 @@
 const cloudHelper = require("../helper/cloud_helper.js");
 const pageHelper = require("../helper/page_helper.js");
+const cardFaceHelper = require("../helper/card_face_helper.js");
 
 module.exports = Behavior({
   data: {
@@ -28,7 +29,9 @@ module.exports = Behavior({
           { hint: false },
         );
         this.setData({
-          cardList: (res && res.list) || [],
+          cardList: ((res && res.list) || []).map((item) =>
+            cardFaceHelper.enrichCardVisual(item),
+          ),
           loading: false,
         });
       } catch (err) {

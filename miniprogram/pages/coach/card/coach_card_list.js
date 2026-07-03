@@ -1,5 +1,6 @@
 const cloudHelper = require('../../../helper/cloud_helper.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
+const cardFaceHelper = require('../../../helper/card_face_helper.js');
 
 Page({
   behaviors: [require('../../../behavior/coach_page_bh.js')],
@@ -7,6 +8,7 @@ Page({
   data: {
     loading: true,
     cardList: [],
+    heroSub: '配置次卡、期限卡与售价',
   },
 
   onLoad() {
@@ -40,6 +42,7 @@ Page({
       this.setData({
         cardList: ((res && res.list) || []).map((item) => this._formatCardItem(item)),
         loading: false,
+        heroSub: this._buildHeroSub((res && res.list) || []),
       });
     } catch (e) {
       console.error(e);
@@ -49,6 +52,12 @@ Page({
 
   bindAddTap() {
     wx.navigateTo({ url: '/pages/coach/card/coach_card_edit' });
+  },
+
+  _buildHeroSub(list) {
+    const n = (list || []).length;
+    if (!n) return '配置次卡、期限卡与售价';
+    return `共 ${n} 种卡型 · 长按可删除`;
   },
 
   _formatCardItem(item) {
@@ -71,7 +80,7 @@ Page({
     if (scopeDesc && scopeDesc !== '全馆课程') {
       metaTags.push({ key: 'scope', label: '适用', value: scopeDesc });
     }
-    return { ...item, metaTags };
+    return cardFaceHelper.enrichCardVisual({ ...item, metaTags });
   },
 
   bindCardTap(e) {

@@ -25,6 +25,16 @@ class TenantController extends BaseController {
     let tenant = await service.getTenantDetail(input.pid);
     return { tenant };
   }
+
+  /** 校验租户是否可访问 */
+  async checkTenantAccess() {
+    let rules = {
+      pid: "must|string|name=租户ID",
+    };
+    let input = this.validateData(rules);
+    let service = new TenantService();
+    return await service.checkTenantAccess(input.pid);
+  }
 }
 
 module.exports = TenantController;

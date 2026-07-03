@@ -21,28 +21,49 @@
 
     <block wx:else>
       <view class="invite-poster">
-        <view class="invite-poster-head">约课就用小程序</view>
-        <view class="invite-poster-body">
+        <view class="invite-poster-main">
           <image
-            wx:if="{{qrUrl}}"
-            class="invite-qr"
-            src="{{qrUrl}}"
-            mode="aspectFit"
-            show-menu-by-longpress="{{true}}"
+            class="invite-poster-bg"
+            src="/pages/coach/images/member_invite_poster.jpg?v=3"
+            mode="aspectFill"
           />
-          <view wx:else class="invite-qr-placeholder">二维码加载失败</view>
+          <view class="invite-poster-overlay"></view>
+          <view class="invite-poster-body">
+            <view class="invite-poster-head">{{slogan}}</view>
+            <view class="invite-qr-shell">
+              <image
+                wx:if="{{qrUrl}}"
+                class="invite-qr"
+                src="{{qrUrl}}"
+                mode="aspectFit"
+                show-menu-by-longpress="{{true}}"
+              />
+              <view wx:else class="invite-qr-placeholder">二维码加载失败</view>
+            </view>
+            <view class="invite-poster-hint">微信扫一扫或</view>
+            <view class="invite-poster-hint">微信长按识别</view>
+          </view>
         </view>
-        <view class="invite-poster-hint">微信扫一扫或长按识别</view>
-        <view class="invite-poster-foot">{{tenantName}}（门店）</view>
+        <view class="invite-poster-foot" style="background: {{accentColor}};">
+          {{tenantName}}（门店）
+        </view>
       </view>
 
       <view class="invite-actions">
-        <button class="invite-action-btn" open-type="share">
-          <van-icon name="share-o" size="44rpx" color="{{accentColor}}" />
+        <button
+          class="invite-action-btn invite-action-btn--ghost"
+          style="color: {{accentColor}}; border-color: {{accentColor}}33; background: #fff;"
+          open-type="share"
+        >
+          <van-icon name="share-o" size="36rpx" color="{{accentColor}}" />
           <text>发送给朋友</text>
         </button>
-        <view class="invite-action-btn" bindtap="bindSaveTap">
-          <van-icon name="down" size="44rpx" color="{{accentColor}}" />
+        <view
+          class="invite-action-btn invite-action-btn--primary"
+          style="background: {{accentColor}};"
+          bindtap="bindSaveTap"
+        >
+          <van-icon name="photo-o" size="36rpx" color="#fff" />
           <text>保存图片</text>
         </view>
       </view>
@@ -51,4 +72,6 @@
     </block>
   </view>
 </van-popup>
+
+<canvas type="2d" id="inviteCanvas" class="invite-canvas" />
 </root-portal>

@@ -13,7 +13,14 @@
 <!-- 已选卡预览（参照 my_card_pack 卡面样式） -->
 <view wx:if="{{selectedTpl}}" class="ctp-preview">
   <view class="ctp-card">
-    <view class="ctp-card-visual" style="background: {{selectedTpl.CARD_TPL_COLOR}};">
+    <view class="ctp-card-visual">
+      <image
+        wx:if="{{selectedTpl.coverUrl}}"
+        class="ctp-card-visual-img"
+        src="{{selectedTpl.coverUrl}}"
+        mode="aspectFill"
+      />
+      <view wx:else class="ctp-card-visual-solid" style="background: {{selectedTpl.color}};"></view>
       <text class="ctp-card-vip">VIP CARD</text>
       <text class="ctp-card-type">{{selectedTpl.typeDesc}}</text>
     </view>
@@ -47,7 +54,14 @@
         data-id="{{item.CARD_TPL_ID}}"
         bindtap="bindTplPick"
       >
-        <view class="ctp-card-visual" style="background: {{item.CARD_TPL_COLOR}};">
+        <view class="ctp-card-visual">
+          <image
+            wx:if="{{item.coverUrl}}"
+            class="ctp-card-visual-img"
+            src="{{item.coverUrl}}"
+            mode="aspectFill"
+          />
+          <view wx:else class="ctp-card-visual-solid" style="background: {{item.color}};"></view>
           <text class="ctp-card-vip">VIP CARD</text>
           <text class="ctp-card-type">{{item.typeDesc}}</text>
         </view>

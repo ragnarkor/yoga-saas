@@ -5,7 +5,12 @@ module.exports = {
   IMG_ROOT: "/pages/default/skin/images",
   IMG_DEFAULT_INDEX_BG: "/pages/default/skin/images/default_index_bg.jpg",
   IMG_UPIMG: "/pages/default/skin/images/upimg.jpg",
+  IMG_MY_COURSE_BG: "/pages/default/skin/images/my_course_bg.jpg",
   IMG_COACH_HOME_HERO: "/pages/coach/images/coach_home_hero.jpg",
+  IMG_COACH_MEMBER_HERO: "/pages/coach/images/coach_member_hero.jpg",
+  IMG_MEMBER_INVITE_POSTER: "/pages/coach/images/member_invite_poster.jpg",
+  IMG_COACH_MARKETING_HERO: "/pages/coach/images/coach_marketing_hero.jpg",
+  IMG_COACH_CARD_HERO: "/pages/coach/images/coach_card_hero.jpg",
   IMG_DEFAULT_COVER: "/images/default_cover_1.jpg",
   IMG_DEFAULT_COVERS: [
     "/images/default_cover_1.jpg",

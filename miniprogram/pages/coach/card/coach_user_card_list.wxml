@@ -27,8 +27,19 @@
       bindtap="bindCardTap"
       bindlongpress="bindDeleteTap"
     >
-      <view class="ucard-chip" style="background: {{item.color}};">
-        <text>{{item.typeLabel}}</text>
+      <view class="ucard-chip ucard-chip--visual">
+        <image
+          wx:if="{{item.coverUrl}}"
+          class="ucard-chip-img"
+          src="{{item.coverUrl}}"
+          mode="aspectFill"
+        />
+        <view
+          wx:else
+          class="ucard-chip-solid"
+          style="background: {{item.color}};"
+        ></view>
+        <text class="ucard-chip-type">{{item.typeLabel}}</text>
       </view>
       <view class="ucard-info">
         <view class="ucard-name">{{item.name}}</view>

@@ -29,7 +29,18 @@
       </view>
 
       <view class="card-pack-body">
-        <view class="card-pack-visual" style="background: {{item.color}};">
+        <view class="card-pack-visual">
+          <image
+            wx:if="{{item.coverUrl}}"
+            class="card-pack-visual-img"
+            src="{{item.coverUrl}}"
+            mode="aspectFill"
+          />
+          <view
+            wx:else
+            class="card-pack-visual-solid"
+            style="background: {{item.color}};"
+          ></view>
           <text class="card-pack-vip">VIP CARD</text>
           <text class="card-pack-type">{{item.typeLabel}}</text>
         </view>

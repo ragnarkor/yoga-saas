@@ -8,6 +8,8 @@ const setting = require("../setting/setting.js");
 
 const CACHE_USER_PROFILE = "CACHE_USER_PROFILE";
 const CACHE_USER_PROFILE_TIME = 86400 * 365;
+const CACHE_GUIDE_SKIP = "PROFILE_GUIDE_SKIP";
+const CACHE_GUIDE_SKIP_TIME = 86400;
 
 class UserProfileBiz {
   static displayAvatar(user) {
@@ -95,6 +97,23 @@ class UserProfileBiz {
     return !!(user && user.USER_NAME);
   }
 
+  static needsGuide(user) {
+    if (!user) return true;
+    return !(user.USER_NAME && user.USER_PIC);
+  }
+
+  static isGuideSkipped() {
+    return !!cacheHelper.get(CACHE_GUIDE_SKIP);
+  }
+
+  static skipGuide() {
+    cacheHelper.set(CACHE_GUIDE_SKIP, 1, CACHE_GUIDE_SKIP_TIME);
+  }
+
+  static clearGuideSkip() {
+    cacheHelper.remove(CACHE_GUIDE_SKIP);
+  }
+
   static cacheUser(user) {
     if (user) {
       cacheHelper.set(CACHE_USER_PROFILE, user, CACHE_USER_PROFILE_TIME);
@@ -168,6 +187,9 @@ class UserProfileBiz {
     );
     const user = res.data || null;
     if (user) UserProfileBiz.cacheUser(user);
+    if (user && user.USER_NAME && user.USER_PIC) {
+      UserProfileBiz.clearGuideSkip();
+    }
     return user;
   }
 
@@ -182,6 +204,9 @@ class UserProfileBiz {
     );
     const user = res.data || null;
     if (user) UserProfileBiz.cacheUser(user);
+    if (user && user.USER_NAME && user.USER_PIC) {
+      UserProfileBiz.clearGuideSkip();
+    }
     return user;
   }
 
@@ -214,6 +239,9 @@ class UserProfileBiz {
     );
     const user = res.data || null;
     if (user) UserProfileBiz.cacheUser(user);
+    if (user && user.USER_NAME && user.USER_PIC) {
+      UserProfileBiz.clearGuideSkip();
+    }
     return user;
   }
 

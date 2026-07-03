@@ -1,0 +1,64 @@
+<root-portal>
+<van-popup
+  show="{{ show }}"
+  position="bottom"
+  round
+  z-index="{{10000}}"
+  safe-area-inset-bottom
+  custom-class="profile-guide-popup"
+  close-on-click-overlay="{{ false }}"
+>
+  <view class="profile-guide-sheet">
+    <view class="profile-guide-head">
+      <text class="profile-guide-title">完善个人资料</text>
+      <text class="profile-guide-sub">用于预约、签到等场景展示您的昵称和头像</text>
+    </view>
+
+    <view class="profile-guide-avatar-wrap">
+      <view class="profile-guide-avatar-box">
+        <image
+          wx:if="{{showAvatar}}"
+          class="profile-guide-avatar-img"
+          mode="aspectFill"
+          src="{{avatarSrc}}"
+        />
+        <view wx:else class="profile-guide-avatar-placeholder">
+          <van-icon name="photograph" size="56rpx" color="{{themeColor || '#5b8a72'}}" />
+          <text>点击选头像</text>
+        </view>
+        <button
+          class="profile-guide-avatar-btn"
+          open-type="chooseAvatar"
+          bindchooseavatar="bindChooseAvatar"
+        ></button>
+      </view>
+    </view>
+
+    <view class="profile-guide-name">
+      <text class="profile-guide-name-label">昵称</text>
+      <input
+        class="profile-guide-name-input"
+        type="nickname"
+        maxlength="30"
+        placeholder="点击使用微信昵称"
+        value="{{formName}}"
+        bindinput="bindNameInput"
+        bindblur="bindNameBlur"
+        bindnicknamereview="bindNicknameReview"
+      />
+    </view>
+
+    <view class="profile-guide-actions">
+      <van-button
+        block
+        round
+        color="{{themeColor || '#5b8a72'}}"
+        loading="{{submitting}}"
+        disabled="{{submitting}}"
+        bind:click="bindSaveTap"
+      >保存并继续</van-button>
+      <view class="profile-guide-skip" bindtap="bindSkipTap">稍后再说</view>
+    </view>
+  </view>
+</van-popup>
+</root-portal>

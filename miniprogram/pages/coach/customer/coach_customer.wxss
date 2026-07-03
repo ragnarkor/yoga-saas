@@ -1,7 +1,7 @@
 /* [AI_START TIMESTAMP=2025-01-27 10:30:00] */
 @import "../coach_common.wxss";
 
-/* ==================== 客户页 — Hero 汇总 ==================== */
+/* ==================== 会员页 — Hero 汇总 ==================== */
 .customer-hero {
   margin: 0 24rpx 28rpx;
   padding: 48rpx 32rpx;
@@ -14,7 +14,6 @@
   overflow: hidden;
 }
 
-/* Hero 装饰光晕 */
 .customer-hero::after {
   content: "";
   position: absolute;
@@ -46,13 +45,59 @@
   z-index: 1;
 }
 
-/* ==================== 客户页 — 分区卡片 ==================== */
+/* ==================== 会员页 — 分区卡片 ==================== */
 .customer-section {
   margin-bottom: 24rpx;
   background: var(--neutralSurface, #fff);
   border-radius: var(--radius-xl, 24rpx);
   padding: 28rpx 20rpx 8rpx;
   box-shadow: var(--projectShadowSm, 0 2rpx 12rpx rgba(91, 138, 114, 0.08));
+}
+
+.customer-section--illustrated {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  background: transparent;
+}
+
+.customer-section-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.customer-section-bg--focus-left {
+  left: 0;
+  right: auto;
+  width: 118%;
+  max-width: none;
+}
+
+.customer-section-bg-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.customer-section-bg-overlay--overview {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.82) 46%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
+}
+
+.customer-section-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.customer-section--illustrated .customer-section-inner {
+  padding: 28rpx 20rpx 8rpx;
 }
 
 .customer-section--alert {
@@ -81,18 +126,14 @@
   color: var(--neutralTextTertiary, #8f959e);
 }
 
-/* ==================== 客户页 — 卡片网格 ==================== */
+/* ==================== 会员页 — 卡片网格 ==================== */
 .customer-card-grid {
   display: flex;
   flex-wrap: wrap;
 }
 
-/* 统一 3 列 */
 .customer-card-item {
   width: 33.33%;
-}
-
-.customer-card-item {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -105,12 +146,19 @@
     transform var(--transition-fast, 0.15s ease);
 }
 
+.customer-section--illustrated .customer-card-item {
+  background: rgba(255, 255, 255, 0.72);
+}
+
 .customer-card-item:active {
   background: var(--projectColorLight, #e5f1ec);
   transform: scale(0.94);
 }
 
-/* 关注分区点击态用赤陶浅色，避免与主题绿冲突 */
+.customer-section--illustrated .customer-card-item:active {
+  background: rgba(229, 241, 236, 0.95);
+}
+
 .customer-section--alert .customer-card-item:active {
   background: rgba(221, 145, 104, 0.14);
 }
@@ -133,7 +181,6 @@
   transform: scale(0.88);
 }
 
-/* 关注分区图标用赤陶色底 */
 .customer-card-icon--alert {
   background: rgba(221, 145, 104, 0.12);
 }

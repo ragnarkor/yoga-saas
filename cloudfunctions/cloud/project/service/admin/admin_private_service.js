@@ -446,7 +446,7 @@ class AdminPrivateService extends BaseAdminService {
     }
     if (cardId) {
       const cardService = new UserCardService();
-      await cardService.checkCardForJoin(userId, meetId, cardId);
+      await cardService.checkCardForJoin(userId, meetId, cardId, mark);
     }
 
     const joinResult = await meetService.join(

@@ -22,6 +22,8 @@ TenantModel.DB_STRUCTURE = {
   TENANT_MEET_NAME: "string|false|default=约课|comment=预约功能名称",
   TENANT_THEME_COLOR:
     "string|false|comment=品牌主题色，如 #5B8A72，会员端与教练端共用",
+  TENANT_EXPIRE_TIME:
+    "int|false|default=0|comment=服务到期时间戳，0=长期有效",
 
   TENANT_ADD_TIME: "int|true",
   TENANT_EDIT_TIME: "int|true",

@@ -1,5 +1,6 @@
 const cloudHelper = require("../helper/cloud_helper.js");
 const pageHelper = require("../helper/page_helper.js");
+const cardFaceHelper = require("../helper/card_face_helper.js");
 
 module.exports = Behavior({
   data: {
@@ -44,7 +45,7 @@ module.exports = Behavior({
         wx.setNavigationBarTitle({ title: res.card.name || "会员卡详情" });
         this.setData({
           loading: false,
-          card: res.card,
+          card: cardFaceHelper.enrichCardVisual(res.card),
           usageList: res.usageList || [],
           usageTotal: res.usageTotal || 0,
         });

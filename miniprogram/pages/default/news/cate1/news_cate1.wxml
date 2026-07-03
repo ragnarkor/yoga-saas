@@ -4,6 +4,6 @@
   <import src="../../../../tpls/project/my_course_tpl.wxml" />
   <template
     is="myCourseTpl"
-    data="{{themeColor,isLoad,filterTabs,activeFilter,list,loading,hasMore,emptyText}}"
+    data="{{skin,themeColor,isLoad,filterTabs,activeFilter,list,loading,hasMore,emptyText}}"
   />
 </view>

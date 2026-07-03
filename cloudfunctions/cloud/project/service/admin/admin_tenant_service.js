@@ -11,6 +11,7 @@ const AdminModel = require("../../model/admin_model.js");
 const cloudUtil = require("../../../framework/cloud/cloud_util.js");
 const timeUtil = require("../../../framework/utils/time_util.js");
 const tenantSetupHelper = require("../tenant_setup_helper.js");
+const tenantExpireUtil = require("../../utils/tenant_expire_util.js");
 const bufferUtil = require("../../utils/schedule_buffer_util.js");
 
 const DEFAULT_MEET_TYPE =
@@ -348,10 +349,16 @@ class AdminTenantService extends BaseAdminService {
   }
 
   /** 超管：新建瑜伽馆 */
-  async insertTenant(name, desc, template, operator) {
+  async insertTenant(name, desc, template, operator, expireDay) {
     name = String(name || "").trim();
     if (!name) this.AppError("请填写瑜伽馆名称");
     if (name.length > 30) this.AppError("名称不超过30字");
+
+    let expireTime = 0;
+    if (expireDay && String(expireDay).trim() && expireDay !== "long") {
+      expireTime = tenantExpireUtil.expireDayToTime(expireDay);
+      if (!expireTime) this.AppError("到期日期无效");
+    }
 
     let pid = TenantModel.makeID();
     let data = {
@@ -364,6 +371,7 @@ class AdminTenantService extends BaseAdminService {
       TENANT_MEET_TYPE: this._defaultMeetType(),
       TENANT_MEET_NAME: "约课",
       TENANT_THEME_COLOR: "#5B8A72",
+      TENANT_EXPIRE_TIME: expireTime,
     };
 
     await TenantModel.insert(data, false);
@@ -389,7 +397,7 @@ class AdminTenantService extends BaseAdminService {
     }
 
     await this.insertLog(
-      `新建瑜伽馆「${name}」`,
+      `新建瑜伽馆「${name}」${expireTime ? `，有效期至 ${tenantExpireUtil.expireTimeToDay(expireTime)}` : "，长期有效"}`,
       operator,
       require("../../model/log_model.js").TYPE.SYS,
     );
@@ -399,9 +407,10 @@ class AdminTenantService extends BaseAdminService {
 
   /** 超管：平台概览 */
   async getPlatformOverview() {
+    const now = timeUtil.time();
     let tenantList = await TenantModel.getAll(
       { TENANT_STATUS: TenantModel.STATUS.OPEN },
-      "_pid,TENANT_ID,TENANT_NAME,TENANT_DESC,TENANT_TEMPLATE",
+      "_pid,TENANT_ID,TENANT_NAME,TENANT_DESC,TENANT_TEMPLATE,TENANT_EXPIRE_TIME",
       { TENANT_ADD_TIME: "desc" },
       200,
       false,
@@ -416,10 +425,68 @@ class AdminTenantService extends BaseAdminService {
     );
 
     return {
-      tenantList: tenantList || [],
+      tenantList: (tenantList || []).map((item) =>
+        tenantExpireUtil.enrichTenantExpire(item, now),
+      ),
       tenantCount: (tenantList || []).length,
       adminCount: adminCount || 0,
     };
+  }
+
+  /** 超管：租户有效期详情 */
+  async getTenantExpireDetail(pid) {
+    pid = String(pid || "").trim();
+    if (!pid) this.AppError("请选择瑜伽馆");
+    let tenant = await TenantModel.getOne(
+      { _pid: pid },
+      "_pid,TENANT_ID,TENANT_NAME,TENANT_EXPIRE_TIME,TENANT_STATUS",
+      {},
+      false,
+    );
+    if (!tenant) this.AppError("瑜伽馆不存在");
+    return tenantExpireUtil.enrichTenantExpire(tenant);
+  }
+
+  /** 超管：保存租户有效期 */
+  async saveTenantExpire(pid, expireDay, operator) {
+    pid = String(pid || "").trim();
+    if (!pid) this.AppError("请选择瑜伽馆");
+
+    let tenant = await TenantModel.getOne(
+      { _pid: pid },
+      "TENANT_NAME",
+      {},
+      false,
+    );
+    if (!tenant) this.AppError("瑜伽馆不存在");
+
+    let expireTime = 0;
+    if (expireDay && String(expireDay).trim() && expireDay !== "long") {
+      expireTime = tenantExpireUtil.expireDayToTime(expireDay);
+      if (!expireTime) this.AppError("到期日期无效");
+    }
+
+    await TenantModel.edit(
+      { _pid: pid },
+      {
+        TENANT_EXPIRE_TIME: expireTime,
+        TENANT_EDIT_TIME: timeUtil.time(),
+      },
+      false,
+    );
+
+    const desc = tenantExpireUtil.formatExpireDesc(expireTime);
+    await this.insertLog(
+      `设置瑜伽馆「${tenant.TENANT_NAME}」有效期：${desc}`,
+      operator,
+      require("../../model/log_model.js").TYPE.SYS,
+    );
+
+    return tenantExpireUtil.enrichTenantExpire({
+      _pid: pid,
+      TENANT_NAME: tenant.TENANT_NAME,
+      TENANT_EXPIRE_TIME: expireTime,
+    });
   }
 
   /** 客户 Tab 会员统计 */
@@ -611,7 +678,7 @@ class AdminTenantService extends BaseAdminService {
         );
         targetIds = new Set();
         for (let c of rows || []) {
-          if (c.USER_CARD_END_TIME <= now + 86400 * 7) {
+          if (c.USER_CARD_END_TIME <= now + 86400 * 7 * 1000) {
             let uid = c.USER_CARD_USER_ID;
             if (!uid) continue;
             targetIds.add(uid);

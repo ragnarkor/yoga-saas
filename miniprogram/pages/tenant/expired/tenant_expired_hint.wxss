@@ -1,0 +1,87 @@
+.expired-hint {
+  min-height: 100vh;
+  padding: 48rpx 32rpx calc(48rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background: #f6f7f5;
+}
+
+.expired-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 48rpx 36rpx 40rpx;
+  box-shadow: 0 8rpx 32rpx rgba(31, 35, 41, 0.06);
+  text-align: center;
+}
+
+.expired-icon {
+  width: 120rpx;
+  height: 120rpx;
+  margin: 0 auto 24rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expired-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1f2329;
+}
+
+.expired-name {
+  margin-top: 12rpx;
+  font-size: 30rpx;
+  color: #646a73;
+}
+
+.expired-desc {
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  line-height: 1.65;
+  color: #646a73;
+  text-align: left;
+}
+
+.expired-steps {
+  margin-top: 28rpx;
+  padding: 24rpx 28rpx;
+  border-radius: 16rpx;
+  text-align: left;
+}
+
+.expired-step {
+  font-size: 24rpx;
+  line-height: 1.8;
+  color: #646a73;
+}
+
+.expired-actions {
+  margin-top: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.expired-btn {
+  height: 88rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 88rpx;
+  padding: 0;
+  margin: 0;
+  border: 1rpx solid transparent;
+}
+
+.expired-btn::after {
+  border: none;
+}
+
+.expired-btn--ghost {
+  background: #fff;
+}
+
+.expired-btn--primary {
+  color: #fff;
+}

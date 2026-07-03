@@ -1,24 +1,39 @@
 <page-meta page-style="{{themeStyle}}" />
-<view class="coach-page">
+<view class="coach-page coach-marketing">
   <coach-tenant-switch title="营销" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" bind:change="bindCoachTenantChange" />
 
-  <view class="coach-revenue-card">
-    <view class="coach-revenue-sub">今日收款 {{todayCount}} 笔</view>
-    <view class="coach-revenue-num">¥{{todayAmount}}</view>
-    <view class="coach-revenue-link">查看订单</view>
+  <view class="marketing-hero">
+    <image
+      class="marketing-hero-bg"
+      src="/pages/coach/images/coach_marketing_hero.jpg?v=3"
+      mode="aspectFill"
+    />
+    <view class="marketing-hero-overlay"></view>
+    <view class="marketing-hero-text">
+      <text class="marketing-hero-title">营销</text>
+      <text class="marketing-hero-sub">会员卡与商城</text>
+    </view>
   </view>
 
-  <view class="coach-section" style="margin: 0 24rpx;">
-    <view class="coach-section-head">
-      <view class="coach-section-title">营销工具</view>
+  <view class="marketing-body">
+    <view class="coach-revenue-card">
+      <view class="coach-revenue-sub">今日收款 {{todayCount}} 笔</view>
+      <view class="coach-revenue-num">¥{{todayAmount}}</view>
+      <view class="coach-revenue-link">查看订单</view>
     </view>
-    <view class="coach-grid coach-grid-3">
-      <view class="coach-grid-item" wx:for="{{malls}}" wx:key="name" bindtap="onMallTap">
-        <view class="coach-grid-icon" style="background: {{item.color}}20;">
-          <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
+
+    <view class="coach-section">
+      <view class="coach-section-head">
+        <view class="coach-section-title">营销工具</view>
+      </view>
+      <view class="coach-grid coach-grid-3">
+        <view class="coach-grid-item" wx:for="{{malls}}" wx:key="name" bindtap="onMallTap">
+          <view class="coach-grid-icon" style="background: {{item.color}}20;">
+            <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
+          </view>
+          <text class="coach-grid-text">{{item.name}}</text>
+          <text class="coach-grid-text" wx:if="{{item.sub}}" style="font-size:20rpx;margin-top:4rpx;">{{item.sub}}</text>
         </view>
-        <text class="coach-grid-text">{{item.name}}</text>
-        <text class="coach-grid-text" wx:if="{{item.sub}}" style="font-size:20rpx;margin-top:4rpx;">{{item.sub}}</text>
       </view>
     </view>
   </view>

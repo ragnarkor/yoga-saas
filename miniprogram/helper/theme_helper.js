@@ -66,6 +66,13 @@ function getNavBarBg(color) {
   return mixColor(color, "#FFFFFF", 0.35);
 }
 
+/** 主题色半透明背景（用于提示框、标签等） */
+function getThemeAlphaBg(color, alpha = 0.12) {
+  const { r, g, b } = hexToRgb(color);
+  const a = Math.max(0, Math.min(1, alpha));
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
 function getCoachHeaderGradient(color) {
   const c = normalizeHex(color);
   const a = mixColor(c, "#FFFFFF", 0.35);
@@ -181,6 +188,7 @@ module.exports = {
   getThemeLight,
   getThemeDark,
   getNavBarBg,
+  getThemeAlphaBg,
   getCoachNavBg,
   getCoachHeaderGradient,
   getThemeCssVars,

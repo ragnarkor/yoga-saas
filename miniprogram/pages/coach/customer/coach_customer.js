@@ -10,6 +10,7 @@ const SECTIONS = [
   {
     title: "会员概况",
     desc: "掌握整体会员动态",
+    banner: true,
     cards: [
       { label: "全部会员卡", key: "totalCards", icon: "friends-o" },
       { label: "本月新增会员", key: "monthNew", icon: "add-o" },

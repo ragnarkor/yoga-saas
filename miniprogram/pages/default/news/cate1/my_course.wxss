@@ -7,6 +7,44 @@ page {
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
 }
 
+.course-hero {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 8rpx;
+  line-height: 0;
+  font-size: 0;
+  border-radius: 0 0 48rpx 48rpx;
+}
+
+.course-hero-bg {
+  width: 100%;
+  display: block;
+  vertical-align: top;
+  border-radius: 0 0 48rpx 48rpx;
+}
+
+.course-hero-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 0 0 48rpx 48rpx;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.04) 0%,
+    rgba(0, 0, 0, 0.14) 100%
+  );
+}
+
+.course-hero-caption {
+  position: absolute;
+  left: 32rpx;
+  right: 32rpx;
+  bottom: 28rpx;
+  z-index: 1;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: 1rpx;
+}
+
 .filter-bar {
   display: flex;
   align-items: center;

@@ -1,5 +1,6 @@
 const cloudHelper = require("../../../helper/cloud_helper.js");
 const AdminWxBiz = require("../../../biz/admin_wx_biz.js");
+const cardFaceHelper = require("../../../helper/card_face_helper.js");
 
 /**
  * 会员持卡选择器（教练代约 / 扣次用）
@@ -16,6 +17,7 @@ Component({
   properties: {
     userId: { type: String, value: "" },
     meetId: { type: String, value: "" },
+    timeMark: { type: String, value: "" },
     value: { type: String, value: "" },
     themeColor: { type: String, value: "#5B8A72" },
     label: { type: String, value: "会员卡" },
@@ -33,7 +35,7 @@ Component({
   },
 
   observers: {
-    "userId, meetId"() {
+    "userId, meetId, timeMark"() {
       this._loadCards();
     },
     value(cardId) {
@@ -52,6 +54,7 @@ Component({
     async _loadCards() {
       const userId = (this.data.userId || "").trim();
       const meetId = (this.data.meetId || "").trim();
+      const timeMark = (this.data.timeMark || "").trim();
       if (!userId) {
         this.setData({
           cardList: [],
@@ -74,7 +77,7 @@ Component({
         if (meetId) {
           const res = await cloudHelper.callCloudData(
             "admin/user_join_card_options",
-            { userId, meetId },
+            { userId, meetId, timeMark },
             { hint: false },
           );
           list = (res && res.list) || [];
@@ -88,6 +91,7 @@ Component({
             (c) => c.isActive || c.canBook,
           );
         }
+        list = list.map((item) => cardFaceHelper.enrichCardVisual(item));
 
         this.setData({ cardList: list, loading: false });
         this._syncSelected(this.data.value);

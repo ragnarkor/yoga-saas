@@ -1,53 +1,95 @@
 <page-meta page-style="{{themeStyle}}" />
 <view class="coach-page card-page">
   <coach-tenant-switch
-    title="会员卡列表"
+    title="会员卡"
     show-back="{{true}}"
     theme-color="{{themeColor}}"
     nav-bg="{{themeNavBg}}"
   />
 
-  <view wx:if="{{loading}}" class="card-loading">
-    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
-  </view>
-
-  <view wx:elif="{{!cardList.length}}" class="card-empty">
-    <van-empty description="暂无会员卡">
-      <van-button round color="{{themeColor}}" size="small" bind:click="bindAddTap">添加会员卡</van-button>
-    </van-empty>
-  </view>
-
-  <view wx:else class="card-list">
-    <view
-      class="card-row"
-      wx:for="{{cardList}}"
-      wx:key="CARD_TPL_ID"
-      data-id="{{item.CARD_TPL_ID}}"
-      data-name="{{item.CARD_TPL_NAME}}"
-      bindtap="bindCardTap"
-      bindlongpress="bindDeleteTap"
-    >
-      <view class="card-chip" style="background: {{item.CARD_TPL_COLOR}};">
-        <text class="card-chip-type">{{item.typeDesc}}</text>
-      </view>
-      <view class="card-info">
-        <view class="card-name">{{item.CARD_TPL_NAME}}</view>
-        <view class="card-meta-row" wx:if="{{item.metaTags.length}}">
-          <view
-            class="card-meta-tag {{tag.highlight ? 'card-meta-tag--price' : ''}}"
-            wx:for="{{item.metaTags}}"
-            wx:for-item="tag"
-            wx:key="key"
-          >
-            <text class="card-meta-tag-label">{{tag.label}}</text>
-            <text class="card-meta-tag-value">{{tag.value}}</text>
-          </view>
-        </view>
-      </view>
+  <view class="card-hero">
+    <image
+      class="card-hero-bg"
+      src="/pages/coach/images/coach_card_hero.jpg?v=1"
+      mode="aspectFill"
+    />
+    <view class="card-hero-overlay"></view>
+    <view class="card-hero-text">
+      <text class="card-hero-title">会员卡</text>
+      <text class="card-hero-sub">{{heroSub}}</text>
     </view>
   </view>
 
-  <view class="card-fab" bindtap="bindAddTap">
-    <van-icon name="add" size="48rpx" color="#fff" />
+  <view class="card-body">
+    <view wx:if="{{loading}}" class="card-loading">
+      <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+    </view>
+
+    <view wx:elif="{{!cardList.length}}" class="card-empty">
+      <van-empty description="暂无会员卡模板">
+        <view
+          class="card-empty-btn"
+          style="background: {{themeColor}};"
+          bindtap="bindAddTap"
+        >
+          <van-icon name="plus" size="32rpx" color="#fff" />
+          <text>添加会员卡</text>
+        </view>
+      </van-empty>
+    </view>
+
+    <view wx:else class="card-list">
+      <view
+        class="card-row"
+        wx:for="{{cardList}}"
+        wx:key="CARD_TPL_ID"
+        data-id="{{item.CARD_TPL_ID}}"
+        data-name="{{item.CARD_TPL_NAME}}"
+        bindtap="bindCardTap"
+        bindlongpress="bindDeleteTap"
+      >
+        <view class="card-chip card-chip--visual">
+          <image
+            wx:if="{{item.coverUrl}}"
+            class="card-chip-img"
+            src="{{item.coverUrl}}"
+            mode="aspectFill"
+          />
+          <view
+            wx:else
+            class="card-chip-solid"
+            style="background: {{item.color}};"
+          ></view>
+          <text class="card-chip-type">{{item.typeDesc}}</text>
+        </view>
+        <view class="card-info">
+          <view class="card-name">{{item.CARD_TPL_NAME}}</view>
+          <view class="card-meta-row" wx:if="{{item.metaTags.length}}">
+            <view
+              class="card-meta-tag {{tag.highlight ? 'card-meta-tag--price' : ''}}"
+              wx:for="{{item.metaTags}}"
+              wx:for-item="tag"
+              wx:key="key"
+            >
+              <text class="card-meta-tag-label">{{tag.label}}</text>
+              <text class="card-meta-tag-value">{{tag.value}}</text>
+            </view>
+          </view>
+        </view>
+        <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+      </view>
+      <view class="card-hint">长按卡片可删除模板</view>
+    </view>
+  </view>
+
+  <view class="card-footer" wx:if="{{!loading && cardList.length}}">
+    <view
+      class="card-footer-btn"
+      style="background: {{themeColor}};"
+      bindtap="bindAddTap"
+    >
+      <van-icon name="plus" size="36rpx" color="#fff" />
+      <text>添加会员卡</text>
+    </view>
   </view>
 </view>

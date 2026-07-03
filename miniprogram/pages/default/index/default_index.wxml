@@ -3,3 +3,4 @@
 <view class="theme-scope" style="{{pageStyle}}">
   <template is="defaultIndexTpl" data="{{skin,themeColor,isLoad,phone,banners,announcements,teachers,photos,photoAlbums,tenantName,returnHome:false}}" />
 </view>
+<cmpt-user-profile-guide theme-color="{{themeColor}}" />

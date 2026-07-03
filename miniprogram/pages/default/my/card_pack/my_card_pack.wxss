@@ -81,27 +81,44 @@
 }
 
 .card-pack-visual {
+  position: relative;
   width: 140rpx;
   height: 88rpx;
   border-radius: 12rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
-  color: #fff;
+  overflow: hidden;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 }
 
+.card-pack-visual-img,
+.card-pack-visual-solid {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 .card-pack-vip {
+  position: absolute;
+  top: 10rpx;
+  left: 0;
+  right: 0;
+  text-align: center;
   font-size: 18rpx;
   font-weight: 700;
   letter-spacing: 1rpx;
+  color: #fff;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.28);
 }
 
 .card-pack-type {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10rpx;
+  text-align: center;
   font-size: 22rpx;
-  margin-top: 4rpx;
+  color: #fff;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.28);
 }
 
 .card-pack-info {

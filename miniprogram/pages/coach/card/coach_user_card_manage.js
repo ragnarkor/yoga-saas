@@ -1,6 +1,7 @@
 const cloudHelper = require("../../../helper/cloud_helper.js");
 const AdminWxBiz = require("../../../biz/admin_wx_biz.js");
 const AdminBiz = require("../../../biz/admin_biz.js");
+const cardFaceHelper = require("../../../helper/card_face_helper.js");
 
 const ACTION_TITLES = {
   add: "手动加次",
@@ -56,7 +57,7 @@ Page({
       );
       this.setData({
         loading: false,
-        card: (res && res.card) || null,
+        card: res && res.card ? cardFaceHelper.enrichCardVisual(res.card) : null,
         usageList: (res && res.usageList) || [],
       });
     } catch (e) {

@@ -249,6 +249,7 @@
         <user-card-picker
           user-id="{{bookUserId}}"
           meet-id="{{meetId}}"
+          time-mark="{{mark}}"
           value="{{bookCardId}}"
           theme-color="{{themeColor}}"
           label="会员卡"

@@ -16,6 +16,10 @@ Component({
       type: Boolean,
       value: false,
     },
+    showSwitch: {
+      type: Boolean,
+      value: true,
+    },
   },
 
   data: {
@@ -23,11 +27,15 @@ Component({
     statusBar: 20,
     customBar: 64,
     navBg: themeHelper.DEFAULT_THEME,
+    effectiveShowSwitch: true,
   },
 
   observers: {
     themeColor(color) {
       this._syncNavBg(color);
+    },
+    "showBack, showSwitch"(showBack, showSwitch) {
+      this.setData({ effectiveShowSwitch: !showBack && showSwitch });
     },
   },
 
@@ -38,6 +46,8 @@ Component({
       this.setData({
         statusBar: globalData.statusBar || 20,
         customBar: globalData.customBar || 64,
+        effectiveShowSwitch:
+          !this.properties.showBack && this.properties.showSwitch,
       });
       this.refreshTenant();
     },

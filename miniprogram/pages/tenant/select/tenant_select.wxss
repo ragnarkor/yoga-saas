@@ -5,6 +5,18 @@
   background: #f6f7f5;
 }
 
+.tenant-expired-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+  padding: 24rpx 28rpx;
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  line-height: 1.55;
+  color: #646a73;
+}
+
 .header {
   display: flex;
   align-items: center;
@@ -93,6 +105,15 @@
   justify-content: center;
   flex-shrink: 0;
   overflow: hidden;
+}
+
+.tenant-logo--default {
+  background: var(--themeColor, #6fae96);
+}
+
+.tenant-logo-icon {
+  font-size: 60rpx !important;
+  line-height: 1;
 }
 
 .logo-img {

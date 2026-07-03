@@ -1,0 +1,42 @@
+<view class="platform-form admin-theme">
+  <view wx:if="{{loading}}" class="page-loading">
+    <van-loading size="48rpx" color="#4a7c8c">加载中...</van-loading>
+  </view>
+
+  <block wx:else>
+    <view class="form-card">
+      <view class="field field--readonly">
+        <text class="label">瑜伽馆</text>
+        <text class="readonly-value">{{tenantName}}</text>
+      </view>
+
+      <view class="field">
+        <text class="label">有效期</text>
+        <view class="expire-mode-row">
+          <view
+            class="expire-mode {{expireMode === 'long' ? 'is-active' : ''}}"
+            data-mode="long"
+            bindtap="bindExpireModeTap"
+          >长期有效</view>
+          <view
+            class="expire-mode {{expireMode === 'date' ? 'is-active' : ''}}"
+            data-mode="date"
+            bindtap="bindExpireModeTap"
+          >指定到期日</view>
+        </view>
+        <picker
+          wx:if="{{expireMode === 'date'}}"
+          mode="date"
+          value="{{expireDay}}"
+          start="{{minExpireDay}}"
+          bindchange="bindExpireDayChange"
+        >
+          <view class="expire-day-pick">{{expireDay || '请选择到期日'}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="form-tip">到期后会员无法选馆、教练端无法正常使用；超管仍可进入管理并续期。</view>
+    <button class="submit-btn" loading="{{submitting}}" disabled="{{submitting}}" bindtap="bindSubmit">保存</button>
+  </block>
+</view>

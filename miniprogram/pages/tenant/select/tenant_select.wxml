@@ -1,37 +1,91 @@
-<!-- [AI_START TIMESTAMP=2025-01-25 19:10:00] -->
-<page-meta page-style="{{pageStyle}}" />
-<view wx:if="{{!isLoad}}" class="loading-wrap">
-	<van-loading size="40rpx" color="{{themeColor}}">加载中...</van-loading>
-</view>
-
-<view class="tenant-select theme-scope" style="{{pageStyle}}" wx:if="{{isLoad}}">
-	<view class="header">
-		<van-icon name="home-o" size="44rpx" color="{{themeColor}}" custom-class="text-xxl" />
-		<text class="text-xl margin-left-s header-title">选择瑜伽馆</text>
-	</view>
-
-	<view wx:if="{{list.length==0}}" class="tenant-empty">
-		<van-empty description="暂无可用瑜伽馆" />
-	</view>
-
-	<view class="tenant-list" wx:if="{{list.length>0}}">
-		<view class="tenant-card" wx:for="{{list}}" wx:key="TENANT_ID"
-			bindtap="bindSelectTap" data-item="{{item}}">
-
-			<view class="tenant-logo">
-					<image wx:if="{{item.TENANT_LOGO}}" src="{{item.TENANT_LOGO}}" mode="aspectFill" class="logo-img" />
-					<van-icon wx:else name="home-o" size="56rpx" color="{{themeColor}}" custom-class="text-xxxl" />
-				</view>
-
-			<view class="tenant-info">
-				<view class="tenant-name text-lg">{{item.TENANT_NAME}}</view>
-				<view class="tenant-desc text-s" wx:if="{{item.TENANT_DESC}}">{{item.TENANT_DESC}}</view>
-			</view>
-
-			<view class="tenant-arrow">
-				<van-icon name="arrow" size="32rpx" color="{{themeColor}}" custom-class="tenant-arrow-icon" />
-			</view>
-		</view>
-	</view>
-</view>
-<!-- [AI_END LINES=31 TIMESTAMP=2025-01-25 19:10:00] -->
+<!-- [AI_START TIMESTAMP=2025-01-25 19:10:00] -->
+
+<page-meta page-style="{{pageStyle}}" />
+
+<cmpt-tenant-switch
+  wx:if="{{scope === 'member'}}"
+  title="选择瑜伽馆"
+  theme-color="{{themeColor}}"
+  show-switch="{{false}}"
+/>
+<coach-tenant-switch
+  wx:else
+  title="选择瑜伽馆"
+  theme-color="{{themeColor}}"
+  show-switch="{{false}}"
+/>
+
+<view wx:if="{{!isLoad}}" class="loading-wrap">
+
+	<van-loading size="40rpx" color="{{themeColor}}">加载中...</van-loading>
+
+</view>
+
+
+
+<view class="tenant-select theme-scope" style="{{pageStyle}}" wx:if="{{isLoad}}">
+
+
+
+	<view wx:if="{{expiredBanner}}" class="tenant-expired-banner" style="background: {{themeColorSoft}};">
+
+		<van-icon name="info-o" size="32rpx" color="{{themeColor}}" />
+
+		<text>{{expiredBanner}}</text>
+
+	</view>
+
+
+
+	<view wx:if="{{list.length==0}}" class="tenant-empty">
+
+		<van-empty description="{{emptyDesc}}" />
+
+	</view>
+
+
+
+	<view class="tenant-list" wx:if="{{list.length>0}}">
+
+		<view class="tenant-card" wx:for="{{list}}" wx:key="TENANT_ID"
+
+			bindtap="bindSelectTap" data-item="{{item}}">
+
+
+
+			<view class="tenant-logo {{item.TENANT_LOGO ? '' : 'tenant-logo--default'}}">
+
+				<image wx:if="{{item.TENANT_LOGO}}" src="{{item.TENANT_LOGO}}" mode="aspectFill" class="logo-img" />
+
+				<van-icon wx:else name="shop-o" size="48rpx" color="#ffffff" custom-class="tenant-logo-icon" />
+
+			</view>
+
+
+
+			<view class="tenant-info">
+
+				<view class="tenant-name text-lg">{{item.TENANT_NAME}}</view>
+
+				<view class="tenant-desc text-s" wx:if="{{item.TENANT_DESC}}">{{item.TENANT_DESC}}</view>
+
+				<view class="tenant-desc text-s" wx:if="{{scope === 'coach' && item.roleLabel}}">{{item.roleLabel}}</view>
+
+			</view>
+
+
+
+			<view class="tenant-arrow">
+
+				<van-icon name="arrow" size="32rpx" color="{{themeColor}}" custom-class="tenant-arrow-icon" />
+
+			</view>
+
+		</view>
+
+	</view>
+
+</view>
+
+<!-- [AI_END LINES=31 TIMESTAMP=2025-01-25 19:10:00] -->
+

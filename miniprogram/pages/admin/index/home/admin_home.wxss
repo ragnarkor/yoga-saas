@@ -110,6 +110,54 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+.platform-hero--illustrated {
+  padding: 0;
+  background: none;
+  line-height: 0;
+  font-size: 0;
+}
+
+.platform-hero--illustrated::after {
+  display: none;
+}
+
+.platform-hero--illustrated .platform-hero-bg {
+  width: 100%;
+  display: block;
+  border-bottom-left-radius: var(--adminRadiusLg, 20rpx);
+  border-bottom-right-radius: var(--adminRadiusLg, 20rpx);
+}
+
+.platform-hero--illustrated .platform-hero-overlay {
+  position: absolute;
+  inset: 0;
+  border-bottom-left-radius: var(--adminRadiusLg, 20rpx);
+  border-bottom-right-radius: var(--adminRadiusLg, 20rpx);
+  background: linear-gradient(
+    135deg,
+    rgba(31, 35, 41, 0.78) 0%,
+    rgba(74, 124, 140, 0.62) 55%,
+    rgba(0, 0, 0, 0.12) 100%
+  );
+  pointer-events: none;
+}
+
+.platform-hero--illustrated .platform-hero-inner {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 40rpx 32rpx 36rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  line-height: normal;
+  font-size: 28rpx;
+}
+
+.platform-hero--illustrated .platform-hero-title {
+  text-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.2);
+}
+
 /* ========== 超管平台页 — Tab 切换 ========== */
 .platform-tabs {
   display: flex;
@@ -277,6 +325,14 @@
   margin-top: 8rpx;
   font-size: 22rpx;
   color: var(--adminTextSecondary);
+}
+
+.tenant-row-meta--soon {
+  color: #d48806;
+}
+
+.tenant-row-meta--warn {
+  color: #cf1322;
 }
 
 .tenant-row-actions {
