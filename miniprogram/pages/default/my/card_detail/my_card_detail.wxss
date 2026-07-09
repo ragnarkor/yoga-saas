@@ -97,7 +97,7 @@
 
 .card-usage-top {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16rpx;
 }
@@ -120,12 +120,17 @@
 }
 
 .card-usage-type {
-  padding: 4rpx 14rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rpx 14rpx;
   border-radius: 100rpx;
   font-size: 20rpx;
   font-weight: 500;
+  line-height: 1;
   color: var(--themeColor, #5b8a72);
   background: var(--projectColorLight, #e3efe8);
+  box-sizing: border-box;
 }
 
 .card-usage-deduct {
@@ -151,12 +156,18 @@
 
 .card-usage-status {
   flex-shrink: 0;
-  padding: 4rpx 14rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rpx 14rpx;
   border-radius: 100rpx;
   font-size: 20rpx;
   font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
   color: var(--themeColor, #5b8a72);
   background: var(--projectColorLight, #e3efe8);
+  box-sizing: border-box;
 }
 
 .card-usage-status.is-refund {
@@ -215,6 +226,54 @@
   font-size: 28rpx;
   color: #fff;
   text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.28);
+}
+
+.card-info-section {
+  margin-bottom: 8rpx;
+}
+
+.card-info-section-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #323233;
+  margin-bottom: 16rpx;
+}
+
+.card-info-divider {
+  height: 1rpx;
+  background: #ebedf0;
+  margin: 28rpx 0;
+}
+
+.card-scope-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.card-scope-tag {
+  padding: 8rpx 20rpx;
+  border-radius: 100rpx;
+  font-size: 24rpx;
+  color: var(--themeColor, #5b8a72);
+  background: var(--projectColorLight, #e3efe8);
+}
+
+.card-scope-tag--all {
+  color: #646566;
+  background: #f2f3f5;
+}
+
+.card-scope-hint-text {
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.card-scope-tip {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #969799;
+  line-height: 1.5;
 }
 
 .card-info-rows {

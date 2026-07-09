@@ -87,9 +87,7 @@ Component({
             { userId },
             { hint: false },
           );
-          list = ((res && res.list) || []).filter(
-            (c) => c.isActive || c.canBook,
-          );
+          list = (res && res.list) || [];
         }
         list = list.map((item) => cardFaceHelper.enrichCardVisual(item));
 

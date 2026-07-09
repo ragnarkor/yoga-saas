@@ -547,7 +547,6 @@ class AdminCardService extends BaseAdminService {
     const now = timeUtil.time();
     const nameMap = await cardService._getCategoryNameMap();
     for (let c of cards || []) {
-      await cardService._selfHealCardEndTime(c, daysMap);
       await cardService._selfHealPeriodCardRecord(c, typeMap);
     }
     const list = (cards || []).map((c) =>

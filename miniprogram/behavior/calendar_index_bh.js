@@ -292,7 +292,6 @@ module.exports = Behavior({
     onShow: async function () {
       if (this._skipShowRefresh) {
         this._skipShowRefresh = false;
-        return;
       }
 
       await this._syncTenantCategories();

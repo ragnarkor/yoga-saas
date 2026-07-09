@@ -145,7 +145,7 @@
 		<view class="md-card-sheet">
 			<view class="md-card-sheet-head">
 				<text class="md-card-sheet-title">选择划扣会员卡</text>
-				<text class="md-card-sheet-sub">本次预约需扣 {{cardNeedTimes}} 次</text>
+				<text class="md-card-sheet-sub">期限卡不扣次，次卡需扣 {{cardNeedTimes}} 次</text>
 			</view>
 			<view wx:if="{{cardPickLoading}}" class="md-card-sheet-loading">
 				<van-loading size="40rpx" color="{{themeColor}}">加载中...</van-loading>

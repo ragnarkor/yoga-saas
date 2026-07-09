@@ -40,13 +40,11 @@
 }
 
 .ucp-sheet {
-  padding: 24rpx 0 calc(24rpx + env(safe-area-inset-bottom));
-  max-height: 70vh;
-  box-sizing: border-box;
+  padding: 24rpx 24rpx calc(24rpx + env(safe-area-inset-bottom));
 }
 
 .ucp-sheet-head {
-  padding: 8rpx 32rpx 16rpx;
+  padding: 8rpx 8rpx 24rpx;
 }
 
 .ucp-sheet-title {
@@ -63,55 +61,61 @@
   color: #969799;
 }
 
+.ucp-sheet-loading {
+  padding: 48rpx 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .ucp-sheet-scroll {
-  max-height: 52vh;
-  padding: 0 24rpx;
-  box-sizing: border-box;
+  max-height: 60vh;
 }
 
 .ucp-popup {
   border-radius: 20rpx 20rpx 0 0 !important;
 }
 
-.ucp-card-item {
+.ucp-card-option {
   display: flex;
   align-items: center;
   gap: 20rpx;
-  padding: 20rpx 18rpx;
-  margin-bottom: 16rpx;
-  border-radius: 20rpx;
-  background: #fff;
-  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 24rpx 16rpx;
+  border-bottom: 1rpx solid #f0f1f3;
+  border-radius: 16rpx;
 }
 
-.ucp-card-item.is-active {
-  box-shadow: 0 12rpx 28rpx rgba(0, 0, 0, 0.12);
-  outline: 2rpx solid var(--projectColor, #5b8a72);
-  outline-offset: -2rpx;
+.ucp-card-option.is-selected {
+  background: rgba(91, 138, 114, 0.08);
+  border: 2rpx solid var(--projectColor, #5b8a72);
 }
 
-.ucp-card-item:active {
-  transform: translateY(1rpx);
+.ucp-card-option:active {
+  background: #f7f8fa;
 }
 
-.ucp-card-visual {
+.ucp-card-option.is-selected:active {
+  background: rgba(91, 138, 114, 0.12);
+}
+
+.ucp-card-option-visual {
   position: relative;
-  width: 86rpx;
+  width: 88rpx;
   height: 56rpx;
-  border-radius: 14rpx;
+  border-radius: 10rpx;
   overflow: hidden;
   flex-shrink: 0;
 }
 
-.ucp-card-visual-img,
-.ucp-card-visual-solid {
+.ucp-card-option-img,
+.ucp-card-option-solid {
   width: 100%;
   height: 100%;
   display: block;
 }
 
-.ucp-card-type {
+.ucp-card-option-type {
   position: absolute;
   left: 0;
   right: 0;
@@ -119,26 +123,32 @@
   text-align: center;
   color: #fff;
   font-size: 20rpx;
-  font-weight: 700;
+  font-weight: 600;
   text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.28);
 }
 
-.ucp-card-main {
+.ucp-card-option-body {
   flex: 1;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6rpx;
 }
 
-.ucp-card-name {
+.ucp-card-option-name {
+  display: block;
   font-size: 30rpx;
   font-weight: 600;
   color: #323233;
 }
 
-.ucp-card-sub {
+.ucp-card-option-balance {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 26rpx;
+  color: #646566;
+}
+
+.ucp-card-option-hint {
+  display: block;
+  margin-top: 4rpx;
   font-size: 24rpx;
   color: #969799;
 }
-

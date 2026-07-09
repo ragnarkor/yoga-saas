@@ -659,24 +659,12 @@ class MeetService extends BaseService {
         let t = times[j];
         if (t.status != 1) continue;
 
-        let teacherId = t.teacherId || style.teacherId || "";
+        let teacherId = t.teacherId || "";
         let coachName = "";
         let coachAvatar = "";
 
         if (t.teacherName) {
           coachName = t.teacherName;
-        } else if (style.teacherName) {
-          coachName = style.teacherName;
-        } else if (meet.MEET_ADMIN_ID) {
-          let adminId = meet.MEET_ADMIN_ID;
-          if (adminNameCache[adminId] === undefined) {
-            let admin = await AdminModel.getOne(
-              { _id: adminId },
-              "ADMIN_NAME",
-            );
-            adminNameCache[adminId] = admin ? admin.ADMIN_NAME : "";
-          }
-          coachName = adminNameCache[adminId];
         }
 
         if (teacherId) {
@@ -799,22 +787,12 @@ class MeetService extends BaseService {
   }
 
   async _resolveCoachProfile(style, timeNode, meet, teacherCache, adminNameCache) {
-    let teacherId =
-      (timeNode && timeNode.teacherId) || style.teacherId || "";
+    let teacherId = (timeNode && timeNode.teacherId) || "";
     let coachName = "";
     let coachAvatar = "";
 
     if (timeNode && timeNode.teacherName) {
       coachName = timeNode.teacherName;
-    } else if (style.teacherName) {
-      coachName = style.teacherName;
-    } else if (meet.MEET_ADMIN_ID) {
-      let adminId = meet.MEET_ADMIN_ID;
-      if (adminNameCache[adminId] === undefined) {
-        let admin = await AdminModel.getOne({ _id: adminId }, "ADMIN_NAME");
-        adminNameCache[adminId] = admin ? admin.ADMIN_NAME : "";
-      }
-      coachName = adminNameCache[adminId];
     }
 
     if (teacherId) {

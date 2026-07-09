@@ -33,12 +33,12 @@
           <view class="card-usage-body">
             <view class="card-usage-top">
               <text class="card-usage-title">{{item.meetTitle}}</text>
-              <text class="card-usage-status {{item.isRefund ? 'is-refund' : ''}} {{item.isManual ? 'is-manual' : ''}}">
+              <view class="card-usage-status {{item.isRefund ? 'is-refund' : ''}} {{item.isManual ? 'is-manual' : ''}}">
                 {{item.statusLabel}}
-              </text>
+              </view>
             </view>
             <view class="card-usage-meta">
-              <text wx:if="{{item.meetTypeName}}" class="card-usage-type">{{item.meetTypeName}}</text>
+              <view wx:if="{{item.meetTypeName}}" class="card-usage-type">{{item.meetTypeName}}</view>
               <text class="card-usage-deduct">{{item.deductText}}</text>
             </view>
             <view wx:if="{{item.scheduleText}}" class="card-usage-schedule">
@@ -69,7 +69,30 @@
           <text class="card-info-vip">VIP CARD</text>
           <text class="card-info-type">{{card.typeLabel}}</text>
         </view>
-        <view class="card-info-rows">
+        <view class="card-info-section">
+          <view class="card-info-section-title">适用课程</view>
+          <view class="card-scope-tags">
+            <text
+              wx:if="{{card.scopeMode === 'all'}}"
+              class="card-scope-tag card-scope-tag--all"
+            >全馆课程</text>
+            <block wx:elif="{{card.scopeCategoryNames.length}}">
+              <text
+                wx:for="{{card.scopeCategoryNames}}"
+                wx:key="*this"
+                class="card-scope-tag"
+              >{{item}}</text>
+            </block>
+            <text wx:else class="card-scope-hint-text">未指定分类</text>
+          </view>
+          <view class="card-scope-tip">{{card.usageRuleText}}</view>
+        </view>
+
+        <view class="card-info-divider"></view>
+
+        <view class="card-info-section">
+          <view class="card-info-section-title">卡信息</view>
+          <view class="card-info-rows">
           <view class="card-info-row">
             <text class="card-info-label">卡名称</text>
             <text class="card-info-value">{{card.name}}</text>
@@ -82,12 +105,28 @@
             </view>
           </view>
           <view class="card-info-row">
+            <text class="card-info-label">卡类型</text>
+            <text class="card-info-value">{{card.typeLabel}}</text>
+          </view>
+          <view class="card-info-row">
             <text class="card-info-label">余额</text>
             <text class="card-info-value">{{card.balanceText}}</text>
           </view>
           <view wx:if="{{card.type !== 'period'}}" class="card-info-row">
             <text class="card-info-label">初始次数</text>
             <text class="card-info-value">{{card.quotaInit}}次</text>
+          </view>
+          <view wx:if="{{card.type !== 'period' && card.quotaInit > 0}}" class="card-info-row">
+            <text class="card-info-label">已用次数</text>
+            <text class="card-info-value">{{card.usedTimes}}次</text>
+          </view>
+          <view wx:if="{{card.type === 'period' && card.validDaysText}}" class="card-info-row">
+            <text class="card-info-label">有效天数</text>
+            <text class="card-info-value">{{card.validDaysText}}</text>
+          </view>
+          <view class="card-info-row">
+            <text class="card-info-label">激活方式</text>
+            <text class="card-info-value">{{card.activateLabel}}</text>
           </view>
           <view class="card-info-row">
             <text class="card-info-label">开卡时间</text>
@@ -108,6 +147,7 @@
           <view wx:if="{{card.memo}}" class="card-info-row">
             <text class="card-info-label">备注</text>
             <text class="card-info-value">{{card.memo}}</text>
+          </view>
           </view>
         </view>
       </view>

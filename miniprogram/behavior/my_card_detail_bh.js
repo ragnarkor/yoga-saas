@@ -43,9 +43,12 @@ module.exports = Behavior({
           return;
         }
         wx.setNavigationBarTitle({ title: res.card.name || "会员卡详情" });
+        const card = this._enrichCardDetail(
+          cardFaceHelper.enrichCardVisual(res.card),
+        );
         this.setData({
           loading: false,
-          card: cardFaceHelper.enrichCardVisual(res.card),
+          card,
           usageList: res.usageList || [],
           usageTotal: res.usageTotal || 0,
         });
@@ -69,6 +72,41 @@ module.exports = Behavior({
           wx.showToast({ title: "卡号已复制", icon: "success" });
         },
       });
+    },
+
+    _enrichCardDetail(card) {
+      if (!card) return card;
+      const scope = card.scope || {};
+      const scopeMode =
+        scope.mode === "categories" && (scope.categoryIds || []).length
+          ? "categories"
+          : "all";
+      let scopeCategoryNames = [];
+      if (scopeMode === "categories" && card.scopeDesc) {
+        scopeCategoryNames = String(card.scopeDesc)
+          .split("、")
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+
+      const enriched = {
+        ...card,
+        scopeMode,
+        scopeCategoryNames,
+      };
+
+      if (card.type === "period") {
+        enriched.usageRuleText = "有效期内预约上课不扣次，可重复预约";
+        enriched.validDaysText =
+          card.validDays > 0 ? `${card.validDays}天` : "";
+      } else {
+        const init = Number(card.quotaInit) || 0;
+        const left = Number(card.quota) || 0;
+        enriched.usedTimes = Math.max(0, init - left);
+        enriched.usageRuleText = "每次上课按课程设置扣减卡内次数";
+      }
+
+      return enriched;
     },
   },
 });

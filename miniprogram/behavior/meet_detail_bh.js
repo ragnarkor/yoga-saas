@@ -69,6 +69,12 @@ module.exports = Behavior({
 			this._loadDetail();
 		},
 
+		onShow: function () {
+			if (this.data.isLoad && this.data.id) {
+				this._loadDetail();
+			}
+		},
+
 		_loadDetail: async function () {
 			let id = this.data.id;
 			if (!id) return;

@@ -75,6 +75,22 @@
       {
         "type": "folder",
         "value": "node_modules"
+      },
+      {
+        "type": "suffix",
+        "value": ".bak"
+      },
+      {
+        "type": "suffix",
+        "value": ".bak2"
+      },
+      {
+        "type": "suffix",
+        "value": ".bak3"
+      },
+      {
+        "type": "file",
+        "value": "cmpts/public/calendar/calendar_comm/din.wxss"
       }
     ],
     "include": []
