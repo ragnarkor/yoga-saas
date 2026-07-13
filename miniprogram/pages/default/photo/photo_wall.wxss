@@ -1,0 +1,141 @@
+.photo-wall-page {
+  min-height: 100vh;
+  background: #f7f8fa;
+}
+
+.photo-wall-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.photo-wall-album-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20rpx 16rpx 32rpx;
+  box-sizing: border-box;
+}
+
+.photo-wall-album-card {
+  width: calc(50% - 12rpx);
+  margin: 0 6rpx 20rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(31, 35, 41, 0.05);
+}
+
+.photo-wall-album-card--active {
+  opacity: 0.9;
+}
+
+.photo-wall-album-thumbs {
+  width: 100%;
+  height: 280rpx;
+  display: grid;
+  gap: 4rpx;
+  background: #f0f1f3;
+  overflow: hidden;
+}
+
+.photo-wall-album-thumbs--1 {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+.photo-wall-album-thumbs--2 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+.photo-wall-album-thumbs--3 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.photo-wall-album-thumbs--3 .photo-wall-album-thumb:first-child {
+  grid-row: span 2;
+}
+
+.photo-wall-album-thumbs--4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.photo-wall-album-thumb {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: #f0f1f3;
+}
+
+.photo-wall-album-thumb--empty {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-wall-album-meta {
+  padding: 20rpx 20rpx 22rpx;
+}
+
+.photo-wall-album-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.photo-wall-album-count {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.photo-wall-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20rpx 16rpx 32rpx;
+  box-sizing: border-box;
+}
+
+.photo-wall-grid--plain {
+  padding: 12rpx 8rpx 32rpx;
+  gap: 8rpx;
+}
+
+.photo-wall-item {
+  width: calc(50% - 12rpx);
+  margin: 0 6rpx 20rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(31, 35, 41, 0.05);
+}
+
+.photo-wall-item--plain {
+  width: calc(50% - 8rpx);
+  margin: 0;
+  border-radius: 8rpx;
+  box-shadow: none;
+  background: transparent;
+}
+
+.photo-wall-item:active {
+  opacity: 0.9;
+}
+
+.photo-wall-img {
+  width: 100%;
+  height: 280rpx;
+  background: #f0f1f3;
+  display: block;
+}
+
+.photo-wall-item--plain .photo-wall-img {
+  border-radius: 8rpx;
+}

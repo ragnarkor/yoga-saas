@@ -51,22 +51,36 @@
 			</scroll-view>
 		</view>
 
-		<!-- 照片墙（横向滑动） -->
-		<view class="home-section" wx:if="{{photos.length > 0}}">
+		<!-- 照片墙（相册横向滑动） -->
+		<view class="home-section" wx:if="{{photoAlbums.length > 0}}">
 			<view class="section-head">
 				<text class="section-title">照片墙</text>
 			</view>
 			<scroll-view class="hscroll" scroll-x enhanced show-scrollbar="{{false}}">
 				<view class="hscroll-inner">
 					<view
-						class="photo-card"
-						wx:for="{{photos}}"
-						wx:key="_id"
-						bindtap="bindPhotoTap"
+						class="photo-album-card"
+						wx:for="{{photoAlbums}}"
+						wx:key="id"
+						bindtap="bindHomeAlbumTap"
 						data-index="{{index}}"
 					>
-						<image class="photo-cover" mode="aspectFill" src="{{item.pic}}" />
-						<view class="photo-title text-cut">{{item.title || item.album || '馆舍风采'}}</view>
+						<view class="photo-album-thumbs photo-album-thumbs--{{item.thumbCount || 1}}">
+							<block wx:if="{{item.thumbs.length}}">
+								<image
+									wx:for="{{item.thumbs}}"
+									wx:for-item="thumb"
+									wx:key="*this"
+									class="photo-album-thumb"
+									mode="aspectFill"
+									src="{{thumb}}"
+								/>
+							</block>
+							<view wx:else class="photo-album-thumb photo-album-thumb--empty">
+								<van-icon name="photo-o" size="48rpx" color="#c8c9cc" />
+							</view>
+						</view>
+						<view class="photo-title text-cut">{{item.title}}</view>
 					</view>
 				</view>
 			</scroll-view>

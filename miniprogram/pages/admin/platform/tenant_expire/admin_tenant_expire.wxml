@@ -8,10 +8,39 @@
       <view class="field field--readonly">
         <text class="label">瑜伽馆</text>
         <text class="readonly-value">{{tenantName}}</text>
+        <text class="status-chip {{isClosed ? 'status-chip--warn' : ''}}" wx:if="{{statusDesc}}">{{statusDesc}}</text>
       </view>
 
       <view class="field">
-        <text class="label">有效期</text>
+        <text class="label">运营状态</text>
+        <view class="status-row">
+          <text class="status-row-text">{{tenantStatus === 1 ? '正常运营' : '已停用'}}</text>
+          <switch
+            checked="{{tenantStatus === 1}}"
+            color="#4a7c8c"
+            bindchange="bindStatusSwitch"
+          />
+        </view>
+        <text class="field-hint">停用可立即封停违规租户，无需等到期日</text>
+        <button
+          class="inline-btn"
+          loading="{{statusSubmitting}}"
+          disabled="{{statusSubmitting}}"
+          bindtap="bindSaveStatus"
+        >保存运营状态</button>
+      </view>
+
+      <view class="field">
+        <text class="label">功能开关</text>
+        <view class="feature-link" bindtap="bindFeatureTap">
+          <text>管理该馆功能开关</text>
+          <text class="feature-link-arrow">›</text>
+        </view>
+        <text class="field-hint">预约、支付、签到、资讯等按馆独立配置</text>
+      </view>
+
+      <view class="field">
+        <text class="label">服务有效期</text>
         <view class="expire-mode-row">
           <view
             class="expire-mode {{expireMode === 'long' ? 'is-active' : ''}}"
@@ -33,10 +62,30 @@
         >
           <view class="expire-day-pick">{{expireDay || '请选择到期日'}}</view>
         </picker>
+        <button
+          class="inline-btn"
+          loading="{{submitting}}"
+          disabled="{{submitting}}"
+          bindtap="bindSaveExpire"
+        >保存有效期</button>
       </view>
     </view>
 
-    <view class="form-tip">到期后会员无法选馆、教练端无法正常使用；超管仍可进入管理并续期。</view>
-    <button class="submit-btn" loading="{{submitting}}" disabled="{{submitting}}" bindtap="bindSubmit">保存</button>
+    <view class="danger-card">
+      <view class="danger-title">删除测试馆</view>
+      <view class="danger-desc">用于清理测试数据。输入馆名后删除，将移除租户记录、配置与馆管理员。</view>
+      <input
+        class="danger-input"
+        placeholder="输入馆名确认删除"
+        value="{{deleteConfirmName}}"
+        bindinput="bindDeleteNameInput"
+      />
+      <button
+        class="danger-btn"
+        loading="{{deleting}}"
+        disabled="{{deleting}}"
+        bindtap="bindDeleteTenant"
+      >删除该瑜伽馆</button>
+    </view>
   </block>
 </view>

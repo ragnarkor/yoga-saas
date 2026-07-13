@@ -105,20 +105,29 @@
 <block wx:else>
   <view class="platform-section">
     <view wx:if="{{!data.tenantList.length}}" class="empty-block">暂无瑜伽馆，点击上方新建</view>
-    <view class="tenant-row" wx:for="{{data.tenantList}}" wx:key="TENANT_ID">
+    <view class="tenant-row {{item.isClosed ? 'tenant-row--closed' : ''}}" wx:for="{{data.tenantList}}" wx:key="TENANT_ID">
       <view class="tenant-row-main">
-        <text class="tenant-row-name">{{item.TENANT_NAME}}</text>
+        <view class="tenant-row-title-line">
+          <text class="tenant-row-name">{{item.TENANT_NAME}}</text>
+          <text class="tenant-row-badge tenant-row-badge--closed" wx:if="{{item.isClosed}}">已停用</text>
+        </view>
         <text class="tenant-row-desc" wx:if="{{item.TENANT_DESC}}">{{item.TENANT_DESC}}</text>
-        <text class="tenant-row-meta {{item.isExpired ? 'tenant-row-meta--warn' : (item.isExpiringSoon ? 'tenant-row-meta--soon' : '')}}">{{item.expireDesc}}</text>
+        <text class="tenant-row-meta {{item.isClosed ? 'tenant-row-meta--warn' : (item.isExpired ? 'tenant-row-meta--warn' : (item.isExpiringSoon ? 'tenant-row-meta--soon' : ''))}}">{{item.statusDesc}} · {{item.expireDesc}}</text>
       </view>
       <view class="tenant-row-actions">
         <view
           class="tenant-row-btn tenant-row-btn--ghost"
           data-pid="{{item._pid}}"
           data-name="{{item.TENANT_NAME}}"
-          bindtap="bindTenantExpireTap"
-        >有效期</view>
-        <view class="tenant-row-btn" data-item="{{item}}" bindtap="bindEnterCoachTap">管理</view>
+          bindtap="bindTenantManageTap"
+        >管理</view>
+        <view
+          class="tenant-row-btn tenant-row-btn--ghost"
+          data-pid="{{item._pid}}"
+          data-name="{{item.TENANT_NAME}}"
+          bindtap="bindTenantFeatureTap"
+        >功能</view>
+        <view class="tenant-row-btn" data-item="{{item}}" bindtap="bindEnterCoachTap">进入</view>
       </view>
     </view>
   </view>
@@ -179,6 +188,10 @@
         <view class="platform-action-item" bindtap="url" data-url="/pages/coach/booking/coach_booking">
           <view class="platform-action-icon"><van-icon name="calendar-o" size="40rpx" color="#4a7c8c" /></view>
           <text class="platform-action-text">预约管理</text>
+        </view>
+        <view class="platform-action-item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/coach/photo/coach_photo_wall">
+          <view class="platform-action-icon"><van-icon name="photo" size="40rpx" color="#4a7c8c" /></view>
+          <text class="platform-action-text">照片墙</text>
         </view>
         <view class="platform-action-item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/coach/home/coach_home_content">
           <view class="platform-action-icon"><van-icon name="photo-o" size="40rpx" color="#4a7c8c" /></view>

@@ -239,10 +239,7 @@ function fmtImgUrl(url) {
   ) {
     return url;
   }
-  if (/default_cover_pic\.gif/i.test(url)) {
-    return defaultCoverHelper.pickDefaultCover();
-  }
-  if (/default_cover_pic\.png/i.test(url)) {
+  if (defaultCoverHelper.isLegacyDefaultCover(url)) {
     return defaultCoverHelper.pickDefaultCover();
   }
   if (url.startsWith("/")) return url;
@@ -686,20 +683,25 @@ function formSetBarTitleByAddEdit(id, title) {
     }));
 }
 
-// 二次确认操作
+// 二次确认操作（支持回调，也支持 await）
 function showConfirm(title = "确定要删除吗？", yes, no) {
-  return wx.showModal({
-    title: "",
-    content: title,
-    cancelText: "取消",
-    confirmText: "确定",
-    success: (res) => {
-      if (res.confirm) {
-        yes && yes();
-      } else if (res.cancel) {
-        no && no();
-      }
-    },
+  return new Promise((resolve) => {
+    wx.showModal({
+      title: "",
+      content: title,
+      cancelText: "取消",
+      confirmText: "确定",
+      success: (res) => {
+        if (res.confirm) {
+          yes && yes();
+          resolve(true);
+        } else {
+          no && no();
+          resolve(false);
+        }
+      },
+      fail: () => resolve(false),
+    });
   });
 }
 

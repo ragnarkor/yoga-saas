@@ -1,5 +1,6 @@
 <page-meta page-style="{{pageStyle}}" />
 <view class="jd-wrap theme-scope" style="{{pageStyle}}">
+  <cmpt-tenant-switch title="预约详情" show-back="{{true}}" show-switch="{{false}}" theme-color="{{themeColor}}" />
   <import src="../../../../tpls/project/my_join_detail_tpl.wxml" />
-  <template is="myJoinDetailTpl" data="{{skin,id,isLoad,isShowHome,join,qrImageData,themeColor}}" />
+  <template is="myJoinDetailTpl" data="{{skin,id,isLoad,join,qrImageData,themeColor}}" />
 </view>

@@ -556,8 +556,8 @@ module.exports = Behavior({
 					showCancel: false,
 					content,
 					success() {
-						wx.reLaunch({
-							url: pageHelper.fmtURLByPID('/pages/my/join_detail/my_join_detail?flag=home&id=' + joinId),
+						wx.redirectTo({
+							url: pageHelper.fmtURLByPID('/pages/default/my/join_detail/my_join_detail?id=' + joinId),
 						});
 					},
 				});

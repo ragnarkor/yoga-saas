@@ -17,9 +17,20 @@ const bufferUtil = require("../../utils/schedule_buffer_util.js");
 const DEFAULT_MEET_TYPE =
   "1=特色课程|leftbig3,2=精品课|leftbig2,3=私教定制|leftbig2,4=核心床|leftbig3";
 
+const MS_PER_DAY = 86400 * 1000;
+
 class AdminTenantService extends BaseAdminService {
   _defaultMeetType() {
     return DEFAULT_MEET_TYPE;
+  }
+
+  _msDaysAgo(days, now) {
+    const ts = now != null ? now : timeUtil.time();
+    return ts - days * MS_PER_DAY;
+  }
+
+  _joinActivityTime(join) {
+    return Number(join.JOIN_START_TIME || join.JOIN_ADD_TIME) || 0;
   }
 
   _parseTimeHm(value, fallback, label) {
@@ -409,8 +420,8 @@ class AdminTenantService extends BaseAdminService {
   async getPlatformOverview() {
     const now = timeUtil.time();
     let tenantList = await TenantModel.getAll(
-      { TENANT_STATUS: TenantModel.STATUS.OPEN },
-      "_pid,TENANT_ID,TENANT_NAME,TENANT_DESC,TENANT_TEMPLATE,TENANT_EXPIRE_TIME",
+      {},
+      "_pid,TENANT_ID,TENANT_NAME,TENANT_DESC,TENANT_TEMPLATE,TENANT_STATUS,TENANT_EXPIRE_TIME",
       { TENANT_ADD_TIME: "desc" },
       200,
       false,
@@ -424,12 +435,28 @@ class AdminTenantService extends BaseAdminService {
       false,
     );
 
+    const enriched = (tenantList || []).map((item) =>
+      this._enrichPlatformTenant(item, now),
+    );
+
     return {
-      tenantList: (tenantList || []).map((item) =>
-        tenantExpireUtil.enrichTenantExpire(item, now),
-      ),
-      tenantCount: (tenantList || []).length,
+      tenantList: enriched,
+      tenantCount: enriched.length,
+      tenantOpenCount: enriched.filter((item) => item.TENANT_STATUS === TenantModel.STATUS.OPEN).length,
       adminCount: adminCount || 0,
+    };
+  }
+
+  _enrichPlatformTenant(tenant, now) {
+    const item = tenantExpireUtil.enrichTenantExpire(tenant, now);
+    const closed = tenant.TENANT_STATUS === TenantModel.STATUS.CLOSE;
+    let statusDesc = closed ? "已停用" : "运营中";
+    if (!closed && item.isExpired) statusDesc = "已到期";
+    else if (!closed && item.isExpiringSoon) statusDesc = "即将到期";
+    return {
+      ...item,
+      isClosed: closed,
+      statusDesc,
     };
   }
 
@@ -444,7 +471,111 @@ class AdminTenantService extends BaseAdminService {
       false,
     );
     if (!tenant) this.AppError("瑜伽馆不存在");
-    return tenantExpireUtil.enrichTenantExpire(tenant);
+    return this._enrichPlatformTenant(
+      tenantExpireUtil.enrichTenantExpire(tenant),
+    );
+  }
+
+  /** 超管：启用/停用租户 */
+  async saveTenantStatus(pid, status, operator) {
+    pid = String(pid || "").trim();
+    if (!pid) this.AppError("请选择瑜伽馆");
+
+    let tenant = await TenantModel.getOne(
+      { _pid: pid },
+      "TENANT_NAME,TENANT_STATUS",
+      {},
+      false,
+    );
+    if (!tenant) this.AppError("瑜伽馆不存在");
+
+    const nextStatus =
+      Number(status) === TenantModel.STATUS.CLOSE
+        ? TenantModel.STATUS.CLOSE
+        : TenantModel.STATUS.OPEN;
+
+    await TenantModel.edit(
+      { _pid: pid },
+      {
+        TENANT_STATUS: nextStatus,
+        TENANT_EDIT_TIME: timeUtil.time(),
+      },
+      false,
+    );
+
+    const action = nextStatus === TenantModel.STATUS.CLOSE ? "停用" : "启用";
+    await this.insertLog(
+      `${action}瑜伽馆「${tenant.TENANT_NAME}」`,
+      operator,
+      require("../../model/log_model.js").TYPE.SYS,
+    );
+
+    let updated = await TenantModel.getOne(
+      { _pid: pid },
+      "_pid,TENANT_ID,TENANT_NAME,TENANT_EXPIRE_TIME,TENANT_STATUS",
+      {},
+      false,
+    );
+    return this._enrichPlatformTenant(updated);
+  }
+
+  /** 超管：删除瑜伽馆 */
+  async delTenant(pid, confirmName, operator) {
+    pid = String(pid || "").trim();
+    confirmName = String(confirmName || "").trim();
+    if (!pid) this.AppError("请选择瑜伽馆");
+    if (!confirmName) this.AppError("请输入馆名确认");
+
+    let tenant = await TenantModel.getOne(
+      { _pid: pid },
+      "TENANT_NAME,TENANT_LOGO",
+      {},
+      false,
+    );
+    if (!tenant) this.AppError("瑜伽馆不存在");
+    if (tenant.TENANT_NAME !== confirmName) {
+      this.AppError("馆名不一致，请重新输入");
+    }
+
+    let admins = await AdminModel.getAll(
+      {
+        _pid: pid,
+        ADMIN_TYPE: ["in", [AdminModel.TYPE.OWNER, AdminModel.TYPE.TEACHER]],
+      },
+      "ADMIN_ID",
+      {},
+      500,
+      false,
+    );
+    for (let admin of admins || []) {
+      if (admin && admin.ADMIN_ID) {
+        await AdminModel.del({ ADMIN_ID: admin.ADMIN_ID }, false);
+      }
+    }
+
+    let setup = await tenantSetupHelper.getSetupForPid(pid, "_pid,SETUP_ABOUT_PIC,SETUP_SERVICE_PIC,SETUP_OFFICE_PIC");
+    if (setup) {
+      let files = []
+        .concat(setup.SETUP_ABOUT_PIC || [])
+        .concat(setup.SETUP_SERVICE_PIC || [])
+        .concat(setup.SETUP_OFFICE_PIC || [])
+        .filter(Boolean);
+      if (tenant.TENANT_LOGO) files.push(tenant.TENANT_LOGO);
+      if (files.length) await cloudUtil.deleteFiles(files);
+      await SetupModel.del({ _pid: pid }, false);
+    } else if (tenant.TENANT_LOGO) {
+      await cloudUtil.deleteFiles([tenant.TENANT_LOGO]);
+    }
+
+    await TenantModel.del({ _pid: pid }, false);
+
+    await this.insertLog(
+      `删除瑜伽馆「${tenant.TENANT_NAME}」`,
+      operator,
+      require("../../model/log_model.js").TYPE.SYS,
+    );
+
+    return { pid, tenantName: tenant.TENANT_NAME };
   }
 
   /** 超管：保存租户有效期 */
@@ -498,8 +629,8 @@ class AdminTenantService extends BaseAdminService {
     const monthStart = timeUtil.time2Timestamp(
       timeUtil.time("Y-M") + "-01 00:00:00",
     );
-    const day30 = now - 86400 * 30;
-    const day90 = now - 86400 * 90;
+    const day30 = this._msDaysAgo(30, now);
+    const day90 = this._msDaysAgo(90, now);
 
     const totalMembers = await UserModel.count({});
     const monthNew = await UserModel.count({
@@ -507,32 +638,33 @@ class AdminTenantService extends BaseAdminService {
     });
 
     let activeRows = await JoinModel.getAll(
-      {
-        JOIN_STATUS: JoinModel.STATUS.SUCC,
-        JOIN_ADD_TIME: [">=", day30],
-      },
-      "JOIN_USER_ID",
+      { JOIN_STATUS: JoinModel.STATUS.SUCC },
+      "JOIN_USER_ID,JOIN_START_TIME,JOIN_ADD_TIME",
       {},
       5000,
     );
-    let activeIds = new Set(
-      (activeRows || []).map((r) => r.JOIN_USER_ID).filter(Boolean),
-    );
+    let activeIds = new Set();
+    for (let row of activeRows || []) {
+      if (this._joinActivityTime(row) >= day30 && row.JOIN_USER_ID) {
+        activeIds.add(row.JOIN_USER_ID);
+      }
+    }
     const inactive30 = Math.max(0, totalMembers - activeIds.size);
 
     let allJoins = await JoinModel.getAll(
       { JOIN_STATUS: JoinModel.STATUS.SUCC },
-      "JOIN_USER_ID,JOIN_ADD_TIME",
+      "JOIN_USER_ID,JOIN_START_TIME,JOIN_ADD_TIME",
       {},
       10000,
     );
     let lastJoinByUser = {};
     for (let j of allJoins || []) {
+      const activityTime = this._joinActivityTime(j);
       if (
         !lastJoinByUser[j.JOIN_USER_ID] ||
-        j.JOIN_ADD_TIME > lastJoinByUser[j.JOIN_USER_ID]
+        activityTime > lastJoinByUser[j.JOIN_USER_ID]
       ) {
-        lastJoinByUser[j.JOIN_USER_ID] = j.JOIN_ADD_TIME;
+        lastJoinByUser[j.JOIN_USER_ID] = activityTime;
       }
     }
     let churn = 0;
@@ -585,8 +717,8 @@ class AdminTenantService extends BaseAdminService {
     if (!TYPE_META[type]) this.AppError("无效的关注类型");
 
     const now = timeUtil.time();
-    const day30 = now - 86400 * 30;
-    const day90 = now - 86400 * 90;
+    const day30 = this._msDaysAgo(30, now);
+    const day90 = this._msDaysAgo(90, now);
     const monthStart = timeUtil.time2Timestamp(
       timeUtil.time("Y-M") + "-01 00:00:00",
     );
@@ -616,37 +748,38 @@ class AdminTenantService extends BaseAdminService {
       targetIds = new Set();
     } else if (type === "inactive30") {
       let activeRows = await JoinModel.getAll(
-        {
-          JOIN_STATUS: JoinModel.STATUS.SUCC,
-          JOIN_ADD_TIME: [">=", day30],
-        },
-        "JOIN_USER_ID",
+        { JOIN_STATUS: JoinModel.STATUS.SUCC },
+        "JOIN_USER_ID,JOIN_START_TIME,JOIN_ADD_TIME",
         {},
         5000,
       );
-      let activeIds = new Set(
-        (activeRows || []).map((r) => r.JOIN_USER_ID).filter(Boolean),
-      );
+      let activeIds = new Set();
+      for (let row of activeRows || []) {
+        if (this._joinActivityTime(row) >= day30 && row.JOIN_USER_ID) {
+          activeIds.add(row.JOIN_USER_ID);
+        }
+      }
       targetIds = new Set(
         (allUsers || [])
           .map((u) => u.USER_MINI_OPENID)
           .filter((uid) => uid && !activeIds.has(uid)),
       );
-      for (let uid of targetIds) hintsByUser[uid] = "近30天未成功约课";
+      for (let uid of targetIds) hintsByUser[uid] = "近30天未上课";
     } else if (type === "churn") {
       let allJoins = await JoinModel.getAll(
         { JOIN_STATUS: JoinModel.STATUS.SUCC },
-        "JOIN_USER_ID,JOIN_ADD_TIME",
+        "JOIN_USER_ID,JOIN_START_TIME,JOIN_ADD_TIME",
         {},
         10000,
       );
       let lastJoinByUser = {};
       for (let j of allJoins || []) {
+        const activityTime = this._joinActivityTime(j);
         if (
           !lastJoinByUser[j.JOIN_USER_ID] ||
-          j.JOIN_ADD_TIME > lastJoinByUser[j.JOIN_USER_ID]
+          activityTime > lastJoinByUser[j.JOIN_USER_ID]
         ) {
-          lastJoinByUser[j.JOIN_USER_ID] = j.JOIN_ADD_TIME;
+          lastJoinByUser[j.JOIN_USER_ID] = activityTime;
         }
       }
       targetIds = new Set();

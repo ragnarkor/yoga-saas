@@ -20,6 +20,7 @@ module.exports = Behavior({
     avatarChoosing: false,
     nicknameEditing: false,
     adminLoginShow: false,
+    achievementSummary: "预约成功即计入成就",
   },
 
   methods: {
@@ -57,6 +58,7 @@ module.exports = Behavior({
     onShow: function () {
       this._loadTodayList();
       this._loadUser();
+      this._loadAchievementSummary();
     },
 
     onHide: async function () {
@@ -65,6 +67,22 @@ module.exports = Behavior({
     },
 
     onUnload: function () {},
+
+    _loadAchievementSummary: async function () {
+      try {
+        const data = await cloudHelper.callCloudData(
+          "my/achievement",
+          {},
+          { hint: false },
+        );
+        const total = (data && data.streak && data.streak.totalClasses) || 0;
+        this.setData({
+          achievementSummary: total ? `已上课 ${total} 次` : "预约成功即计入成就",
+        });
+      } catch (e) {
+        console.warn("[achievement summary]", e);
+      }
+    },
 
     _loadUser: async function () {
       try {
@@ -252,6 +270,15 @@ module.exports = Behavior({
 
     bindSetTap: function (e) {
       this.setTap(e, this.data.skin);
+    },
+
+    bindContactAuthorTap: function () {
+      wx.showModal({
+        title: '联系作者',
+        content: '如需了解更多定制开发详情，请通过官方渠道联系作者。',
+        showCancel: false,
+        confirmText: '知道了',
+      });
     },
 
     bindAdminLoginCloseTap: function () {

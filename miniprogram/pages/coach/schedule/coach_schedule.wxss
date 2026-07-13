@@ -253,15 +253,24 @@
   bottom: 0;
   z-index: 100;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16rpx 32rpx calc(16rpx + env(safe-area-inset-bottom));
+  align-items: stretch;
+  gap: 12rpx;
+  padding: 16rpx 20rpx calc(16rpx + env(safe-area-inset-bottom));
   background: #fff;
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
 }
 
-.schedule-bottom van-button {
-  flex: none;
+.schedule-bottom-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.schedule-bottom-item--copy {
+  flex: 1.75;
+}
+
+.schedule-bottom-item--side {
+  flex: 0.95;
 }
 
 .schedule-canvas-hidden {

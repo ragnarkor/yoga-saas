@@ -20,6 +20,10 @@ Component({
       type: Boolean,
       value: false,
     },
+    backMode: {
+      type: String,
+      value: "navigate",
+    },
     showSwitch: {
       type: Boolean,
       value: true,
@@ -106,9 +110,13 @@ Component({
     },
 
     bindBackTap() {
+      if (this.properties.backMode === "emit") {
+        this.triggerEvent("back");
+        return;
+      }
       wx.navigateBack({
         fail: () => {
-          wx.redirectTo({ url: '/pages/coach/index/coach_index' });
+          wx.redirectTo({ url: "/pages/coach/index/coach_index" });
         },
       });
     },

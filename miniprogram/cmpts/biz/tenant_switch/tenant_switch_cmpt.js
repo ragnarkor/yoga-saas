@@ -20,6 +20,10 @@ Component({
       type: Boolean,
       value: true,
     },
+    backMode: {
+      type: String,
+      value: "navigate",
+    },
   },
 
   data: {
@@ -102,6 +106,10 @@ Component({
     },
 
     bindBackTap() {
+      if (this.properties.backMode === "emit") {
+        this.triggerEvent("back");
+        return;
+      }
       wx.navigateBack({
         fail: () => {
           wx.switchTab({ url: "/pages/default/index/default_index" });

@@ -10,8 +10,14 @@ Page({
     expireMode: 'long',
     expireDay: '',
     minExpireDay: tenantExpireHelper.todayYMD(),
+    tenantStatus: 1,
+    isClosed: false,
+    statusDesc: '',
+    deleteConfirmName: '',
     loading: true,
     submitting: false,
+    statusSubmitting: false,
+    deleting: false,
   },
 
   onLoad(options) {
@@ -42,6 +48,9 @@ Page({
         tenantName: (res && res.TENANT_NAME) || this.data.tenantName,
         expireMode,
         expireDay: (res && res.expireDay) || tenantExpireHelper.todayYMD(),
+        tenantStatus: (res && res.TENANT_STATUS) != null ? res.TENANT_STATUS : 1,
+        isClosed: !!(res && res.isClosed),
+        statusDesc: (res && res.statusDesc) || '',
       });
     } catch (e) {
       console.error(e);
@@ -62,7 +71,27 @@ Page({
     this.setData({ expireDay: e.detail.value });
   },
 
-  async bindSubmit() {
+  bindStatusSwitch(e) {
+    const enabled = !!e.detail.value;
+    this.setData({
+      tenantStatus: enabled ? 1 : 0,
+      isClosed: !enabled,
+    });
+  },
+
+  bindDeleteNameInput(e) {
+    this.setData({ deleteConfirmName: e.detail.value });
+  },
+
+  bindFeatureTap() {
+    const { pid, tenantName } = this.data;
+    if (!pid) return;
+    wx.navigateTo({
+      url: `/pages/admin/setup/feature/admin_setup_feature?pid=${pid}&name=${encodeURIComponent(tenantName)}`,
+    });
+  },
+
+  async bindSaveExpire() {
     const { pid, expireMode, expireDay, submitting } = this.data;
     if (!pid || submitting) return;
 
@@ -76,11 +105,72 @@ Page({
         },
         { title: '保存中' },
       );
-      pageHelper.showSuccToast('已保存', 1200, () => wx.navigateBack());
+      pageHelper.showSuccToast('有效期已保存');
+      await this._loadDetail(pid);
     } catch (e) {
       console.error(e);
     } finally {
       this.setData({ submitting: false });
+    }
+  },
+
+  async bindSaveStatus() {
+    const { pid, tenantStatus, statusSubmitting } = this.data;
+    if (!pid || statusSubmitting) return;
+
+    const action = tenantStatus === 1 ? '启用' : '立即停用';
+    const ok = await pageHelper.showConfirm(
+      `确认${action}「${this.data.tenantName}」？${tenantStatus === 0 ? '停用后会员与教练端将无法使用该馆。' : ''}`,
+    );
+    if (!ok) {
+      await this._loadDetail(pid);
+      return;
+    }
+
+    this.setData({ statusSubmitting: true });
+    try {
+      await cloudHelper.callCloudSumbit(
+        'admin/tenant_status_save',
+        { pid, status: tenantStatus },
+        { title: '保存中' },
+      );
+      pageHelper.showSuccToast(tenantStatus === 1 ? '已启用' : '已停用');
+      await this._loadDetail(pid);
+    } catch (e) {
+      console.error(e);
+      await this._loadDetail(pid);
+    } finally {
+      this.setData({ statusSubmitting: false });
+    }
+  },
+
+  async bindDeleteTenant() {
+    const { pid, tenantName, deleteConfirmName, deleting } = this.data;
+    if (!pid || deleting) return;
+    if (!deleteConfirmName) {
+      return wx.showToast({ title: '请输入馆名确认', icon: 'none' });
+    }
+    if (deleteConfirmName !== tenantName) {
+      return wx.showToast({ title: '馆名不一致', icon: 'none' });
+    }
+
+    const ok = await pageHelper.showConfirm(
+      `确认永久删除「${tenantName}」？将移除馆配置与管理员账号，业务数据仍保留在库中。`,
+    );
+    if (!ok) return;
+
+    this.setData({ deleting: true });
+    try {
+      await cloudHelper.callCloudSumbit(
+        'admin/tenant_del',
+        { pid, confirmName: deleteConfirmName },
+        { title: '删除中' },
+      );
+      pageHelper.showSuccToast('已删除', 1200, () => wx.navigateBack());
+    } catch (e) {
+      console.error(e);
+    } finally {
+      this.setData({ deleting: false });
     }
   },
 });

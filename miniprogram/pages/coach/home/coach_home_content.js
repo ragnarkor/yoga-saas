@@ -5,10 +5,9 @@ const AdminWxBiz = require("../../../biz/admin_wx_biz.js");
 const TYPE_NAMES = {
   announce: "公告",
   banner: "横幅",
-  photo: "照片",
 };
 
-const TAB_TYPES = ["banner", "announce", "photo"];
+const TAB_TYPES = ["banner", "announce"];
 
 Page({
   behaviors: [require("../../../behavior/coach_page_bh.js")],
@@ -19,11 +18,9 @@ Page({
     tabs: [
       { id: "banner", name: "横幅", icon: "photo-o" },
       { id: "announce", name: "公告", icon: "volume-o" },
-      { id: "photo", name: "照片墙", icon: "photo" },
     ],
     banners: [],
     announces: [],
-    photos: [],
     popupType: "",
     popupTitle: "",
     popupShow: false,
@@ -66,16 +63,14 @@ Page({
 
   async _loadAll() {
     try {
-      const [banners, announces, photos] = await Promise.all([
+      const [banners, announces] = await Promise.all([
         cloudHelper.callCloudData("admin/home_banner_list", {}),
         cloudHelper.callCloudData("admin/home_announce_list", {}),
-        cloudHelper.callCloudData("admin/home_photo_list", {}),
       ]);
       this.setData({
         isLoad: true,
         banners: (banners && banners.list) || [],
         announces: (announces && announces.list) || [],
-        photos: (photos && photos.list) || [],
       });
     } catch (err) {
       console.error(err);
@@ -88,7 +83,6 @@ Page({
     const routeMap = {
       banner: "admin/home_banner_del",
       announce: "admin/home_announce_del",
-      photo: "admin/home_photo_del",
     };
     const route = routeMap[type];
     if (!route || !id) return;
@@ -99,7 +93,7 @@ Page({
     try {
       await cloudHelper.callCloudSumbit(route, { id }, { title: "删除中" });
       pageHelper.showSuccToast("已删除");
-      this._loadAll();
+      await this._loadAll();
     } catch (err) {
       console.error(err);
     }
@@ -138,13 +132,6 @@ Page({
       if (item) {
         form.title = item.ANNOUNCE_TITLE || "";
         form.desc = item.ANNOUNCE_DESC || "";
-      }
-    } else if (type === "photo") {
-      const item = this.data.photos.find((p) => p._id === id);
-      if (item) {
-        form.title = item.PHOTO_TITLE || "";
-        form.desc = item.PHOTO_DESC || "";
-        if (item.PHOTO_PIC) imgList = [item.PHOTO_PIC];
       }
     }
 
@@ -220,25 +207,6 @@ Page({
       } else {
         await this._submit("admin/home_banner_insert", { title, pic });
       }
-    } else if (type === "photo") {
-      if (!this.data.imgList.length) {
-        return wx.showToast({ title: "请选择照片", icon: "none" });
-      }
-      let pic = this.data.imgList[0];
-      if (this.data.imgChanged) {
-        pic = await this._uploadImg("photo");
-        if (!pic) return;
-      }
-      if (isEdit) {
-        await this._submit("admin/home_photo_edit", {
-          id: this.data.editId,
-          title,
-          desc,
-          pic,
-        });
-      } else {
-        await this._submit("admin/home_photo_insert", { title, desc, pic });
-      }
     }
   },
 
@@ -271,7 +239,7 @@ Page({
         form: { title: "", desc: "" },
         imgList: [],
       });
-      this._loadAll();
+      await this._loadAll();
     } catch (err) {
       console.error(err);
       this.setData({ submitting: false });

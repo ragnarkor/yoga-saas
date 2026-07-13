@@ -151,7 +151,7 @@ class PassportService extends BaseService {
 
 		}
 
-		let fields = 'USER_ID,USER_MOBILE,USER_NAME,USER_PIC,USER_CITY,USER_TRADE,USER_WORK'
+		let fields = 'USER_ID,USER_MOBILE,USER_NAME,USER_PIC,USER_BIRTHDAY,USER_CITY,USER_TRADE,USER_WORK'
 
 		let user = await UserModel.getOne(where, fields, {}, PassportService.MUST_PID);
 
@@ -207,7 +207,7 @@ class PassportService extends BaseService {
 
 	/** 同步微信昵称 / 头像 / 手机号 */
 
-	async syncProfile(userId, { name, mobile, pic, cloudID, code }) {
+	async syncProfile(userId, { name, mobile, pic, cloudID, code, birthday }) {
 
 		if (code || cloudID) {
 
@@ -232,6 +232,14 @@ class PassportService extends BaseService {
 		if (mobile) data.USER_MOBILE = mobile;
 
 		if (pic) data.USER_PIC = pic;
+
+		if (birthday !== undefined) {
+			const bday = String(birthday || '').trim();
+			if (bday && !/^\d{4}-\d{2}-\d{2}$/.test(bday)) {
+				this.AppError('生日格式应为 yyyy-mm-dd');
+			}
+			data.USER_BIRTHDAY = bday;
+		}
 
 
 
@@ -273,7 +281,9 @@ class PassportService extends BaseService {
 
 		work,
 
-		city
+		city,
+
+		birthday
 
 	}) {
 
@@ -308,6 +318,14 @@ class PassportService extends BaseService {
 			USER_TRADE: trade
 
 		};
+
+		if (birthday !== undefined) {
+			const bday = String(birthday || '').trim();
+			if (bday && !/^\d{4}-\d{2}-\d{2}$/.test(bday)) {
+				this.AppError('生日格式应为 yyyy-mm-dd');
+			}
+			data.USER_BIRTHDAY = bday;
+		}
 
 
 

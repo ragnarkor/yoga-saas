@@ -4,6 +4,7 @@
 
 const BaseController = require("./base_controller.js");
 const HomeService = require("../service/home_service.js");
+const homeCacheUtil = require("../utils/home_cache_util.js");
 
 class HomeController extends BaseController {
   async getSetupAll() {
@@ -11,17 +12,18 @@ class HomeController extends BaseController {
     this.validateData(rules);
 
     let service = new HomeService();
-    let result = await service.getSetup(
-      "SETUP_ABOUT,SETUP_ABOUT_PIC,SETUP_ADDRESS,SETUP_OFFICE_PIC,SETUP_PHONE,SETUP_SERVICE_PIC,SETUP_FEATURES,SETUP_LATITUDE,SETUP_LONGITUDE",
+    return await homeCacheUtil.getSetupAll(() =>
+      service.getSetup(
+        "SETUP_ABOUT,SETUP_ABOUT_PIC,SETUP_ADDRESS,SETUP_OFFICE_PIC,SETUP_PHONE,SETUP_SERVICE_PIC,SETUP_FEATURES,SETUP_LATITUDE,SETUP_LONGITUDE",
+      ),
     );
-    return result;
   }
 
   async getHomeIndex() {
     let rules = {};
     this.validateData(rules);
     let service = new HomeService();
-    return await service.getHomeIndex();
+    return await homeCacheUtil.getHomeIndex(() => service.getHomeIndex());
   }
 
   async searchHome() {
@@ -57,6 +59,13 @@ class HomeController extends BaseController {
     let input = this.validateData(rules);
     let service = new HomeService();
     return await service.getAnnounceDetail(input.id);
+  }
+
+  async getPhotoAlbumList() {
+    let rules = {};
+    this.validateData(rules);
+    let service = new HomeService();
+    return await service.getPhotoAlbumList();
   }
 }
 

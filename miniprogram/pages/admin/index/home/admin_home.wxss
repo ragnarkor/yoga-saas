@@ -303,6 +303,29 @@
   padding-right: 20rpx;
 }
 
+.tenant-row--closed {
+  opacity: 0.82;
+}
+
+.tenant-row-title-line {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-wrap: wrap;
+}
+
+.tenant-row-badge {
+  padding: 2rpx 12rpx;
+  border-radius: 999rpx;
+  font-size: 20rpx;
+  line-height: 1.4;
+}
+
+.tenant-row-badge--closed {
+  color: #cf1322;
+  background: rgba(207, 19, 34, 0.1);
+}
+
 .tenant-row-name {
   display: block;
   font-size: 30rpx;
@@ -342,8 +365,8 @@
 }
 
 .tenant-row-btn {
-  padding: 12rpx 28rpx;
-  font-size: 26rpx;
+  padding: 12rpx 20rpx;
+  font-size: 24rpx;
   color: #fff;
   background: var(--adminColor);
   border-radius: var(--adminRadiusSm, 12rpx);

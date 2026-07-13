@@ -6,6 +6,7 @@ const BaseAdminController = require("./base_admin_controller.js");
 const AdminHomeService = require("../../service/admin/admin_home_service.js");
 const AdminWxService = require("../../service/admin/admin_wx_service.js");
 const AdminModel = require("../../model/admin_model.js");
+const homeCacheUtil = require("../../utils/home_cache_util.js");
 
 class AdminHomeController extends BaseAdminController {
   async getBannerList() {
@@ -36,6 +37,7 @@ class AdminHomeController extends BaseAdminController {
       BANNER_LINK_ID: input.linkId,
       BANNER_ORDER: input.order,
     });
+    await homeCacheUtil.invalidateHomeCache();
     return { id };
   }
 
@@ -63,6 +65,7 @@ class AdminHomeController extends BaseAdminController {
       BANNER_LINK_ID: input.linkId,
       BANNER_ORDER: input.order,
     });
+    await homeCacheUtil.invalidateHomeCache();
   }
   // [AI_END LINES=23 TIMESTAMP=2025-01-27 15:00:00]
 
@@ -72,6 +75,7 @@ class AdminHomeController extends BaseAdminController {
     let input = this.validateData(rules);
     let service = new AdminHomeService();
     await service.delBanner(input.id);
+    await homeCacheUtil.invalidateHomeCache();
   }
 
   async getAnnounceList() {
@@ -95,6 +99,7 @@ class AdminHomeController extends BaseAdminController {
       ANNOUNCE_ORDER: input.order,
       ANNOUNCE_CONTENT: [{ type: "text", val: input.desc || input.title }],
     });
+    await homeCacheUtil.invalidateHomeCache();
     return { id };
   }
 
@@ -115,6 +120,7 @@ class AdminHomeController extends BaseAdminController {
       ANNOUNCE_ORDER: input.order,
       ANNOUNCE_CONTENT: [{ type: "text", val: input.desc || input.title }],
     });
+    await homeCacheUtil.invalidateHomeCache();
   }
   // [AI_END LINES=20 TIMESTAMP=2025-01-27 15:00:00]
 
@@ -124,6 +130,7 @@ class AdminHomeController extends BaseAdminController {
     let input = this.validateData(rules);
     let service = new AdminHomeService();
     await service.delAnnounce(input.id);
+    await homeCacheUtil.invalidateHomeCache();
   }
 
   async getTeacherList() {
@@ -154,6 +161,7 @@ class AdminHomeController extends BaseAdminController {
       TEACHER_HOME: input.home,
       TEACHER_ORDER: input.order,
     });
+    await homeCacheUtil.invalidateHomeCache();
     return { id };
   }
 
@@ -163,6 +171,7 @@ class AdminHomeController extends BaseAdminController {
     let input = this.validateData(rules);
     let service = new AdminHomeService();
     await service.delTeacher(input.id);
+    await homeCacheUtil.invalidateHomeCache();
   }
 
   async getPhotoList() {
@@ -176,6 +185,7 @@ class AdminHomeController extends BaseAdminController {
     let rules = {
       title: "string",
       desc: "string",
+      album: "string",
       pic: "must|string",
       linkType: "string|default=none",
       linkId: "string",
@@ -186,11 +196,13 @@ class AdminHomeController extends BaseAdminController {
     let id = await service.insertPhoto({
       PHOTO_TITLE: input.title,
       PHOTO_DESC: input.desc,
+      PHOTO_ALBUM: input.album || "",
       PHOTO_PIC: input.pic,
       PHOTO_LINK_TYPE: input.linkType,
       PHOTO_LINK_ID: input.linkId,
       PHOTO_ORDER: input.order,
     });
+    await homeCacheUtil.invalidateHomeCache();
     return { id };
   }
 
@@ -201,6 +213,7 @@ class AdminHomeController extends BaseAdminController {
       id: "must|id",
       title: "string",
       desc: "string",
+      album: "string",
       pic: "must|string",
       linkType: "string|default=none",
       linkId: "string",
@@ -211,11 +224,13 @@ class AdminHomeController extends BaseAdminController {
     await service.editPhoto(input.id, {
       PHOTO_TITLE: input.title,
       PHOTO_DESC: input.desc,
+      PHOTO_ALBUM: input.album || "",
       PHOTO_PIC: input.pic,
       PHOTO_LINK_TYPE: input.linkType,
       PHOTO_LINK_ID: input.linkId,
       PHOTO_ORDER: input.order,
     });
+    await homeCacheUtil.invalidateHomeCache();
   }
   // [AI_END LINES=23 TIMESTAMP=2025-01-27 15:00:00]
 
@@ -225,6 +240,28 @@ class AdminHomeController extends BaseAdminController {
     let input = this.validateData(rules);
     let service = new AdminHomeService();
     await service.delPhoto(input.id);
+    await homeCacheUtil.invalidateHomeCache();
+  }
+
+  async delPhotoAlbum() {
+    await this.isAdmin();
+    let rules = {
+      album: "must|string|min:1|max:50|name=相册名",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminHomeService();
+    let result = await service.delPhotoAlbum(input.album);
+    await homeCacheUtil.invalidateHomeCache();
+    return result;
+  }
+
+  /** 清除首页与全局配置缓存 */
+  async clearCache() {
+    await this.isAdmin();
+    const cacheUtil = require("../../../framework/utils/cache_util.js");
+    await cacheUtil.clear();
+    await homeCacheUtil.invalidateHomeCache();
+    return { ok: true };
   }
 
   /** 密码登录（超管/备用） */
@@ -390,7 +427,9 @@ class AdminHomeController extends BaseAdminController {
       false,
     );
     let service = new AdminHomeService();
-    return await service.saveMyTeacherProfile(operator, input);
+    const result = await service.saveMyTeacherProfile(operator, input);
+    await homeCacheUtil.invalidateHomeCache();
+    return result;
   }
 }
 

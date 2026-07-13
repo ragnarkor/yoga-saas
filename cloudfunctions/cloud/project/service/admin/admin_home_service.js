@@ -112,6 +112,28 @@ class AdminHomeService extends BaseAdminService {
     await PhotoModel.del({ _id: id });
   }
 
+  async delPhotoAlbum(albumName) {
+    const name = String(albumName || "").trim();
+    if (!name) this.AppError("相册名不能为空");
+
+    const all = await PhotoModel.getAll({}, "PHOTO_PIC,PHOTO_ALBUM,PHOTO_DESC", {}, 500);
+    const matched = (all || []).filter((item) => {
+      const album = (item.PHOTO_ALBUM || "").trim();
+      if (album) return album === name;
+      return (item.PHOTO_DESC || "").trim() === name;
+    });
+
+    if (!matched.length) return { count: 0 };
+
+    const files = matched.map((item) => item.PHOTO_PIC).filter(Boolean);
+    if (files.length) await cloudUtil.deleteFiles(files);
+
+    for (const item of matched) {
+      await PhotoModel.del({ _id: item._id });
+    }
+    return { count: matched.length };
+  }
+
   /** 当前登录馆主/教练：读取会员端主页展示资料 */
   async getMyTeacherProfile(admin) {
     if (!admin) this.AppError("无权限");

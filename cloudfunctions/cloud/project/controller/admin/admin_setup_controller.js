@@ -6,6 +6,7 @@
 
 const BaseAdminController = require("./base_admin_controller.js");
 const AdminSetupService = require("../../service/admin/admin_setup_service.js");
+const AdminModel = require("../../model/admin_model.js");
 
 const contentCheck = require("../../../framework/validate/content_check.js");
 
@@ -57,20 +58,32 @@ class AdminSetupController extends BaseAdminController {
 
     let rules = {
       features: "must|object|name=功能开关配置",
+      pid: "string|false|name=租户ID",
     };
 
     let input = this.validateData(rules);
     let service = new AdminSetupService();
-    await service.setupFeature(input.features);
+    let pid = String(input.pid || global.PID || "").trim();
+    if (!pid) this.AppError("请选择瑜伽馆");
+    await service.setupFeatureForPid(pid, input.features);
   }
 
   /** 获取功能开关配置 */
   async getFeature() {
     await this.isAdmin();
 
+    let rules = {
+      pid: "string|false|name=租户ID",
+    };
+    let input = this.validateData(rules);
+    let pid = String(input.pid || global.PID || "").trim();
+    if (input.pid && this._adminType !== AdminModel.TYPE.SUPER) {
+      this.AppError("无权限查看其他瑜伽馆配置");
+    }
+
     let service = new AdminSetupService();
-    let features = await service.getFeature();
-    return { features };
+    let features = await service.getFeatureForPid(pid);
+    return { features, pid: pid || "" };
   }
   // [AI_END LINES=17 TIMESTAMP=2025-01-25 12:00:00]
 }

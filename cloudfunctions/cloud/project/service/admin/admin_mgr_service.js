@@ -10,6 +10,7 @@ const util = require("../../../framework/utils/util.js");
 const dataUtil = require("../../../framework/utils/data_util.js");
 const MeetModel = require("../../model/meet_model.js");
 const teacherAdminHelper = require("../teacher_admin_helper.js");
+const pwdUtil = require("../../utils/pwd_util.js");
 
 class AdminMgrService extends BaseAdminService {
   /** 取得日志分页列表 */
@@ -126,7 +127,7 @@ class AdminMgrService extends BaseAdminService {
       _pid: pid,
       ADMIN_NAME: name,
       ADMIN_PHONE: phone,
-      ADMIN_PWD: pwd,
+      ...pwdUtil.hashNewPwd(pwd, phone),
       ADMIN_TYPE: adminType,
       ADMIN_STATUS: 1,
     };

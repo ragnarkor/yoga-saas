@@ -100,12 +100,21 @@ Page({
     this.setData({ platformTab: 1 });
   },
 
-  bindTenantExpireTap: function (e) {
+  bindTenantManageTap: function (e) {
     const pid = e.currentTarget.dataset.pid;
     const name = e.currentTarget.dataset.name || '';
     if (!pid) return;
     wx.navigateTo({
       url: `/pages/admin/platform/tenant_expire/admin_tenant_expire?pid=${pid}&name=${encodeURIComponent(name)}`,
+    });
+  },
+
+  bindTenantFeatureTap: function (e) {
+    const pid = e.currentTarget.dataset.pid;
+    const name = e.currentTarget.dataset.name || '';
+    if (!pid) return;
+    wx.navigateTo({
+      url: `/pages/admin/setup/feature/admin_setup_feature?pid=${pid}&name=${encodeURIComponent(name)}`,
     });
   },
 

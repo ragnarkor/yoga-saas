@@ -1,0 +1,69 @@
+<page-meta page-style="{{pageStyle}}" />
+<view class="theme-scope photo-wall-page" style="{{pageStyle}}">
+  <cmpt-tenant-switch
+    title="{{viewMode === 'albums' ? '照片墙' : activeAlbumTitle}}"
+    show-back="{{true}}"
+    show-switch="{{false}}"
+    back-mode="{{viewMode === 'detail' && !entryFromHome ? 'emit' : 'navigate'}}"
+    theme-color="{{themeColor}}"
+    bind:back="bindHeaderBack"
+  />
+
+  <view wx:if="{{!isLoad}}" class="photo-wall-loading">
+    <van-loading size="48rpx" color="{{themeColor}}" />
+  </view>
+
+  <block wx:elif="{{!displayAlbums.length}}">
+    <van-empty description="暂无相册" />
+  </block>
+
+  <!-- 相册合辑列表 -->
+  <block wx:elif="{{viewMode === 'albums'}}">
+    <view class="photo-wall-album-grid">
+      <view
+        class="photo-wall-album-card"
+        wx:for="{{displayAlbums}}"
+        wx:key="id"
+        data-index="{{index}}"
+        bindtap="bindAlbumTap"
+        hover-class="photo-wall-album-card--active"
+      >
+        <view class="photo-wall-album-thumbs photo-wall-album-thumbs--{{item.thumbCount || 1}}">
+          <block wx:if="{{item.thumbs.length}}">
+            <image
+              wx:for="{{item.thumbs}}"
+              wx:for-item="thumb"
+              wx:key="*this"
+              class="photo-wall-album-thumb"
+              mode="aspectFill"
+              src="{{thumb}}"
+            />
+          </block>
+          <view wx:else class="photo-wall-album-thumb photo-wall-album-thumb--empty">
+            <van-icon name="photo-o" size="48rpx" color="#c8c9cc" />
+          </view>
+        </view>
+        <view class="photo-wall-album-meta">
+          <text class="photo-wall-album-title text-cut">{{item.title}}</text>
+          <text class="photo-wall-album-count">{{item.count}} 张</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 单个相册：纯图片陈列 -->
+  <block wx:else>
+    <view class="photo-wall-grid photo-wall-grid--plain" wx:if="{{displayPhotos.length}}">
+      <view
+        class="photo-wall-item photo-wall-item--plain"
+        wx:for="{{displayPhotos}}"
+        wx:key="_id"
+        data-index="{{index}}"
+        bindtap="bindPhotoTap"
+      >
+        <image class="photo-wall-img" mode="aspectFill" src="{{item.pic}}" />
+      </view>
+    </view>
+    <van-empty wx:else description="暂无照片" />
+  </block>
+</view>

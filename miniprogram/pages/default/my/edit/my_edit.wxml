@@ -26,6 +26,10 @@
       bind:nicknamereview="bindNicknameReview"
     />
 
+    <picker mode="date" value="{{formBirthday}}" end="2099-12-31" bindchange="bindBirthdayChange">
+      <van-cell title="生日" is-link value="{{formBirthday || '选填'}}" />
+    </picker>
+
     <van-cell title="用户ID" value="{{userId || '—'}}" />
 
     <van-cell title="绑定手机号" center>

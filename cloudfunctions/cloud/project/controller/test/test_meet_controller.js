@@ -20,6 +20,9 @@ const JobService = require('../../service/job_service.js');
 class TestController {
 
 	async testJoin() {
+		if (!config.TEST_MODE) {
+			throw new AppError('测试接口已关闭');
+		}
 		let meetService = new MeetService();
 		let userId = 'obytx5EuMzFj-rC7t3x8PY5S3GHs';
 		let meetId = '617ef50c620ab4160556a8537944a517';

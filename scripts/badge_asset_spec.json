@@ -1,0 +1,61 @@
+{
+  "style": "metallic ring frame + simple abstract colorful center icon, Apple Watch achievement badge inspired",
+  "prompt_prefix": "Premium mobile achievement badge icon, perfect circle. OUTER RING: polished metallic silver-champagne metal border with realistic brushed metal texture, subtle highlights and bevel, like Apple Watch award medal frame. INNER AREA: soft off-white cream circular center. CENTER GRAPHIC: simple abstract colorful flat geometric illustration, minimal shapes, gentle gradients, NOT photorealistic, NOT emoji, NO text, NO human feet, NO footprints.",
+  "badges": [
+    {
+      "id": "first_class",
+      "name": "初心者",
+      "center": "tiny abstract seedling: one green stem and two soft lime leaf shapes, very simple"
+    },
+    {
+      "id": "classes_10",
+      "name": "十步之遥",
+      "center": "ten small colorful dots arranged in a gentle ascending arc path, abstract progress steps, absolutely NO feet NO footprints NO shoes"
+    },
+    {
+      "id": "classes_30",
+      "name": "月度常客",
+      "center": "abstract crescent moon in soft indigo-blue with three tiny golden star dots"
+    },
+    {
+      "id": "classes_50",
+      "name": "稳定修行",
+      "center": "abstract half-open lotus flower with soft lavender and pink petal shapes"
+    },
+    {
+      "id": "classes_100",
+      "name": "百课不倦",
+      "center": "abstract blooming flower with warm gold and amber petals and soft radial glow"
+    },
+    {
+      "id": "classes_200",
+      "name": "瑜伽深耕",
+      "center": "three simplified mountain peaks in layered teal and blue gradients, geometric abstract"
+    },
+    {
+      "id": "streak_4",
+      "name": "月月不断",
+      "center": "four small colored circles (green, coral, blue, gold) arranged in a ring, like closing activity rings"
+    },
+    {
+      "id": "streak_8",
+      "name": "习惯养成",
+      "center": "single smooth flowing ribbon curve in emerald green, abstract habit loop"
+    },
+    {
+      "id": "streak_12",
+      "name": "季度达人",
+      "center": "abstract sun with warm orange and yellow arc segments around it, seasonal energy"
+    },
+    {
+      "id": "streak_24",
+      "name": "半年坚守",
+      "center": "minimal geometric hourglass shape in rose-gold and copper tones, very abstract"
+    },
+    {
+      "id": "streak_max_12",
+      "name": "最长记录",
+      "center": "abstract rising line chart with pink-to-purple gradient stroke and three dot nodes"
+    }
+  ]
+}

@@ -19,6 +19,7 @@ UserModel.DB_STRUCTURE = {
 	USER_STATUS: 'int|true|default=1|comment=状态 0=待审核,1=正常',
 
 	USER_NAME: 'string|false|comment=用户姓名',
+	USER_BIRTHDAY: 'string|false|comment=生日 yyyy-mm-dd',
 	USER_MOBILE: 'string|false|comment=联系电话',
 	USER_PIC: 'string|false|comment=头像',
 

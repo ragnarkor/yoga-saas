@@ -158,6 +158,14 @@ class MeetService extends BaseService {
     // 规则校验
     await this.checkMeetRules(userId, meetId, timeMark, cardId, options);
 
+    // 写入前再次校验名额（降低并发超报）
+    if (timeSet.isLimit) {
+      const liveCnt = await this._countSuccJoin(meetId, timeMark);
+      if (liveCnt >= timeSet.limit) {
+        this.AppError("该时段预约人员已满，请选择其他");
+      }
+    }
+
     let data = {};
 
     data.JOIN_USER_ID = userId;
@@ -182,24 +190,25 @@ class MeetService extends BaseService {
     // 入库
     let joinId = await JoinModel.insert(data);
 
-    // 若有手机号码 用户入库
-    let mobile = "";
-    let userName = "";
-    for (let k in forms) {
-      if (!mobile && forms[k].type == "mobile") {
-        mobile = forms[k].val;
-        continue;
-      } else if (!userName && forms[k].title == "姓名") {
-        userName = forms[k].val;
-        continue;
-      }
-    }
-
     // 统计（失败不影响预约结果）
     try {
       await this.statJoinCnt(meetId, timeMark);
     } catch (err) {
       console.error("[meet/join] statJoinCnt failed:", err.message);
+    }
+
+    // 并发兜底：若超出上限则回滚本次预约
+    if (timeSet.isLimit) {
+      const afterCnt = await this._countSuccJoin(meetId, timeMark);
+      if (afterCnt > timeSet.limit) {
+        await JoinModel.del({ _id: joinId });
+        try {
+          await this.statJoinCnt(meetId, timeMark);
+        } catch (err) {
+          console.error("[meet/join] rollback statJoinCnt failed:", err.message);
+        }
+        this.AppError("该时段预约人员已满，请选择其他");
+      }
     }
 
     // 扣减会员卡次数（预约已入库，扣卡失败不撤销预约，返回提示供前端展示）
@@ -213,6 +222,13 @@ class MeetService extends BaseService {
         cardWarning =
           (err && err.message) || "会员卡划扣异常，请联系馆方核对";
       }
+    }
+
+    try {
+      const StreakService = require("./streak_service.js");
+      await new StreakService().updateStreak(userId, daySet.day);
+    } catch (err) {
+      console.error("[meet/join] updateStreak failed:", err.message);
     }
 
     return {
@@ -268,6 +284,15 @@ class MeetService extends BaseService {
     return null;
   }
 
+  // 按时段统计有效预约人数（实时）
+  async _countSuccJoin(meetId, timeMark) {
+    return await JoinModel.count({
+      JOIN_MEET_TIME_MARK: timeMark,
+      JOIN_MEET_ID: meetId,
+      JOIN_STATUS: JoinModel.STATUS.SUCC,
+    });
+  }
+
   // 预约时段人数和状态控制校验
   async checkMeetTimeControll(meet, timeMark) {
     if (!meet) this.AppError("预约时段设置错误, 预约项目不存在");
@@ -283,20 +308,20 @@ class MeetService extends BaseService {
       limitDesc = "人数上限MAX=" + timeSet.limit;
     } else limitDesc = "人数不限制NO";
 
+    const liveCnt = await this._countSuccJoin(meet._id, timeMark);
+
     this._meetLog(meet, `------------------------------`);
     this._meetLog(
       meet,
       `#预约时段控制,预约日期=<${daySet.day}>`,
-      `预约时段=[${timeSet.start}-${timeSet.end}],状态=${statusDesc}, ${limitDesc} 当前预约成功人数=${timeSet.stat.succCnt}`,
+      `预约时段=[${timeSet.start}-${timeSet.end}],状态=${statusDesc}, ${limitDesc} 当前预约成功人数=${liveCnt}`,
     );
 
     if (timeSet.status == 0) this.AppError("该时段预约已经关闭，请选择其他");
 
-    // 时段总人数限制
-    if (timeSet.isLimit) {
-      if (timeSet.stat.succCnt >= timeSet.limit) {
-        this.AppError("该时段预约人员已满，请选择其他");
-      }
+    // 时段总人数限制（以 join 表实时统计为准）
+    if (timeSet.isLimit && liveCnt >= timeSet.limit) {
+      this.AppError("该时段预约人员已满，请选择其他");
     }
   }
 

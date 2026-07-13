@@ -1,0 +1,217 @@
+<page-meta page-style="{{pageStyle}}" />
+
+<view class="ach-page theme-scope" style="{{pageStyle}}">
+
+  <cmpt-tenant-switch title="我的成就" theme-color="{{themeColor}}" show-back="{{true}}" />
+
+
+
+  <view wx:if="{{!isLoad}}" class="ach-loading">
+
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+
+  </view>
+
+
+
+  <block wx:else>
+
+    <view class="ach-hero">
+      <image class="ach-hero-bg" src="{{heroSrc}}" mode="aspectFill" />
+      <view class="ach-hero-overlay" />
+      <view class="ach-hero-emojis">
+        <text
+          class="ach-hero-emoji"
+          wx:for="{{heroEmojis}}"
+          wx:key="index"
+          style="{{item.style}}"
+        >{{item.emoji}}</text>
+      </view>
+      <view class="ach-hero-text">
+        <text class="ach-hero-label">我的成就</text>
+        <text class="ach-hero-num">{{streak.totalClasses || 0}}</text>
+        <text class="ach-hero-sub">次上课记录</text>
+      </view>
+    </view>
+
+
+
+    <view class="ach-body">
+
+      <view class="ach-stats">
+
+        <view class="ach-stat-card">
+
+          <text class="ach-stat-num" style="color:{{themeColor}}">{{streak.totalClasses || 0}}</text>
+
+          <text class="ach-stat-label">累计上课</text>
+
+        </view>
+
+        <view class="ach-stat-card">
+
+          <text class="ach-stat-num" style="color:{{themeColor}}">{{streak.current || 0}}</text>
+
+          <text class="ach-stat-label">连续周数</text>
+
+        </view>
+
+        <view class="ach-stat-card">
+
+          <text class="ach-stat-num" style="color:{{themeColor}}">{{streak.totalDays || 0}}</text>
+
+          <text class="ach-stat-label">上课天数</text>
+
+        </view>
+
+        <view class="ach-stat-card">
+
+          <text class="ach-stat-num" style="color:{{themeColor}}">{{streak.max || 0}}</text>
+
+          <text class="ach-stat-label">历史最长</text>
+
+        </view>
+
+      </view>
+
+
+
+      <view class="ach-section">
+
+        <view class="ach-section-title">上课热力图</view>
+
+        <view class="ach-section-sub">统计预约成功且未取消的课程（无需签到）</view>
+
+        <view class="ach-heatmap">
+
+          <view class="ach-heatmap-row" wx:for="{{heatmapRows}}" wx:key="label">
+
+            <text class="ach-heatmap-label">{{item.label}}</text>
+
+            <view class="ach-heatmap-cells">
+
+              <view
+
+                class="ach-heatmap-cell {{cell.on ? 'ach-heatmap-cell--on' : ''}}"
+
+                wx:for="{{item.cells}}"
+
+                wx:for-item="cell"
+
+                wx:key="date"
+
+                style="{{cell.on ? 'background:' + themeColor : ''}}"
+
+                data-date="{{cell.date}}"
+
+                data-on="{{cell.on}}"
+
+                bindtap="bindHeatmapCellTap"
+
+              />
+
+            </view>
+
+          </view>
+
+        </view>
+
+        <view class="ach-heatmap-legend">
+
+          <view class="ach-legend-item"><view class="ach-legend-box" />未上课</view>
+
+          <view class="ach-legend-item"><view class="ach-legend-box ach-legend-box--on" style="background:{{themeColor}}" />已上课</view>
+
+        </view>
+
+        <view class="ach-heatmap-hint" wx:if="{{heatmapHint}}">{{heatmapHint}}</view>
+
+        <view class="ach-heatmap-tip" wx:if="{{heatmapTip}}">{{heatmapTip}}</view>
+
+      </view>
+
+
+
+      <view class="ach-section">
+
+        <view class="ach-section-head">
+
+          <view class="ach-section-title ach-section-title--inline">我的徽章</view>
+
+          <text class="ach-section-extra">已获得 {{unlockedBadgeCount}} 枚</text>
+
+        </view>
+
+        <view class="ach-badge-grid">
+          <view
+            class="ach-badge-item {{item.unlocked ? '' : 'ach-badge-item--locked'}}"
+            wx:for="{{badges}}"
+            wx:key="id"
+            data-index="{{index}}"
+            bindtap="bindBadgeTap"
+          >
+            <text class="ach-badge-emoji">{{item.emoji}}</text>
+            <text class="ach-badge-name">{{item.name}}</text>
+            <text class="ach-badge-new" wx:if="{{item.isNew}}">NEW</text>
+          </view>
+        </view>
+
+      </view>
+
+
+
+      <view class="ach-actions">
+
+        <button
+
+          class="ach-btn ach-btn--primary"
+
+          style="background:{{themeColor}}"
+
+          loading="{{posterLoading}}"
+
+          bindtap="bindPosterTap"
+
+        >生成成就海报</button>
+
+        <button class="ach-btn ach-btn--ghost" loading="{{posterLoading}}" bindtap="bindSavePosterTap">保存到相册</button>
+
+      </view>
+
+    </view>
+
+  </block>
+
+
+
+  <canvas type="2d" id="achievementCanvas" class="ach-canvas" />
+
+
+
+  <van-popup show="{{badgePopupShow}}" position="bottom" round bind:close="bindBadgePopupClose">
+    <view class="ach-badge-popup" wx:if="{{activeBadge}}">
+      <text class="ach-badge-popup-emoji">{{activeBadge.emoji}}</text>
+      <text class="ach-badge-popup-name">{{activeBadge.name}}</text>
+
+      <text class="ach-badge-popup-desc">{{activeBadge.desc}}</text>
+
+      <view wx:if="{{activeBadge.unlocked}}" class="ach-badge-popup-done">
+
+        {{activeBadge.unlockedAt ? activeBadge.unlockedAt + ' 已解锁' : '已解锁'}}
+
+      </view>
+
+      <view wx:else class="ach-badge-popup-progress">
+
+        <text>{{activeBadge.progressHint || '继续努力'}}</text>
+
+        <text wx:if="{{activeBadge.target}}">{{activeBadge.progress || 0}} / {{activeBadge.target}}</text>
+
+      </view>
+
+    </view>
+
+  </van-popup>
+
+</view>
+

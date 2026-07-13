@@ -144,7 +144,7 @@ class HomeService extends BaseService {
       this._safeGetAll(
         PhotoModel,
         { PHOTO_STATUS: 1 },
-        "PHOTO_TITLE,PHOTO_DESC,PHOTO_PIC,PHOTO_LINK_TYPE,PHOTO_LINK_ID",
+        "PHOTO_TITLE,PHOTO_DESC,PHOTO_ALBUM,PHOTO_PIC,PHOTO_LINK_TYPE,PHOTO_LINK_ID",
         { PHOTO_ORDER: "asc", PHOTO_ADD_TIME: "desc" },
         30,
       ),
@@ -184,19 +184,44 @@ class HomeService extends BaseService {
       };
     });
 
-    let photos = rawPhotos.map((item) => ({
-      _id: item._id,
-      pic: this._fmtMediaUrlSync(item.PHOTO_PIC),
-      title: item.PHOTO_TITLE || "",
-      desc: item.PHOTO_DESC || "",
-      album: (item.PHOTO_DESC || "").trim() || "馆舍风采",
-      linkType: item.PHOTO_LINK_TYPE || "none",
-      linkId: item.PHOTO_LINK_ID || "",
-    }));
+    let photos = rawPhotos.map((item) => this._mapPhotoItem(item));
 
     let photoAlbums = this._buildPhotoAlbums(photos);
 
     return { phone, banners, announcements, teachers, photos, photoAlbums };
+  }
+
+  _resolvePhotoAlbum(item) {
+    const album = (item.PHOTO_ALBUM || "").trim();
+    if (album) return album;
+    const desc = (item.PHOTO_DESC || "").trim();
+    return desc || "馆舍风采";
+  }
+
+  _mapPhotoItem(item) {
+    return {
+      _id: item._id,
+      pic: this._fmtMediaUrlSync(item.PHOTO_PIC),
+      title: item.PHOTO_TITLE || "",
+      desc: item.PHOTO_DESC || "",
+      album: this._resolvePhotoAlbum(item),
+      linkType: item.PHOTO_LINK_TYPE || "none",
+      linkId: item.PHOTO_LINK_ID || "",
+    };
+  }
+
+  async getPhotoAlbumList() {
+    await this._ensureHomeCollections();
+    let rawPhotos = await this._safeGetAll(
+      PhotoModel,
+      { PHOTO_STATUS: 1 },
+      "PHOTO_TITLE,PHOTO_DESC,PHOTO_ALBUM,PHOTO_PIC,PHOTO_LINK_TYPE,PHOTO_LINK_ID",
+      { PHOTO_ORDER: "asc", PHOTO_ADD_TIME: "desc" },
+      100,
+    );
+    let photos = rawPhotos.map((item) => this._mapPhotoItem(item));
+    let photoAlbums = this._buildPhotoAlbums(photos);
+    return { photos, photoAlbums, albumCount: photoAlbums.length };
   }
 
   _buildPhotoAlbums(photos) {

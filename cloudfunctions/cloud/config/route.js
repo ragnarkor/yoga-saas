@@ -16,6 +16,7 @@ module.exports = {
   "home/teacher_detail": "home_controller@getTeacherDetail",
   "home/teacher_home": "home_controller@getTeacherHome",
   "home/announce_detail": "home_controller@getAnnounceDetail",
+  "home/photo_album_list": "home_controller@getPhotoAlbumList",
 
   "passport/phone": "passport_controller@getPhone",
   "passport/my_detail": "passport_controller@getMyDetail",
@@ -52,6 +53,7 @@ module.exports = {
   "my/my_card_list": "card_controller@getMyCardList",
   "my/my_card_summary": "card_controller@getMyCardSummary",
   "my/my_card_detail": "card_controller@getMyCardDetail",
+  "my/achievement": "my_controller@getAchievement",
 
   "test/test": "test/test_controller@test",
   "test/seed": "test/test_controller@seed",
@@ -80,6 +82,9 @@ module.exports = {
     "admin/admin_tenant_controller@getTenantExpireDetail",
   "admin/tenant_expire_save":
     "admin/admin_tenant_controller@saveTenantExpire#noDemo",
+  "admin/tenant_status_save":
+    "admin/admin_tenant_controller@saveTenantStatus#noDemo",
+  "admin/tenant_del": "admin/admin_tenant_controller@delTenant#noDemo",
   "admin/mgr_list": "admin/admin_mgr_controller@getAdminList",
   "admin/mgr_insert": "admin/admin_mgr_controller@insertAdmin#noDemo",
   "admin/staff_insert": "admin/admin_mgr_controller@insertStaff#noDemo",
@@ -145,6 +150,7 @@ module.exports = {
   "admin/home_photo_insert": "admin/admin_home_controller@insertPhoto#noDemo",
   "admin/home_photo_edit": "admin/admin_home_controller@editPhoto#noDemo",
   "admin/home_photo_del": "admin/admin_home_controller@delPhoto#noDemo",
+  "admin/home_photo_album_del": "admin/admin_home_controller@delPhotoAlbum#noDemo",
 
   "admin/news_list": "admin/admin_news_controller@getNewsList",
   "admin/news_insert": "admin/admin_news_controller@insertNews#noDemo",
@@ -159,6 +165,8 @@ module.exports = {
 
   "admin/meet_list": "admin/admin_meet_controller@getMeetList",
   "admin/schedule_week": "admin/admin_meet_controller@getScheduleWeek",
+  "admin/schedule_copy_week":
+    "admin/admin_meet_controller@copyScheduleWeek#noDemo",
   "admin/schedule_slot_remove":
     "admin/admin_meet_controller@removeScheduleSlot#noDemo",
   "admin/meet_join_list": "admin/admin_meet_controller@getJoinList",

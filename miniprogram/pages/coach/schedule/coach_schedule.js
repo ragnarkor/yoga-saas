@@ -51,6 +51,7 @@ Page({
 
   data: {
     loading: true,
+    copying: false,
     weekOffset: 0,
     weekLabel: '',
     startDay: '',
@@ -363,6 +364,37 @@ Page({
   bindNextWeek() {
     this._initWeek(this.data.weekOffset + 1);
     this._loadSchedule();
+  },
+
+  bindCopyNextWeek() {
+    const { startDay, endDay } = this.data;
+    if (!startDay || !endDay) return;
+    wx.showModal({
+      title: '复制课表',
+      content: `将 ${startDay} 至 ${endDay} 的团课排课复制到下周？\n私教动态时段不会复制。`,
+      success: async (res) => {
+        if (!res.confirm) return;
+        this.setData({ copying: true });
+        try {
+          const result = await cloudHelper.callCloudSumbit(
+            'admin/schedule_copy_week',
+            { startDay, endDay },
+            { title: '复制中' },
+          );
+          const copied = (result && result.copiedSlots) || 0;
+          wx.showToast({
+            title: copied ? `已复制 ${copied} 个时段` : '无可复制时段',
+            icon: copied ? 'success' : 'none',
+          });
+          this._initWeek(this.data.weekOffset + 1);
+          await this._loadSchedule();
+        } catch (e) {
+          console.error(e);
+        } finally {
+          this.setData({ copying: false });
+        }
+      },
+    });
   },
 
   async bindSaveImageTap() {

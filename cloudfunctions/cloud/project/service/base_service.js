@@ -23,6 +23,7 @@ const TeacherModel = require("../model/teacher_model.js");
 const PhotoModel = require("../model/photo_model.js");
 // [AI_END LINES=3 TIMESTAMP=2025-01-25 14:45:00]
 const config = require("../../config/config.js");
+const pwdUtil = require("../utils/pwd_util.js");
 
 class BaseService {
   constructor() {
@@ -232,21 +233,21 @@ class BaseService {
         let ownerData = {};
         ownerData.ADMIN_NAME = "馆长";
         ownerData.ADMIN_PHONE = "13900000000";
-        ownerData.ADMIN_PWD = "123456";
+        Object.assign(ownerData, pwdUtil.hashNewPwd("123456", ownerData.ADMIN_PHONE));
         ownerData.ADMIN_TYPE = AdminModel.TYPE.OWNER;
         ownerId = await AdminModel.insert(ownerData);
 
         let teacherData1 = {};
         teacherData1.ADMIN_NAME = "教练小王";
         teacherData1.ADMIN_PHONE = "13900000001";
-        teacherData1.ADMIN_PWD = "123456";
+        Object.assign(teacherData1, pwdUtil.hashNewPwd("123456", teacherData1.ADMIN_PHONE));
         teacherData1.ADMIN_TYPE = AdminModel.TYPE.TEACHER;
         teacherId1 = await AdminModel.insert(teacherData1);
 
         let teacherData2 = {};
         teacherData2.ADMIN_NAME = "教练小李";
         teacherData2.ADMIN_PHONE = "13900000002";
-        teacherData2.ADMIN_PWD = "123456";
+        Object.assign(teacherData2, pwdUtil.hashNewPwd("123456", teacherData2.ADMIN_PHONE));
         teacherData2.ADMIN_TYPE = AdminModel.TYPE.TEACHER;
         teacherId2 = await AdminModel.insert(teacherData2);
       }
@@ -469,7 +470,7 @@ class BaseService {
     superData._pid = "admin";
     superData.ADMIN_NAME = "超级管理员";
     superData.ADMIN_PHONE = "13800000000";
-    superData.ADMIN_PWD = "123456";
+    Object.assign(superData, pwdUtil.hashNewPwd("123456", superData.ADMIN_PHONE));
     superData.ADMIN_TYPE = AdminModel.TYPE.SUPER;
     await AdminModel.insert(superData, false);
     result.accounts.push({
@@ -568,7 +569,7 @@ class BaseService {
         let data = {};
         data.ADMIN_NAME = tc.admins[i].name;
         data.ADMIN_PHONE = tc.admins[i].phone;
-        data.ADMIN_PWD = tc.admins[i].pwd;
+        Object.assign(data, pwdUtil.hashNewPwd(tc.admins[i].pwd, data.ADMIN_PHONE));
         data.ADMIN_TYPE = tc.admins[i].type;
         let id = await AdminModel.insert(data);
         if (tc.admins[i].type === AdminModel.TYPE.OWNER) ownerId = id;

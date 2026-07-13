@@ -53,6 +53,7 @@ class PassportController extends BaseController {
 			name: 'string|max:30|name=昵称',
 			mobile: 'string|max:20|name=手机',
 			pic: 'string|max:5000|name=头像',
+			birthday: 'string|max:10|name=生日',
 			cloudID: 'string|max:200|name=cloudID',
 			code: 'string|max:200|name=code',
 		};
@@ -76,6 +77,7 @@ class PassportController extends BaseController {
 			city: 'string|max:100|name=所在城市',
 			work: 'string|max:100|name=所在单位',
 			trade: 'string|max:100|name=行业领域',
+			birthday: 'string|max:10|name=生日',
 		};
 
 		// 取得数据

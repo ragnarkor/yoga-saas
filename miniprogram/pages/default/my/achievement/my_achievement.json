@@ -1,0 +1,10 @@
+{
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "我的成就",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "cmpt-tenant-switch": "/cmpts/biz/tenant_switch/tenant_switch_cmpt",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-popup": "@vant/weapp/popup/index"
+  }
+}

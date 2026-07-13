@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "配置有效期",
+  "navigationBarTitleText": "场馆管理",
   "usingComponents": {
     "van-loading": "@vant/weapp/loading/index"
   }

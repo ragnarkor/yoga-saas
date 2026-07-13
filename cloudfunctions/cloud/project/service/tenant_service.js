@@ -45,16 +45,20 @@ class TenantService extends BaseService {
       return { active: false, reason: "not_found" };
     }
     let tenant = await TenantModel.getOne(
-      {
-        _pid: pid,
-        TENANT_STATUS: TenantModel.STATUS.OPEN,
-      },
-      "TENANT_NAME,TENANT_EXPIRE_TIME",
+      { _pid: pid },
+      "TENANT_NAME,TENANT_STATUS,TENANT_EXPIRE_TIME",
       {},
       false,
     );
     if (!tenant) {
       return { active: false, reason: "not_found" };
+    }
+    if (tenant.TENANT_STATUS !== TenantModel.STATUS.OPEN) {
+      return {
+        active: false,
+        reason: "closed",
+        tenantName: tenant.TENANT_NAME,
+      };
     }
     if (tenantExpireUtil.isExpired(tenant.TENANT_EXPIRE_TIME)) {
       return {

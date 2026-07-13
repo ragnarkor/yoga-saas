@@ -51,11 +51,7 @@
 		<view class="jd-actions" wx:if="{{join.JOIN_STATUS==0 || join.JOIN_STATUS==1}}">
 			<view class="jd-btn jd-btn--primary" wx:if="{{join.JOIN_STATUS==1 && join.JOIN_IS_CHECKIN!=1}}" bindtap="bindScanCheckinTap">扫码签到</view>
 			<view class="jd-btn jd-btn--ghost" wx:if="{{join.JOIN_IS_CHECKIN==0}}" bindtap="bindCancelTap">取消预约</view>
-			<view class="jd-btn jd-btn--ghost" wx:if="{{isShowHome}}" bindtap="url" data-url="../../my/index/my_index" data-type="relaunch">返回首页</view>
 			<view class="jd-btn jd-btn--primary" bindtap="bindCalendarTap">加入手机日程</view>
-		</view>
-		<view class="jd-actions" wx:elif="{{isShowHome}}">
-			<view class="jd-btn jd-btn--primary" bindtap="url" data-url="../../my/index/my_index" data-type="relaunch">返回首页</view>
 		</view>
 	</view>
 </template>

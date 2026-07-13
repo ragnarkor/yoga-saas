@@ -104,8 +104,22 @@
   </scroll-view>
 
   <view class="schedule-bottom">
-    <van-button icon="photo-o" color="{{themeColor}}" plain bind:click="bindSaveImageTap">保存图片</van-button>
-    <van-button icon="plus" color="{{themeColor}}" bind:click="bindGoSchedule">排课</van-button>
+    <view class="schedule-bottom-item schedule-bottom-item--side">
+      <van-button block icon="photo-o" color="{{themeColor}}" plain bind:click="bindSaveImageTap">保存图片</van-button>
+    </view>
+    <view class="schedule-bottom-item schedule-bottom-item--copy">
+      <van-button
+        block
+        icon="records"
+        color="{{themeColor}}"
+        plain
+        loading="{{copying}}"
+        bind:click="bindCopyNextWeek"
+      >复制到下周</van-button>
+    </view>
+    <view class="schedule-bottom-item schedule-bottom-item--side">
+      <van-button block icon="plus" color="{{themeColor}}" bind:click="bindGoSchedule">排课</van-button>
+    </view>
   </view>
 
   <canvas

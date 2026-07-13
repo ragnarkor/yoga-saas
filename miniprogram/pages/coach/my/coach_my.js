@@ -11,6 +11,11 @@ const HOME_CONTENT_MENU = {
   url: "/pages/coach/home/coach_home_content",
 };
 
+const PHOTO_WALL_MENU = {
+  name: "照片墙",
+  url: "/pages/coach/photo/coach_photo_wall",
+};
+
 Page({
   behaviors: [require("../../../behavior/coach_page_bh.js")],
 
@@ -60,6 +65,7 @@ Page({
     let menus = BASE_MENUS.slice();
     if (admin && admin.type === "owner") {
       menus.push(HOME_CONTENT_MENU);
+      menus.push(PHOTO_WALL_MENU);
     }
     if (admin && (admin.type === "owner" || admin.type === "teacher")) {
       menus.splice(1, 0, {
@@ -67,9 +73,7 @@ Page({
         url: "/pages/coach/profile/coach_profile",
       });
     }
-    if (admin && admin.type === "owner") {
-      menus.push({ name: "员工管理", url: staffUrl });
-    } else if (admin && admin.type === "teacher") {
+    if (admin && admin.type === "teacher") {
       menus.push({ name: "我的账号", url: staffUrl });
     }
     return menus;
@@ -81,7 +85,7 @@ Page({
 
     if (isSuperAdmin) {
       this.setData({
-        menus: BASE_MENUS.concat([HOME_CONTENT_MENU]),
+        menus: BASE_MENUS.concat([HOME_CONTENT_MENU, PHOTO_WALL_MENU]),
         isSuperAdmin: true,
         roleTag: "超级管理员",
         userName: admin.name || "超级管理员",

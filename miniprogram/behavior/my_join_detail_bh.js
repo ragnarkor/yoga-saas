@@ -12,8 +12,6 @@ module.exports = Behavior({
 	 */
 	data: {
 		isLoad: false,
-
-		isShowHome: false,
 	},
 
 	methods: {
@@ -23,12 +21,6 @@ module.exports = Behavior({
 		onLoad: function (options) {
 			if (!pageHelper.getOptions(this, options)) return;
 			this._loadDetail();
-
-			if (options && options.flag == 'home') {
-				this.setData({
-					isShowHome: true
-				});
-			}
 		},
 
 		_loadDetail: async function (e) {

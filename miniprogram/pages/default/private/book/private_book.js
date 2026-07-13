@@ -406,7 +406,7 @@ Page({
           if (joinId) {
             wx.redirectTo({
               url: pageHelper.fmtURLByPID(
-                '/pages/default/my/join_detail/my_join_detail?flag=home&id=' + joinId,
+                '/pages/default/my/join_detail/my_join_detail?id=' + joinId,
               ),
             });
           } else {

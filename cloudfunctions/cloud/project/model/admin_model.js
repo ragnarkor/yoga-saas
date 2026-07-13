@@ -22,7 +22,8 @@ AdminModel.DB_STRUCTURE = {
   // [AI_START TIMESTAMP=2025-01-25 10:00:00]
   ADMIN_TYPE:
     "string|true|default=teacher|comment=角色 owner=馆长 teacher=教师",
-  ADMIN_PWD: "string|true|comment=登录密码",
+  ADMIN_PWD: "string|true|comment=登录密码(sha256哈希)",
+  ADMIN_PWD_SALT: "string|false|comment=密码盐",
   // [AI_END LINES=2 TIMESTAMP=2025-01-25 10:00:00]
 
   ADMIN_TOKEN: "string|false|comment=当前登录token",

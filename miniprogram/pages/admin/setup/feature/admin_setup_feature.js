@@ -3,23 +3,19 @@ const pageHelper = require("../../../../helper/page_helper.js");
 const cloudHelper = require("../../../../helper/cloud_helper.js");
 
 Page({
-  /**
-   * 页面的初始数据
-   */
   data: {
+    pid: "",
+    tenantName: "",
     features: {},
     isLoad: false,
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: async function (options) {
     if (!AdminBiz.isAdmin(this)) return;
     if (!AdminBiz.isSuperAdmin()) {
       wx.showModal({
         title: "提示",
-        content: "仅馆长可管理功能开关",
+        content: "仅超级管理员可管理功能开关",
         showCancel: false,
         success: () => {
           wx.navigateBack();
@@ -27,27 +23,39 @@ Page({
       });
       return;
     }
+
+    const pid = options.pid || "";
+    const tenantName = options.name ? decodeURIComponent(options.name) : "";
+    if (!pid) {
+      wx.showModal({
+        title: "提示",
+        content: "请从平台管理进入指定瑜伽馆",
+        showCancel: false,
+        success: () => wx.navigateBack(),
+      });
+      return;
+    }
+
+    this.setData({ pid, tenantName });
     await this._loadDetail();
   },
 
-  /**
-   * 加载功能开关配置
-   */
   _loadDetail: async function () {
     try {
-      let res = await cloudHelper.callCloudData("admin/setup_feature_get", {});
+      let res = await cloudHelper.callCloudData("admin/setup_feature_get", {
+        pid: this.data.pid,
+      });
       if (res && res.features) {
         this.setData({
           features: res.features,
           isLoad: true,
         });
       } else {
-        // 如果没有配置，使用默认值
         this.setData({
           features: {
             booking: true,
             payment: false,
-            teacherManage: false,
+            teacherManage: true,
             checkin: true,
             news: true,
             selfCheckin: true,
@@ -61,9 +69,6 @@ Page({
     }
   },
 
-  /**
-   * 功能开关切换
-   */
   onFeatureChange: function (e) {
     let key = e.currentTarget.dataset.key;
     let val = e.detail.value;
@@ -72,9 +77,6 @@ Page({
     this.setData({ features });
   },
 
-  /**
-   * 保存设置
-   */
   onSave: async function () {
     try {
       let opt = {
@@ -82,7 +84,7 @@ Page({
       };
       await cloudHelper.callCloudSumbit(
         "admin/setup_feature",
-        { features: this.data.features },
+        { pid: this.data.pid, features: this.data.features },
         opt,
       );
       pageHelper.showSuccToast("保存成功");

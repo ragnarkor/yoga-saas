@@ -1,0 +1,179 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page cpw-page">
+  <coach-tenant-switch
+    title="{{photoView === 'albums' ? '照片墙' : activeAlbumTitle}}"
+    show-back="{{true}}"
+    back-mode="{{photoView === 'detail' ? 'emit' : 'navigate'}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+    bind:back="bindPhotoAlbumBack"
+  />
+
+  <view wx:if="{{!isLoad}}" class="coach-page-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <view wx:else class="cpw-body {{batchDeleteMode ? 'cpw-body--batch' : ''}}">
+    <block wx:if="{{photoView === 'albums'}}">
+      <view class="cpw-tip">左滑相册可删除 · 点击相册管理照片</view>
+      <view class="cpw-add-card" bindtap="bindNewAlbumTap">
+        <view class="cpw-add-icon" style="background: {{themeColor}}18;">
+          <van-icon name="plus" size="36rpx" color="{{themeColor}}" />
+        </view>
+        <view class="cpw-add-texts">
+          <text class="cpw-add-title">新建相册</text>
+          <text class="cpw-add-sub">上传馆舍风采、课堂瞬间</text>
+        </view>
+        <van-icon name="arrow" size="28rpx" color="#c8c9cc" />
+      </view>
+
+      <van-empty wx:if="{{!albumGroups.length}}" description="还没有相册" />
+
+      <view class="cpw-album-list">
+        <van-swipe-cell
+          wx:for="{{albumGroups}}"
+          wx:key="id"
+          id="album-swipe-{{item.id}}"
+          data-swipe-id="{{item.id}}"
+          right-width="{{65}}"
+          custom-class="cpw-swipe-cell"
+          bind:open="bindAlbumSwipeOpen"
+        >
+          <view
+            class="cpw-album-row"
+            data-index="{{index}}"
+            bindtap="bindPhotoAlbumTap"
+          >
+            <view class="cpw-album-thumbs cpw-album-thumbs--{{item.thumbCount || 1}}">
+              <block wx:if="{{item.thumbs.length}}">
+                <image
+                  wx:for="{{item.thumbs}}"
+                  wx:for-item="thumb"
+                  wx:key="*this"
+                  class="cpw-album-thumb"
+                  mode="aspectFill"
+                  src="{{thumb}}"
+                />
+              </block>
+              <view wx:else class="cpw-album-thumb cpw-album-thumb--empty">
+                <van-icon name="photo-o" size="40rpx" color="#c8c9cc" />
+              </view>
+            </view>
+            <view class="cpw-album-info">
+              <text class="cpw-album-title text-cut">{{item.title}}</text>
+              <text class="cpw-album-count">{{item.count}} 张</text>
+            </view>
+            <van-icon name="arrow" size="28rpx" color="#c8c9cc" />
+          </view>
+          <view
+            slot="right"
+            class="cpw-swipe-del"
+            data-title="{{item.title}}"
+            data-count="{{item.count}}"
+            data-swipe-id="{{item.id}}"
+            catchtap="bindDelAlbumTap"
+          >
+            删除
+          </view>
+        </van-swipe-cell>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view class="cpw-tip">{{batchDeleteMode ? '点击选择照片' : '点击预览 · 长按批量删除'}}</view>
+
+      <view class="cpw-upload-bar" wx:if="{{!batchDeleteMode}}" catchtap="bindQuickAddPhotos">
+        <van-icon name="photograph" size="36rpx" color="{{themeColor}}" />
+        <text class="cpw-upload-bar-text" style="color: {{themeColor}}">上传照片</text>
+      </view>
+
+      <van-empty wx:if="{{!activeAlbumPhotos.length}}" description="暂无照片" />
+
+      <view class="cpw-photo-grid">
+        <view
+          class="cpw-photo-cell {{batchDeleteMode && selectedPhotoMap[item._id] ? 'cpw-photo-cell--selected' : ''}}"
+          wx:for="{{activeAlbumPhotos}}"
+          wx:key="_id"
+          data-id="{{item._id}}"
+          catchlongpress="bindPhotoLongPress"
+          catchtap="bindPhotoGridTap"
+        >
+          <image
+            class="cpw-photo-img"
+            src="{{item.PHOTO_PIC}}"
+            mode="aspectFill"
+          />
+          <view class="cpw-photo-select-mask" wx:if="{{batchDeleteMode}}">
+            <view class="cpw-photo-check {{selectedPhotoMap[item._id] ? 'cpw-photo-check--on' : ''}}">
+              <van-icon wx:if="{{selectedPhotoMap[item._id]}}" name="success" size="22rpx" color="#fff" />
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="cpw-batch-bar" wx:if="{{batchDeleteMode}}">
+        <view class="cpw-batch-cancel" bindtap="bindCancelBatchDelete">取消</view>
+        <view
+          class="cpw-batch-del {{selectedPhotoCount ? '' : 'cpw-batch-del--disabled'}}"
+          bindtap="bindBatchDeleteTap"
+        >
+          删除{{selectedPhotoCount ? '（' + selectedPhotoCount + '）' : ''}}
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <van-popup
+    show="{{popupShow}}"
+    position="bottom"
+    round
+    bind:close="bindPopupClose"
+    custom-class="cpw-popup"
+  >
+    <view class="cpw-popup-head">
+      <text class="cpw-popup-title">新建相册</text>
+      <view class="cpw-popup-close" bindtap="bindPopupClose">
+        <van-icon name="cross" size="36rpx" color="#969799" />
+      </view>
+    </view>
+    <view class="cpw-popup-form">
+      <van-field
+        value="{{newAlbumName}}"
+        bind:input="bindAlbumNameInput"
+        label="相册名"
+        placeholder="如：馆舍风采"
+        border="{{ false }}"
+      />
+      <view class="cpw-upload">
+        <text class="cpw-upload-label">照片（最多 9 张）</text>
+        <view class="cpw-upload-grid">
+          <view class="cpw-upload-preview" wx:for="{{newAlbumImgs}}" wx:key="*this">
+            <image src="{{item}}" mode="aspectFill" class="cpw-upload-img" />
+            <view class="cpw-upload-del" data-index="{{index}}" catchtap="bindDelNewAlbumImg">
+              <van-icon name="cross" size="28rpx" color="#fff" />
+            </view>
+          </view>
+          <view
+            wx:if="{{newAlbumImgs.length < 9}}"
+            class="cpw-upload-placeholder"
+            bindtap="bindChooseNewAlbumImg"
+          >
+            <van-icon name="plus" size="40rpx" color="#c8c9cc" />
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="cpw-popup-foot">
+      <van-button
+        block
+        round
+        color="{{themeColor}}"
+        loading="{{submitting}}"
+        bind:click="bindSubmitNewAlbum"
+      >
+        创建相册
+      </van-button>
+    </view>
+  </van-popup>
+</view>

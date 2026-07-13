@@ -10,8 +10,14 @@ const BaseService = require("../../service/base_service.js");
 // [AI_END LINES=1 TIMESTAMP=2025-01-25 14:30:00]
 // [AI_START TIMESTAMP=2025-01-25 15:30:00]
 class TestController extends BaseController {
+  _ensureTestMode() {
+    if (!config.TEST_MODE) {
+      this.AppError("测试接口已关闭");
+    }
+  }
   // [AI_END LINES=1 TIMESTAMP=2025-01-25 15:30:00]
   async test() {
+    this._ensureTestMode();
     console.log("1111");
 
     let userId = "userid3243l4l3j24324324";
@@ -21,6 +27,7 @@ class TestController extends BaseController {
 
   // [AI_START TIMESTAMP=2025-01-25 14:30:00]
   async seed() {
+    this._ensureTestMode();
     let baseService = new BaseService();
     let result = await baseService.seedDemo();
     return result;

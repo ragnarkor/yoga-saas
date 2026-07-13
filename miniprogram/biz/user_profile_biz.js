@@ -193,6 +193,18 @@ class UserProfileBiz {
     return user;
   }
 
+  static async syncBirthday(birthday) {
+    const val = (birthday || "").trim();
+    const res = await cloudHelper.callCloudSumbit(
+      "passport/sync_profile",
+      { birthday: val },
+      { hint: false },
+    );
+    const user = res.data || null;
+    if (user) UserProfileBiz.cacheUser(user);
+    return user;
+  }
+
   static async syncName(name) {
     const val = (name || "").trim();
     if (!val) return null;

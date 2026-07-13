@@ -19,6 +19,7 @@ const LogModel = require("../../model/log_model.js");
 const tenantSetupHelper = require("../tenant_setup_helper.js");
 const tenantExpireUtil = require("../../utils/tenant_expire_util.js");
 const teacherAdminHelper = require("../teacher_admin_helper.js");
+const pwdUtil = require("../../utils/pwd_util.js");
 
 const BIND_CODE_TTL = 86400; // 24h
 const BIND_CACHE_PREFIX = "admin_bind_";
@@ -65,7 +66,16 @@ class AdminWxService extends BaseAdminService {
       ADMIN_STATUS: 1,
     };
     let admin = await AdminModel.getOne(where, "*", {}, false);
-    if (!admin || admin.ADMIN_PWD != pwd) this.AppError("账号或密码错误");
+    if (!admin || !pwdUtil.verifyPwd(pwd, admin.ADMIN_PWD, admin.ADMIN_PWD_SALT || admin._id)) {
+      this.AppError("账号或密码错误");
+    }
+
+    if (!pwdUtil.isHashed(admin.ADMIN_PWD)) {
+      const hashed = pwdUtil.hashNewPwd(pwd, admin.ADMIN_PWD_SALT || admin._id);
+      await AdminModel.edit({ _id: admin._id }, hashed, false);
+      admin.ADMIN_PWD = hashed.ADMIN_PWD;
+      admin.ADMIN_PWD_SALT = hashed.ADMIN_PWD_SALT;
+    }
 
     if (
       openId &&

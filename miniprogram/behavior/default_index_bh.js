@@ -1,6 +1,7 @@
 const pageHelper = require("../helper/page_helper.js");
 const cloudHelper = require("../helper/cloud_helper.js");
 const setting = require("../setting/setting.js");
+const { enrichPhotoAlbumList } = require("../helper/photo_album_helper.js");
 
 function buildLinkUrl(linkType, linkId) {
   switch (linkType) {
@@ -132,6 +133,11 @@ module.exports = Behavior({
         );
         if (!data) return;
 
+        const photos = (data.photos || []).map(mapPhoto);
+        const photoAlbums = enrichPhotoAlbumList(
+          data.photoAlbums || buildPhotoAlbums(photos),
+        );
+
         this.setData({
           phone: data.phone || "",
           banners: (data.banners || []).map(mapBanner),
@@ -139,10 +145,8 @@ module.exports = Behavior({
             ...item,
           })),
           teachers: (data.teachers || []).map(mapTeacher),
-          photos: (data.photos || []).map(mapPhoto),
-          photoAlbums:
-            data.photoAlbums ||
-            buildPhotoAlbums((data.photos || []).map(mapPhoto)),
+          photos,
+          photoAlbums,
         });
       } catch (err) {
         console.error("[home/index]", err);
@@ -208,6 +212,17 @@ module.exports = Behavior({
       if (!id) return;
       wx.navigateTo({
         url: "/pages/default/teacher/detail/teacher_detail?id=" + id,
+      });
+    },
+
+    bindHomeAlbumTap: function (e) {
+      const index = e.currentTarget.dataset.index;
+      const album = this.data.photoAlbums[index];
+      if (!album) return;
+      wx.navigateTo({
+        url:
+          "/pages/default/photo/photo_wall?album=" +
+          encodeURIComponent(album.title),
       });
     },
 

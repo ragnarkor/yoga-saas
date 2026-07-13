@@ -8,6 +8,7 @@ Page({
     isLoad: false,
     userId: '',
     formName: '',
+    formBirthday: '',
     formAvatar: [],
     avatarSrc: '',
     showAvatar: false,
@@ -44,6 +45,7 @@ Page({
         isLoad: true,
         userId: user.USER_ID || '',
         formName: user.USER_NAME || '',
+        formBirthday: user.USER_BIRTHDAY || '',
         formAvatar: user.USER_PIC ? [user.USER_PIC] : [],
         avatarSrc,
         showAvatar: !!avatarSrc,
@@ -95,6 +97,10 @@ Page({
     }
   },
 
+  bindBirthdayChange(e) {
+    this.setData({ formBirthday: (e.detail && e.detail.value) || '' });
+  },
+
   async bindSubmitTap() {
     const name = (this.data.formName || '').trim();
     if (!name) {
@@ -117,6 +123,7 @@ Page({
       }
 
       await UserProfileBiz.syncName(name);
+      await UserProfileBiz.syncBirthday(this.data.formBirthday || '');
       wx.showToast({ title: '已保存', icon: 'success' });
       setTimeout(() => wx.navigateBack(), 500);
     } catch (e) {

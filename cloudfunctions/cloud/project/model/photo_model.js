@@ -9,6 +9,7 @@ PhotoModel.DB_STRUCTURE = {
   PHOTO_ID: "string|true",
   PHOTO_TITLE: "string|false|comment=标题",
   PHOTO_DESC: "string|false|comment=描述",
+  PHOTO_ALBUM: "string|false|comment=相册名",
   PHOTO_PIC: "string|true|comment=图片",
   PHOTO_LINK_TYPE: "string|true|default=none|comment=news/meet/none",
   PHOTO_LINK_ID: "string|false|comment=跳转目标ID",

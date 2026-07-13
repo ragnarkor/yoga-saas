@@ -124,6 +124,38 @@ class AdminTenantController extends BaseAdminController {
       this._admin,
     );
   }
+
+  /** 超管：启用/停用租户 */
+  async saveTenantStatus() {
+    await this.isSuperAdmin();
+    let rules = {
+      pid: "must|string|name=租户ID",
+      status: "must|int|in:0,1|name=租户状态",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminTenantService();
+    return await service.saveTenantStatus(
+      input.pid,
+      input.status,
+      this._admin,
+    );
+  }
+
+  /** 超管：删除瑜伽馆（测试馆清理） */
+  async delTenant() {
+    await this.isSuperAdmin();
+    let rules = {
+      pid: "must|string|name=租户ID",
+      confirmName: "must|string|min:1|max:30|name=确认馆名",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminTenantService();
+    return await service.delTenant(
+      input.pid,
+      input.confirmName,
+      this._admin,
+    );
+  }
 }
 
 module.exports = AdminTenantController;
