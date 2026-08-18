@@ -245,7 +245,7 @@ CLOSE = 10  已关闭（会员不可见）
 | `JOIN_MEET_TIME_END` | string | ✅ | 时段结束 `hh:mm` |
 | `JOIN_MEET_TIME_MARK` | string | ✅ | 时段唯一标识（timeMark） |
 | `JOIN_START_TIME` | int | ✅ | 课程开始时间戳（用于排序） |
-| `JOIN_CODE` | string | ✅ | 扫码核销码（15位随机串） |
+| `JOIN_CODE` | string | ✅ | 历史核验码（兼容旧数据，当前会员端不展示） |
 | `JOIN_IS_CHECKIN` | int | ✅ | `0`=未签到 `1`=已签到 |
 | `JOIN_IS_ADMIN` | int | ✅ | `0`=自主预约 `1`=管理员代约 |
 | `JOIN_STATUS` | int | ✅ | 预约状态（见常量） |
@@ -387,6 +387,6 @@ teacher 教练（仅自己课程）
   "teacherManage": true,  // 教练管理
   "checkin": true,        // 签到核销
   "news": true,           // 动态资讯
-  "selfCheckin": false    // 用户自助签到
+  "selfCheckin": false    // 会员到店定位签到
 }
 ```

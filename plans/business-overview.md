@@ -78,7 +78,7 @@
     ↓
 预约成功 → consumeForJoin 扣次 / 记流水
     ↓
-到店扫码 / 自助签到 → 签到完成 → 触发首次上课激活（如有）
+到店后打开小程序并完成定位签到 → 签到完成 → 触发首次上课激活（如有）
 ```
 
 **取消流程：**  
@@ -148,9 +148,8 @@ quota++ → status 可能恢复 NORMAL
 
 | 方式 | 操作者 | 入口 |
 |---|---|---|
-| 扫码核销 | 教练用小程序扫会员二维码 | `admin/join_scan`，会员持 `JOIN_CODE` 展示 |
 | 手动签到 | 教练在名单页手动勾选 | `admin/join_checkin` / 批量 `join_checkin_batch` |
-| 用户自助签到 | 会员扫场馆二维码 | `my/my_join_checkin`，场馆生成时段二维码 |
+| 到店定位签到 | 会员在课程签到窗口内授权定位并点击签到 | `my/my_join_checkin`，校验场馆距离与时间窗口 |
 
 签到后触发 `tryActivateForJoinCheckin`，若该会员卡激活方式为 `first_class` / `first_use_limit` 则激活。
 

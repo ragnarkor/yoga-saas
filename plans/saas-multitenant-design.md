@@ -183,7 +183,7 @@ TenantModel.DB_STRUCTURE = {
         teacherManage: true,   // 教师管理
         checkin: true,         // 签到核销
         news: true,            // 动态资讯
-        selfCheckin: false,    // 用户自助签到
+        selfCheckin: false,    // 会员到店定位签到
     }
     */
 
@@ -448,7 +448,7 @@ SetupModel.DB_STRUCTURE = {
         teacherManage: true,
         checkin: true,
         news: true,
-        selfCheckin: false
+        selfCheckin: false // 会员到店定位签到
     }
     */
 
@@ -563,7 +563,7 @@ async userDataExport() {
         <van-switch slot="extra" checked="{{ features.news }}"
             data-key="news" bind:change="onFeatureChange" />
     </van-cell>
-    <van-cell title="用户自助签到" center>
+    <van-cell title="到店定位签到" center>
         <van-switch slot="extra" checked="{{ features.selfCheckin }}"
             data-key="selfCheckin" bind:change="onFeatureChange" />
     </van-cell>
@@ -980,7 +980,7 @@ async migrateTenant() {
             teacherManage: true,
             checkin: true,
             news: true,
-            selfCheckin: false
+            selfCheckin: false // 会员到店定位签到
         }
     });
 }

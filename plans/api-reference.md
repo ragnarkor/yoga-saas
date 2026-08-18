@@ -57,7 +57,7 @@
 | `my/my_join_detail` | 预约详情 | `joinId` | `{join, meet, slot}` |
 | `my/my_join_cancel` | 取消预约（自主） | `joinId` | `{ok}` |
 | `my/my_join_someday` | 查看某天我的约课 | `day` | `{list}` |
-| `my/my_join_checkin` | 自助签到（扫时段码） | `timeMark` | `{ok}` |
+| `my/my_join_checkin` | 到店定位签到 | `timeMark, latitude, longitude` | `{ok}` |
 | `my/my_card_list` | 我的会员卡列表 | — | `{list, total}` |
 | `my/my_card_summary` | 持卡概要（首页用） | — | `{hasCard, canBook, timesTotal, hasPeriod}` |
 | `my/my_card_detail` | 会员卡详情 + 使用记录 | `cardId` | `{card, usageList}` |
@@ -161,10 +161,8 @@
 
 | 路由 | 权限 | 说明 | 主要参数 |
 |---|---|---|---|
-| `admin/join_scan` | 全部 | 扫码核销 | `{meetId, code}` |
 | `admin/join_checkin` #noDemo | 全部 | 手动签到/取消签到 | `{joinId, flag(0/1)}` |
 | `admin/join_checkin_batch` #noDemo | 全部 | 批量签到 | `{meetId, timeMark, flag}` |
-| `admin/self_checkin_qr` | 全部 | 生成自助签到码 | `{page, timeMark}` |
 
 ### 2.8 私教管理
 
