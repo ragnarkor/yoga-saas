@@ -194,7 +194,9 @@
 ### 第二步：配置项目
 
 1. 用微信开发者工具导入项目
-2. 替换云环境 ID（共两处）：
+2. 在项目根目录执行 `npm install`，然后在微信开发者工具中选择「工具 → 构建 npm」。
+3. 创建云函数本地配置：复制 `cloudfunctions/cloud/config/config.example.js` 为 `config.js`。该文件已被 Git 忽略，不应提交真实云环境 ID 或管理员密码。
+4. 替换云环境 ID（共两处）：
    - [`miniprogram/setting/setting.js`](miniprogram/setting/setting.js) → `CLOUD_ID`
    - [`cloudfunctions/cloud/config/config.js`](cloudfunctions/cloud/config/config.js) → `CLOUD_ID`
 
@@ -273,6 +275,13 @@
 | **主题**   | CSS 变量动态换色，三端独立主题           |
 | **数据库** | 16 个集合（会员/课程/预约/卡务/资讯等）  |
 
+### 架构维护说明
+
+- 课程排期、预约和会员卡是核心业务域。修改时应同时验证名额控制、扣卡、取消退款和统计流水，避免只修改页面逻辑。
+- 云函数按 `Controller → Service → Model` 分层；体量较大的业务服务应按领域继续拆分，避免在同一文件中同时维护排课、预约、卡务和统计规则。
+- 云函数日志只记录路由、租户、参数字段名和耗时等排障元信息。不得记录 token、OpenID、完整请求参数、会员健康信息或完整响应数据。
+- 执行 `npm test` 可运行不依赖云环境的核心规则测试；新增预约、扣卡或排课规则时应同步补充对应测试。
+
 ### 核心目录
 
 ```
@@ -294,8 +303,9 @@ cloudfunctions/cloud/ # 云函数后端
 ### 正式上线前必做
 
 1. `cloud/config/config.js` → `TEST_MODE: false`（关闭测试模式）
-2. 修改超管账号密码（`ADMIN_NAME` / `ADMIN_PWD`）
-3. 上传云函数 + 构建 npm + 提交审核
+2. 复制 `cloud/config/config.example.js` 为 `config.js`，并修改超管账号密码（`ADMIN_NAME` / `ADMIN_PWD`）
+3. 确认 `miniprogram/app.json` 中的导航栏、Tab 和权限说明为正式中文文案
+4. 上传云函数 + 构建 npm + 提交审核
 
 ---
 

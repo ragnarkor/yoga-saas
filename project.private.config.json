@@ -17,19 +17,7 @@
     "bigPackageSizeSupport": false,
     "useIsolateContext": false
   },
-  "condition": {
-    "miniprogram": {
-      "list": [
-        {
-          "name": "/pages/admin/bind/admin_bind",
-          "pathName": "/pages/admin/bind/admin_bind",
-          "query": "code=oh7hfojsjoff8nkuyjwwisb4zyabvfc0",
-          "scene": null,
-          "launchMode": "default"
-        }
-      ]
-    }
-  },
-  "libVersion": "3.16.1",
+  "condition": {},
+  "libVersion": "3.8.7",
   "projectname": "yoga-saas"
 }
