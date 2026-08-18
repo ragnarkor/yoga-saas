@@ -116,6 +116,7 @@
 
         </view>
 
+        <view class="ach-heatmap-guide">点击任意日期，查看当天练习状态</view>
         <view class="ach-heatmap-legend">
 
           <view class="ach-legend-item"><view class="ach-legend-box" />未上课</view>
@@ -126,7 +127,6 @@
 
         <view class="ach-heatmap-hint" wx:if="{{heatmapHint}}">{{heatmapHint}}</view>
 
-        <view class="ach-heatmap-tip" wx:if="{{heatmapTip}}">{{heatmapTip}}</view>
 
       </view>
 
@@ -172,9 +172,9 @@
 
           bindtap="bindPosterTap"
 
-        >生成成就海报</button>
+        >生成海报</button>
 
-        <button class="ach-btn ach-btn--ghost" loading="{{posterLoading}}" bindtap="bindSavePosterTap">保存到相册</button>
+        <button class="ach-btn ach-btn--ghost" loading="{{posterLoading}}" bindtap="bindSavePosterTap">保存海报</button>
 
       </view>
 
@@ -213,5 +213,13 @@
 
   </van-popup>
 
-</view>
+  <van-popup show="{{heatmapPopupShow}}" position="bottom" round bind:close="bindHeatmapPopupClose">
+    <view class="ach-heatmap-popup" wx:if="{{selectedHeatmapCell}}">
+      <view class="ach-heatmap-popup-icon {{selectedHeatmapCell.on ? 'is-on' : ''}}"><van-icon name="{{selectedHeatmapCell.on ? 'success' : 'clock-o'}}" size="46rpx" color="{{selectedHeatmapCell.on ? themeColor : '#a8aaa2'}}" /></view>
+      <text class="ach-heatmap-popup-date">{{selectedHeatmapCell.date}}</text>
+      <text class="ach-heatmap-popup-status">{{selectedHeatmapCell.on ? '今天完成了一次练习' : '今天没有上课记录'}}</text>
+      <text class="ach-heatmap-popup-note">{{selectedHeatmapCell.on ? '每一次来到垫上，都会成为你的积累。' : '休息也是练习的一部分，明天继续。'}}</text>
+    </view>
+  </van-popup>
 
+</view>

@@ -546,6 +546,49 @@
 
 }
 
+/* 成就页：从数据面板调整为温和的瑜伽旅程卡片 */
+.ach-page { background: #f5f1e9; }
+.ach-hero { height: 430rpx; background: #557e69; }
+.ach-hero-overlay { background: linear-gradient(to bottom, rgba(24,55,42,.18), rgba(24,55,42,.62)); }
+.ach-hero-text { left: 40rpx; bottom: 54rpx; }
+.ach-hero-label { font-size: 25rpx; letter-spacing: 4rpx; }
+.ach-hero-num { margin-top: 10rpx; font-size: 84rpx; letter-spacing: 2rpx; }
+.ach-hero-sub { margin-top: 6rpx; font-size: 25rpx; }
+.ach-body { margin-top: -32rpx; }
+.ach-stats { margin: 0 28rpx 28rpx; padding: 26rpx 16rpx; border-radius: 28rpx; box-shadow: 0 12rpx 32rpx rgba(73,77,61,.09); }
+.ach-stat-card { padding: 12rpx 0; }
+.ach-stat-num { font-size: 36rpx; }
+.ach-stat-label { font-size: 23rpx; color: #8a8f84; }
+.ach-section { margin: 0 28rpx 24rpx; padding: 28rpx; border-radius: 26rpx; background: #fffdf9; box-shadow: 0 8rpx 24rpx rgba(73,77,61,.05); }
+.ach-section-title { color: #3c5145; font-size: 31rpx; }
+.ach-section-sub { color: #9a9c91; font-size: 23rpx; }
+.ach-heatmap-cell { height: 27rpx; border-radius: 7rpx; background: #eee9df; }
+.ach-heatmap-cell:active { transform: scale(.86); }
+.ach-heatmap-guide { margin-top: 18rpx; color: #9a9c91; font-size: 22rpx; }
+.ach-heatmap-legend, .ach-section-extra { color: #92958b; }
+.ach-badge-grid { gap: 18rpx; }
+.ach-badge-item { min-height: 170rpx; border-radius: 22rpx; background: #f3eee3; border: 1rpx solid #e9dfcd; }
+.ach-badge-item--locked { background: #f8f7f3; border-color: #eee; }
+.ach-badge-emoji { font-size: 52rpx; }
+.ach-badge-name { color: #53675b; font-size: 23rpx; }
+.ach-actions { margin: 8rpx 28rpx 36rpx; }
+.ach-btn { border-radius: 999rpx; box-shadow: 0 8rpx 18rpx rgba(73,77,61,.08); }
+.ach-page { background: #fcfbf8; }
+.ach-stats { background: #ffffff; box-shadow: 0 8rpx 24rpx rgba(67,84,73,.06); }
+.ach-section { background: #ffffff; box-shadow: 0 6rpx 18rpx rgba(67,84,73,.045); }
+.ach-badge-item { background: #f8f6ef; border-color: #eee8db; }
+.ach-badge-item--locked { background: #fbfaf8; border-color: #f0efeb; }
+.ach-actions { display:flex; flex-direction:row; margin: 12rpx 28rpx 40rpx; padding: 0; gap: 16rpx; }
+.ach-btn { flex:1; height: 78rpx; line-height: 78rpx; font-size: 27rpx; box-sizing: border-box; box-shadow: none; }
+.ach-btn--primary { background: var(--themeColor, #6fae96) !important; color: #fff; box-shadow: 0 6rpx 14rpx rgba(111,174,150,.22); }
+.ach-btn--ghost { background: #fff !important; color: var(--themeColor, #6fae96); border: 1rpx solid var(--themeColor, #6fae96); }
+.ach-heatmap-popup { padding: 48rpx 36rpx calc(48rpx + env(safe-area-inset-bottom)); text-align:center; background:#fff; }
+.ach-heatmap-popup-icon { width:92rpx; height:92rpx; margin:0 auto 20rpx; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#f2f1ec; }
+.ach-heatmap-popup-icon.is-on { background:var(--projectColorLight,#e8f2ed); }
+.ach-heatmap-popup-date { display:block; font-size:34rpx; font-weight:600; color:#3c5145; }
+.ach-heatmap-popup-status { display:block; margin-top:12rpx; font-size:28rpx; color:#53675b; }
+.ach-heatmap-popup-note { display:block; margin-top:18rpx; font-size:24rpx; color:#9a9c91; }
+
 
 
 .ach-badge-popup {
@@ -604,4 +647,3 @@
   color: #646566;
 
 }
-

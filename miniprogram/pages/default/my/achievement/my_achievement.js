@@ -68,7 +68,8 @@ Page({
     heatmapRows: [],
     heatmapStartDay: "",
     heatmapHint: "",
-    heatmapTip: "",
+    heatmapPopupShow: false,
+    selectedHeatmapCell: null,
     badgePopupShow: false,
     activeBadge: null,
     posterLoading: false,
@@ -131,8 +132,13 @@ Page({
     if (!date) return;
     const on = !!e.currentTarget.dataset.on;
     this.setData({
-      heatmapTip: on ? `${date} 已上课` : `${date} 未上课`,
+      selectedHeatmapCell: { date, on },
+      heatmapPopupShow: true,
     });
+  },
+
+  bindHeatmapPopupClose() {
+    this.setData({ heatmapPopupShow: false });
   },
 
   bindBadgeTap(e) {
@@ -156,6 +162,7 @@ Page({
         {
           userName: this.data.userName,
           avatarSrc: this.data.avatarSrc,
+          heroSrc: this.data.heroSrc,
           streak: this.data.streak,
           badges: this.data.badges,
           heatmap: this._flatHeatmap(),
@@ -185,6 +192,7 @@ Page({
         {
           userName: this.data.userName,
           avatarSrc: this.data.avatarSrc,
+          heroSrc: this.data.heroSrc,
           streak: this.data.streak,
           badges: this.data.badges,
           heatmap: this._flatHeatmap(),
