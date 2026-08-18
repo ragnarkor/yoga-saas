@@ -76,7 +76,7 @@ class PrivateService extends BaseService {
     return Math.max(openMin, minFromNow);
   }
 
-  async getAvailableSlots({ meetId, teacherId, day }) {
+  async getAvailableSlots({ meetId, teacherId, day, start = "" }) {
     const adminPrivate = await this._getAdminPrivate();
     const ctx = await adminPrivate._getPrivateContext();
     const schedule = bufferUtil.resolveScheduleConfig(ctx.bufferConfig);
@@ -118,6 +118,32 @@ class PrivateService extends BaseService {
       minBlockStartMin,
     });
 
+    let customSlot = null;
+    if (start) {
+      const startMin = bufferUtil.timeToMinutes(start);
+      const endMin = startMin + duration;
+      const closeMin = bufferUtil.timeToMinutes(schedule.closeTime);
+      const candidate = bufferUtil.computeBlock(
+        start,
+        bufferUtil.minutesToTime(endMin),
+        buf.bufferBefore,
+        buf.bufferAfter,
+      );
+      const validFormat = /^([01]\d|2[0-3]):[0-5]\d$/.test(String(start));
+      const conflict = (existing || []).some((block) =>
+        bufferUtil.blocksOverlap(candidate, block),
+      );
+      if (validFormat && startMin >= bufferUtil.timeToMinutes(schedule.openTime) &&
+        endMin <= closeMin && candidate.blockStartMin >= minBlockStartMin && !conflict) {
+        customSlot = {
+          start,
+          end: bufferUtil.minutesToTime(endMin),
+          blockStart: candidate.blockStart,
+          blockEnd: candidate.blockEnd,
+        };
+      }
+    }
+
     return {
       day,
       meetId,
@@ -125,6 +151,41 @@ class PrivateService extends BaseService {
       duration,
       schedule,
       slots,
+      customSlot,
+    };
+  }
+
+  /** 会员查看指定教练当天的排班，只返回时间状态，不暴露课程/会员信息。 */
+  async getDaySchedule({ meetId, teacherId, day }) {
+    const adminPrivate = await this._getAdminPrivate();
+    const ctx = await adminPrivate._getPrivateContext();
+    const schedule = bufferUtil.resolveScheduleConfig(ctx.bufferConfig || {});
+    this._validateDayInRange(day, schedule);
+    const available = await this.getAvailableSlots({ meetId, teacherId, day });
+    const blocks = await adminPrivate._loadTeacherBlocksForDay(
+      teacherId,
+      day,
+      "",
+      ctx.bufferConfig,
+      ctx.privateCategoryIds,
+    );
+    return {
+      day,
+      schedule: {
+        openTime: schedule.openTime,
+        closeTime: schedule.closeTime,
+      },
+      blocks: (blocks || []).map((block) => ({
+        start: block.start,
+        end: block.end,
+        blockStart: block.blockStart,
+        blockEnd: block.blockEnd,
+        type: block.slotKind === "group" ? "group" : "private",
+      })),
+      quickSlots: (available.slots || []).filter((slot) => {
+        const minute = Number(String(slot.start || "").split(":")[1]);
+        return minute % 30 === 0;
+      }),
     };
   }
 
@@ -134,8 +195,8 @@ class PrivateService extends BaseService {
     const { meetId, teacherId, teacherName, day, start, cardId } = input;
     if (!cardId) this.AppError("请选择会员卡");
 
-    const available = await this.getAvailableSlots({ meetId, teacherId, day });
-    const hit = (available.slots || []).find((s) => s.start === start);
+    const available = await this.getAvailableSlots({ meetId, teacherId, day, start });
+    const hit = available.customSlot || (available.slots || []).find((s) => s.start === start);
     if (!hit) {
       this.AppError("该时段已不可用，请重新选择");
     }

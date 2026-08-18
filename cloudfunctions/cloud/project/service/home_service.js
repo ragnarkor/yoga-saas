@@ -414,7 +414,7 @@ class HomeService extends BaseService {
   async getAnnounceDetail(id) {
     let item = await AnnouncementModel.getOne(
       { _id: id, ANNOUNCE_STATUS: 1 },
-      "ANNOUNCE_TITLE,ANNOUNCE_DESC,ANNOUNCE_CONTENT",
+      "ANNOUNCE_TITLE,ANNOUNCE_DESC,ANNOUNCE_CONTENT,ANNOUNCE_CONTENT_DELTA",
     );
     if (!item) return null;
     return {
@@ -422,6 +422,7 @@ class HomeService extends BaseService {
       title: item.ANNOUNCE_TITLE,
       desc: item.ANNOUNCE_DESC || "",
       content: item.ANNOUNCE_CONTENT || [],
+      contentDelta: item.ANNOUNCE_CONTENT_DELTA || null,
     };
   }
 

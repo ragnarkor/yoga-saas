@@ -89,6 +89,8 @@ class AdminHomeController extends BaseAdminController {
     let rules = {
       title: "must|string",
       desc: "string",
+      content: "array",
+      delta: "object",
       order: "int|default=9999",
     };
     let input = this.validateData(rules);
@@ -97,7 +99,8 @@ class AdminHomeController extends BaseAdminController {
       ANNOUNCE_TITLE: input.title,
       ANNOUNCE_DESC: input.desc,
       ANNOUNCE_ORDER: input.order,
-      ANNOUNCE_CONTENT: [{ type: "text", val: input.desc || input.title }],
+      ANNOUNCE_CONTENT: input.content || [{ type: "text", val: input.desc || input.title }],
+      ANNOUNCE_CONTENT_DELTA: input.delta,
     });
     await homeCacheUtil.invalidateHomeCache();
     return { id };
@@ -110,6 +113,8 @@ class AdminHomeController extends BaseAdminController {
       id: "must|id",
       title: "must|string",
       desc: "string",
+      content: "array",
+      delta: "object",
       order: "int|default=9999",
     };
     let input = this.validateData(rules);
@@ -118,7 +123,8 @@ class AdminHomeController extends BaseAdminController {
       ANNOUNCE_TITLE: input.title,
       ANNOUNCE_DESC: input.desc,
       ANNOUNCE_ORDER: input.order,
-      ANNOUNCE_CONTENT: [{ type: "text", val: input.desc || input.title }],
+      ANNOUNCE_CONTENT: input.content || [{ type: "text", val: input.desc || input.title }],
+      ANNOUNCE_CONTENT_DELTA: input.delta,
     });
     await homeCacheUtil.invalidateHomeCache();
   }

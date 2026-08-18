@@ -300,7 +300,13 @@ class MeetController extends BaseController {
 		let input = this.validateData(rules);
 
 		let service = new MeetService();
-		return await service.userSelfCheckin(this._userId, input.timeMark);
+		const latitude = Number(this.getParameter('latitude'));
+		const longitude = Number(this.getParameter('longitude'));
+		return await service.userSelfCheckin(this._userId, input.timeMark, {
+			mode: 'location',
+			latitude,
+			longitude,
+		});
 	}
 
 

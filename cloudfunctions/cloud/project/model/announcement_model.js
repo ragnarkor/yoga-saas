@@ -10,6 +10,7 @@ AnnouncementModel.DB_STRUCTURE = {
   ANNOUNCE_TITLE: "string|true|comment=公告标题",
   ANNOUNCE_DESC: "string|false|comment=摘要",
   ANNOUNCE_CONTENT: "array|true|default=[]|comment=详情内容",
+  ANNOUNCE_CONTENT_DELTA: "object|false|comment=富文本Delta内容",
   ANNOUNCE_ORDER: "int|true|default=9999",
   ANNOUNCE_STATUS: "int|true|default=1|comment=0/1",
   ANNOUNCE_ADD_TIME: "int|true",

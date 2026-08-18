@@ -140,24 +140,22 @@ class TeacherAdminHelper {
       TeacherAdminHelper.isAdminBound(a),
     );
 
-    let list = [];
-    for (let admin of admins) {
-      await this.ensureTeacherOnBind(admin);
-      let teacher = await TeacherModel.getOne(
-        { TEACHER_ADMIN_ID: admin._id },
-        "*",
-        {},
-        true,
-      );
-      if (
-        teacher &&
-        teacher.TEACHER_HOME === 1 &&
-        teacher.TEACHER_STATUS === 1
-      ) {
-        list.push(teacher);
-      }
-    }
-    return list;
+    // 首页不应逐个串行查询教练；绑定恢复与资料读取彼此独立，并行可显著降低首屏接口耗时。
+    const teachers = await Promise.all(
+      admins.map(async (admin) => {
+        await this.ensureTeacherOnBind(admin);
+        return TeacherModel.getOne(
+          { TEACHER_ADMIN_ID: admin._id },
+          "*",
+          {},
+          true,
+        );
+      }),
+    );
+    return teachers.filter(
+      (teacher) =>
+        teacher && teacher.TEACHER_HOME === 1 && teacher.TEACHER_STATUS === 1,
+    );
   }
 
   /** @deprecated 兼容旧查询 */

@@ -94,7 +94,8 @@ class AdminNewsController extends BaseAdminController {
 		// 数据校验
 		let rules = {
 			newsId: 'must|id',
-			content: 'array'
+			content: 'array',
+			delta: 'object'
 		};
 
 		// 取得数据

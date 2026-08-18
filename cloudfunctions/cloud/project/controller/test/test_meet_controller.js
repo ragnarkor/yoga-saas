@@ -46,7 +46,6 @@ class TestController {
 
 		//	});
 
-		//serviceAdmin.genSelfCheckinQr('','11','x')
 
 
 		//service.statJoinCnt(m)

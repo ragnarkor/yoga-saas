@@ -16,9 +16,13 @@ const config = require("../../config/config.js");
 const UserCardService = require("./user_card_service.js");
 const PassportService = require("../service/passport_service.js");
 const cloudBase = require("../../framework/cloud/cloud_base.js");
+const cloudUtil = require("../../framework/cloud/cloud_util.js");
 const UserModel = require("../model/user_model.js");
 const AdminModel = require("../model/admin_model.js");
 const TeacherModel = require("../model/teacher_model.js");
+const BookingTransactionService = require("./booking_transaction_service.js");
+const StreakService = require("./streak_service.js");
+const { distanceMeters } = require("../utils/geo_util.js");
 
 class MeetService extends BaseService {
   constructor() {
@@ -136,8 +140,23 @@ class MeetService extends BaseService {
     await this.checkMeetRules(userId, meetId, timeMark);
   }
 
+  /**
+   * 在事务内校验名额与重复预约并创建预约记录。
+   * runTransaction 会在发生写冲突时自动重试，避免“先查后写”的并发超卖。
+   */
+  async _createJoinInTransaction(data, timeSet) {
+    return new BookingTransactionService().createJoinAndConsume({
+      data,
+      timeSet,
+      pid: global.PID,
+      cardInfo: this._transactionCardInfo,
+      onError: (message) => this.AppError(message),
+    });
+  }
+
   // 预约逻辑
   async join(userId, meetId, timeMark, forms, cardId, options = {}) {
+    this._transactionCardInfo = null;
     // 预约时段是否存在
     let meetWhere = {
       _id: meetId,
@@ -157,14 +176,6 @@ class MeetService extends BaseService {
 
     // 规则校验
     await this.checkMeetRules(userId, meetId, timeMark, cardId, options);
-
-    // 写入前再次校验名额（降低并发超报）
-    if (timeSet.isLimit) {
-      const liveCnt = await this._countSuccJoin(meetId, timeMark);
-      if (liveCnt >= timeSet.limit) {
-        this.AppError("该时段预约人员已满，请选择其他");
-      }
-    }
 
     let data = {};
 
@@ -187,8 +198,16 @@ class MeetService extends BaseService {
     data.JOIN_CODE = dataUtil.genRandomIntString(15);
     if (options.isAdmin) data.JOIN_IS_ADMIN = 1;
 
-    // 入库
-    let joinId = await JoinModel.insert(data);
+    if (cardId) this._transactionCardInfo = await new UserCardService().prepareJoinCard(userId, meetId, timeMark, cardId);
+    // 事务内完成名额、预约、扣卡和扣次流水写入。
+    let joinId = await this._createJoinInTransaction(data, timeSet);
+
+    // 成就以有效预约为口径；统计失败不能影响预约主流程。
+    try {
+      await new StreakService().markStreakDirty(userId);
+    } catch (err) {
+      console.error("[meet/join] mark streak dirty failed:", err.message);
+    }
 
     // 统计（失败不影响预约结果）
     try {
@@ -197,44 +216,9 @@ class MeetService extends BaseService {
       console.error("[meet/join] statJoinCnt failed:", err.message);
     }
 
-    // 并发兜底：若超出上限则回滚本次预约
-    if (timeSet.isLimit) {
-      const afterCnt = await this._countSuccJoin(meetId, timeMark);
-      if (afterCnt > timeSet.limit) {
-        await JoinModel.del({ _id: joinId });
-        try {
-          await this.statJoinCnt(meetId, timeMark);
-        } catch (err) {
-          console.error("[meet/join] rollback statJoinCnt failed:", err.message);
-        }
-        this.AppError("该时段预约人员已满，请选择其他");
-      }
-    }
-
-    // 扣减会员卡次数（预约已入库，扣卡失败不撤销预约，返回提示供前端展示）
-    let cardWarning = "";
-    if (cardId) {
-      let cardService = new UserCardService();
-      try {
-        await cardService.consumeForJoin(userId, meetId, joinId, cardId);
-      } catch (err) {
-        console.error("[meet/join] consumeForJoin failed:", err.message);
-        cardWarning =
-          (err && err.message) || "会员卡划扣异常，请联系馆方核对";
-      }
-    }
-
-    try {
-      const StreakService = require("./streak_service.js");
-      await new StreakService().updateStreak(userId, daySet.day);
-    } catch (err) {
-      console.error("[meet/join] updateStreak failed:", err.message);
-    }
-
     return {
       result: "ok",
       joinId,
-      cardWarning,
     };
   }
 
@@ -486,16 +470,18 @@ class MeetService extends BaseService {
     ret.coachAvatar = coachProfile.coachAvatar;
     ret.coachId = coachProfile.teacherId;
 
+    await this._resolveCoachAvatars([ret]);
+
     return ret;
   }
 
   /** 用户自助签到 */
-  async userSelfCheckin(userId, timeMark) {
+  async userSelfCheckin(userId, timeMark, options = {}) {
     let day = this.getDayByTimeMark(timeMark);
 
     let today = timeUtil.time("Y-M-D");
     if (day != today)
-      this.AppError("仅在预约当天可以签到，当前签到码的日期是" + day);
+      this.AppError("仅在预约当天可以签到，当前课程日期是" + day);
 
     let whereSucc = {
       JOIN_MEET_DAY: day,
@@ -528,6 +514,7 @@ class MeetService extends BaseService {
         JOIN_STATUS: JoinModel.STATUS.SUCC,
       };
       let join = await JoinModel.getOne(where);
+      await this._assertLocationCheckin(join, day, timeMark, options);
       let data = {
         JOIN_IS_CHECKIN: 1,
       };
@@ -541,6 +528,35 @@ class MeetService extends BaseService {
     return {
       ret,
     };
+  }
+
+  async _assertLocationCheckin(join, day, timeMark, options) {
+    const setup = await new (require("./home_service.js"))().getSetup(
+      "SETUP_LATITUDE,SETUP_LONGITUDE",
+    );
+    const distance = distanceMeters(
+      options.latitude,
+      options.longitude,
+      setup && setup.SETUP_LATITUDE,
+      setup && setup.SETUP_LONGITUDE,
+    );
+    if (distance === null) this.AppError("场馆尚未配置有效的签到位置");
+    if (distance > Number(config.CHECKIN_LOCATION_RADIUS_METERS)) {
+      this.AppError("当前不在场馆签到范围内，请到店后再试");
+    }
+    const meet = await this.getMeetOneDay(join.JOIN_MEET_ID, day, {
+      _id: join.JOIN_MEET_ID,
+    });
+    const timeSet = this.getTimeSetByTimeMark(meet, timeMark);
+    if (!timeSet) this.AppError("签到时段不存在");
+    const start = timeUtil.time2Timestamp(`${day} ${timeSet.start}:00`);
+    const end = timeUtil.time2Timestamp(`${day} ${timeSet.end}:00`);
+    const now = timeUtil.time();
+    const before = Number(config.CHECKIN_BEFORE_MINUTES) || 30;
+    const after = Number(config.CHECKIN_AFTER_MINUTES) || 30;
+    if (now < start - before * 60 || now > end + after * 60) {
+      this.AppError("当前不在签到时间范围内");
+    }
   }
 
   /**  预约前获取关键信息 */
@@ -632,7 +648,14 @@ class MeetService extends BaseService {
       { day: "asc" },
       500,
     );
-    return await this._buildMeetListFromDayRecords(dayRecords);
+    let list = await this._buildMeetListFromDayRecords(dayRecords);
+    // 当天只展示尚未开始的时段；已开始的课程不能再预约，避免会员看到后提交必然失败。
+    const today = timeUtil.time("Y-M-D");
+    if (day === today) {
+      const now = timeUtil.time("Y-M-D h:m:s");
+      list = list.filter((item) => `${day} ${item.timeStart}:00` > now);
+    }
+    return await this._resolveCoachAvatars(list);
   }
 
   /** 按周获取预约项目 */
@@ -643,7 +666,26 @@ class MeetService extends BaseService {
       { day: "asc" },
       2000,
     );
-    return await this._buildMeetListFromDayRecords(dayRecords);
+    return await this._resolveCoachAvatars(
+      await this._buildMeetListFromDayRecords(dayRecords),
+    );
+  }
+
+  async _resolveCoachAvatars(list) {
+    const items = (list || []).filter(
+      (item) => item && typeof item.coachAvatar === "string" && item.coachAvatar.indexOf("cloud://") === 0,
+    );
+    const fileIds = [...new Set(items.map((item) => item.coachAvatar))];
+    if (!fileIds.length) return list || [];
+    try {
+      const resolved = await cloudUtil.getTempFileURL(fileIds);
+      const map = {};
+      for (const item of resolved || []) map[item.cloudId] = item.url || item.cloudId;
+      for (const item of items) item.coachAvatar = map[item.coachAvatar] || item.coachAvatar;
+    } catch (err) {
+      console.warn("[meet/avatar-batch] failed:", err.message);
+    }
+    return list || [];
   }
 
   async _buildMeetListFromDayRecords(dayRecords) {
@@ -669,8 +711,26 @@ class MeetService extends BaseService {
       meetMap[meets[k]._id] = meets[k];
     }
 
-    let adminNameCache = {};
     let teacherCache = {};
+    const teacherIds = [];
+    for (const record of dayRecords) {
+      const meet = meetMap[record.DAY_MEET_ID];
+      const style = (meet && meet.MEET_STYLE_SET) || {};
+      for (const time of record.times || []) {
+        if (time.status != 1) continue;
+        const teacherId = time.teacherId || style.teacherId || "";
+        if (teacherId && !teacherIds.includes(teacherId)) teacherIds.push(teacherId);
+      }
+    }
+    if (teacherIds.length) {
+      const teachers = await TeacherModel.getAll(
+        { _id: ["in", teacherIds] },
+        "TEACHER_NAME,TEACHER_AVATAR",
+        {},
+        teacherIds.length,
+      );
+      for (const teacher of teachers || []) teacherCache[teacher._id] = teacher;
+    }
     let retList = [];
 
     for (let k in dayRecords) {
@@ -693,13 +753,6 @@ class MeetService extends BaseService {
         }
 
         if (teacherId) {
-          if (teacherCache[teacherId] === undefined) {
-            let teacher = await TeacherModel.getOne(
-              { _id: teacherId },
-              "TEACHER_NAME,TEACHER_AVATAR",
-            );
-            teacherCache[teacherId] = teacher || null;
-          }
           let teacher = teacherCache[teacherId];
           if (teacher) {
             if (!coachName) coachName = teacher.TEACHER_NAME || coachName;
@@ -962,7 +1015,15 @@ class MeetService extends BaseService {
       JOIN_REASON: "",
       JOIN_IS_CHECKIN: 0,
     };
-    await JoinModel.edit(where, data);
+    const updated = await JoinModel.edit(where, data);
+    if (!updated) {
+      this.AppError("预约状态已变更，请刷新后重试");
+    }
+    try {
+      await new StreakService().markStreakDirty(userId);
+    } catch (err) {
+      console.error("[meet/cancel] mark streak dirty failed:", err.message);
+    }
     this.statJoinCnt(join.JOIN_MEET_ID, join.JOIN_MEET_TIME_MARK);
 
     let cardService = new UserCardService();
@@ -1081,7 +1142,7 @@ class MeetService extends BaseService {
   /** 取得我的某日预约列表 */
   async getMyJoinSomeday(userId, day) {
     let fields =
-      "JOIN_IS_CHECKIN,JOIN_MEET_ID,JOIN_MEET_TITLE,JOIN_MEET_DAY,JOIN_MEET_TIME_START,JOIN_MEET_TIME_END,JOIN_STATUS,JOIN_ADD_TIME";
+      "JOIN_IS_CHECKIN,JOIN_MEET_ID,JOIN_MEET_TITLE,JOIN_MEET_DAY,JOIN_MEET_TIME_MARK,JOIN_MEET_TIME_START,JOIN_MEET_TIME_END,JOIN_STATUS,JOIN_ADD_TIME";
 
     let where = {
       JOIN_USER_ID: userId,

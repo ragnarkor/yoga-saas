@@ -15,11 +15,26 @@ const dbUtil = require("../../framework/database/db_util.js");
 const timeUtil = require("../../framework/utils/time_util.js");
 const cardScopeUtil = require("../utils/card_scope_util.js");
 const cardCoverUtil = require("../utils/card_cover_util.js");
+const cardStateUtil = require("../utils/card_state_util.js");
+const CardLogService = require("./card_log_service.js");
 
 const CARD_COLLECTIONS = ["ax_user_card", "ax_user_card_log"];
 const MS_PER_DAY = 86400 * 1000;
 
 class UserCardService extends BaseService {
+  /** 只读准备扣卡信息，实际写入由预约事务服务完成。 */
+  async prepareJoinCard(userId, meetId, timeMark, cardId) {
+    const meet = await MeetModel.getOne({ _id: meetId }, "MEET_TITLE,MEET_TYPE_NAME,MEET_STYLE_SET,MEET_DAYS_SET");
+    if (!meet) this.AppError("课程不存在");
+    const needTimes = this._getMeetCardTimes(meet);
+    const card = await this._resolveCardForJoin(userId, needTimes, cardId, meet, this._meetDayFromTimeMark(timeMark));
+    if (!card) this.AppError("会员卡划扣失败，请联系馆方");
+    const tplMaps = card.USER_CARD_TPL_ID ? await this._loadTplVisualMaps([card.USER_CARD_TPL_ID]) : {};
+    const type = this._resolveCardType(card, tplMaps.typeMap || {});
+    const activation = card.USER_CARD_ACTIVATE || UserCardModel.ACTIVATE.IMMEDIATE;
+    const activationPatch = this._isPendingActivation(card) && (activation === UserCardModel.ACTIVATE.FIRST_BOOK || activation === UserCardModel.ACTIVATE.FIRST_USE_LIMIT) ? this._buildActivatePatch(card, timeUtil.time(), tplMaps.daysMap || {}) : null;
+    return { cardId: card._id, userId, needTimes, type, activationPatch };
+  }
   async _ensureCardCollections() {
     for (let cl of CARD_COLLECTIONS) {
       if (!(await dbUtil.isExistCollection(cl))) {
@@ -29,51 +44,31 @@ class UserCardService extends BaseService {
   }
 
   _isExpired(card, now) {
-    const start = Number(card.USER_CARD_START_TIME) || 0;
-    if (start <= 0) return false;
-    const end = Number(card.USER_CARD_END_TIME) || 0;
-    return end > 0 && end <= now;
+    return cardStateUtil.isExpired(card, now);
   }
 
   _isPendingActivation(card) {
-    return !(Number(card.USER_CARD_START_TIME) > 0);
+    return cardStateUtil.isPendingActivation(card);
   }
 
   _canUsePendingForJoin(card) {
-    if (!this._isPendingActivation(card)) return false;
     const activate = card.USER_CARD_ACTIVATE || UserCardModel.ACTIVATE.IMMEDIATE;
-    return [
+    return cardStateUtil.canUsePendingForJoin(card, activate, [
       UserCardModel.ACTIVATE.FIRST_BOOK,
       UserCardModel.ACTIVATE.FIRST_CLASS,
       UserCardModel.ACTIVATE.FIRST_USE_LIMIT,
-    ].includes(activate);
+    ]);
   }
 
   _resolveCardType(card, tplTypeMap = {}) {
-    const tplId = card.USER_CARD_TPL_ID;
-    const tplType = tplId && tplTypeMap[tplId];
-    const raw = String(card.USER_CARD_TYPE || "")
-      .trim()
-      .toLowerCase();
-
-    if (raw === CardTplModel.TYPE.PERIOD) return CardTplModel.TYPE.PERIOD;
-    if (tplType === CardTplModel.TYPE.PERIOD) return CardTplModel.TYPE.PERIOD;
-
-    if (raw === CardTplModel.TYPE.TIMES) return CardTplModel.TYPE.TIMES;
-    if (tplType === CardTplModel.TYPE.TIMES) return CardTplModel.TYPE.TIMES;
-
-    return CardTplModel.TYPE.TIMES;
+    return cardStateUtil.resolveCardType(card, tplTypeMap, {
+      times: CardTplModel.TYPE.TIMES,
+      period: CardTplModel.TYPE.PERIOD,
+    });
   }
 
   _meetDayFromTimeMark(timeMark) {
-    if (!timeMark || timeMark.length < 11) return "";
-    return (
-      timeMark.substr(1, 4) +
-      "-" +
-      timeMark.substr(5, 2) +
-      "-" +
-      timeMark.substr(7, 2)
-    );
+    return cardStateUtil.meetDayFromTimeMark(timeMark);
   }
 
   _cardDayFromTs(ts) {
@@ -91,32 +86,13 @@ class UserCardService extends BaseService {
   }
 
   _cardValidForMeetDay(card, meetDay, now, tplDaysMap = {}) {
-    const pending = this._isPendingActivation(card);
-    if (pending) {
-      if (!this._canUsePendingForJoin(card)) return false;
-      if (!meetDay) return true;
-
-      const activate = card.USER_CARD_ACTIVATE || UserCardModel.ACTIVATE.IMMEDIATE;
-      if (
-        activate === UserCardModel.ACTIVATE.FIRST_BOOK ||
-        activate === UserCardModel.ACTIVATE.FIRST_USE_LIMIT
-      ) {
-        const days = this._resolveCardDays(card, tplDaysMap);
-        if (days <= 0) return true;
-        const endDay = this._cardDayFromTs(now + days * MS_PER_DAY);
-        return !endDay || meetDay <= endDay;
-      }
-      return true;
-    }
-
-    if (this._isExpired(card, now)) return false;
-    if (!meetDay) return true;
-
-    const endDay = this._cardDayFromTs(card.USER_CARD_END_TIME);
-    const startDay = this._cardDayFromTs(card.USER_CARD_START_TIME);
-    if (endDay && meetDay > endDay) return false;
-    if (startDay && meetDay < startDay) return false;
-    return true;
+    return cardStateUtil.isValidForMeetDay(card, meetDay, now, {
+      canUsePending: (item) => this._canUsePendingForJoin(item),
+      resolveDays: (item) => this._resolveCardDays(item, tplDaysMap),
+      timestampToDay: (value) => this._cardDayFromTs(value),
+      firstBook: UserCardModel.ACTIVATE.FIRST_BOOK,
+      firstUse: UserCardModel.ACTIVATE.FIRST_USE_LIMIT,
+    });
   }
 
   async _selfHealPeriodCardRecord(card, tplTypeMap = {}) {
@@ -974,24 +950,7 @@ class UserCardService extends BaseService {
     coachName,
   }) {
     await this._ensureCardCollections();
-    const now = timeUtil.time();
-    await UserCardLogModel.insert({
-      CARD_LOG_USER_ID: userId,
-      CARD_LOG_USER_CARD_ID: cardId,
-      CARD_LOG_JOIN_ID: joinId,
-      CARD_LOG_MEET_ID: meet._id || join.JOIN_MEET_ID,
-      CARD_LOG_MEET_TITLE: join.JOIN_MEET_TITLE || meet.MEET_TITLE || "",
-      CARD_LOG_MEET_TYPE_NAME: meet.MEET_TYPE_NAME || "",
-      CARD_LOG_MEET_DAY: join.JOIN_MEET_DAY || "",
-      CARD_LOG_TIME_START: join.JOIN_MEET_TIME_START || "",
-      CARD_LOG_TIME_END: join.JOIN_MEET_TIME_END || "",
-      CARD_LOG_COACH_NAME: coachName || "",
-      CARD_LOG_TIMES: needTimes,
-      CARD_LOG_ACTION: UserCardLogModel.ACTION.DEDUCT,
-      CARD_LOG_STATUS: UserCardLogModel.STATUS.VALID,
-      CARD_LOG_ADD_TIME: now,
-      CARD_LOG_EDIT_TIME: now,
-    });
+    return new CardLogService().insertDeductLog({ userId, cardId, joinId, meet, join, needTimes, coachName });
   }
 
   /** 预约成功后扣次 */
@@ -1006,69 +965,104 @@ class UserCardService extends BaseService {
     let join = await JoinModel.getOne({ _id: joinId });
     if (!join) return;
 
-    const needTimes = this._getMeetCardTimes(meet);
-    const meetDay = join.JOIN_MEET_DAY || this._meetDayFromTimeMark(join.JOIN_MEET_TIME_MARK);
-    let card = await this._resolveCardForJoin(
-      userId,
-      needTimes,
-      cardId,
-      meet,
-      meetDay,
+    // 同一个预约只允许一个请求进入扣卡流程，防止网络重试或并发请求重复扣次。
+    const claimed = await JoinModel.edit(
+      { _id: joinId, JOIN_CARD_CONSUME_STATUS: 0 },
+      { JOIN_CARD_CONSUME_STATUS: 1 },
     );
-    if (!card) {
-      if (cardId) this.AppError("会员卡划扣失败，请联系馆方");
-      return;
+    if (!claimed) {
+      return { cardId: "", deducted: 0, joinId, alreadyProcessed: true };
     }
 
-    const tplMaps = card.USER_CARD_TPL_ID
-      ? await this._loadTplVisualMaps([card.USER_CARD_TPL_ID])
-      : {};
-    await this._tryActivateCard(card, "book", tplMaps.daysMap || {});
-    card = await UserCardModel.getOne({ _id: card._id });
-    if (!card) return;
-
-    const coachName = await this._resolveCoachName(
-      meet,
-      join.JOIN_MEET_TIME_MARK,
-      join.JOIN_MEET_DAY,
-    );
-    const type = this._resolveCardType(card, tplMaps.typeMap || {});
-
-    if (type === CardTplModel.TYPE.PERIOD) {
-      await this._insertDeductLog({
+    try {
+      const needTimes = this._getMeetCardTimes(meet);
+      const meetDay = join.JOIN_MEET_DAY || this._meetDayFromTimeMark(join.JOIN_MEET_TIME_MARK);
+      let card = await this._resolveCardForJoin(
         userId,
-        cardId: card._id,
-        joinId,
+        needTimes,
+        cardId,
         meet,
-        join,
-        needTimes: 0,
-        coachName,
-      });
-      return { cardId: card._id, deducted: 0 };
+        meetDay,
+      );
+      if (!card) {
+        if (cardId) this.AppError("会员卡划扣失败，请联系馆方");
+        return;
+      }
+
+      const tplMaps = card.USER_CARD_TPL_ID
+        ? await this._loadTplVisualMaps([card.USER_CARD_TPL_ID])
+        : {};
+      await this._tryActivateCard(card, "book", tplMaps.daysMap || {});
+      card = await UserCardModel.getOne({ _id: card._id });
+      if (!card) return;
+
+      const coachName = await this._resolveCoachName(
+        meet,
+        join.JOIN_MEET_TIME_MARK,
+        join.JOIN_MEET_DAY,
+      );
+      const type = this._resolveCardType(card, tplMaps.typeMap || {});
+
+      if (type === CardTplModel.TYPE.PERIOD) {
+        await this._insertDeductLog({
+          userId,
+          cardId: card._id,
+          joinId,
+          meet,
+          join,
+          needTimes: 0,
+          coachName,
+        });
+        return { cardId: card._id, deducted: 0 };
+      }
+
+      // 条件自减保证并发时余额不会被扣成负数或被旧值覆盖。
+      const deducted = await UserCardModel.inc(
+        {
+          _id: card._id,
+          USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,
+          USER_CARD_QUOTA: [">=", needTimes],
+        },
+        "USER_CARD_QUOTA",
+        -needTimes,
+      );
+      if (!deducted) this.AppError("会员卡次数不足或状态已变更");
+
+      const updatedCard = await UserCardModel.getOne({ _id: card._id });
+      if (updatedCard && Number(updatedCard.USER_CARD_QUOTA) <= 0) {
+        await UserCardModel.edit(
+          { _id: card._id, USER_CARD_QUOTA: ["<=", 0] },
+          { USER_CARD_STATUS: UserCardModel.STATUS.USED },
+        );
+      }
+
+      try {
+        await this._insertDeductLog({
+          userId,
+          cardId: card._id,
+          joinId,
+          meet,
+          join,
+          needTimes,
+          coachName,
+        });
+      } catch (err) {
+        await UserCardModel.inc({ _id: card._id }, "USER_CARD_QUOTA", needTimes);
+        await UserCardModel.edit(
+          { _id: card._id, USER_CARD_QUOTA: [">", 0] },
+          { USER_CARD_STATUS: UserCardModel.STATUS.NORMAL },
+        );
+        throw err;
+      }
+
+      return { cardId: card._id, deducted: needTimes, joinId };
+    } catch (err) {
+      await JoinModel.edit(
+        { _id: joinId, JOIN_CARD_CONSUME_STATUS: 1 },
+        { JOIN_CARD_CONSUME_STATUS: 0 },
+      );
+      throw err;
     }
-
-    const left = Number(card.USER_CARD_QUOTA) || 0;
-    const next = Math.max(0, left - needTimes);
-    const patch = {
-      USER_CARD_QUOTA: next,
-      USER_CARD_EDIT_TIME: timeUtil.time(),
-    };
-    if (next <= 0) {
-      patch.USER_CARD_STATUS = UserCardModel.STATUS.USED;
-    }
-    await UserCardModel.edit({ _id: card._id }, patch);
-
-    await this._insertDeductLog({
-      userId,
-      cardId: card._id,
-      joinId,
-      meet,
-      join,
-      needTimes,
-      coachName,
-    });
-
-    return { cardId: card._id, deducted: needTimes, joinId };
   }
 
   /** 取消预约退还次数 */
@@ -1083,32 +1077,32 @@ class UserCardService extends BaseService {
     });
     if (!log) return { refunded: 0 };
 
+    // 先原子认领流水；重复取消请求无法再次进入退款流程。
+    const cardLogService = new CardLogService();
+    const claimed = await cardLogService.claimRefund(log._id);
+    if (!claimed) return { refunded: 0 };
+
     const times = Number(log.CARD_LOG_TIMES) || 0;
     const cardId = log.CARD_LOG_USER_CARD_ID;
     const now = timeUtil.time();
 
-    if (times > 0 && cardId) {
-      let card = await UserCardModel.getOne({ _id: cardId });
-      if (card) {
-        const next = (Number(card.USER_CARD_QUOTA) || 0) + times;
-        const patch = {
-          USER_CARD_QUOTA: next,
-          USER_CARD_EDIT_TIME: now,
-        };
-        if (card.USER_CARD_STATUS === UserCardModel.STATUS.USED && next > 0) {
-          patch.USER_CARD_STATUS = UserCardModel.STATUS.NORMAL;
+    try {
+      if (times > 0 && cardId) {
+        let card = await UserCardModel.getOne({ _id: cardId });
+        if (card) {
+          await UserCardModel.inc({ _id: cardId }, "USER_CARD_QUOTA", times);
+          if (card.USER_CARD_STATUS === UserCardModel.STATUS.USED) {
+            await UserCardModel.edit(
+              { _id: cardId, USER_CARD_QUOTA: [">", 0] },
+              { USER_CARD_STATUS: UserCardModel.STATUS.NORMAL, USER_CARD_EDIT_TIME: now },
+            );
+          }
         }
-        await UserCardModel.edit({ _id: cardId }, patch);
       }
+    } catch (err) {
+      await cardLogService.releaseRefundClaim(log._id);
+      throw err;
     }
-
-    await UserCardLogModel.edit(
-      { _id: log._id },
-      {
-        CARD_LOG_STATUS: UserCardLogModel.STATUS.REFUNDED,
-        CARD_LOG_EDIT_TIME: now,
-      },
-    );
 
     return { refunded: times, cardId };
   }

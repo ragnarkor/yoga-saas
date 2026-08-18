@@ -16,12 +16,23 @@ const LogModel = require("../../model/log_model.js");
 const MeetModel = require("../../model/meet_model.js");
 const UserModel = require("../../model/user_model.js");
 const NewsModel = require("../../model/news_model.js");
+const tenantAuthorizationUtil = require("../../utils/tenant_authorization_util.js");
 
 class BaseAdminService extends BaseService {
   /** 解析管理员：token 优先，其次 openid+当前馆 PID（馆长/教练） */
   async resolveAdmin(token, openId, pid) {
     let admin = await this._tryTokenAdmin(token);
-    if (admin) return admin;
+    if (admin) {
+      if (
+        tenantAuthorizationUtil.canAccessTenant(
+          admin,
+          pid,
+          AdminModel.TYPE.SUPER,
+        )
+      )
+        return admin;
+      this.AppError("无权访问当前瑜伽馆", appCode.ADMIN_ERROR);
+    }
 
     if (openId && pid) {
       admin = await AdminModel.getOne(

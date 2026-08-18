@@ -72,16 +72,23 @@ class AdminNewsService extends BaseAdminService {
    * 更新富文本详细的内容及图片信息
    * @returns 返回 urls数组 [url1, url2, url3, ...]
    */
-  async updateNewsContent({ newsId, content }) {
+  async updateNewsContent({ newsId, content, delta = null }) {
     let where = { _id: newsId };
-    let news = await NewsModel.getOne(where, "NEWS_CONTENT");
+    let news = await NewsModel.getOne(where, "NEWS_CONTENT,NEWS_CONTENT_DELTA");
     if (!news) this.AppError("资讯不存在");
 
-    content = await cloudUtil.handlerCloudFilesByRichEditor(
-      news.NEWS_CONTENT || [],
-      content || [],
-    );
-    await NewsModel.edit(where, { NEWS_CONTENT: content });
+    content = await cloudUtil.handlerCloudFilesByRichEditor(news.NEWS_CONTENT || [], content || []);
+    const update = { NEWS_CONTENT: content };
+    if (delta && Array.isArray(delta.ops)) {
+      const oldOps = (news.NEWS_CONTENT_DELTA && news.NEWS_CONTENT_DELTA.ops) || [];
+      const oldImages = oldOps.filter((op) => op.insert && op.insert.image).map((op) => op.insert.image);
+      const newImages = delta.ops.filter((op) => op.insert && op.insert.image).map((op) => op.insert.image);
+      const legacyImages = (news.NEWS_CONTENT || []).filter((item) => item.type === "img").map((item) => item.val);
+      const removed = oldImages.filter((fileId) => !newImages.includes(fileId) && !legacyImages.includes(fileId));
+      if (removed.length) await cloudUtil.deleteFiles(removed);
+      update.NEWS_CONTENT_DELTA = delta;
+    }
+    await NewsModel.edit(where, update);
 
     let imgList = [];
     for (let k in content) {

@@ -27,6 +27,7 @@ StreakModel.DB_STRUCTURE = {
     "int|true|default=0|comment=是否已从历史约课回填",
   STREAK_SYNC_VERSION:
     "int|true|default=0|comment=历史回填口径版本，变更后触发重算",
+  STREAK_DIRTY: "int|true|default=0|comment=预约状态变化后需要重算",
 
   STREAK_ADD_TIME: "int|true",
   STREAK_EDIT_TIME: "int|true",

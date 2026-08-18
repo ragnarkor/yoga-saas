@@ -16,6 +16,8 @@ const UserModel = require("../../model/user_model.js");
 const DayModel = require("../../model/day_model.js");
 const AdminModel = require("../../model/admin_model.js");
 const dbUtil = require("../../../framework/database/db_util.js");
+const config = require("../../../config/config.js");
+const { buildPeriodIncomeMap } = require("../../utils/period_income_util.js");
 
 const CARD_COLLECTIONS = ["ax_card_tpl", "ax_user_card", "ax_user_card_log"];
 
@@ -610,7 +612,7 @@ class AdminStatsService extends BaseAdminService {
       let cards = await this._safeGetAll(
         UserCardModel,
         { _id: ["in", cardIds] },
-        "USER_CARD_NAME,USER_CARD_TYPE,USER_CARD_PRICE,USER_CARD_QUOTA,USER_CARD_QUOTA_INIT",
+        "USER_CARD_NAME,USER_CARD_TYPE,USER_CARD_PRICE,USER_CARD_DAYS,USER_CARD_QUOTA,USER_CARD_QUOTA_INIT",
         {},
         cardIds.length,
       );
@@ -619,7 +621,11 @@ class AdminStatsService extends BaseAdminService {
       }
     }
 
-    let periodFirstMap = this._buildPeriodFirstLogMap(logs || [], cardMap);
+    let periodIncomeMap = buildPeriodIncomeMap(
+      logs || [],
+      cardMap,
+      config.PERIOD_INCOME_MODE || "per_day",
+    );
     let userIds = [
       ...new Set(incomeLogs.map((log) => log.CARD_LOG_USER_ID).filter(Boolean)),
     ];
@@ -648,10 +654,11 @@ class AdminStatsService extends BaseAdminService {
       let subtitle = "";
 
       if (type === CardTplModel.TYPE.PERIOD) {
-        if (!periodFirstMap[log._id]) continue;
-        amount = Number(card.USER_CARD_PRICE) || 0;
+        const allocation = periodIncomeMap[log._id];
+        if (!allocation) continue;
+        amount = allocation.amount;
         incomeKind = "period_first";
-        subtitle = "首次上课";
+        subtitle = allocation.subtitle;
       } else {
         if (times <= 0) continue;
         amount = this._calcTimesIncome(card, times);

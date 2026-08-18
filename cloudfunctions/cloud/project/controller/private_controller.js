@@ -19,10 +19,23 @@ class PrivateController extends BaseController {
       meetId: "must|id|name=课程",
       teacherId: "must|string|name=教练",
       day: "must|date|name=日期",
+      start: "string|name=开始时间",
     };
     let input = this.validateData(rules);
     let service = new PrivateService();
     return await service.getAvailableSlots(input);
+  }
+
+  async getDaySchedule() {
+    await FeatureGate.check("booking");
+    const rules = {
+      meetId: "must|id|name=课程",
+      teacherId: "must|string|name=教练",
+      day: "must|date|name=日期",
+    };
+    const input = this.validateData(rules);
+    const service = new PrivateService();
+    return await service.getDaySchedule(input);
   }
 
   async bookSession() {

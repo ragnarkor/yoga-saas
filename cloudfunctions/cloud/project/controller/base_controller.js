@@ -11,8 +11,7 @@ const util = require("../../framework/utils/util.js");
 const AppError = require("../../framework/core/app_error.js");
 const appCode = require("../../framework/core/app_code.js");
 const BaseService = require("../service/base_service.js");
-
-global.PID = "unknown";
+const tenantContext = require("../utils/tenant_context.js");
 
 class BaseController extends Controller {
   constructor(route, openId, event) {
@@ -28,16 +27,13 @@ class BaseController extends Controller {
 
     // 模板判定
     if (config.PID) {
-      global.PID = config.PID;
+      tenantContext.setPID(config.PID);
     } else {
       // [AI_START TIMESTAMP=2025-01-25 17:45:00]
       // 多租户模式：每次请求重置PID，避免上次请求残留
-      if (event.PID) global.PID = event.PID;
-      else global.PID = "";
+      tenantContext.setPID(event.PID || "");
       // [AI_END LINES=3 TIMESTAMP=2025-01-25 17:45:00]
     }
-
-    console.log(`【↘event.PID=${event.PID}, global.PID=${global.PID}】`);
 
     let userId = openId;
 
@@ -47,13 +43,16 @@ class BaseController extends Controller {
 
     // 当前时间戳
     this._timestamp = timeUtil.time();
-    let time = timeUtil.time("Y-M-D h:m:s");
-
-    console.log("------------------------");
-    console.log(
-      `【${time}】【Request -- ↘↘↘】\n【↘Token = ${this._token}】\n【↘USER-ID = ${userId}】\n【↘↘IN DATA】=\n`,
-      JSON.stringify(this._request, null, 4),
-    );
+    const requestKeys = this._request && typeof this._request === "object"
+      ? Object.keys(this._request)
+      : [];
+    // 生产日志仅保留排障所需的元信息，禁止写入 token、OpenID 和请求内容。
+    console.log("[Request]", {
+      route,
+      pid: global.PID || "default",
+      paramKeys: requestKeys,
+      time: timeUtil.time("Y-M-D h:m:s"),
+    });
   }
 
   /**

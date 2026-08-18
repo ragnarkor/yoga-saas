@@ -33,6 +33,7 @@ NewsModel.DB_STRUCTURE = {
 	NEWS_HOME: 'int|true|default=9999|comment=推荐到首页',
 
 	NEWS_CONTENT: 'array|true|default=[]|comment=内容',
+	NEWS_CONTENT_DELTA: 'object|false|comment=富文本Delta内容',
 
 	NEWS_VIEW_CNT: 'int|true|default=0|comment=访问次数',
 	NEWS_FAV_CNT: 'int|true|default=0|comment=收藏人数',

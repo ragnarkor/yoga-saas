@@ -7,6 +7,7 @@ const StreakModel = require("../model/streak_model.js");
 const JoinModel = require("../model/join_model.js");
 const timeUtil = require("../../framework/utils/time_util.js");
 const dbUtil = require("../../framework/database/db_util.js");
+const streakDateUtil = require("../utils/streak_date_util.js");
 
 const HEATMAP_DAYS = 84;
 const MS_DAY = 86400000;
@@ -62,38 +63,15 @@ class StreakService extends BaseService {
 
   /** ISO 周 key：yyyy-Www */
   _isoWeekKey(day) {
-    const d = this._parseDay(day);
-    const dayNum = d.getDay() || 7;
-    d.setDate(d.getDate() + 4 - dayNum);
-    const year = d.getFullYear();
-    const yearStart = new Date(year, 0, 1);
-    const week = Math.ceil(
-      ((d - yearStart) / MS_DAY + yearStart.getDay() + 1) / 7,
-    );
-    return `${year}-W${String(week).padStart(2, "0")}`;
+    return streakDateUtil.isoWeekKey(day);
   }
 
   _isoWeekMonday(key) {
-    const m = String(key || "").match(/^(\d{4})-W(\d{2})$/);
-    if (!m) return null;
-    const year = Number(m[1]);
-    const week = Number(m[2]);
-    const jan4 = new Date(year, 0, 4);
-    const day = jan4.getDay() || 7;
-    const mondayWeek1 = new Date(jan4);
-    mondayWeek1.setDate(jan4.getDate() - day + 1);
-    const monday = new Date(mondayWeek1);
-    monday.setDate(mondayWeek1.getDate() + (week - 1) * 7);
-    return monday;
+    return streakDateUtil.isoWeekMonday(key);
   }
 
   _weekGap(lastWeek, thisWeek) {
-    if (!lastWeek || !thisWeek) return null;
-    if (lastWeek === thisWeek) return 0;
-    const lastMon = this._isoWeekMonday(lastWeek);
-    const thisMon = this._isoWeekMonday(thisWeek);
-    if (!lastMon || !thisMon) return null;
-    return Math.round((thisMon - lastMon) / (7 * MS_DAY));
+    return streakDateUtil.weekGap(lastWeek, thisWeek);
   }
 
   _activeJoinWhere(extra = {}) {
@@ -129,6 +107,7 @@ class StreakService extends BaseService {
       row &&
       row.STREAK_HISTORY_SYNCED === 1 &&
       row.STREAK_SYNC_VERSION === STREAK_SYNC_VERSION &&
+      row.STREAK_DIRTY !== 1 &&
       (row.STREAK_TOTAL_CLASSES || 0) > 0
     ) {
       console.log("[streak] skip resync, totalClasses=", row.STREAK_TOTAL_CLASSES);
@@ -150,6 +129,7 @@ class StreakService extends BaseService {
           {
             STREAK_HISTORY_SYNCED: 1,
             STREAK_SYNC_VERSION: STREAK_SYNC_VERSION,
+            STREAK_DIRTY: 0,
             STREAK_EDIT_TIME: timeUtil.time(),
           },
         );
@@ -165,6 +145,7 @@ class StreakService extends BaseService {
         STREAK_BADGE_AT: {},
         STREAK_HISTORY_SYNCED: 1,
         STREAK_SYNC_VERSION: STREAK_SYNC_VERSION,
+        STREAK_DIRTY: 0,
       };
       await StreakModel.insert(
         Object.assign(empty, {
@@ -186,10 +167,21 @@ class StreakService extends BaseService {
       {
         STREAK_HISTORY_SYNCED: 1,
         STREAK_SYNC_VERSION: STREAK_SYNC_VERSION,
+        STREAK_DIRTY: 0,
         STREAK_EDIT_TIME: timeUtil.time(),
       },
     );
     return await StreakModel.getOne({ STREAK_USER_ID: userId }, "*");
+  }
+
+  /** 预约新增/取消后标记，下次打开成就页按 ax_join 重新计算。 */
+  async markStreakDirty(userId) {
+    userId = String(userId || "").trim();
+    if (!userId) return;
+    await StreakModel.edit(
+      { STREAK_USER_ID: userId },
+      { STREAK_DIRTY: 1, STREAK_EDIT_TIME: timeUtil.time() },
+    );
   }
 
   _detectBadges(state) {
@@ -384,6 +376,17 @@ class StreakService extends BaseService {
     const now = timeUtil.time();
     const row = await this.syncStreakFromHistory(userId);
     const heat = await this.buildHeatmap(userId);
+    // 漏掉至少一个完整自然周后，当前连续周数应归零；历史最长不受影响。
+    let displayRow = row;
+    if (row && row.STREAK_LAST_WEEK) {
+      const gap = this._weekGap(
+        row.STREAK_LAST_WEEK,
+        this._isoWeekKey(timeUtil.time("Y-M-D")),
+      );
+      if (gap !== null && gap >= 2) {
+        displayRow = Object.assign({}, row, { STREAK_CURRENT: 0 });
+      }
+    }
 
     let heatmapHint = "";
     if (!heat.activeDayCount) {
@@ -393,12 +396,12 @@ class StreakService extends BaseService {
 
     return {
       streak: {
-        current: (row && row.STREAK_CURRENT) || 0,
+        current: (displayRow && displayRow.STREAK_CURRENT) || 0,
         max: (row && row.STREAK_MAX) || 0,
         totalClasses: (row && row.STREAK_TOTAL_CLASSES) || 0,
         totalDays: (row && row.STREAK_TOTAL_DAYS) || 0,
       },
-      badges: this._buildBadgeViews(row, now),
+      badges: this._buildBadgeViews(displayRow, now),
       heatmap: heat.heatmap,
       heatmapDays: heat.heatmapDays,
       heatmapStartDay: heat.heatmapStartDay,

@@ -24,6 +24,7 @@ JoinModel.DB_STRUCTURE = {
 	JOIN_EDIT_ADMIN_STATUS: 'int|false|comment=最近管理员修改为的状态 ',
 
 	JOIN_IS_ADMIN: 'int|true|default=0|comment=是否管理员添加 0/1',
+	JOIN_CARD_CONSUME_STATUS: 'int|true|default=0|comment=会员卡处理状态 0=待处理 1=已处理',
 
 	JOIN_CODE: 'string|true|comment=核验码15位',
 	JOIN_IS_CHECKIN: 'int|true|default=0|comment=是否签到 0/1 ',

@@ -24,7 +24,7 @@ class AdminMeetController extends BaseAdminController {
     return count;
   }
 
-  /** 生成自助签到码 */
+  /** 获取课程日期列表 */
   async getDayList() {
     await this.isAdmin();
 
@@ -39,23 +39,6 @@ class AdminMeetController extends BaseAdminController {
 
     let service = new AdminMeetService();
     return await service.getDayList(input.meetId, input.start, input.end);
-  }
-
-  /** 生成自助签到码 */
-  async genSelfCheckinQr() {
-    await this.isAdmin();
-    await FeatureGate.check("selfCheckin");
-
-    let rules = {
-      page: "must|string",
-      timeMark: "must|string",
-    };
-
-    // 取得数据
-    let input = this.validateData(rules);
-
-    let service = new AdminMeetService();
-    return await service.genSelfCheckinQr(input.page, input.timeMark);
   }
 
   /** 管理员按钮核销 */
@@ -112,23 +95,6 @@ class AdminMeetController extends BaseAdminController {
 
     let service = new AdminMeetService();
     return await service.bookGroupJoin(input);
-  }
-
-  /** 管理员扫码核验 */
-  async scanJoin() {
-    await this.isAdmin();
-    await FeatureGate.check("checkin");
-
-    let rules = {
-      meetId: "must|id",
-      code: "must|string|len:15",
-    };
-
-    // 取得数据
-    let input = this.validateData(rules);
-
-    let service = new AdminMeetService();
-    await service.scanJoin(input.meetId, input.code);
   }
 
   /** 预约排序 */

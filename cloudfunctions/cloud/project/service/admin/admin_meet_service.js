@@ -7,11 +7,11 @@
 const BaseAdminService = require("./base_admin_service.js");
 const MeetService = require("../meet_service.js");
 const UserCardService = require("../user_card_service.js");
+const StreakService = require("../streak_service.js");
 const dataUtil = require("../../../framework/utils/data_util.js");
 const timeUtil = require("../../../framework/utils/time_util.js");
 const util = require("../../../framework/utils/util.js");
 const cloudUtil = require("../../../framework/cloud/cloud_util.js");
-const cloudBase = require("../../../framework/cloud/cloud_base.js");
 
 const MeetModel = require("../../model/meet_model.js");
 const TeacherModel = require("../../model/teacher_model.js");
@@ -21,7 +21,11 @@ const DayModel = require("../../model/day_model.js");
 const UserModel = require("../../model/user_model.js");
 const bufferUtil = require("../../utils/schedule_buffer_util.js");
 const privateMeetUtil = require("../../utils/private_meet_util.js");
-const config = require("../../../config/config.js");
+const scheduleDateUtil = require("../../utils/schedule_date_util.js");
+const scheduleConflictUtil = require("../../utils/schedule_conflict_util.js");
+const ScheduleCopyService = require("./schedule_copy_service.js");
+const CheckinService = require("./checkin_service.js");
+const JoinRosterService = require("./join_roster_service.js");
 
 class AdminMeetService extends BaseAdminService {
   /** 预约数据列表 */
@@ -161,30 +165,9 @@ class AdminMeetService extends BaseAdminService {
     return null;
   }
 
-  /** 自助签到码 */
-  async genSelfCheckinQr(page, timeMark) {
-    let cloud = cloudBase.getCloud();
-
-    let result = await cloud.openapi.wxacode.getUnlimited({
-      scene: timeMark,
-      width: 280,
-      check_path: false,
-      env_version: "release",
-      page,
-    });
-
-    let upload = await cloud.uploadFile({
-      cloudPath: config.MEET_TIMEMARK_QR_PATH + timeMark + ".png",
-      fileContent: result.buffer,
-    });
-
-    if (!upload || !upload.fileID) this.AppError("签到码生成失败");
-
-    return await cloudUtil.getTempFileURLOne(upload.fileID);
-  }
-
   /** 管理员按钮核销 */
   async checkinJoin(joinId, flag) {
+    return new CheckinService().checkinJoin(joinId, flag);
     let where = { _id: joinId };
     let join = await JoinModel.getOne(where);
     if (!join) this.AppError("预约记录不存在");
@@ -200,6 +183,7 @@ class AdminMeetService extends BaseAdminService {
 
   /** 本节批量签到/取消签到 */
   async checkinJoinBatch(meetId, timeMark, flag) {
+    return new CheckinService().checkinJoinBatch(meetId, timeMark, flag);
     flag = Number(flag);
     let where = {
       JOIN_MEET_ID: meetId,
@@ -224,24 +208,6 @@ class AdminMeetService extends BaseAdminService {
       }
     }
     return { count: joins.length };
-  }
-
-  /** 管理员扫码核销 */
-  async scanJoin(meetId, code) {
-    let where = {
-      JOIN_MEET_ID: meetId,
-      JOIN_CODE: code,
-      JOIN_STATUS: JoinModel.STATUS.SUCC,
-      JOIN_IS_CHECKIN: 0,
-    };
-    let join = await JoinModel.getOne(where);
-    if (!join) this.AppError("未找到可核销的预约记录");
-
-    await JoinModel.edit(where, { JOIN_IS_CHECKIN: 1 });
-    if (join._id) {
-      let cardService = new UserCardService();
-      await cardService.tryActivateForJoinCheckin(join._id, join.JOIN_USER_ID);
-    }
   }
 
   checkHasJoinCnt(times) {
@@ -270,7 +236,7 @@ class AdminMeetService extends BaseAdminService {
       JOIN_MEET_TIME_MARK: timeMark,
       JOIN_STATUS: JoinModel.STATUS.SUCC,
     };
-    let joins = await JoinModel.getAll(where, "_id", {}, 500);
+    let joins = await JoinModel.getAll(where, "_id,JOIN_USER_ID", {}, 500);
     let data = {
       JOIN_STATUS: JoinModel.STATUS.ADMIN_CANCEL,
       JOIN_REASON: reason || "",
@@ -283,8 +249,10 @@ class AdminMeetService extends BaseAdminService {
     await JoinModel.edit(where, data);
 
     let cardService = new UserCardService();
+    let streakService = new StreakService();
     for (let k in joins || []) {
       await cardService.refundForJoinCancel(joins[k]._id);
+      await streakService.markStreakDirty(joins[k].JOIN_USER_ID);
     }
 
     let meetService = new MeetService();
@@ -453,94 +421,26 @@ class AdminMeetService extends BaseAdminService {
     };
   }
 
-  _buildSlotBlock(meet, slot, tenantConfig, privateCategoryIds) {
-    if (!slot || slot.status === 0 || !slot.start || !slot.end) return null;
-    const style = meet.MEET_STYLE_SET || {};
-    const teacherId = slot.teacherId || style.teacherId || "";
-    if (!teacherId) return null;
-    const isPrivate =
-      slot.slotType === "private" ||
-      privateMeetUtil.isPrivateMeet(meet, privateCategoryIds);
-    const kind = isPrivate ? "private" : "group";
-    const buf = bufferUtil.resolveBufferForSlot(slot, kind, tenantConfig);
-    const block = bufferUtil.computeBlock(
-      slot.start,
-      slot.end,
-      buf.bufferBefore,
-      buf.bufferAfter,
-    );
-    return {
-      ...block,
-      teacherId: String(teacherId),
-      mark: slot.mark || "",
-      title: meet.MEET_TITLE || "",
-    };
-  }
-
   async _validateDayTeacherTimes(meet, meetId, day, times, tenantConfig, privateCategoryIds) {
     const AdminPrivateService = require("./admin_private_service.js");
     const privateService = new AdminPrivateService();
-    const active = (times || []).filter(
-      (t) => t && t.status !== 0 && t.start && t.end,
-    );
-    const batchBlocks = [];
-
-    for (const slot of active) {
-      const candidate = this._buildSlotBlock(
-        meet,
-        slot,
-        tenantConfig,
-        privateCategoryIds,
-      );
-      if (!candidate) continue;
-
-      const existing = await privateService._loadTeacherBlocksForDay(
-        candidate.teacherId,
-        day,
-        "",
-        tenantConfig,
-        privateCategoryIds,
-      );
-      const external = existing.filter(
-        (b) => String(b.meetId) !== String(meetId),
-      );
-
-      for (const b of external) {
-        if (bufferUtil.blocksOverlap(candidate, b)) {
-          this.AppError(
-            "与教练已有排课冲突：「" +
-              (b.title || "课程") +
-              "」" +
-              bufferUtil.formatBlockLabel(b) +
-              "（占用 " +
-              b.blockStart +
-              "-" +
-              b.blockEnd +
-              "）",
-          );
-        }
-      }
-
-      for (const b of batchBlocks) {
-        if (b.teacherId !== candidate.teacherId) continue;
-        if (String(b.mark) === String(candidate.mark)) continue;
-        if (bufferUtil.blocksOverlap(candidate, b)) {
-          this.AppError(
-            "时段 " +
-              slot.start +
-              "-" +
-              slot.end +
-              " 与同日其他时段冲突（占用 " +
-              candidate.blockStart +
-              "-" +
-              candidate.blockEnd +
-              "）",
-          );
-        }
-      }
-
-      batchBlocks.push(candidate);
-    }
+    return await scheduleConflictUtil.validateDayTeacherTimes({
+      meet,
+      meetId,
+      day,
+      times,
+      tenantConfig,
+      privateCategoryIds,
+      loadTeacherBlocks: (teacherId, scheduleDay) =>
+        privateService._loadTeacherBlocksForDay(
+          teacherId,
+          scheduleDay,
+          "",
+          tenantConfig,
+          privateCategoryIds,
+        ),
+      onError: (message) => this.AppError(message),
+    });
   }
 
   /** 更新日期设置 */
@@ -661,6 +561,7 @@ class AdminMeetService extends BaseAdminService {
     isTotal = true,
     oldTotal,
   }) {
+    return new JoinRosterService().getJoinList({ search, sortType, sortVal, orderBy, meetId, mark, page, size, isTotal, oldTotal });
     orderBy = orderBy || {
       JOIN_EDIT_TIME: "desc",
     };
@@ -857,6 +758,7 @@ class AdminMeetService extends BaseAdminService {
     let meetId = join.JOIN_MEET_ID;
     let timeMark = join.JOIN_MEET_TIME_MARK;
     await JoinModel.del({ _id: joinId });
+    await new StreakService().markStreakDirty(join.JOIN_USER_ID);
 
     let meetService = new MeetService();
     await meetService.statJoinCnt(meetId, timeMark);
@@ -888,12 +790,16 @@ class AdminMeetService extends BaseAdminService {
 
     await JoinModel.edit({ _id: joinId }, data);
 
+    // 取消、恢复都会改变有效预约集合，统一标记后由成就页重算。
+    await new StreakService().markStreakDirty(join.JOIN_USER_ID);
+
     if (
       join.JOIN_STATUS === JoinModel.STATUS.SUCC &&
       (status == 10 || status == 99)
     ) {
       let cardService = new UserCardService();
       await cardService.refundForJoinCancel(joinId);
+      await new StreakService().markStreakDirty(join.JOIN_USER_ID);
     }
 
     let meetService = new MeetService();
@@ -932,104 +838,16 @@ class AdminMeetService extends BaseAdminService {
   }
 
   _addDays(dayStr, offset) {
-    const d = new Date(String(dayStr).replace(/-/g, "/") + " 00:00:00");
-    d.setDate(d.getDate() + offset);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${dd}`;
+    return scheduleDateUtil.addDays(dayStr, offset);
   }
 
   /** 复制本周课表到下周 */
   async copyScheduleWeek({ startDay, endDay, excludeDays = [] }) {
-    if (!startDay || !endDay) this.AppError("请选择复制范围");
-    const excludeSet = new Set((excludeDays || []).map(String));
-    const dayRecords = await DayModel.getAllBig(
-      { day: ["between", startDay, endDay] },
-      "day,times,DAY_MEET_ID,dayDesc",
-      { day: "asc" },
-      2000,
-    );
-
-    let copiedDays = 0;
-    let copiedSlots = 0;
-    let skippedSlots = 0;
-    const now = timeUtil.time();
-    const meetIds = new Set();
-
-    for (const rec of dayRecords || []) {
-      const targetDay = this._addDays(rec.day, 7);
-      if (excludeSet.has(targetDay)) continue;
-
-      const sourceTimes = (rec.times || []).filter(
-        (t) => t && t.slotType !== "private" && t.status == 1,
-      );
-      if (!sourceTimes.length) continue;
-
-      const newTimes = [];
-      for (const t of sourceTimes) {
-        const slot = dataUtil.deepClone(t);
-        slot.mark =
-          "T" +
-          targetDay.replace(/-/g, "") +
-          dataUtil.genRandomAlpha(10).toUpperCase();
-        slot.stat = { succCnt: 0, cancelCnt: 0, adminCancelCnt: 0 };
-        newTimes.push(slot);
-      }
-
-      let targetRec = await DayModel.getOne(
-        { DAY_MEET_ID: rec.DAY_MEET_ID, day: targetDay },
-        "times,dayDesc",
-      );
-
-      if (targetRec) {
-        const existing = targetRec.times || [];
-        const existKeys = new Set(
-          existing.map((t) => `${t.start}-${t.end}-${t.teacherId || ""}`),
-        );
-        const toAdd = newTimes.filter(
-          (t) => !existKeys.has(`${t.start}-${t.end}-${t.teacherId || ""}`),
-        );
-        skippedSlots += newTimes.length - toAdd.length;
-        if (!toAdd.length) continue;
-        const merged = this._normTimes([...existing, ...toAdd], targetDay);
-        await DayModel.edit(
-          { DAY_MEET_ID: rec.DAY_MEET_ID, day: targetDay },
-          { times: merged, DAY_EDIT_TIME: now },
-        );
-        copiedSlots += toAdd.length;
-      } else {
-        const weekday = timeUtil.week(targetDay);
-        const dayDesc =
-          timeUtil.fmtDateCHN(targetDay) + " (" + weekday + ")";
-        await DayModel.insert({
-          DAY_MEET_ID: rec.DAY_MEET_ID,
-          day: targetDay,
-          dayDesc,
-          times: this._normTimes(newTimes, targetDay),
-          DAY_ADD_TIME: now,
-          DAY_EDIT_TIME: now,
-        });
-        copiedSlots += newTimes.length;
-      }
-
-      meetIds.add(rec.DAY_MEET_ID);
-      copiedDays++;
-    }
-
-    for (const meetId of meetIds) {
-      await this._syncMeetDaysAfterChange(meetId);
-    }
-
-    return {
-      copiedDays,
-      copiedSlots,
-      skippedSlots,
-      targetStartDay: this._addDays(startDay, 7),
-      targetEndDay: this._addDays(endDay, 7),
-    };
+    return new ScheduleCopyService({
+      normTimes: (times, day) => this._normTimes(times, day),
+      syncMeetDaysAfterChange: (meetId) => this._syncMeetDaysAfterChange(meetId),
+    }).copyScheduleWeek({ startDay, endDay, excludeDays });
   }
-
   /** 教练端周课表 */
   async getScheduleWeek(
     { startDay, endDay, typeId, includeInactive, excludePrivate, onlyMine },

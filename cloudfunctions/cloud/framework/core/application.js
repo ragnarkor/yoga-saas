@@ -11,8 +11,14 @@ const appCode = require('./app_code.js');
 const appOther = require('./app_other.js');
 const config = require('../../config/config.js');
 const routes = require('config/route.js');
+const tenantContext = require('../../project/utils/tenant_context.js');
 
 async function app(event, context) {
+	const pid = config.PID || (event && event.PID) || '';
+	return await tenantContext.runWithPID(pid, () => appWithTenantContext(event, context));
+}
+
+async function appWithTenantContext(event, context) {
 
 	// 非标业务处理
 	let {
@@ -68,8 +74,12 @@ async function app(event, context) {
 		let timeTicks = timeUtil.time();
 		let openId = wxContext.OPENID;
 
-		console.log('▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤');
-		console.log(`【↘${time} ENV (${config.CLOUD_ID})】【Request Base↘↘↘】\n【↘Route =***${r}】\n【↘Controller = ${controllerName}】\n【↘Action = ${actionName}】\n【↘OPENID = ${openId}】`);
+		console.log('[Cloud request]', {
+			route: r,
+			controller: controllerName,
+			action: actionName,
+			time
+		});
 
 
 
@@ -144,13 +154,13 @@ async function app(event, context) {
 		}
 
 
-		console.log('------');
 		time = timeUtil.time('Y-M-D h:m:s');
 		timeTicks = timeUtil.time() - timeTicks;
-		console.log(`【${time}】【Return Base↗↗↗】\n【↗Route =***${r}】\n【↗Duration = ${timeTicks}ms】\n【↗↗OUT DATA】= `, result);
-		console.log('▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦');
-		console.log('');
-		console.log('');
+		console.log('[Cloud response]', {
+			route: r,
+			durationMs: timeTicks,
+			code: result.code
+		});
 
 		return result;
 
@@ -205,7 +215,12 @@ function beforeApp(method) {
 
 // 展示当前输入数据
 function showEvent(event) {
-	console.log(event);
+	console.warn('[Invalid cloud request]', {
+		route: event && event.route,
+		paramKeys: event && event.params && typeof event.params === 'object'
+			? Object.keys(event.params)
+			: []
+	});
 }
 
 module.exports = {

@@ -43,6 +43,7 @@ module.exports = {
 
   "private/meta": "private_controller@getMeta",
   "private/available_slots": "private_controller@getAvailableSlots",
+  "private/day_schedule": "private_controller@getDaySchedule",
   "private/book": "private_controller@bookSession",
 
   "my/my_join_list": "meet_controller@getMyJoinList",
@@ -128,6 +129,7 @@ module.exports = {
   // [AI_START TIMESTAMP=2025-01-25 12:00:00]
   "admin/setup_feature": "admin/admin_setup_controller@setupFeature#noDemo",
   "admin/setup_feature_get": "admin/admin_setup_controller@getFeature",
+  "admin/db_indexes_ensure": "admin/admin_setup_controller@ensureDbIndexes#noDemo",
   // [AI_END LINES=2 TIMESTAMP=2025-01-25 12:00:00]
 
   "admin/home_banner_list": "admin/admin_home_controller@getBannerList",
@@ -186,12 +188,10 @@ module.exports = {
     "admin/admin_meet_controller@cancelJoinByTimeMark#noDemo",
   "admin/meet_restore_time_slot":
     "admin/admin_meet_controller@restoreScheduleSlot#noDemo",
-  "admin/join_scan": "admin/admin_meet_controller@scanJoin#noDemo",
   "admin/join_checkin": "admin/admin_meet_controller@checkinJoin#noDemo",
   "admin/join_checkin_batch":
     "admin/admin_meet_controller@checkinJoinBatch#noDemo",
   "admin/group_book": "admin/admin_meet_controller@bookGroupJoin#noDemo",
-  "admin/self_checkin_qr": "admin/admin_meet_controller@genSelfCheckinQr",
   "admin/meet_day_list": "admin/admin_meet_controller@getDayList",
 
   "admin/join_data_get": "admin/admin_export_controller@joinDataGet",
