@@ -144,7 +144,7 @@
 
         <view class="ach-badge-grid">
           <view
-            class="ach-badge-item {{item.unlocked ? '' : 'ach-badge-item--locked'}}"
+            class="ach-badge-item ach-badge-item--{{item.rarity}} {{item.unlocked ? '' : 'ach-badge-item--locked'}}"
             wx:for="{{badges}}"
             wx:key="id"
             data-index="{{index}}"
@@ -152,6 +152,10 @@
           >
             <text class="ach-badge-emoji">{{item.emoji}}</text>
             <text class="ach-badge-name">{{item.name}}</text>
+            <text class="ach-badge-meta">{{item.categoryName}} · {{item.rarityName}}</text>
+            <view class="ach-badge-progress" wx:if="{{!item.unlocked && item.target}}">
+              <view class="ach-badge-progress-fill" style="width:{{item.progressPercent}}%;background:{{themeColor}}" />
+            </view>
             <text class="ach-badge-new" wx:if="{{item.isNew}}">NEW</text>
           </view>
         </view>
@@ -195,6 +199,8 @@
 
       <text class="ach-badge-popup-desc">{{activeBadge.desc}}</text>
 
+      <view class="ach-badge-popup-meta">{{activeBadge.categoryName}} · {{activeBadge.rarityName}}</view>
+
       <view wx:if="{{activeBadge.unlocked}}" class="ach-badge-popup-done">
 
         {{activeBadge.unlockedAt ? activeBadge.unlockedAt + ' 已解锁' : '已解锁'}}
@@ -204,6 +210,10 @@
       <view wx:else class="ach-badge-popup-progress">
 
         <text>{{activeBadge.progressHint || '继续努力'}}</text>
+
+        <view class="ach-badge-popup-progress-track" wx:if="{{activeBadge.target}}">
+          <view class="ach-badge-popup-progress-fill" style="width:{{activeBadge.progressPercent}}%;background:{{themeColor}}" />
+        </view>
 
         <text wx:if="{{activeBadge.target}}">{{activeBadge.progress || 0}} / {{activeBadge.target}}</text>
 

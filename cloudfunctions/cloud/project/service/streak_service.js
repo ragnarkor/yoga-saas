@@ -16,17 +16,17 @@ const STREAK_SYNC_VERSION = 3;
 const STREAK_COLLECTIONS = ["ax_checkin_streak"];
 
 const BADGE_DEFS = [
-  { id: "first_class", name: "初心者", desc: "完成第一次上课", emoji: "🌱", type: "classes", target: 1 },
-  { id: "classes_10", name: "十步之遥", desc: "累计上课 10 次", emoji: "👣", type: "classes", target: 10 },
-  { id: "classes_30", name: "月度常客", desc: "累计上课 30 次", emoji: "🌙", type: "classes", target: 30 },
-  { id: "classes_50", name: "稳定修行", desc: "累计上课 50 次", emoji: "🪷", type: "classes", target: 50 },
-  { id: "classes_100", name: "百课不倦", desc: "累计上课 100 次", emoji: "👑", type: "classes", target: 100 },
-  { id: "classes_200", name: "瑜伽深耕", desc: "累计上课 200 次", emoji: "⛰️", type: "classes", target: 200 },
-  { id: "streak_4", name: "月月不断", desc: "连续上课 4 周", emoji: "🔥", type: "streak", target: 4 },
-  { id: "streak_8", name: "习惯养成", desc: "连续上课 8 周", emoji: "💪", type: "streak", target: 8 },
-  { id: "streak_12", name: "季度达人", desc: "连续上课 12 周", emoji: "⭐", type: "streak", target: 12 },
-  { id: "streak_24", name: "半年坚守", desc: "连续上课 24 周", emoji: "🏆", type: "streak", target: 24 },
-  { id: "streak_max_12", name: "最长记录", desc: "历史最长连续 ≥ 12 周", emoji: "📈", type: "streak_max", target: 12 },
+  { id: "first_class", name: "初心者", desc: "完成第一次上课", emoji: "🌱", type: "classes", target: 1, category: "milestone", categoryName: "里程碑", rarity: "common", rarityName: "初阶" },
+  { id: "classes_10", name: "十步之遥", desc: "累计上课 10 次", emoji: "👣", type: "classes", target: 10, category: "milestone", categoryName: "里程碑", rarity: "common", rarityName: "初阶" },
+  { id: "classes_30", name: "月度常客", desc: "累计上课 30 次", emoji: "🌙", type: "classes", target: 30, category: "milestone", categoryName: "里程碑", rarity: "rare", rarityName: "稀有" },
+  { id: "classes_50", name: "稳定修行", desc: "累计上课 50 次", emoji: "🪷", type: "classes", target: 50, category: "milestone", categoryName: "里程碑", rarity: "rare", rarityName: "稀有" },
+  { id: "classes_100", name: "百课不倦", desc: "累计上课 100 次", emoji: "👑", type: "classes", target: 100, category: "milestone", categoryName: "里程碑", rarity: "epic", rarityName: "珍贵" },
+  { id: "classes_200", name: "瑜伽深耕", desc: "累计上课 200 次", emoji: "⛰️", type: "classes", target: 200, category: "milestone", categoryName: "里程碑", rarity: "legendary", rarityName: "典藏" },
+  { id: "streak_4", name: "月月不断", desc: "连续上课 4 周", emoji: "🔥", type: "streak", target: 4, category: "consistency", categoryName: "坚持", rarity: "common", rarityName: "初阶" },
+  { id: "streak_8", name: "习惯养成", desc: "连续上课 8 周", emoji: "💪", type: "streak", target: 8, category: "consistency", categoryName: "坚持", rarity: "rare", rarityName: "稀有" },
+  { id: "streak_12", name: "季度达人", desc: "连续上课 12 周", emoji: "⭐", type: "streak", target: 12, category: "consistency", categoryName: "坚持", rarity: "epic", rarityName: "珍贵" },
+  { id: "streak_24", name: "半年坚守", desc: "连续上课 24 周", emoji: "🏆", type: "streak", target: 24, category: "consistency", categoryName: "坚持", rarity: "legendary", rarityName: "典藏" },
+  { id: "streak_max_12", name: "最长记录", desc: "历史最长连续 ≥ 12 周", emoji: "📈", type: "streak_max", target: 12, category: "consistency", categoryName: "坚持", rarity: "epic", rarityName: "珍贵" },
 ];
 
 class StreakService extends BaseService {
@@ -340,6 +340,11 @@ class StreakService extends BaseService {
         name: def.name,
         desc: def.desc,
         emoji: def.emoji,
+        category: def.category,
+        categoryName: def.categoryName,
+        rarity: def.rarity,
+        rarityName: def.rarityName,
+        tier: def.target,
         unlocked,
         isNew: unlocked && at && now - at <= NEW_BADGE_MS,
       };
@@ -352,14 +357,17 @@ class StreakService extends BaseService {
       if (def.type === "classes") {
         base.progress = total;
         base.target = def.target;
+        base.progressPercent = Math.min(100, Math.round((total / def.target) * 100));
         base.progressHint = `还差 ${Math.max(0, def.target - total)} 次`;
       } else if (def.type === "streak") {
         base.progress = current;
         base.target = def.target;
+        base.progressPercent = Math.min(100, Math.round((current / def.target) * 100));
         base.progressHint = `还差 ${Math.max(0, def.target - current)} 周`;
       } else if (def.type === "streak_max") {
         base.progress = max;
         base.target = def.target;
+        base.progressPercent = Math.min(100, Math.round((max / def.target) * 100));
         base.progressHint =
           max >= def.target
             ? ""

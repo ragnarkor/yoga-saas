@@ -571,6 +571,12 @@
 .ach-badge-item--locked { background: #f8f7f3; border-color: #eee; }
 .ach-badge-emoji { font-size: 52rpx; }
 .ach-badge-name { color: #53675b; font-size: 23rpx; }
+.ach-badge-meta { margin-top: 6rpx; color: #a0a79d; font-size: 19rpx; }
+.ach-badge-progress { width: 112rpx; height: 8rpx; margin-top: 12rpx; overflow: hidden; border-radius: 99rpx; background: #e8e6df; }
+.ach-badge-progress-fill { height: 100%; border-radius: inherit; }
+.ach-badge-item--rare { border-color: #d7c49b; }
+.ach-badge-item--epic { border-color: #c7b5df; }
+.ach-badge-item--legendary { border-color: #d4ae62; box-shadow: inset 0 0 0 1rpx rgba(212,174,98,.18); }
 .ach-actions { margin: 8rpx 28rpx 36rpx; }
 .ach-btn { border-radius: 999rpx; box-shadow: 0 8rpx 18rpx rgba(73,77,61,.08); }
 .ach-page { background: #fcfbf8; }
@@ -633,6 +639,9 @@
   color: #888;
 
 }
+.ach-badge-popup-meta { margin-top: 12rpx; color: #9a9c91; font-size: 23rpx; }
+.ach-badge-popup-progress-track { width: 360rpx; height: 12rpx; margin: 20rpx auto 12rpx; overflow: hidden; border-radius: 99rpx; background: #eceae4; }
+.ach-badge-popup-progress-fill { height: 100%; border-radius: inherit; }
 
 
 
