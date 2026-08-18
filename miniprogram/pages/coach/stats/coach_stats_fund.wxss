@@ -118,55 +118,9 @@
   line-height: 1.5;
 }
 
-.income-trend-scroll {
-  width: 100%;
-  white-space: nowrap;
-}
-
-.income-trend-bars {
-  display: inline-flex;
-  align-items: flex-end;
-  gap: 12rpx;
-  padding: 8rpx 24rpx 24rpx;
-  min-height: 240rpx;
-}
-
-.income-trend-item {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  width: 72rpx;
-  flex-shrink: 0;
-}
-
-.income-trend-bar-wrap {
-  width: 100%;
-  height: 140rpx;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.income-trend-bar {
-  width: 28rpx;
-  min-height: 4rpx;
-  border-radius: 8rpx 8rpx 4rpx 4rpx;
-  transition: height 0.25s ease;
-}
-
-.income-trend-label {
-  margin-top: 10rpx;
-  font-size: 20rpx;
-  color: var(--neutralTextTertiary, #8f959e);
-  white-space: nowrap;
-}
-
-.income-trend-amt {
-  margin-top: 4rpx;
-  font-size: 18rpx;
-  color: var(--neutralTextSecondary, #646a73);
-  white-space: nowrap;
-}
+.income-trend-chart { width: 100%; height: 360rpx; padding: 12rpx 0 0; box-sizing: border-box; }
+.income-trend-canvas { display: block; width: 100%; height: 100%; }
+.income-trend-caption { display: flex; justify-content: space-between; padding: 0 12rpx; color: var(--neutralTextTertiary, #8f959e); font-size: 20rpx; }
 
 .income-list-row {
   padding-top: 20rpx;

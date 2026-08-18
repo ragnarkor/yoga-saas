@@ -1,15 +1,13 @@
 {
   "navigationStyle": "custom",
-  "navigationBarTitleText": "首页内容",
-  "enablePullDownRefresh": true,
+  "navigationBarTitleText": "编辑公告",
+  "enablePullDownRefresh": false,
   "usingComponents": {
     "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt",
     "van-icon": "@vant/weapp/icon/index",
     "van-loading": "@vant/weapp/loading/index",
-    "van-empty": "/cmpts/public/empty/empty_cmpt",
-    "van-swipe-cell": "@vant/weapp/swipe-cell/index",
-    "van-popup": "@vant/weapp/popup/index",
+    "van-button": "@vant/weapp/button/index",
     "van-field": "@vant/weapp/field/index",
-    "van-button": "@vant/weapp/button/index"
+    "van-popup": "@vant/weapp/popup/index"
   }
 }

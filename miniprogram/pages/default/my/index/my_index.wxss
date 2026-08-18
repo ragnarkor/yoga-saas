@@ -196,19 +196,20 @@
   gap: 20rpx;
 }
 
-.today-scan {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  padding: 8rpx 16rpx;
-  border-radius: 999rpx;
-  background: var(--projectColorLight, #e8f2ed);
-  font-size: 24rpx;
-  color: var(--themeColor, #5b8a72);
+.today-checkin-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6rpx;
+	margin-top: 8rpx;
+	padding: 8rpx 16rpx;
+	border-radius: 999rpx;
+	background: var(--projectColorLight, #e8f2ed);
+	font-size: 24rpx;
+	color: var(--themeColor, #5b8a72);
 }
 
-.today-scan:active {
-  opacity: 0.85;
+.today-checkin-btn:active {
+	opacity: 0.85;
 }
 
 .today-state {

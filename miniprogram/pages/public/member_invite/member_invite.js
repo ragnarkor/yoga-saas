@@ -1,5 +1,8 @@
 const pageHelper = require("../../../helper/page_helper.js");
 const cloudHelper = require("../../../helper/cloud_helper.js");
+const themeHelper = require("../../../helper/theme_helper.js");
+
+const initialTheme = pageHelper.getThemeColor();
 
 Page({
   data: {
@@ -8,6 +11,8 @@ Page({
     errMsg: "",
     tenantName: "",
     isNew: false,
+    themeColor: initialTheme,
+    pageStyle: themeHelper.getPageMetaStyle(initialTheme),
   },
 
   onLoad(options) {
@@ -46,11 +51,15 @@ Page({
         pageHelper.setTenant(data.tenant);
       }
 
+      const themeColor = pageHelper.getThemeColor();
+
       this.setData({
         loading: false,
         success: true,
         tenantName: data.tenant?.TENANT_NAME || pageHelper.getTenantName(),
         isNew: !!data.isNew,
+        themeColor,
+        pageStyle: themeHelper.getPageMetaStyle(themeColor),
       });
     } catch (e) {
       console.error(e);

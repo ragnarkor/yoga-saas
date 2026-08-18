@@ -35,10 +35,6 @@
 						<text wx:if="{{!myTodayLoading && myTodayList.length}}" class="today-badge">{{myTodayList.length}}</text>
 					</view>
 				<view class="today-head-actions">
-					<view class="today-scan" catchtap="bindScanCheckinTap">
-						<van-icon name="scan" size="28rpx" color="{{themeColor}}" />
-						<text>扫码签到</text>
-					</view>
 					<view class="today-link" bindtap="url" data-type="switch" data-url="/pages/default/news/cate1/news_cate1">
 						<text>全部记录</text>
 						<van-icon name="arrow" size="24rpx" color="#969799" />
@@ -79,7 +75,11 @@
 								<text wx:elif="{{item.JOIN_STATUS==99}}" class="today-tag today-tag--system">系统取消</text>
 								<text wx:elif="{{item.JOIN_STATUS==0}}" class="today-tag today-tag--pending">待确认</text>
 							</view>
-							<text wx:if="{{item.JOIN_STATUS==1 && item.JOIN_IS_CHECKIN!=1}}" class="today-hint">到场后扫描场馆签到码，或向工作人员出示预约码</text>
+							<text wx:if="{{item.JOIN_STATUS==1 && item.JOIN_IS_CHECKIN!=1}}" class="today-hint">到场后开启定位并完成签到</text>
+							<view wx:if="{{item.JOIN_STATUS==1 && item.JOIN_IS_CHECKIN!=1}}" class="today-checkin-btn" catchtap="bindLocationCheckinTap" data-time-mark="{{item.JOIN_MEET_TIME_MARK}}">
+								<van-icon name="location-o" size="26rpx" color="{{themeColor}}" />
+								<text>到店签到</text>
+							</view>
 						</view>
 						<van-icon name="arrow" size="28rpx" color="#c8c9cc" custom-class="today-arrow" />
 					</view>

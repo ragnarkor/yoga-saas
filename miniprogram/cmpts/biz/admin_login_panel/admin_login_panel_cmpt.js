@@ -52,7 +52,8 @@ Component({
         const pages = getCurrentPages();
         const page = pages[pages.length - 1];
         if (page?.getTabBar) {
-          page.getTabBar().setData({ hidden });
+          const tabBar = page.getTabBar();
+          if (tabBar) tabBar.setData({ hidden });
         }
       } catch (err) {
         console.log(err);

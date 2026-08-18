@@ -38,64 +38,32 @@
 
     <scroll-view scroll-y class="hc-body" enhanced show-scrollbar="{{false}}">
       <block wx:if="{{activeTab === 0}}">
-        <view class="hc-add-btn" data-type="banner" bindtap="bindAddTap">
-          <van-icon name="plus" size="32rpx" color="{{themeColor}}" />
-          <text style="color: {{themeColor}}">新增横幅</text>
-        </view>
         <van-empty wx:if="{{!banners.length}}" description="暂无横幅，会员端将显示默认封面" />
-        <view class="hc-banner-card" wx:for="{{banners}}" wx:key="_id">
-          <image
-            wx:if="{{item.BANNER_PIC}}"
-            class="hc-banner-img"
-            src="{{item.BANNER_PIC}}"
-            mode="aspectFill"
-          />
-          <view wx:else class="hc-banner-img hc-banner-img--placeholder">
-            <van-icon name="photo-o" size="48rpx" color="#c8c9cc" />
+        <van-swipe-cell wx:for="{{banners}}" wx:key="_id" id="home-swipe-{{item._id}}" data-swipe-id="{{item._id}}" right-width="72" bind:open="bindSwipeOpen" custom-class="hc-swipe-cell">
+          <view class="hc-banner-card" data-type="banner" data-id="{{item._id}}" bindtap="bindEditTap">
+            <image wx:if="{{item.BANNER_PIC}}" class="hc-banner-img" src="{{item.BANNER_PIC}}" mode="aspectFill" />
+            <view wx:else class="hc-banner-img hc-banner-img--placeholder"><van-icon name="photo-o" size="48rpx" color="#c8c9cc" /></view>
+            <view class="hc-banner-meta"><text class="hc-card-title">{{item.BANNER_TITLE || '未命名横幅'}}</text><text class="hc-card-desc">排序 {{item.BANNER_ORDER || 0}}</text></view>
           </view>
-          <view class="hc-banner-meta">
-            <text class="hc-card-title">{{item.BANNER_TITLE || '未命名横幅'}}</text>
-            <text class="hc-card-desc">排序 {{item.BANNER_ORDER || 0}}</text>
-            <view class="hc-card-actions">
-              <view class="hc-action-btn" data-type="banner" data-id="{{item._id}}" catchtap="bindEditTap">
-                <van-icon name="edit" size="32rpx" color="{{themeColor}}" />
-              </view>
-              <view class="hc-action-btn hc-action-btn--danger" data-type="banner" data-id="{{item._id}}" catchtap="bindDelTap">
-                <van-icon name="delete-o" size="32rpx" color="#ee0a24" />
-              </view>
-            </view>
-          </view>
-        </view>
+          <view slot="right" class="hc-swipe-del" data-type="banner" data-id="{{item._id}}" catchtap="bindDelTap">删除</view>
+        </van-swipe-cell>
       </block>
 
       <block wx:else>
-        <view class="hc-add-btn" data-type="announce" bindtap="bindAddTap">
-          <van-icon name="plus" size="32rpx" color="{{themeColor}}" />
-          <text style="color: {{themeColor}}">新增公告</text>
-        </view>
         <van-empty wx:if="{{!announces.length}}" description="暂无公告" />
-        <view class="hc-list-card" wx:for="{{announces}}" wx:key="_id">
-          <view class="hc-list-icon" style="background: {{themeColor}}18;">
-            <van-icon name="volume-o" size="36rpx" color="{{themeColor}}" />
+        <van-swipe-cell wx:for="{{announces}}" wx:key="_id" id="home-swipe-{{item._id}}" data-swipe-id="{{item._id}}" right-width="72" bind:open="bindSwipeOpen" custom-class="hc-swipe-cell">
+          <view class="hc-list-card" data-type="announce" data-id="{{item._id}}" bindtap="bindEditTap">
+            <view class="hc-list-icon" style="background: {{themeColor}}18;"><van-icon name="volume-o" size="36rpx" color="{{themeColor}}" /></view>
+            <view class="hc-list-body"><text class="hc-card-title">{{item.ANNOUNCE_TITLE}}</text><text class="hc-card-desc">{{item.ANNOUNCE_DESC || '无描述'}}</text></view>
+            <van-icon name="arrow" size="28rpx" color="#c8c9cc" />
           </view>
-          <view class="hc-list-body">
-            <text class="hc-card-title">{{item.ANNOUNCE_TITLE}}</text>
-            <text class="hc-card-desc">{{item.ANNOUNCE_DESC || '无描述'}}</text>
-          </view>
-          <view class="hc-card-actions">
-            <view class="hc-action-btn" data-type="announce" data-id="{{item._id}}" catchtap="bindEditTap">
-              <van-icon name="edit" size="32rpx" color="{{themeColor}}" />
-            </view>
-            <view class="hc-action-btn hc-action-btn--danger" data-type="announce" data-id="{{item._id}}" catchtap="bindDelTap">
-              <van-icon name="delete-o" size="32rpx" color="#ee0a24" />
-            </view>
-          </view>
-        </view>
+          <view slot="right" class="hc-swipe-del" data-type="announce" data-id="{{item._id}}" catchtap="bindDelTap">删除</view>
+        </van-swipe-cell>
       </block>
     </scroll-view>
   </block>
 
-  <van-popup show="{{popupShow}}" position="bottom" round bind:close="bindPopupClose" custom-class="hc-popup">
+  <van-popup wx:if="{{popupShow}}" show="{{popupShow}}" position="bottom" round bind:close="bindPopupClose" custom-class="hc-popup">
     <view class="hc-popup-head">
       <text class="hc-popup-title">{{popupTitle}}</text>
       <view class="hc-popup-close" bindtap="bindPopupClose">
@@ -109,17 +77,6 @@
         bind:input="bindFormInput"
         label="标题"
         placeholder="请输入标题"
-        border="{{ false }}"
-      />
-      <van-field
-        wx:if="{{popupType == 'announce'}}"
-        value="{{form.desc}}"
-        data-field="desc"
-        bind:input="bindFormInput"
-        label="描述"
-        type="textarea"
-        placeholder="请输入描述"
-        autosize="{{ {maxHeight: 200} }}"
         border="{{ false }}"
       />
       <view wx:if="{{popupType == 'banner'}}" class="hc-upload">
@@ -142,4 +99,5 @@
       </van-button>
     </view>
   </van-popup>
+  <view class="hc-fab" data-type="{{activeTab === 0 ? 'banner' : 'announce'}}" bindtap="bindAddTap"><van-icon name="plus" size="46rpx" color="#fff" /></view>
 </view>

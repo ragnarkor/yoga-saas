@@ -58,20 +58,12 @@
 
     <view class="stats-section" wx:if="{{showTrend}}">
       <view class="stats-section-title">{{range === 'month' ? '本月耗卡趋势' : '近12月耗卡趋势'}}</view>
-      <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="income-trend-scroll">
-        <view class="income-trend-bars">
-          <view class="income-trend-item" wx:for="{{trend}}" wx:key="day">
-            <view class="income-trend-bar-wrap">
-              <view
-                class="income-trend-bar"
-                style="height: {{item.barPct}}%; background: {{themeColor}};"
-              ></view>
-            </view>
-            <text class="income-trend-label">{{item.label}}</text>
-            <text class="income-trend-amt">¥{{item.amountText}}</text>
-          </view>
-        </view>
-      </scroll-view>
+      <view class="income-trend-chart">
+        <canvas type="2d" id="incomeTrendCanvas" class="income-trend-canvas" />
+      </view>
+      <view class="income-trend-caption">
+        <text wx:for="{{trend}}" wx:key="day">{{item.label}}</text>
+      </view>
     </view>
 
     <view class="stats-section">

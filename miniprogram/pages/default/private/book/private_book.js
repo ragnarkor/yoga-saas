@@ -16,6 +16,17 @@ function formatDayStr(d) {
   return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
 }
 
+function timeToMin(value) {
+  const parts = String(value || '').split(':');
+  return Number(parts[0] || 0) * 60 + Number(parts[1] || 0);
+}
+
+function minToTime(value) {
+  const h = String(Math.floor(value / 60)).padStart(2, '0');
+  const m = String(value % 60).padStart(2, '0');
+  return h + ':' + m;
+}
+
 function buildDateList(maxBookDays) {
   const days = Math.max(1, Number(maxBookDays) || 14);
   const list = [];
@@ -67,6 +78,12 @@ Page({
     cardNeedTimes: 1,
     submitBtnText: '请先选择时段',
     pickerSheetOpen: false,
+    dayScheduleShow: false,
+    dayScheduleLoading: false,
+    dayScheduleError: '',
+    dayQuickSlots: [],
+    customTimeHint: '',
+    timeAvailable: false,
   },
 
   onLoad(options) {
@@ -207,11 +224,11 @@ Page({
   async _loadSlots() {
     const { form } = this.data;
     if (!form.meetId || !form.teacherId || !form.day) {
-      this.setData({ slots: [], 'form.start': '', 'form.end': '' });
+      this.setData({ slots: [], 'form.start': '', 'form.end': '', timeAvailable: false });
       return;
     }
 
-    this.setData({ slotsLoading: true, slots: [], 'form.start': '', 'form.end': '' });
+    this.setData({ slotsLoading: true, slots: [], 'form.start': '', 'form.end': '', timeAvailable: false });
     try {
       const res = await cloudHelper.callCloudData(
         'private/available_slots',
@@ -224,7 +241,10 @@ Page({
       );
       this.setData({
         slotsLoading: false,
-        slots: (res && res.slots) || [],
+        slots: ((res && res.slots) || []).filter((item) => {
+          const minute = Number(String(item.start || '').split(':')[1]);
+          return minute % 30 === 0;
+        }),
         'form.duration': (res && res.duration) || form.duration,
       }, () => this._updateSubmitBtnText());
     } catch (e) {
@@ -242,6 +262,7 @@ Page({
       'form.duration': course.duration || 60,
       'form.start': '',
       'form.end': '',
+      timeAvailable: false,
     };
     if (course.teacherId && !this.data.form.teacherId) {
       patch['form.teacherId'] = course.teacherId;
@@ -261,6 +282,7 @@ Page({
       'form.teacherName': teacherName || '',
       'form.start': '',
       'form.end': '',
+      timeAvailable: false,
     }, () => this._loadSlots());
   },
 
@@ -276,7 +298,45 @@ Page({
       'form.dayDisplay': privateScheduleHelper.buildDayDesc(day),
       'form.start': '',
       'form.end': '',
+      timeAvailable: false,
     }, () => this._loadSlots());
+  },
+
+  async bindViewScheduleTap() {
+    const { meetId, teacherId, day } = this.data.form;
+    if (!meetId || !teacherId || !day) {
+      wx.showToast({ title: '请先选择课程、教练和日期', icon: 'none' });
+      return;
+    }
+    this.setData({ dayScheduleShow: true, dayScheduleLoading: true, dayScheduleError: '', dayQuickSlots: [] });
+    try {
+      const res = await cloudHelper.callCloudData(
+        'private/day_schedule',
+        { meetId, teacherId, day },
+        { hint: false },
+      );
+      this.setData({ dayScheduleLoading: false, dayScheduleError: '', dayQuickSlots: (res && res.quickSlots) || [] });
+    } catch (err) {
+      console.error('[private/day_schedule]', err);
+      this.setData({ dayScheduleLoading: false, dayScheduleError: '排班暂时加载失败，请稍后重试', dayQuickSlots: [] });
+      wx.showToast({ title: '排班加载失败，请重试', icon: 'none' });
+    }
+  },
+
+  bindDayScheduleClose() {
+    this.setData({ dayScheduleShow: false });
+  },
+
+  bindQuickScheduleSlotTap(e) {
+    const { start, end } = e.currentTarget.dataset;
+    if (!start || !end) return;
+    this.setData({
+      'form.start': start,
+      'form.end': end,
+      customTimeHint: '已选择快速时段',
+      timeAvailable: true,
+      dayScheduleShow: false,
+    }, () => this._updateSubmitBtnText());
   },
 
   bindSlotTap(e) {
@@ -285,13 +345,37 @@ Page({
     this.setData({
       'form.start': start,
       'form.end': end || '',
+      timeAvailable: !!end,
     }, () => this._updateSubmitBtnText());
+  },
+
+  async bindCustomTimeChange(e) {
+    const start = e.detail && e.detail.value;
+    if (!start) return;
+    const { form } = this.data;
+    this.setData({ 'form.start': start, 'form.end': '', timeAvailable: false, customTimeHint: '正在检查时间...' });
+    try {
+      const res = await cloudHelper.callCloudData(
+        'private/available_slots',
+        { meetId: form.meetId, teacherId: form.teacherId, day: form.day, start },
+        { hint: false },
+      );
+      const slot = res && res.customSlot;
+      if (slot) {
+        this.setData({ 'form.end': slot.end, timeAvailable: true, customTimeHint: '时间可用' }, () => this._updateSubmitBtnText());
+      } else {
+        this.setData({ 'form.end': '', timeAvailable: false, customTimeHint: '该时间不可用，请换一个时间' }, () => this._updateSubmitBtnText());
+      }
+    } catch (err) {
+      console.error('[private/custom-time]', err);
+      this.setData({ 'form.end': '', timeAvailable: false, customTimeHint: '时间检查失败，请重试' }, () => this._updateSubmitBtnText());
+    }
   },
 
   async bindSubmitTap() {
     if (this.data.submitting) return;
     const { form, cardCanBook, cardNeedTimes } = this.data;
-    if (!form.meetId || !form.teacherId || !form.day || !form.start) {
+    if (!form.meetId || !form.teacherId || !form.day || !form.start || !form.end || !this.data.timeAvailable) {
       wx.showToast({ title: '请选择课程、教练和时段', icon: 'none' });
       return;
     }

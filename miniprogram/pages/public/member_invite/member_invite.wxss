@@ -14,7 +14,7 @@
   width: 120rpx;
   height: 120rpx;
   border-radius: 50%;
-  background: #5b8a72;
+  background: var(--themeColor, #5b8a72);
   color: #fff;
   font-size: 64rpx;
   display: flex;
@@ -42,7 +42,7 @@
 
 .invite-tenant {
   font-size: 32rpx;
-  color: #5b8a72;
+  color: var(--themeColor, #5b8a72);
   font-weight: 600;
   margin-bottom: 48rpx;
 }

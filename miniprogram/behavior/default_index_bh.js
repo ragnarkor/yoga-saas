@@ -115,15 +115,12 @@ module.exports = Behavior({
         return;
       }
 
-      try {
-        await cloudHelper.callCloudSumbit(
+      // 会员初始化与首页公开内容无依赖关系，不阻塞首页数据请求。
+      const ensureMemberTask = cloudHelper.callCloudSumbit(
           "passport/ensure_member",
           {},
           { hint: false },
-        );
-      } catch (err) {
-        console.warn("[home/ensure_member]", err);
-      }
+        ).catch((err) => console.warn("[home/ensure_member]", err));
 
       try {
         let data = await cloudHelper.callCloudData(
@@ -148,6 +145,8 @@ module.exports = Behavior({
           photos,
           photoAlbums,
         });
+        // 初始化失败不影响首页首屏；后台任务完成即可。
+        ensureMemberTask.catch(() => {});
       } catch (err) {
         console.error("[home/index]", err);
       }

@@ -31,6 +31,15 @@ App({
 		}
 	},
 
+	// 云请求超时或开发者工具切换页面时，避免残留 loading 遮罩拦截所有触摸。
+	onShow: function () {
+		try {
+			wx.hideLoading();
+			wx.hideNavigationBarLoading();
+		} catch (e) {
+			console.warn('[app] clear loading mask failed', e);
+		}
+	},
 
 	/*
 	onShow: function (options) {

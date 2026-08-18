@@ -20,6 +20,8 @@ Component({
     defaultCoachId: { type: String, value: "" },
     /** admin=归属教练(adminId)；teacher=授课教练(teacher._id) */
     idMode: { type: String, value: "admin" },
+    /** 可选：由页面直接传入教练列表（会员端避免调用管理端接口） */
+    teachers: { type: Array, value: null },
   },
 
   data: {
@@ -31,6 +33,9 @@ Component({
   },
 
   observers: {
+    teachers(list) {
+      if (Array.isArray(list)) this._setCoachList(list);
+    },
     value(coachId) {
       this._syncSelected(coachId);
     },
@@ -44,11 +49,47 @@ Component({
   lifetimes: {
     attached() {
       this.setData({ displayText: this.data.placeholder });
-      this._loadCoaches();
+      if (Array.isArray(this.data.teachers)) {
+        this._setCoachList(this.data.teachers);
+      } else {
+        this._loadCoaches();
+      }
     },
   },
 
   methods: {
+    async _setCoachList(rawList) {
+      const list = Array.isArray(rawList) ? rawList : [];
+      const avatarUrls = list
+        .map((t) => t.TEACHER_AVATAR || t.avatar || "")
+        .filter(Boolean);
+      let avatarMap = {};
+      try {
+        avatarMap = await UserProfileBiz.resolveAvatarUrlMap(avatarUrls);
+      } catch (e) {
+        console.warn("coach_picker avatar resolve error:", e);
+      }
+      const idMode = this.data.idMode === "teacher" ? "teacher" : "admin";
+      const coachList = list.map((t) => {
+        const avatar = t.TEACHER_AVATAR || t.avatar || "";
+        const coachId = t.TEACHER_ADMIN_ID || t.coachId || t._id;
+        const teacherId = t.teacherId || t._id;
+        const pickId = idMode === "teacher" ? teacherId : coachId;
+        return {
+          pickId,
+          coachId,
+          teacherId,
+          name: t.TEACHER_NAME || t.name || "",
+          specialty: t.TEACHER_SPECIALTY || t.specialty || "",
+          avatar,
+          avatarSrc: avatar ? avatarMap[avatar] || "" : "",
+        };
+      }).filter((t) => t.pickId && t.name);
+      this.setData({ coachList, loading: false });
+      if (this.data.value) this._syncSelected(this.data.value);
+      else if (this.data.defaultCoachId) this._applyDefault(this.data.defaultCoachId);
+    },
+
     async _loadCoaches() {
       this.setData({ loading: true });
       try {
@@ -63,32 +104,7 @@ Component({
           { hint: false },
         );
         const rawList = (res && res.list) || [];
-        const avatarUrls = rawList
-          .map((t) => t.TEACHER_AVATAR || t.avatar || "")
-          .filter(Boolean);
-        const avatarMap = await UserProfileBiz.resolveAvatarUrlMap(avatarUrls);
-        const idMode = this.data.idMode === "teacher" ? "teacher" : "admin";
-        const coachList = rawList.map((t) => {
-          const avatar = t.TEACHER_AVATAR || t.avatar || "";
-          const coachId = t.TEACHER_ADMIN_ID || t._id;
-          const teacherId = t._id;
-          const pickId = idMode === "teacher" ? teacherId : coachId;
-          return {
-            pickId,
-            coachId,
-            teacherId,
-            name: t.TEACHER_NAME || t.name || "",
-            specialty: t.TEACHER_SPECIALTY || "",
-            avatar,
-            avatarSrc: avatar ? avatarMap[avatar] || "" : "",
-          };
-        });
-        this.setData({ coachList, loading: false });
-        if (this.data.value) {
-          this._syncSelected(this.data.value);
-        } else if (this.data.defaultCoachId) {
-          this._applyDefault(this.data.defaultCoachId);
-        }
+        await this._setCoachList(rawList);
       } catch (e) {
         console.error("coach_picker load error:", e);
         this.setData({ coachList: [], loading: false });

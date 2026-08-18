@@ -1,6 +1,7 @@
 {
 	"component": true,
 	"usingComponents": {
-		"cmpt-checkbox": "/cmpts/public/checkbox/checkbox_cmpt" 
+		"cmpt-checkbox": "/cmpts/public/checkbox/checkbox_cmpt",
+		"cmpt-modal": "../../modal/modal_cmpt"
 	}
 }

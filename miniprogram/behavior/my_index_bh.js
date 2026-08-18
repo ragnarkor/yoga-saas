@@ -258,8 +258,11 @@ module.exports = Behavior({
       pageHelper.url(e, this);
     },
 
-    bindScanCheckinTap: function () {
-      checkinScanHelper.scanAndCheckin({
+    bindLocationCheckinTap: function (e) {
+      const timeMark = e && e.currentTarget && e.currentTarget.dataset.timeMark;
+      if (!timeMark) return;
+      checkinScanHelper.locationCheckin({
+        timeMark,
         onSuccess: (msg) => {
           pageHelper.showModal(msg, "签到结果", () => {
             this._loadTodayList();

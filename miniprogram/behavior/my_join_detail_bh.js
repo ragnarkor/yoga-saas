@@ -1,7 +1,6 @@
 const pageHelper = require('../helper/page_helper.js');
 const cloudHelper = require('../helper/cloud_helper.js');
 const timeHelper = require('../helper/time_helper.js');
-const qrcodeLib = require('../lib/tools/qrcode_lib.js');
 const MeetBiz = require('../biz/meet_biz.js');
 const checkinScanHelper = require('../helper/checkin_scan_helper.js');
 
@@ -12,6 +11,8 @@ module.exports = Behavior({
 	 */
 	data: {
 		isLoad: false,
+		checkinState: 'unavailable',
+		checkinCountdownText: '',
 	},
 
 	methods: {
@@ -42,17 +43,11 @@ module.exports = Behavior({
 					return;
 				}
 
-				let qrImageData = qrcodeLib.drawImg('meet=' + join.JOIN_CODE, {
-					typeNumber: 1,
-					errorCorrectLevel: 'L',
-					size: 100
-				});
-
 				this.setData({
 					isLoad: true,
-					join,
-					qrImageData
+					join
 				});
+				this._startCheckinTimer();
 			} catch (err) {
 				console.error(err);
 			}
@@ -69,21 +64,71 @@ module.exports = Behavior({
 		 * 生命周期函数--监听页面显示
 		 */
 		onShow: function () {
-
+			if (this.data.join) this._startCheckinTimer();
 		},
 
 		/**
 		 * 生命周期函数--监听页面隐藏
 		 */
 		onHide: function () {
-
+		this._stopCheckinTimer();
 		},
 
 		/**
 		 * 生命周期函数--监听页面卸载
 		 */
 		onUnload: function () {
+		this._stopCheckinTimer();
+		},
 
+		_startCheckinTimer: function () {
+			this._stopCheckinTimer();
+			this._updateCheckinStatus();
+			this._checkinTimer = setInterval(() => this._updateCheckinStatus(), 1000);
+		},
+
+		_stopCheckinTimer: function () {
+			if (this._checkinTimer) {
+				clearInterval(this._checkinTimer);
+				this._checkinTimer = null;
+			}
+		},
+
+		_updateCheckinStatus: function () {
+			const join = this.data.join;
+			if (!join || join.JOIN_STATUS !== 1) {
+				this.setData({ checkinState: 'unavailable', checkinCountdownText: '' });
+				return;
+			}
+			if (Number(join.JOIN_IS_CHECKIN) === 1) {
+				this.setData({ checkinState: 'done', checkinCountdownText: '' });
+				return;
+			}
+			const start = timeHelper.time2Timestamp(join.JOIN_MEET_DAY + ' ' + join.JOIN_MEET_TIME_START + ':00');
+			const end = timeHelper.time2Timestamp(join.JOIN_MEET_DAY + ' ' + join.JOIN_MEET_TIME_END + ':00');
+			const now = Date.now();
+			const beforeMs = 30 * 60 * 1000;
+			const afterMs = 30 * 60 * 1000;
+			let state = 'ready';
+			let text = '到店签到';
+			if (now < start - beforeMs) {
+				state = 'before';
+				text = '距开课 ' + this._formatCountdown(start - now);
+			} else if (now > end + afterMs) {
+				state = 'ended';
+				text = '签到已截止';
+			} else if (now > end) {
+				text = '课程已结束 · 可补签';
+			}
+			this.setData({ checkinState: state, checkinCountdownText: text });
+		},
+
+		_formatCountdown: function (ms) {
+			const seconds = Math.max(0, Math.ceil(ms / 1000));
+			const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+			const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+			const s = String(seconds % 60).padStart(2, '0');
+			return h + ':' + m + ':' + s;
 		},
 
 		/**
@@ -131,12 +176,15 @@ module.exports = Behavior({
 			pageHelper.url(e, this);
 		},
 
-		bindScanCheckinTap: function () {
-			checkinScanHelper.scanAndCheckin({
+		bindLocationCheckinTap: function () {
+			if (this.data.checkinState !== 'ready') {
+				pageHelper.showNoneToast(this.data.checkinCountdownText || '当前不可签到');
+				return;
+			}
+			checkinScanHelper.locationCheckin({
+				timeMark: this.data.join.JOIN_MEET_TIME_MARK,
 				onSuccess: (msg) => {
-					pageHelper.showModal(msg, '签到结果', () => {
-						this._loadDetail();
-					});
+					pageHelper.showModal(msg, '签到结果', () => this._loadDetail());
 				},
 			});
 		},

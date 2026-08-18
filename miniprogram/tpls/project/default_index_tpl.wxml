@@ -71,6 +71,7 @@
 									wx:for="{{item.thumbs}}"
 									wx:for-item="thumb"
 									wx:key="*this"
+									lazy-load="{{true}}"
 									class="photo-album-thumb"
 									mode="aspectFill"
 									src="{{thumb}}"

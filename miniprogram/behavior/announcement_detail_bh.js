@@ -1,5 +1,6 @@
 const pageHelper = require('../helper/page_helper.js');
 const cloudHelper = require('../helper/cloud_helper.js');
+const newsContentHelper = require('../helper/news_content_helper.js');
 
 module.exports = Behavior({
   data: {
@@ -21,10 +22,8 @@ module.exports = Behavior({
           { id: this._announceId },
           { title: 'bar' },
         );
-        this.setData({
-          detail: (res && res.data) ? res.data : null,
-          isLoad: true,
-        });
+        const detail = (res && res.data) ? res.data : null;
+        this.setData({ detail, contentNodes: newsContentHelper.deltaToRichNodes(detail && detail.contentDelta), isLoad: true });
       } catch (err) {
         console.error(err);
         this.setData({ detail: null, isLoad: true });

@@ -120,6 +120,101 @@
   line-height: 1.5;
 }
 
+.pb-schedule-link {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 0 32rpx 24rpx;
+  color: var(--projectColor, #6fae96);
+  font-size: 26rpx;
+}
+
+.pb-schedule-link text {
+  flex: 1;
+}
+
+.pb-day-schedule-sheet {
+  padding: 28rpx 28rpx 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pb-day-schedule-head {
+  padding: 8rpx 8rpx 24rpx;
+}
+
+.pb-day-schedule-title,
+.pb-day-schedule-sub {
+  display: block;
+}
+
+.pb-day-schedule-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #323233;
+}
+
+.pb-day-schedule-sub {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.pb-day-schedule-list {
+  max-height: 58vh;
+}
+
+.pb-day-schedule-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx;
+  margin-bottom: 10rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+}
+
+.pb-day-schedule-row--available {
+  color: #2d6a4f;
+  background: #eef8f2;
+}
+
+.pb-day-schedule-row--busy {
+  color: #969799;
+  background: #f5f6f7;
+}
+
+.pb-day-schedule-time {
+  font-weight: 600;
+}
+
+.pb-day-schedule-status {
+  font-size: 24rpx;
+}
+
+.pb-day-schedule-legend {
+  display: flex;
+  gap: 28rpx;
+  padding: 20rpx 8rpx 24rpx;
+  color: #969799;
+  font-size: 23rpx;
+}
+
+.pb-day-schedule-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.pb-legend-dot {
+  display: inline-block;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+}
+
+.pb-legend-dot--available { background: #67b58b; }
+.pb-legend-dot--busy { background: #c8c9cc; }
+
 .pb-section--slots {
   padding-bottom: 8rpx;
 }
@@ -173,6 +268,34 @@
   margin-top: 4rpx;
   font-size: 20rpx;
   color: #5b8a72;
+}
+
+.pb-custom-time {
+  margin: 0 24rpx 24rpx;
+  padding: 22rpx 24rpx;
+  border-radius: 16rpx;
+  background: #f8f9fa;
+}
+
+.pb-custom-time-label {
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.pb-custom-time-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #323233;
+}
+
+.pb-custom-time-hint {
+  margin-top: 8rpx;
+  font-size: 23rpx;
+  color: #969799;
 }
 
 .pb-footer {

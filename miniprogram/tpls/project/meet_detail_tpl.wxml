@@ -1,6 +1,6 @@
 <template name="meetDetailTpl">
 	<view wx:if="{{isLoad===false}}" class="loading-wrap">
-		<van-loading size="48rpx" color="#5b8a72" type="spinner" />
+		<van-loading size="48rpx" color="{{themeColor || '#5b8a72'}}" type="spinner" />
 	</view>
 	<van-empty wx:if="{{isLoad===null}}" description="课程不存在" />
 

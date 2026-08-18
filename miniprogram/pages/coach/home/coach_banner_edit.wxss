@@ -1,0 +1,14 @@
+@import "../coach_common.wxss";
+.banner-edit-page { display:flex; flex-direction:column; height:100vh; padding-bottom:0; }
+.loading-wrap { flex:1; display:flex; align-items:center; justify-content:center; }
+.banner-edit-scroll { flex:1; height:0; padding:24rpx; box-sizing:border-box; }
+.banner-edit-card { padding:24rpx; border-radius:22rpx; background:#fff; box-shadow:0 6rpx 22rpx rgba(40,70,56,.06); }
+.section-title { margin-bottom:16rpx; font-size:30rpx; font-weight:600; color:#323233; }
+.image-label { margin:20rpx 0 14rpx; color:#646566; font-size:27rpx; }
+.image-picker { height:360rpx; border:2rpx dashed #cbdcd1; border-radius:18rpx; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12rpx; color:#718479; font-size:27rpx; background:#f8fbf9; }
+.image-tip { color:#a0aaa3; font-size:22rpx; }
+.banner-preview { position:relative; height:360rpx; border-radius:18rpx; overflow:hidden; background:#f2f3f5; }
+.banner-preview image { width:100%; height:100%; display:block; }
+.image-delete { position:absolute; right:16rpx; top:16rpx; width:48rpx; height:48rpx; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.5); }
+.replace-image { margin-top:16rpx; text-align:center; color:var(--themeColor,#6fae96); font-size:26rpx; }
+.banner-save { margin-top:24rpx; }

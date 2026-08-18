@@ -52,6 +52,11 @@ Page({
     this._loadStats(true);
   },
 
+  onReady() {
+    this._trendCanvasReady = true;
+    this._drawTrend();
+  },
+
   onPullDownRefresh() {
     const task =
       this.data.pageTab === 'export'
@@ -227,10 +232,61 @@ Page({
         page,
         hasMore: items.length >= 20,
         loading: false,
-      });
+      }, () => this._drawTrend());
     } catch (e) {
       console.error(e);
       this.setData({ loading: false });
     }
+  },
+
+  _drawTrend() {
+    if (!this._trendCanvasReady || !this.data.showTrend || !this.data.trend.length) return;
+    wx.createSelectorQuery().in(this).select('#incomeTrendCanvas')
+      .fields({ node: true, size: true }).exec((res) => {
+        const item = res && res[0];
+        if (!item || !item.node) return;
+        const canvas = item.node;
+        const width = item.width || 320;
+        const height = item.height || 180;
+        const dpr = wx.getWindowInfo ? wx.getWindowInfo().pixelRatio : 2;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        ctx.clearRect(0, 0, width, height);
+        const values = this.data.trend.map((entry) => Number(entry.amount) || 0);
+        const max = Math.max(...values, 1);
+        const left = 12;
+        const right = width - 12;
+        const top = 14;
+        const bottom = height - 18;
+        const chartHeight = bottom - top;
+        const step = values.length > 1 ? (right - left) / (values.length - 1) : 0;
+        const color = this.data.themeColor || '#5B8A72';
+        ctx.strokeStyle = '#edf1ef';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 3; i++) {
+          const y = top + (chartHeight * i) / 3;
+          ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(right, y); ctx.stroke();
+        }
+        const points = values.map((value, index) => ({
+          x: left + step * index,
+          y: bottom - (value / max) * chartHeight,
+        }));
+        if (!points.length) return;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, bottom);
+        points.forEach((point) => ctx.lineTo(point.x, point.y));
+        ctx.lineTo(points[points.length - 1].x, bottom);
+        ctx.closePath();
+        ctx.fillStyle = color + '22'; ctx.fill();
+        ctx.beginPath();
+        points.forEach((point, index) => index ? ctx.lineTo(point.x, point.y) : ctx.moveTo(point.x, point.y));
+        ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.stroke();
+        points.forEach((point) => {
+          ctx.beginPath(); ctx.arc(point.x, point.y, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+        });
+      });
   },
 });

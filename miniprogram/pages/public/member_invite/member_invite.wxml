@@ -1,3 +1,4 @@
+<page-meta page-style="{{pageStyle}}"></page-meta>
 <view class="invite-page">
   <view wx:if="{{loading}}" class="invite-center">
     <van-loading size="48rpx">正在加入瑜伽馆...</van-loading>

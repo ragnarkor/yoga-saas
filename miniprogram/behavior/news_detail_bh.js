@@ -1,5 +1,6 @@
 const cloudHelper = require('../helper/cloud_helper.js');
 const pageHelper = require('../helper/page_helper.js');
+const newsContentHelper = require('../helper/news_content_helper.js');
 
 
 module.exports = Behavior({
@@ -45,6 +46,7 @@ module.exports = Behavior({
 			this.setData({
 				isLoad: true,
 				news,
+				newsContentNodes: newsContentHelper.deltaToRichNodes(news.NEWS_CONTENT_DELTA),
 
 			});
 

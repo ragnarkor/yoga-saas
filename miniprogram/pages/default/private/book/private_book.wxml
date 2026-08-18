@@ -25,6 +25,7 @@
       <coach-picker
         id-mode="teacher"
         value="{{form.teacherId}}"
+        teachers="{{teachers}}"
         theme-color="{{themeColor}}"
         label="授课教练"
         field-class="pb-field"
@@ -50,26 +51,25 @@
         </view>
       </scroll-view>
       <view class="pb-hint">{{scheduleHint}}</view>
+      <view class="pb-schedule-link" bindtap="bindViewScheduleTap">
+        <van-icon name="calendar-o" size="30rpx" color="{{themeColor}}" />
+        <text>查看{{form.teacherName || '教练'}}当天排班</text>
+        <van-icon name="arrow" size="26rpx" color="#c8c9cc" />
+      </view>
     </view>
 
     <view class="pb-section pb-section--slots">
-      <view class="pb-section-title">可选时段</view>
-      <view wx:if="{{slotsLoading}}" class="pb-slots-loading">
-        <van-loading size="40rpx" color="{{themeColor}}">计算中...</van-loading>
-      </view>
-      <view wx:elif="{{!slots.length}}" class="pb-slots-empty">当天暂无可约时段</view>
-      <view wx:else class="pb-slot-grid">
-        <view
-          class="pb-slot {{form.start === item.start ? 'is-selected' : ''}}"
-          wx:for="{{slots}}"
-          wx:key="start"
-          data-start="{{item.start}}"
-          data-end="{{item.end}}"
-          bindtap="bindSlotTap"
-        >
-          <text class="pb-slot-time">{{item.start}}</text>
-          <text class="pb-slot-end">{{item.end}} 结束</text>
-        </view>
+      <view class="pb-section-title">选择时间</view>
+      <view class="pb-custom-time">
+        <view class="pb-custom-time-label">开始时间</view>
+        <picker mode="time" value="{{form.start || '09:00'}}" bindchange="bindCustomTimeChange">
+          <view class="pb-custom-time-picker">
+            <text wx:if="{{form.start && form.end}}">{{form.start}}–{{form.end}}</text>
+            <text wx:else>{{form.start || '请选择时间'}}</text>
+            <van-icon name="arrow" size="26rpx" color="#c8c9cc" />
+          </view>
+        </picker>
+        <view wx:if="{{customTimeHint}}" class="pb-custom-time-hint">{{customTimeHint}}</view>
       </view>
     </view>
 
@@ -83,13 +83,49 @@
         round
         color="{{themeColor}}"
         loading="{{submitting}}"
-        disabled="{{!form.start || submitting || !cardCanBook}}"
+        disabled="{{!form.start || !form.end || submitting || !cardCanBook}}"
         bind:click="bindSubmitTap"
       >
         {{submitBtnText}}
       </van-button>
     </view>
   </block>
+
+  <van-popup
+    show="{{dayScheduleShow}}"
+    position="bottom"
+    round
+    closeable
+    bind:close="bindDayScheduleClose"
+  >
+    <view class="pb-day-schedule-sheet">
+      <view class="pb-day-schedule-head">
+        <view>
+          <text class="pb-day-schedule-title">{{form.teacherName || '教练'}}当天排班</text>
+          <text class="pb-day-schedule-sub">{{form.day}} · 30分钟快速选择</text>
+        </view>
+      </view>
+      <view wx:if="{{dayScheduleLoading}}" class="pb-slots-loading">
+        <van-loading size="40rpx" color="{{themeColor}}">加载排班中...</van-loading>
+      </view>
+      <view wx:elif="{{dayScheduleError}}" class="pb-slots-empty">{{dayScheduleError}}</view>
+      <scroll-view wx:else scroll-y class="pb-day-schedule-list">
+        <view
+          wx:for="{{dayQuickSlots}}"
+          wx:key="start"
+          class="pb-day-schedule-row pb-day-schedule-row--available"
+          data-start="{{item.start}}"
+          data-end="{{item.end}}"
+          bindtap="bindQuickScheduleSlotTap"
+        >
+          <text class="pb-day-schedule-time">{{item.start}}–{{item.end}}</text>
+          <text class="pb-day-schedule-status">快速选择</text>
+        </view>
+      </scroll-view>
+      <view wx:if="{{!dayScheduleLoading && !dayScheduleError && !dayQuickSlots.length}}" class="pb-slots-empty">当天没有可快速选择的时段，请在下方选择时间。</view>
+      <view class="pb-day-schedule-legend">每 30 分钟推荐一个可预约开始时间</view>
+    </view>
+  </van-popup>
 
   <van-popup show="{{cardSheetShow}}" position="bottom" round bind:close="bindCloseCardSheet">
     <view class="pb-card-sheet">

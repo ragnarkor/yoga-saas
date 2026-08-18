@@ -19,7 +19,6 @@ Page({
     isSuperAdmin: false,
     quickTools: [
       { name: '邀请会员', icon: 'star-o', color: '#ffb74d', action: 'invite' },
-      { name: '签到码', icon: 'qr', color: '#81c784', url: '/pages/coach/checkin/coach_checkin_list' },
     ],
     menus: [
       { name: '预约', icon: 'clock-o', color: '#f48fb1', url: '/pages/coach/booking/coach_booking' },
@@ -124,7 +123,12 @@ Page({
     wx.navigateTo({ url });
   },
 
-  onPlatformTap() {
+  async onPlatformTap() {
+    // 入口点击时再恢复一次会话，避免超管 token 尚在但页面 data 尚未同步导致入口被误判隐藏。
+    if (!AdminWxBiz.isSuperSession()) {
+      await AdminWxBiz.ensureSession();
+    }
+    this._syncSuperAdmin();
     if (!AdminWxBiz.isSuperSession()) {
       this.setData({
         adminLoginShow: true,

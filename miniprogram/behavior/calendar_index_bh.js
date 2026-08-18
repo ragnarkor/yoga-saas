@@ -2,10 +2,13 @@ const cloudHelper = require("../helper/cloud_helper.js");
 const pageHelper = require("../helper/page_helper.js");
 const meetCategoryHelper = require("../helper/meet_category_helper.js");
 const defaultCoverHelper = require("../helper/default_cover_helper.js");
-const UserProfileBiz = require("../biz/user_profile_biz.js");
 const setting = require("../setting/setting.js");
 const timeHelper = require("../helper/time_helper.js");
 const emptyImageHelper = require("../helper/empty_image_helper.js");
+
+// 会员端课表展示未来一个月，避免只能查看当前一周。
+// 课程仍按选中日期懒加载，不会一次性拉取整月课程数据。
+const SCHEDULE_DAYS = 30;
 
 module.exports = Behavior({
   data: {
@@ -92,7 +95,7 @@ module.exports = Behavior({
       let dateList = [];
       let today = new Date();
 
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < SCHEDULE_DAYS; i++) {
         let d = new Date(today);
         d.setDate(today.getDate() + i);
 
@@ -139,9 +142,20 @@ module.exports = Behavior({
     },
 
     _loadList: async function () {
-      let params = {
-        day: this.data.day,
-      };
+      const day = this.data.day;
+      if (!this._dayCourseCache) this._dayCourseCache = {};
+      const requestId = (this._dayRequestId || 0) + 1;
+      this._dayRequestId = requestId;
+
+      if (this._dayCourseCache[day]) {
+        const cached = this._dayCourseCache[day];
+        const courseList = await this._transformCourseData(cached);
+        if (requestId !== this._dayRequestId) return;
+        this.setData({ list: cached, courseList, isLoad: true });
+        return;
+      }
+
+      let params = { day };
       let opts = {
         title: this.data.isLoad ? "bar" : "bar",
       };
@@ -151,8 +165,22 @@ module.exports = Behavior({
           params,
           opts,
         );
-        const rawList = (res && res.data) ? res.data : [];
+        let rawList = (res && res.data) ? res.data : [];
+        // 防止旧版本云函数或缓存返回已开始的当天时段，会员端不再展示可预约入口。
+        if (this.data.day === timeHelper.time("Y-M-D")) {
+          const now = new Date();
+          rawList = rawList.filter((item) => {
+            const start = String(item.timeStart || "");
+            const parts = start.split(":");
+            if (parts.length < 2) return true;
+            const startTime = new Date(now);
+            startTime.setHours(Number(parts[0]), Number(parts[1]), 0, 0);
+            return startTime.getTime() > now.getTime();
+          });
+        }
+        this._dayCourseCache[day] = rawList;
         const courseList = await this._transformCourseData(rawList);
+        if (requestId !== this._dayRequestId) return;
         this.setData({
           list: rawList,
           courseList,
@@ -208,13 +236,9 @@ module.exports = Behavior({
 
         const defaultCover = defaultCoverHelper.pickDefaultCover(item._id);
 
-        let coachAvatar = "";
-        if (item.coachAvatar) {
-          coachAvatar =
-            (await UserProfileBiz.resolveAvatarUrl(item.coachAvatar)) ||
-            pageHelper.fmtImgUrl(item.coachAvatar) ||
-            "";
-        }
+        const coachAvatar = item.coachAvatar
+          ? pageHelper.fmtImgUrl(item.coachAvatar) || ""
+          : "";
 
         return {
           _id: item._id,

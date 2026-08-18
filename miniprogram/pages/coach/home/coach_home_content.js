@@ -1,6 +1,7 @@
 const cloudHelper = require("../../../helper/cloud_helper.js");
 const pageHelper = require("../../../helper/page_helper.js");
 const AdminWxBiz = require("../../../biz/admin_wx_biz.js");
+const newsContentHelper = require("../../../helper/news_content_helper.js");
 
 const TYPE_NAMES = {
   announce: "公告",
@@ -31,6 +32,7 @@ Page({
     editMode: false,
     imgChanged: false,
     submitBtnText: "确认添加",
+    contentDelta: { ops: [{ insert: "\n" }] },
   },
 
   onLoad() {
@@ -101,6 +103,8 @@ Page({
 
   bindAddTap(e) {
     const type = e.currentTarget.dataset.type || TAB_TYPES[this.data.activeTab];
+    if (type === "announce") return wx.navigateTo({ url: "/pages/coach/home/coach_announce_edit" });
+    if (type === "banner") return wx.navigateTo({ url: "/pages/coach/home/coach_banner_edit" });
     const name = TYPE_NAMES[type] || "";
     this.setData({
       popupType: type,
@@ -111,15 +115,29 @@ Page({
       imgChanged: false,
       submitBtnText: "确认添加",
       form: { title: "", desc: "" },
+      contentDelta: newsContentHelper.legacyToDelta([{ type: "text", val: "" }]),
       imgList: [],
+    }, () => {
+      if (type === "announce" && this.announceEditorCtx) {
+        this.announceEditorCtx.setContents({ delta: this.data.contentDelta });
+      }
     });
   },
 
   bindEditTap(e) {
     const { type, id } = e.currentTarget.dataset;
+    if (type === "announce") {
+      wx.navigateTo({ url: "/pages/coach/home/coach_announce_edit?id=" + encodeURIComponent(id) });
+      return;
+    }
+    if (type === "banner") {
+      wx.navigateTo({ url: "/pages/coach/home/coach_banner_edit?id=" + encodeURIComponent(id) });
+      return;
+    }
     const name = TYPE_NAMES[type] || "";
     let form = { title: "", desc: "" };
     let imgList = [];
+    let contentDelta = { ops: [{ insert: "\n" }] };
 
     if (type === "banner") {
       const item = this.data.banners.find((b) => b._id === id);
@@ -132,6 +150,7 @@ Page({
       if (item) {
         form.title = item.ANNOUNCE_TITLE || "";
         form.desc = item.ANNOUNCE_DESC || "";
+        contentDelta = item.ANNOUNCE_CONTENT_DELTA || newsContentHelper.legacyToDelta(item.ANNOUNCE_CONTENT || [{ type: "text", val: form.desc }]);
       }
     }
 
@@ -144,8 +163,69 @@ Page({
       imgChanged: false,
       submitBtnText: "保存修改",
       form,
+      contentDelta,
       imgList,
+    }, () => {
+      if (type === "announce" && this.announceEditorCtx) {
+        this.announceEditorCtx.setContents({ delta: this.data.contentDelta });
+      }
     });
+  },
+
+  bindSwipeOpen(e) {
+    const id = e.currentTarget.dataset.swipeId;
+    if (this._openSwipeId && this._openSwipeId !== id) {
+      const old = this.selectComponent(`#home-swipe-${this._openSwipeId}`);
+      if (old) old.close();
+    }
+    this._openSwipeId = id;
+  },
+
+  bindAnnounceEditorReady() {
+    wx.createSelectorQuery().in(this).select("#announceEditor").context((res) => {
+      this.announceEditorCtx = res && res.context;
+      if (this.announceEditorCtx) this.announceEditorCtx.setContents({ delta: this.data.contentDelta });
+    }).exec();
+  },
+
+  bindAnnounceEditorInput(e) {
+    if (e.detail && e.detail.delta) this.setData({ contentDelta: e.detail.delta });
+  },
+
+  bindAnnounceFormatTap(e) {
+    if (!this.announceEditorCtx) return;
+    const name = e.currentTarget.dataset.name;
+    if (name === "image") return this.bindAnnounceImageTap();
+    if (name === "clear") return this.announceEditorCtx.removeFormat();
+    this.announceEditorCtx.format(name, e.currentTarget.dataset.value || true);
+  },
+
+  bindAnnounceImageTap() {
+    if (!this.announceEditorCtx) return;
+    wx.chooseImage({
+      count: 1,
+      sizeType: ["compressed"],
+      sourceType: ["album", "camera"],
+      success: (res) => this.announceEditorCtx.insertImage({ src: res.tempFilePaths[0], width: "100%" }),
+    });
+  },
+
+  _getAnnounceDelta() {
+    return new Promise((resolve) => {
+      if (!this.announceEditorCtx) return resolve(this.data.contentDelta);
+      this.announceEditorCtx.getContents({ success: (res) => resolve(res.delta || this.data.contentDelta), fail: () => resolve(this.data.contentDelta) });
+    });
+  },
+
+  async _prepareAnnounceContent(delta) {
+    const next = JSON.parse(JSON.stringify(delta || { ops: [] }));
+    const images = next.ops.filter((op) => op.insert && op.insert.image).map((op) => op.insert.image);
+    if (images.length) {
+      await cloudHelper.transTempPics(images, "admin_home/announce/", this.data.editId || Date.now() + "");
+      let index = 0;
+      next.ops.forEach((op) => { if (op.insert && op.insert.image) op.insert.image = images[index++]; });
+    }
+    return next;
   },
 
   bindPopupClose() {
@@ -180,14 +260,18 @@ Page({
 
     if (type === "announce") {
       if (!title) return wx.showToast({ title: "请输入标题", icon: "none" });
+      const delta = await this._prepareAnnounceContent(await this._getAnnounceDelta());
+      const content = newsContentHelper.deltaToLegacy(delta);
       if (isEdit) {
         await this._submit("admin/home_announce_edit", {
           id: this.data.editId,
           title,
           desc,
+          content,
+          delta,
         });
       } else {
-        await this._submit("admin/home_announce_insert", { title, desc });
+        await this._submit("admin/home_announce_insert", { title, desc, content, delta });
       }
     } else if (type === "banner") {
       if (!this.data.imgList.length) {

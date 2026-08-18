@@ -2,14 +2,23 @@ const AdminBiz = require("../../../../biz/admin_biz.js");
 const pageHelper = require("../../../../helper/page_helper.js");
 const cloudHelper = require("../../../../helper/cloud_helper.js");
 const adminTheme = require("../../../../helper/admin_theme.js");
+const AdminWxBiz = require("../../../../biz/admin_wx_biz.js");
 
 Page({
   data: {
     adminLoginShow: false,
     platformTab: 0,
+    // 超管接口返回前先提供完整默认结构，避免 WXML 读取 data.tenantList 时白屏。
+    data: {
+      tenantList: [],
+      tenantCount: 0,
+      adminCount: 0,
+    },
   },
 
   onLoad: async function (options) {
+    // 平台管理页允许从超管密码会话直接进入，不依赖当前选中的瑜伽馆 PID。
+    if (!AdminBiz.getAdminToken()) await AdminWxBiz.ensureSession();
     const needLogin = !AdminBiz.getAdminToken();
     if (needLogin || (options && options.login === "1")) {
       this.setData({ adminLoginShow: true });
@@ -42,6 +51,7 @@ Page({
     this.setData({
       isLoad: true,
       admin,
+      data: this.data.data || { tenantList: [], tenantCount: 0, adminCount: 0 },
     });
 
     try {
@@ -66,6 +76,11 @@ Page({
       });
     } catch (err) {
       console.log(err);
+      // 接口异常时保留可操作的后台壳，不让页面落入空白。
+      this.setData({
+        isLoad: true,
+        data: this.data.data || { tenantList: [], tenantCount: 0, adminCount: 0 },
+      });
     }
   },
 

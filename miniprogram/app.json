@@ -10,7 +10,6 @@
     "pages/default/calendar/index/calendar_index",
     "pages/default/meet/index/meet_index",
     "pages/default/meet/detail/meet_detail",
-    "pages/default/meet/self/meet_self",
     "pages/default/my/index/my_index",
     "pages/default/my/edit/my_edit",
     "pages/default/my/join/my_join",
@@ -47,6 +46,8 @@
         "my/coach_my",
         "store/coach_store",
         "home/coach_home_content",
+        "home/coach_announce_edit",
+        "home/coach_banner_edit",
         "photo/coach_photo_wall",
         "staff/coach_staff",
         "profile/coach_profile",
@@ -56,8 +57,6 @@
         "schedule/coach_schedule_edit",
         "booking/coach_booking",
         "booking/coach_booking_detail",
-        "checkin/coach_checkin_list",
-        "checkin/coach_checkin_qr",
         "private/coach_private_list",
         "private/coach_private_book",
         "member/coach_member_list",
@@ -91,14 +90,7 @@
         "platform/mgr_form/admin_mgr_form",
         "platform/staff/admin_platform_staff",
         "bind/admin_bind",
-        "content/admin_content",
-        "meet/scan/admin_meet_scan",
-        "meet/self/admin_meet_self",
         "mgr/log/admin_log_list",
-        "news/list/admin_news_list",
-        "news/add/admin_news_add",
-        "news/edit/admin_news_edit",
-        "news/content/admin_news_content",
         "setup/about/admin_setup_about",
         "setup/contact/admin_setup_contact",
         "setup/qr/admin_setup_qr",
@@ -125,7 +117,7 @@
     "backgroundColor": "#F5F6F8",
     "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#5B8A72",
-    "navigationBarTitleText": "?????",
+    "navigationBarTitleText": "瑜伽馆预约",
     "navigationBarTextStyle": "white"
   },
   "tabBar": {
@@ -136,25 +128,25 @@
     "list": [
       {
         "pagePath": "pages/default/index/default_index",
-        "text": "??"
+        "text": "首页"
       },
       {
         "pagePath": "pages/default/calendar/index/calendar_index",
-        "text": "??"
+        "text": "约课"
       },
       {
         "pagePath": "pages/default/news/cate1/news_cate1",
-        "text": "??"
+        "text": "资讯"
       },
       {
         "pagePath": "pages/default/my/index/my_index",
-        "text": "??"
+        "text": "我的"
       }
     ]
   },
   "permission": {
     "scope.userLocation": {
-      "desc": "????????????"
+      "desc": "用于到店签到时确认您位于场馆附近"
     }
   },
   "requiredPrivateInfos": ["chooseLocation"],
@@ -165,18 +157,15 @@
     "cmpt-tenant-switch": "/cmpts/biz/tenant_switch/tenant_switch_cmpt",
     "cmpt-comm-list": "/cmpts/public/list/comm_list_cmpt",
     "cmpt-picker": "/cmpts/public/picker/picker_cmpt",
-    "cmpt-modal": "/cmpts/public/modal/modal_cmpt",
     "van-button": "@vant/weapp/button/index",
     "van-cell": "@vant/weapp/cell/index",
     "van-cell-group": "@vant/weapp/cell-group/index",
     "van-field": "@vant/weapp/field/index",
-    "van-search": "@vant/weapp/search/index",
     "van-tag": "@vant/weapp/tag/index",
     "van-loading": "@vant/weapp/loading/index",
     "van-empty": "/cmpts/public/empty/empty_cmpt",
     "van-icon": "@vant/weapp/icon/index",
     "van-popup": "@vant/weapp/popup/index",
-    "van-switch": "@vant/weapp/switch/index",
     "coach-picker": "/cmpts/biz/coach_picker/coach_picker_cmpt",
     "card-tpl-picker": "/cmpts/biz/card_tpl_picker/card_tpl_picker_cmpt",
     "user-card-picker": "/cmpts/biz/user_card_picker/user_card_picker_cmpt",

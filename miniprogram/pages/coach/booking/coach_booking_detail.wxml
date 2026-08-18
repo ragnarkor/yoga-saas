@@ -176,7 +176,6 @@
       custom-class="bd-footer-btn bd-footer-btn--primary"
       bind:click="bindCheckinAllTap"
     >一键签到({{counts.pending}})</van-button>
-    <van-button plain round color="{{themeColor}}" custom-class="bd-footer-btn" bind:click="bindQrTap">签到码</van-button>
     <van-button
       wx:if="{{session.slotStatus !== 0}}"
       plain

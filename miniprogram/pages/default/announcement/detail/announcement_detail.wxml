@@ -13,8 +13,12 @@
   <view class="announce-detail" wx:else>
     <view class="title">{{detail.title}}</view>
     <view class="desc" wx:if="{{detail.desc}}">{{detail.desc}}</view>
-    <view class="content" wx:for="{{detail.content}}" wx:key="index">
-      <text wx:if="{{item.type=='text'}}">{{item.val}}</text>
-    </view>
+    <rich-text wx:if="{{detail.contentDelta}}" nodes="{{contentNodes}}" class="content-rich" />
+    <block wx:else>
+      <view class="content" wx:for="{{detail.content}}" wx:key="index">
+		  <text wx:if="{{item.type=='text'}}">{{item.val}}</text>
+		  <image wx:if="{{item.type=='img'}}" src="{{item.val}}" mode="widthFix" class="content-image" />
+	      </view>
+    </block>
   </view>
 </view>

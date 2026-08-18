@@ -374,19 +374,6 @@ Page({
     });
   },
 
-  bindQrTap() {
-    const { mark, session } = this.data;
-    const title = encodeURIComponent(session.title || '');
-    const day = encodeURIComponent(session.day || '');
-    const start = encodeURIComponent(session.start || '');
-    const end = encodeURIComponent(session.end || '');
-    wx.navigateTo({
-      url:
-        `/pages/coach/checkin/coach_checkin_qr?mark=${encodeURIComponent(mark)}` +
-        `&title=${title}&day=${day}&start=${start}&end=${end}`,
-    });
-  },
-
   _isSessionFull() {
     const { session, counts } = this.data;
     const limit = Number(session.limit) || 0;
