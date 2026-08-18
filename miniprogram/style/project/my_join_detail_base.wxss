@@ -136,6 +136,11 @@
   line-height: 1.5;
 }
 
+.jd-card-checkin {
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+}
+
 /* ==================== 预约码卡片 ==================== */
 .jd-qr-card {
   text-align: center;

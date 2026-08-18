@@ -566,6 +566,7 @@
 .ach-heatmap-cell:active { transform: scale(.86); }
 .ach-heatmap-guide { margin-top: 18rpx; color: #9a9c91; font-size: 22rpx; }
 .ach-heatmap-legend, .ach-section-extra { color: #92958b; }
+.ach-heatmap-legend { justify-content: flex-end; }
 .ach-badge-grid { gap: 18rpx; }
 .ach-badge-item { min-height: 170rpx; border-radius: 22rpx; background: #f3eee3; border: 1rpx solid #e9dfcd; }
 .ach-badge-item--locked { background: #f8f7f3; border-color: #eee; }
@@ -594,6 +595,39 @@
 .ach-heatmap-popup-date { display:block; font-size:34rpx; font-weight:600; color:#3c5145; }
 .ach-heatmap-popup-status { display:block; margin-top:12rpx; font-size:28rpx; color:#53675b; }
 .ach-heatmap-popup-note { display:block; margin-top:18rpx; font-size:24rpx; color:#9a9c91; }
+
+/* 练习日历：用真实日期和星期标题替代需要交叉解读的坐标热力图 */
+.ach-heatmap-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:16rpx; }
+.ach-heatmap-heading .ach-section-title { margin-bottom:6rpx; }
+.ach-heatmap-summary { display:flex; align-items:center; gap:6rpx; padding-top:8rpx; white-space:nowrap; font-size:20rpx; color:#9a9c91; }
+.ach-heatmap-summary-dot { width:14rpx; height:14rpx; border-radius:4rpx; }
+.ach-heatmap-week-head { display:flex; align-items:center; gap:10rpx; margin:18rpx 0 10rpx; }
+.ach-heatmap-week-label { width:92rpx; flex-shrink:0; font-size:19rpx; color:#b0b1aa; }
+.ach-heatmap-week-days { flex:1; display:grid; grid-template-columns:repeat(7, 1fr); gap:6rpx; text-align:center; }
+.ach-heatmap-week-days text { font-size:20rpx; color:#9a9c91; }
+.ach-heatmap-row { gap:10rpx; margin-bottom:8rpx; }
+.ach-heatmap-label { width:92rpx; font-size:19rpx; color:#a0a39a; text-align:left; }
+.ach-heatmap-cells { display:grid; grid-template-columns:repeat(7, 1fr); gap:6rpx; }
+.ach-heatmap-cell { height:42rpx; display:flex; align-items:center; justify-content:center; border-radius:9rpx; background:#eee9df; color:#aaa99f; }
+.ach-heatmap-cell-day { font-size:19rpx; line-height:1; }
+.ach-heatmap-cell--on { color:#fff; font-weight:600; box-shadow:0 4rpx 8rpx rgba(76,129,101,.16); }
+.ach-heatmap-cell--today { outline:3rpx solid #d8a84e; outline-offset:2rpx; }
+.ach-heatmap-cell[ data-date=""] { opacity:.35; }
+.ach-heatmap-guide { display:flex; align-items:center; gap:6rpx; }
+
+/* 标准月历布局，用户无需理解热力图坐标 */
+.ach-calendar-month-switch { display:flex; align-items:center; gap:10rpx; padding-top:2rpx; }
+.ach-calendar-month { min-width:132rpx; text-align:center; color:#53675b; font-size:27rpx; font-weight:600; }
+.ach-calendar-arrow { width:42rpx; height:42rpx; line-height:36rpx; text-align:center; border-radius:50%; background:#f4f2ec; color:#6f806f; font-size:38rpx; }
+.ach-calendar { margin-top:18rpx; }
+.ach-calendar-week-head, .ach-calendar-row { display:grid; grid-template-columns:repeat(7, 1fr); gap:8rpx; }
+.ach-calendar-week-head { margin-bottom:10rpx; text-align:center; }
+.ach-calendar-week-head text { font-size:21rpx; color:#9a9c91; }
+.ach-calendar-row { margin-bottom:8rpx; }
+.ach-calendar-cell { height:64rpx; display:flex; align-items:center; justify-content:center; border-radius:14rpx; background:#f1eee7; color:#777b72; font-size:25rpx; }
+.ach-calendar-cell--on { color:#fff; font-weight:600; box-shadow:0 5rpx 10rpx rgba(76,129,101,.18); }
+.ach-calendar-cell--today { outline:3rpx solid #d8a84e; outline-offset:2rpx; }
+.ach-calendar-cell--empty { background:transparent; }
 
 
 

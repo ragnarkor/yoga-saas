@@ -35,22 +35,55 @@ function alignToSunday(day) {
   return `${y}-${m}-${dd}`;
 }
 
-/** 12 列 × 7 行：col=周(0..11)，row=星期(0=日..6=六) */
-function buildHeatmapRows(startDay, heatmap) {
-  // 从「今天所在周的周日」往前推 11 周，共 12 列
-  const todaySunday = alignToSunday(todayYMD());
-  const baseDay = alignToSunday(startDay || addDays(todaySunday, -77));
-  const labels = ["日", "一", "二", "三", "四", "五", "六"];
-  return labels.map((label, row) => ({
-    label,
-    cells: Array.from({ length: 12 }, (_, col) => {
-      const date = addDays(baseDay, col * 7 + row);
-      return {
-        date,
-        on: !!(date && heatmap && heatmap[date]),
-      };
+function buildMonthCalendar(month, heatmap) {
+  const [year, monthNum] = String(month).split("-").map(Number);
+  const first = new Date(year, monthNum - 1, 1, 12, 0, 0);
+  const daysInMonth = new Date(year, monthNum, 0).getDate();
+  const offset = first.getDay();
+  const today = todayYMD();
+  return Array.from({ length: 6 }, (_, row) => ({
+    cells: Array.from({ length: 7 }, (_, col) => {
+      const dayNum = row * 7 + col - offset + 1;
+      if (dayNum < 1 || dayNum > daysInMonth) return { date: "", day: "" };
+      const date = `${year}-${String(monthNum).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
+      return { date, day: dayNum, on: !!(heatmap && heatmap[date]), isToday: date === today };
     }),
   }));
+}
+
+function monthLabel(month) {
+  const [year, monthNum] = String(month).split("-");
+  return `${year}年${Number(monthNum)}月`;
+}
+
+function countMonth(heatmap, month) {
+  return Object.keys(heatmap || {}).filter((date) => date.indexOf(`${month}-`) === 0).length;
+}
+
+/** 按普通日历阅读方式生成 12 周 × 7 天，避免把星期和月份轴交叉阅读。 */
+function buildHeatmapRows(startDay, heatmap) {
+  // 从「今天所在周的周日」往前推 11 周，共 12 行
+  const todaySunday = alignToSunday(todayYMD());
+  const baseDay = alignToSunday(startDay || addDays(todaySunday, -77));
+  const today = todayYMD();
+  return Array.from({ length: 12 }, (_, week) => {
+    const weekStart = addDays(baseDay, week * 7);
+    const weekEnd = addDays(weekStart, 6);
+    const startText = weekStart ? weekStart.slice(5).replace("-", ".") : "";
+    const endText = weekEnd ? weekEnd.slice(5).replace("-", ".") : "";
+    return {
+      label: `${startText}–${endText}`,
+      cells: Array.from({ length: 7 }, (_, dayIndex) => {
+        const date = addDays(weekStart, dayIndex);
+        return {
+          date,
+          day: date ? Number(date.slice(-2)) : "",
+          on: !!(date && heatmap && heatmap[date]),
+          isToday: date === today,
+        };
+      }),
+    };
+  });
 }
 
 Page({
@@ -68,6 +101,11 @@ Page({
     heatmapRows: [],
     heatmapStartDay: "",
     heatmapHint: "",
+    heatmapActiveDays: 0,
+    calendarMonth: "",
+    calendarMonthLabel: "",
+    calendarRows: [],
+    heatmapMap: {},
     heatmapPopupShow: false,
     selectedHeatmapCell: null,
     badgePopupShow: false,
@@ -102,6 +140,8 @@ Page({
         heatmapStartDay,
         (data && data.heatmap) || {},
       );
+      const calendarMonth = todayYMD().slice(0, 7);
+      const heatmapActiveDays = countMonth((data && data.heatmap) || {}, calendarMonth);
       const badges = (data && data.badges) || [];
       this.setData({
         isLoad: true,
@@ -112,6 +152,11 @@ Page({
         heatmapRows,
         heatmapStartDay,
         heatmapHint: (data && data.heatmapHint) || "",
+        heatmapActiveDays,
+        calendarMonth,
+        calendarMonthLabel: monthLabel(calendarMonth),
+        calendarRows: buildMonthCalendar(calendarMonth, (data && data.heatmap) || {}),
+        heatmapMap: (data && data.heatmap) || {},
         userName: (user && user.USER_NAME) || "瑜伽爱好者",
         avatarSrc,
       });
@@ -122,6 +167,11 @@ Page({
         isLoad: true,
         heatmapRows: buildHeatmapRows(heatmapStartDay, {}),
         heatmapStartDay,
+        heatmapActiveDays: 0,
+        calendarMonth: todayYMD().slice(0, 7),
+        calendarMonthLabel: monthLabel(todayYMD().slice(0, 7)),
+        calendarRows: buildMonthCalendar(todayYMD().slice(0, 7), {}),
+        heatmapMap: {},
         heatmapHint: "成就数据加载失败，请下拉刷新；若仍为空请确认云函数已部署",
       });
     }
@@ -139,6 +189,19 @@ Page({
 
   bindHeatmapPopupClose() {
     this.setData({ heatmapPopupShow: false });
+  },
+
+  bindCalendarMonthTap(e) {
+    const offset = Number(e.currentTarget.dataset.offset || 0);
+    const [year, month] = this.data.calendarMonth.split("-").map(Number);
+    const d = new Date(year, month - 1 + offset, 1);
+    const next = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    this.setData({
+      calendarMonth: next,
+      calendarMonthLabel: monthLabel(next),
+      calendarRows: buildMonthCalendar(next, this.data.heatmapMap),
+      heatmapActiveDays: countMonth(this.data.heatmapMap, next),
+    });
   },
 
   bindBadgeTap(e) {

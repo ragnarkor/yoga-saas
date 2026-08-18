@@ -11,13 +11,10 @@
 	<view wx:if="{{isLoad}}" class="jd-page">
 		<!-- 课程信息卡 -->
 		<view class="jd-card jd-course">
-			<view class="jd-status-tag jd-status-tag--success" wx:if="{{join.JOIN_STATUS==1}}">
-				{{join.JOIN_IS_CHECKIN==1 ? '已签到' : '预约成功'}}
-			</view>
+			<view class="jd-status-tag jd-status-tag--success" wx:if="{{join.JOIN_STATUS==1}}">{{join.JOIN_IS_CHECKIN==1 ? '已签到' : '预约成功'}}</view>
 			<view class="jd-status-tag jd-status-tag--pending" wx:if="{{join.JOIN_STATUS==0}}">待确认</view>
 			<view class="jd-status-tag jd-status-tag--cancel" wx:if="{{join.JOIN_STATUS==10}}">已取消</view>
 			<view class="jd-status-tag jd-status-tag--system" wx:if="{{join.JOIN_STATUS==99}}">系统取消</view>
-
 			<view class="jd-course-layout" bindtap="url" data-url="../../meet/detail/meet_detail?id={{join.JOIN_MEET_ID}}">
 				<view class="jd-course-body">
 					<view class="jd-course-name-wrap">
@@ -34,21 +31,20 @@
 					<van-icon name="arrow" size="28rpx" color="#c0c4cc" />
 				</view>
 			</view>
+			<view class="jd-card-checkin" wx:if="{{join.JOIN_STATUS==1}}">
+				<view class="jd-checkin-panel" wx:if="{{join.JOIN_IS_CHECKIN!=1}}">
+					<view class="jd-checkin-circle jd-checkin-circle--{{checkinState}}" bindtap="bindLocationCheckinTap">
+						<van-icon name="location" size="54rpx" color="{{checkinState=='ready' ? '#ffffff' : '#9aa3b2'}}" />
+						<text class="jd-checkin-circle-title">{{checkinCountdownText}}</text>
+						<text class="jd-checkin-circle-sub">{{checkinState=='before' ? '到签到时间自动开启' : (checkinState=='ended' ? '请联系前台处理' : '需在场馆附近')}}</text>
+					</view>
+				</view>
+				<view class="jd-checkin-done" wx:if="{{join.JOIN_IS_CHECKIN==1}}"><van-icon name="success" size="42rpx" color="#059669" /><text>已完成到店签到</text></view>
+			</view>
 		</view>
 
-		<!-- 到店签到：圆形主按钮，按开课前/签到窗口实时切换状态 -->
+		<!-- 预约操作 -->
 		<view class="jd-actions" wx:if="{{join.JOIN_STATUS==0 || join.JOIN_STATUS==1}}">
-			<view class="jd-checkin-panel" wx:if="{{join.JOIN_STATUS==1 && join.JOIN_IS_CHECKIN!=1}}">
-				<view class="jd-checkin-circle jd-checkin-circle--{{checkinState}}" bindtap="bindLocationCheckinTap">
-					<van-icon name="location" size="54rpx" color="{{checkinState=='ready' ? '#ffffff' : '#9aa3b2'}}" />
-					<text class="jd-checkin-circle-title">{{checkinCountdownText}}</text>
-					<text class="jd-checkin-circle-sub">{{checkinState=='before' ? '到签到时间自动开启' : (checkinState=='ended' ? '请联系前台处理' : '需在场馆附近')}}</text>
-				</view>
-			</view>
-			<view class="jd-checkin-done" wx:if="{{join.JOIN_STATUS==1 && join.JOIN_IS_CHECKIN==1}}">
-				<van-icon name="success" size="42rpx" color="#059669" />
-				<text>已完成到店签到</text>
-			</view>
 			<view class="jd-btn jd-btn--ghost" wx:if="{{join.JOIN_IS_CHECKIN==0}}" bindtap="bindCancelTap">取消预约</view>
 			<view class="jd-btn jd-btn--primary" bindtap="bindCalendarTap">加入手机日程</view>
 		</view>

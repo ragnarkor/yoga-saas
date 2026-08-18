@@ -10,6 +10,7 @@
 | `ax_join` | `_pid + JOIN_USER_ID + JOIN_STATUS` |
 | `ax_join` | `_pid + JOIN_MEET_ID + JOIN_MEET_TIME_MARK + JOIN_STATUS` |
 | `ax_join` | `_pid + JOIN_MEET_DAY + JOIN_STATUS` |
+| `ax_join` | `_pid ASC + JOIN_USER_ID ASC + JOIN_MEET_DAY ASC + JOIN_MEET_TIME_START ASC + JOIN_ADD_TIME DESC`（首页今日约课） |
 | `ax_user_card` | `_pid + USER_CARD_USER_ID + USER_CARD_STATUS` |
 | `ax_user_card_log` | `_pid + CARD_LOG_USER_CARD_ID + CARD_LOG_STATUS` |
 | `ax_user_card_log` | `_pid + CARD_LOG_JOIN_ID + CARD_LOG_ACTION` |

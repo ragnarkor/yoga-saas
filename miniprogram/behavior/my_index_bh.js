@@ -30,27 +30,30 @@ module.exports = Behavior({
     },
 
     _loadTodayList: async function () {
+      // 首页 onLoad 后会紧接着触发 onShow，避免同一秒内重复请求今日约课。
+      const now = Date.now();
+      if (this._todayListPromise) return this._todayListPromise;
+      if (this._todayListLoadedAt && now - this._todayListLoadedAt < 15000) return;
       this.setData({ myTodayLoading: true });
-      try {
-        const raw = await cloudHelper.callCloudData(
+      this._todayListPromise = (async () => {
+        try {
+          const raw = await cloudHelper.callCloudData(
           "my/my_join_someday",
           { day: timeHelper.time("Y-M-D") },
           { hint: false },
-        );
-        const list = Array.isArray(raw) ? raw.slice() : [];
-        list.sort((a, b) =>
-          String(a.JOIN_MEET_TIME_START || "").localeCompare(
-            String(b.JOIN_MEET_TIME_START || ""),
-          ),
-        );
-        this.setData({
-          myTodayList: list,
-          myTodayLoading: false,
-        });
-      } catch (err) {
-        console.error(err);
-        this.setData({ myTodayList: [], myTodayLoading: false });
-      }
+          );
+          const list = Array.isArray(raw) ? raw.slice() : [];
+          list.sort((a, b) => String(a.JOIN_MEET_TIME_START || "").localeCompare(String(b.JOIN_MEET_TIME_START || "")));
+          this._todayListLoadedAt = Date.now();
+          this.setData({ myTodayList: list, myTodayLoading: false });
+        } catch (err) {
+          console.error(err);
+          this.setData({ myTodayList: [], myTodayLoading: false });
+        } finally {
+          this._todayListPromise = null;
+        }
+      })();
+      return this._todayListPromise;
     },
 
     onReady: function () {},
