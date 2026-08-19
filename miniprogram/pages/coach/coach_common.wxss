@@ -1,6 +1,9 @@
 /** 教练版公共样式：主题色仅用于顶栏、选中态与图标点缀 */
 .coach-page {
   min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   background: var(--neutralBg, #f5f6f8);
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;

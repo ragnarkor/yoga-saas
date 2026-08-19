@@ -107,8 +107,7 @@ class StreakService extends BaseService {
       row &&
       row.STREAK_HISTORY_SYNCED === 1 &&
       row.STREAK_SYNC_VERSION === STREAK_SYNC_VERSION &&
-      row.STREAK_DIRTY !== 1 &&
-      (row.STREAK_TOTAL_CLASSES || 0) > 0
+      row.STREAK_DIRTY !== 1
     ) {
       console.log("[streak] skip resync, totalClasses=", row.STREAK_TOTAL_CLASSES);
       return row;
@@ -156,22 +155,47 @@ class StreakService extends BaseService {
       return await StreakModel.getOne({ STREAK_USER_ID: userId }, "*");
     }
 
-    if (row) {
-      await StreakModel.del({ STREAK_USER_ID: userId });
-    }
+    // 历史回放只在首次打开或数据变更后发生。以前逐条调用 updateStreak，
+    // 每条预约都会触发一次读写；历史记录较多时会让成就页首屏明显变慢。
+    let current = 0;
+    let max = 0;
+    let totalDays = 0;
+    let lastWeek = "";
+    let lastDay = "";
     for (const join of joins) {
-      await this.updateStreak(userId, join.JOIN_MEET_DAY);
+      const day = this._normDay(join.JOIN_MEET_DAY);
+      const week = this._isoWeekKey(day);
+      const gap = lastWeek ? this._weekGap(lastWeek, week) : null;
+      if (!lastWeek || gap === null || (gap !== 0 && gap !== 1)) current = 1;
+      else if (gap === 1) current += 1;
+      max = Math.max(max, current);
+      if (lastDay !== day) totalDays += 1;
+      lastWeek = week;
+      lastDay = day;
     }
-    await StreakModel.edit(
-      { STREAK_USER_ID: userId },
-      {
+    const rebuilt = {
+      STREAK_USER_ID: userId,
+      STREAK_CURRENT: current,
+      STREAK_MAX: max,
+      STREAK_LAST_WEEK: lastWeek,
+      STREAK_LAST_DAY: lastDay,
+      STREAK_TOTAL_CLASSES: joins.length,
+      STREAK_TOTAL_DAYS: totalDays,
+      STREAK_BADGES: [],
+      STREAK_BADGE_AT: {},
+    };
+    Object.assign(rebuilt, this._detectBadges(rebuilt));
+    if (row) await StreakModel.del({ STREAK_USER_ID: userId });
+    await StreakModel.insert(
+      Object.assign(rebuilt, {
         STREAK_HISTORY_SYNCED: 1,
         STREAK_SYNC_VERSION: STREAK_SYNC_VERSION,
         STREAK_DIRTY: 0,
+        STREAK_ADD_TIME: timeUtil.time(),
         STREAK_EDIT_TIME: timeUtil.time(),
-      },
+      }),
     );
-    return await StreakModel.getOne({ STREAK_USER_ID: userId }, "*");
+    return rebuilt;
   }
 
   /** 预约新增/取消后标记，下次打开成就页按 ax_join 重新计算。 */
@@ -382,8 +406,10 @@ class StreakService extends BaseService {
     if (!userId) this.AppError("请先登录");
 
     const now = timeUtil.time();
-    const row = await this.syncStreakFromHistory(userId);
-    const heat = await this.buildHeatmap(userId);
+    const [row, heat] = await Promise.all([
+      this.syncStreakFromHistory(userId),
+      this.buildHeatmap(userId),
+    ]);
     // 漏掉至少一个完整自然周后，当前连续周数应归零；历史最长不受影响。
     let displayRow = row;
     if (row && row.STREAK_LAST_WEEK) {

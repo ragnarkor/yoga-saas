@@ -5,7 +5,7 @@
     class="coach-tab-item {{active === index ? 'active' : ''}}"
     bindtap="onTabTap"
     data-index="{{index}}">
-    <van-icon name="{{item.icon}}" size="44rpx" />
+    <image class="coach-tab-icon" src="{{item.iconSrc}}" mode="aspectFit" />
     <text class="coach-tab-text">{{item.text}}</text>
   </view>
 </view>

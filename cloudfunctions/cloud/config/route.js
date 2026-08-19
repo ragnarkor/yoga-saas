@@ -12,6 +12,8 @@ module.exports = {
 
   "home/setup_all": "home_controller@getSetupAll", //获取全局配置(所有)
   "home/index": "home_controller@getHomeIndex",
+  "home/member_dashboard": "home_controller@getMemberDashboard",
+  "home/discovery": "home_controller@getHomeDiscovery",
   "home/search": "home_controller@searchHome",
   "home/teacher_detail": "home_controller@getTeacherDetail",
   "home/teacher_home": "home_controller@getTeacherHome",

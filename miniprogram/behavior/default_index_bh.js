@@ -89,6 +89,10 @@ module.exports = Behavior({
     teachers: [],
     photos: [],
     photoAlbums: [],
+    memberDashboardLoaded: false,
+    nextJoin: null,
+    recommendMeets: [],
+    practiceProgress: { totalClasses: 0, currentStreak: 0, badgeCount: 0 },
   },
 
   methods: {
@@ -130,25 +134,65 @@ module.exports = Behavior({
         );
         if (!data) return;
 
-        const photos = (data.photos || []).map(mapPhoto);
-        const photoAlbums = enrichPhotoAlbumList(
-          data.photoAlbums || buildPhotoAlbums(photos),
-        );
-
         this.setData({
           phone: data.phone || "",
           banners: (data.banners || []).map(mapBanner),
           announcements: (data.announcements || []).map((item) => ({
             ...item,
           })),
-          teachers: (data.teachers || []).map(mapTeacher),
+          teachers: [],
+          photos: [],
+          photoAlbums: [],
+        });
+        // 个人区域晚于公共首屏加载，避免会员初始化或预约数据拖慢横幅展示。
+        ensureMemberTask
+          .then(() => this._fetchMemberDashboard())
+          .catch(() => this.setData({ memberDashboardLoaded: true }));
+        setTimeout(() => this._fetchHomeDiscovery(), 180);
+      } catch (err) {
+        console.error("[home/index]", err);
+      }
+    },
+
+    _fetchHomeDiscovery: async function () {
+      try {
+        const data = await cloudHelper.callCloudData("home/discovery", {}, {
+          hint: false,
+        });
+        const photos = (data?.photos || []).map(mapPhoto);
+        const photoAlbums = enrichPhotoAlbumList(
+          data?.photoAlbums || buildPhotoAlbums(photos),
+        );
+        this.setData({
+          teachers: (data?.teachers || []).map(mapTeacher),
           photos,
           photoAlbums,
         });
-        // 初始化失败不影响首页首屏；后台任务完成即可。
-        ensureMemberTask.catch(() => {});
       } catch (err) {
-        console.error("[home/index]", err);
+        console.warn("[home/discovery]", err);
+      }
+    },
+
+    _fetchMemberDashboard: async function () {
+      try {
+        const data = await cloudHelper.callCloudData(
+          "home/member_dashboard",
+          {},
+          { hint: false },
+        );
+        this.setData({
+          memberDashboardLoaded: true,
+          nextJoin: data?.nextJoin || null,
+          recommendMeets: data?.recommends || [],
+          practiceProgress: data?.progress || {
+            totalClasses: 0,
+            currentStreak: 0,
+            badgeCount: 0,
+          },
+        });
+      } catch (err) {
+        console.warn("[home/member_dashboard]", err);
+        this.setData({ memberDashboardLoaded: true });
       }
     },
 
@@ -160,6 +204,36 @@ module.exports = Behavior({
       this._applyTenantInfo();
       if (!this.data.isLoad) return;
       await this._fetchHome();
+    },
+
+    bindHomeBookingTap: function () {
+      wx.switchTab({ url: "/pages/default/calendar/index/calendar_index" });
+    },
+
+    bindNextJoinTap: function (e) {
+      const id = e.currentTarget.dataset.id;
+      if (!id) return;
+      wx.navigateTo({
+        url: "/pages/default/my/join_detail/my_join_detail?id=" + id,
+      });
+    },
+
+    bindRecommendTap: function (e) {
+      const id = e.currentTarget.dataset.id;
+      if (!id) return;
+      wx.navigateTo({
+        url: "/pages/default/meet/detail/meet_detail?id=" + id,
+      });
+    },
+
+    bindAchievementTap: function () {
+      wx.navigateTo({
+        url: "/pages/default/my/achievement/my_achievement",
+      });
+    },
+
+    bindPrivateBookingTap: function () {
+      wx.navigateTo({ url: "/pages/default/private/book/private_book" });
     },
 
     onPullDownRefresh: async function () {

@@ -11,13 +11,14 @@
 /* ---- 顶部横幅 ---- */
 
 .home-hero {
+  position: relative;
   background: #fff;
 }
 
 .home-banner,
 .home-banner-fallback {
   width: 100%;
-  height: 380rpx;
+  height: 300rpx;
   overflow: hidden;
 }
 
@@ -26,7 +27,7 @@
 .banner-media,
 .home-banner-fallback image {
   width: 100%;
-  height: 380rpx;
+  height: 300rpx;
 }
 
 .banner-item {
@@ -37,20 +38,27 @@
 
 .home-studio-card {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   margin: -36rpx 24rpx 0;
-  padding: 28rpx 32rpx;
+  padding: 30rpx 28rpx 24rpx;
   position: relative;
   z-index: 2;
   background: #fff;
-  border-radius: 20rpx;
-  box-shadow: 0 8rpx 32rpx rgba(31, 35, 41, 0.08);
+  border-radius: 24rpx;
+  box-shadow: 0 10rpx 32rpx rgba(31, 35, 41, 0.07);
+}
+
+.home-studio-main {
+  display: flex;
+  align-items: center;
+  min-width: 0;
 }
 
 .home-studio-name {
   flex: 1;
   min-width: 0;
-  font-size: 34rpx;
+  font-size: 36rpx;
   font-weight: 700;
   color: #1a1a1a;
 }
@@ -58,18 +66,18 @@
 .home-studio-divider {
   width: 1rpx;
   height: 48rpx;
-  margin: 0 28rpx;
-  background: #e8e8e8;
+  margin: 0 20rpx;
+  background: #eeece7;
 }
 
 .home-studio-phone {
-  width: 72rpx;
-  height: 72rpx;
+  width: 68rpx;
+  height: 68rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2rpx solid var(--projectColor, #6fae96);
-  border-radius: 50%;
+  background: var(--projectColorLight, #edf5f0);
+  border-radius: 18rpx;
   flex-shrink: 0;
 }
 
@@ -77,28 +85,98 @@
   opacity: 0.7;
 }
 
-/* ---- 公告条 ---- */
+/* ---- 场馆内公告 ---- */
 
-.home-announce-strip {
+.home-studio-announce {
   display: flex;
   align-items: center;
   gap: 12rpx;
-  margin: 20rpx 24rpx 0;
-  padding: 20rpx 24rpx;
-  background: var(--projectColorLight, #f0edf8);
-  border-radius: 16rpx;
+  min-width: 0;
+  margin-top: 22rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0eee9;
+  color: #73776f;
 }
 
-.home-announce-strip:active {
+.home-studio-announce-title {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  color: #596057;
+  font-size: 23rpx;
+}
+
+.home-studio-announce:active {
   opacity: 0.85;
 }
 
-.home-announce-text {
+/* ---- 快捷功能 ---- */
+
+.home-action-card {
+  display: flex;
+  margin: 20rpx 24rpx 0;
+  padding: 20rpx 0;
+  border-radius: 20rpx;
+  background: #fff;
+  box-shadow: 0 8rpx 28rpx rgba(31, 35, 41, 0.06);
+}
+
+.home-action-item {
+  position: relative;
   flex: 1;
   min-width: 0;
-  font-size: 26rpx;
-  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8rpx 12rpx;
+  text-align: center;
 }
+
+.home-action-item + .home-action-item::before {
+  content: '';
+  position: absolute;
+  top: 12rpx;
+  bottom: 12rpx;
+  left: 0;
+  width: 1rpx;
+  background: #efede8;
+}
+
+.home-action-label {
+  display: block;
+  margin-top: 10rpx;
+  color: #747a72;
+  font-size: 21rpx;
+}
+
+.home-action-main {
+  display: block;
+  width: 100%;
+  margin-top: 8rpx;
+  color: #39483d;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.home-action-sub {
+  display: block;
+  width: 100%;
+  margin-top: 6rpx;
+  color: #9a9d96;
+  font-size: 19rpx;
+  white-space: nowrap;
+}
+
+/* ---- 练习进度 ---- */
+
+.home-practice-card { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; margin:20rpx 24rpx 0; background: #fcfbf7; }
+.home-practice-card { padding: 28rpx; border-radius: 20rpx; box-shadow: 0 8rpx 28rpx rgba(31, 35, 41, 0.06); }
+.home-practice-title { font-size: 26rpx; font-weight: 600; color: #425448; }
+.home-practice-sub { display: block; margin-top: 8rpx; color: #94978f; font-size: 21rpx; }
+.home-practice-stats { display: flex; flex-shrink: 0; gap: 18rpx; }
+.home-practice-stats view { display: flex; flex-direction: column; align-items: center; }
+.home-practice-stats text:first-child { color: var(--projectColor, #6fae96); font-size: 31rpx; font-weight: 700; }
+.home-practice-stats text:last-child { margin-top: 2rpx; color: #999d95; font-size: 19rpx; }
 
 /* ---- 板块 ---- */
 
@@ -237,7 +315,8 @@
 }
 
 .home-safe-bottom {
-  height: 24rpx;
+  /* 为固定底部导航留出完整空间，避免最后一排照片被遮住 */
+  height: 160rpx;
 }
 
 .menu .item {

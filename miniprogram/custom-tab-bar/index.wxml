@@ -6,11 +6,7 @@
     data-index="{{index}}"
     bindtap="switchTab"
   >
-    <van-icon
-      name="{{item.icon}}"
-      size="44rpx"
-      color="{{selected === index ? selectedColor : color}}"
-    />
+    <image class="tab-icon" src="{{item.iconSrc}}" mode="aspectFit" />
     <text
       class="tab-bar-text"
       style="color: {{selected === index ? selectedColor : color}}"

@@ -26,6 +26,16 @@ class HomeController extends BaseController {
     return await homeCacheUtil.getHomeIndex(() => service.getHomeIndex());
   }
 
+  async getMemberDashboard() {
+    this.validateData({});
+    return await new HomeService().getMemberDashboard(this._userId);
+  }
+
+  async getHomeDiscovery() {
+    this.validateData({});
+    return await new HomeService().getHomeDiscovery();
+  }
+
   async searchHome() {
     let rules = {
       keyword: "must|string|min:1|max:30|name=搜索关键词",

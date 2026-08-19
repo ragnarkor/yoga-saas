@@ -12,6 +12,8 @@ const NewsModel = require("../model/news_model.js");
 const MeetModel = require("../model/meet_model.js");
 const DayModel = require("../model/day_model.js");
 const AdminModel = require("../model/admin_model.js");
+const JoinModel = require("../model/join_model.js");
+const StreakModel = require("../model/streak_model.js");
 const teacherAdminHelper = require("./teacher_admin_helper.js");
 const dataUtil = require("../../framework/utils/data_util.js");
 const timeUtil = require("../../framework/utils/time_util.js");
@@ -126,7 +128,7 @@ class HomeService extends BaseService {
     let setup = await this.getSetup("SETUP_PHONE");
     let phone = setup ? setup.SETUP_PHONE || "" : "";
 
-    let [rawBanners, rawAnnounces, rawPhotos] = await Promise.all([
+    let [rawBanners, rawAnnounces] = await Promise.all([
       this._safeGetAll(
         BannerModel,
         { BANNER_STATUS: 1 },
@@ -141,16 +143,7 @@ class HomeService extends BaseService {
         { ANNOUNCE_ORDER: "asc", ANNOUNCE_ADD_TIME: "desc" },
         10,
       ),
-      this._safeGetAll(
-        PhotoModel,
-        { PHOTO_STATUS: 1 },
-        "PHOTO_TITLE,PHOTO_DESC,PHOTO_ALBUM,PHOTO_PIC,PHOTO_LINK_TYPE,PHOTO_LINK_ID",
-        { PHOTO_ORDER: "asc", PHOTO_ADD_TIME: "desc" },
-        30,
-      ),
     ]);
-
-    let rawTeachers = await teacherAdminHelper.listBoundStaffForHome();
 
     let banners = rawBanners.map((item) => ({
       _id: item._id,
@@ -168,7 +161,23 @@ class HomeService extends BaseService {
       desc: item.ANNOUNCE_DESC || "",
     }));
 
-    let teachers = rawTeachers.map((item) => {
+    return { phone, banners, announcements };
+  }
+
+  /** 首页第二阶段内容：图片资源较多，首屏展示后再加载。 */
+  async getHomeDiscovery() {
+    const [rawPhotos, rawTeachers] = await Promise.all([
+      this._safeGetAll(
+        PhotoModel,
+        { PHOTO_STATUS: 1 },
+        "PHOTO_TITLE,PHOTO_DESC,PHOTO_ALBUM,PHOTO_PIC,PHOTO_LINK_TYPE,PHOTO_LINK_ID",
+        { PHOTO_ORDER: "asc", PHOTO_ADD_TIME: "desc" },
+        30,
+      ),
+      teacherAdminHelper.listBoundStaffForHome(),
+    ]);
+
+    const teachers = (rawTeachers || []).map((item) => {
       let pics = (item.TEACHER_PIC || []).map((url) =>
         this._fmtMediaUrlSync(url),
       );
@@ -184,11 +193,79 @@ class HomeService extends BaseService {
       };
     });
 
-    let photos = rawPhotos.map((item) => this._mapPhotoItem(item));
+    const photos = (rawPhotos || []).map((item) => this._mapPhotoItem(item));
+    const photoAlbums = this._buildPhotoAlbums(photos);
 
-    let photoAlbums = this._buildPhotoAlbums(photos);
+    return { teachers, photos, photoAlbums };
+  }
 
-    return { phone, banners, announcements, teachers, photos, photoAlbums };
+  /** 会员首页的个人区域，不能走公共首页缓存。 */
+  async getMemberDashboard(userId) {
+    const now = timeUtil.time("Y-M-D h:m");
+    const joinFields =
+      "JOIN_IS_CHECKIN,JOIN_MEET_ID,JOIN_MEET_TITLE,JOIN_MEET_DAY,JOIN_MEET_TIME_START,JOIN_MEET_TIME_END,JOIN_STATUS";
+    const joins = await JoinModel.getAll(
+      { JOIN_USER_ID: userId, JOIN_STATUS: JoinModel.STATUS.SUCC },
+      joinFields,
+      { JOIN_MEET_DAY: "asc", JOIN_MEET_TIME_START: "asc" },
+      500,
+    );
+    const next = (joins || []).find(
+      (item) => `${item.JOIN_MEET_DAY} ${item.JOIN_MEET_TIME_END}` >= now,
+    );
+
+    let recommends = [];
+    if (!next) {
+      const today = timeUtil.time("Y-M-D");
+      const endDay = timeUtil.time("Y-M-D", 6 * 86400);
+      const slots = await new (require("./meet_service.js"))().getMeetListByWeek(
+        today,
+        endDay,
+      );
+      recommends = (slots || [])
+        .filter((item) => `${item.day} ${item.timeStart}` > now)
+        .slice(0, 3)
+        .map((item) => ({
+          meetId: item._id,
+          title: item.title,
+          day: item.day,
+          dayLabel: String(item.day || "").slice(5),
+          timeStart: item.timeStart,
+          timeEnd: item.timeEnd,
+          coachName: item.coachName || "",
+        }));
+    }
+
+    let streak = {};
+    try {
+      streak =
+        (await StreakModel.getOne(
+          { STREAK_USER_ID: userId },
+          "STREAK_CURRENT,STREAK_TOTAL_CLASSES,STREAK_BADGES",
+        )) || {};
+    } catch (err) {
+      // 成就集合尚未初始化时，不影响首页的预约入口。
+      console.warn("[home/member_dashboard] streak unavailable:", err.message);
+    }
+
+    return {
+      nextJoin: next
+        ? {
+            id: next._id,
+            title: next.JOIN_MEET_TITLE,
+            day: next.JOIN_MEET_DAY,
+            timeStart: next.JOIN_MEET_TIME_START,
+            timeEnd: next.JOIN_MEET_TIME_END,
+            checkedIn: next.JOIN_IS_CHECKIN === 1,
+          }
+        : null,
+      recommends,
+      progress: {
+        totalClasses: Number(streak.STREAK_TOTAL_CLASSES) || 0,
+        currentStreak: Number(streak.STREAK_CURRENT) || 0,
+        badgeCount: (streak.STREAK_BADGES || []).length,
+      },
+    };
   }
 
   _resolvePhotoAlbum(item) {

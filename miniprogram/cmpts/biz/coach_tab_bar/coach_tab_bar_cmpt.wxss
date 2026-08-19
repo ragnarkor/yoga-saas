@@ -8,6 +8,8 @@
   padding-bottom: env(safe-area-inset-bottom);
   background: rgba(255, 255, 255, 0.95);
   display: flex;
+  box-sizing: border-box;
+  overflow: hidden;
   z-index: 999;
   box-shadow: 0 -4rpx 24rpx rgba(0, 0, 0, 0.06);
 }
@@ -33,28 +35,10 @@
   color: var(--themeColor, #5b8a72);
 }
 
-.coach-tab-item.active::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 48rpx;
-  height: 6rpx;
-  border-radius: 0 0 6rpx 6rpx;
-  background: var(--themeColor, #5b8a72);
-  animation: coachTabIndicator 0.3s ease-out;
-}
-
-@keyframes coachTabIndicator {
-  from {
-    width: 0;
-    opacity: 0;
-  }
-  to {
-    width: 48rpx;
-    opacity: 1;
-  }
+.coach-tab-icon {
+  width: 44rpx;
+  height: 44rpx;
+  display: block;
 }
 
 .coach-tab-text {

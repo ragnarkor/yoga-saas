@@ -23,17 +23,58 @@
 
 		<!-- 场馆名 + 电话 -->
 		<view class="home-studio-card">
-			<text class="home-studio-name text-cut">{{tenantName || '瑜伽馆'}}</text>
-			<view class="home-studio-divider"></view>
-			<view class="home-studio-phone" bindtap="bindPhoneTap">
-				<van-icon name="phone-o" size="40rpx" color="{{themeColor}}" />
+			<view class="home-studio-main">
+				<text class="home-studio-name text-cut">{{tenantName || '瑜伽馆'}}</text>
+				<view class="home-studio-divider"></view>
+				<view class="home-studio-phone" bindtap="bindPhoneTap">
+					<van-icon name="phone-o" size="40rpx" color="{{themeColor}}" />
+				</view>
+			</view>
+			<view class="home-studio-announce" wx:if="{{announcements.length}}" bindtap="bindAnnounceStripTap">
+				<van-icon name="volume-o" size="25rpx" color="{{themeColor}}" />
+				<text class="home-studio-announce-title text-cut">{{announcements[0].title}}</text>
+				<van-icon name="arrow" size="24rpx" color="#b2b5ae" />
 			</view>
 		</view>
 
-		<!-- 公告条 -->
-		<view class="home-announce-strip" bindtap="bindAnnounceStripTap">
-			<van-icon name="volume-o" size="28rpx" color="{{themeColor}}" custom-class="home-announce-icon" />
-			<text class="home-announce-text text-cut">{{announcements.length ? announcements[0].title : '暂无公告'}}</text>
+		<!-- 统一行动卡：会员一眼完成查看、复约和私教预约 -->
+		<view class="home-action-card" wx:if="{{memberDashboardLoaded}}">
+			<view wx:if="{{nextJoin}}" class="home-action-item" data-id="{{nextJoin.id}}" bindtap="bindNextJoinTap">
+				<van-icon name="records" size="32rpx" color="{{themeColor}}" />
+				<text class="home-action-label">最新预约</text>
+				<text class="home-action-main text-cut">{{nextJoin.title}}</text>
+				<text class="home-action-sub">{{nextJoin.timeStart}}–{{nextJoin.timeEnd}}</text>
+			</view>
+			<view wx:else class="home-action-item" bindtap="bindHomeBookingTap">
+				<van-icon name="records" size="32rpx" color="{{themeColor}}" />
+				<text class="home-action-label">最新预约</text>
+				<text class="home-action-main">暂无预约</text>
+				<text class="home-action-sub">去看看课程</text>
+			</view>
+			<view class="home-action-item" bindtap="bindHomeBookingTap">
+				<van-icon name="replay" size="32rpx" color="{{themeColor}}" />
+				<text class="home-action-label">再约一次</text>
+				<text class="home-action-main">课程预约</text>
+				<text class="home-action-sub">查看本周排课</text>
+			</view>
+			<view class="home-action-item" bindtap="bindPrivateBookingTap">
+				<van-icon name="friends-o" size="32rpx" color="{{themeColor}}" />
+				<text class="home-action-label">私教预约</text>
+				<text class="home-action-main">一对一定制</text>
+				<text class="home-action-sub">自选教练与时间</text>
+			</view>
+		</view>
+
+		<view class="home-practice-card" wx:if="{{memberDashboardLoaded}}" bindtap="bindAchievementTap">
+			<view>
+				<text class="home-practice-title">练习进度</text>
+				<text class="home-practice-sub">每一次来到垫上，都会成为积累</text>
+			</view>
+			<view class="home-practice-stats">
+				<view><text>{{practiceProgress.totalClasses || 0}}</text><text>次上课</text></view>
+				<view><text>{{practiceProgress.currentStreak || 0}}</text><text>周连续</text></view>
+				<view><text>{{practiceProgress.badgeCount || 0}}</text><text>枚徽章</text></view>
+			</view>
 		</view>
 
 		<!-- 金牌老师（横向滑动） -->
