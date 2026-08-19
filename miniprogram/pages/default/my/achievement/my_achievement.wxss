@@ -32,10 +32,10 @@
   pointer-events: none;
 }
 
-.ach-hero-emoji {
+.ach-hero-badge {
   position: absolute;
-  font-size: 44rpx;
-  line-height: 1;
+  width: 82rpx;
+  height: 82rpx;
   filter: drop-shadow(0 2rpx 8rpx rgba(0, 0, 0, 0.18));
 }
 
@@ -546,6 +546,55 @@
 
 }
 
+.ach-poster-preview {
+  padding: 44rpx 32rpx calc(36rpx + env(safe-area-inset-bottom));
+  background: #fcfbf8;
+}
+
+.ach-poster-preview-title {
+  display: block;
+  text-align: center;
+  color: #3d5145;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.ach-poster-preview-tip {
+  display: block;
+  margin-top: 10rpx;
+  text-align: center;
+  color: #96988f;
+  font-size: 23rpx;
+}
+
+.ach-poster-preview-image {
+  display: block;
+  width: 100%;
+  max-height: 760rpx;
+  margin: 28rpx auto 24rpx;
+  border-radius: 20rpx;
+  background: #f2f0ea;
+  box-shadow: 0 12rpx 32rpx rgba(61, 81, 69, .13);
+}
+
+.ach-poster-preview-save {
+  width: 100%;
+}
+
+/* 成就预览统一采用黑色全屏沉浸模式。 */
+.ach-fullscreen-modal { position:fixed; z-index:9999; inset:0; display:flex; align-items:center; justify-content:center; padding:48rpx; box-sizing:border-box; background:rgba(16,21,19,.82); }
+.ach-fullscreen-badge { position:relative; width:100%; max-width:580rpx; padding:72rpx 48rpx 60rpx; box-sizing:border-box; border-radius:36rpx; text-align:center; background:linear-gradient(145deg,#252827,#111313); box-shadow:0 24rpx 80rpx rgba(0,0,0,.5); }
+.ach-fullscreen-poster { position:relative; width:100%; max-height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:56rpx; }
+.ach-fullscreen-badge .ach-badge-popup-name { color:#fff; }
+.ach-fullscreen-badge .ach-badge-popup-desc { color:rgba(255,255,255,.72); }
+.ach-fullscreen-badge .ach-badge-popup-meta { color:rgba(255,255,255,.52); }
+.ach-fullscreen-badge .ach-badge-popup-done, .ach-fullscreen-badge .ach-badge-popup-progress { color:rgba(255,255,255,.82); }
+.ach-fullscreen-poster .ach-poster-preview-image { width:100%; height:auto; max-width:100%; max-height:calc(100vh - 280rpx); margin:0; border-radius:18rpx; box-shadow:0 20rpx 64rpx rgba(0,0,0,.55); }
+.ach-poster-tools { display:flex; align-items:center; justify-content:center; gap:56rpx; }
+.ach-poster-tool { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8rpx; min-width:76rpx; padding:0; margin:0; color:rgba(255,255,255,.9); font-size:22rpx; line-height:1.2; background:transparent; border:0; }
+.ach-poster-tool::after { border:0; }
+.ach-poster-tool--pressed { opacity:.58; background:transparent; }
+
 /* 成就页：从数据面板调整为温和的瑜伽旅程卡片 */
 .ach-page { background: #f5f1e9; }
 .ach-hero { height: 430rpx; background: #557e69; }
@@ -570,7 +619,22 @@
 .ach-badge-grid { gap: 18rpx; }
 .ach-badge-item { min-height: 170rpx; border-radius: 22rpx; background: #f3eee3; border: 1rpx solid #e9dfcd; }
 .ach-badge-item--locked { background: #f8f7f3; border-color: #eee; }
-.ach-badge-emoji { font-size: 52rpx; }
+.ach-badge-flip-scene { width:104rpx; height:104rpx; perspective:900rpx; }
+.ach-badge-flip-card { position:relative; width:100%; height:100%; transform-style:preserve-3d; }
+.ach-badge-icon { position:absolute; inset:0; width:104rpx; height:104rpx; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+.ach-badge-icon--back { transform:rotateY(180deg); }
+.ach-badge-item--spinning .ach-badge-flip-card { animation: ach-badge-flip 900ms cubic-bezier(.2,.72,.24,1); }
+.ach-badge-popup-scene { width:300rpx; height:300rpx; margin:0 auto; perspective:1200rpx; }
+.ach-badge-popup-card { position:relative; width:100%; height:100%; transform-style:preserve-3d; }
+.ach-badge-popup-icon { position:absolute; inset:0; width:300rpx; height:300rpx; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+.ach-badge-popup-icon--back { transform:rotateY(180deg); }
+.ach-badge-popup-scene--spinning .ach-badge-popup-card { animation: ach-badge-flip 900ms cubic-bezier(.2,.72,.24,1); }
+@keyframes ach-badge-flip {
+  0% { transform: rotateY(0deg) scale(1); }
+  50% { transform: rotateY(180deg) scale(1.06); }
+  58% { transform: rotateY(180deg) scale(1.06); }
+  100% { transform: rotateY(360deg) scale(1); }
+}
 .ach-badge-name { color: #53675b; font-size: 23rpx; }
 .ach-badge-meta { margin-top: 6rpx; color: #a0a79d; font-size: 19rpx; }
 .ach-badge-progress { width: 112rpx; height: 8rpx; margin-top: 12rpx; overflow: hidden; border-radius: 99rpx; background: #e8e6df; }
@@ -585,8 +649,8 @@
 .ach-section { background: #ffffff; box-shadow: 0 6rpx 18rpx rgba(67,84,73,.045); }
 .ach-badge-item { background: #f8f6ef; border-color: #eee8db; }
 .ach-badge-item--locked { background: #fbfaf8; border-color: #f0efeb; }
-.ach-actions { display:flex; flex-direction:row; margin: 12rpx 28rpx 40rpx; padding: 0; gap: 16rpx; }
-.ach-btn { flex:1; height: 78rpx; line-height: 78rpx; font-size: 27rpx; box-sizing: border-box; box-shadow: none; }
+.ach-actions { display:flex; flex-direction:column; margin: 12rpx 28rpx 40rpx; padding: 0; gap: 16rpx; }
+.ach-btn { width:100%; flex:none; height: 78rpx; line-height: 78rpx; font-size: 27rpx; box-sizing: border-box; box-shadow: none; }
 .ach-btn--primary { background: var(--themeColor, #6fae96) !important; color: #fff; box-shadow: 0 6rpx 14rpx rgba(111,174,150,.22); }
 .ach-btn--ghost { background: #fff !important; color: var(--themeColor, #6fae96); border: 1rpx solid var(--themeColor, #6fae96); }
 .ach-heatmap-popup { padding: 48rpx 36rpx calc(48rpx + env(safe-area-inset-bottom)); text-align:center; background:#fff; }
@@ -639,13 +703,6 @@
 
 
 
-.ach-badge-popup-emoji {
-  display: block;
-  font-size: 88rpx;
-}
-
-
-
 .ach-badge-popup-name {
 
   display: block;
@@ -690,3 +747,6 @@
   color: #646566;
 
 }
+
+/* 详情信息直接浮在黑色遮罩上，不再使用第二层弹窗卡片。 */
+.ach-fullscreen-badge { max-width:580rpx; padding:72rpx 48rpx 60rpx; background:transparent; box-shadow:none; }

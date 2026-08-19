@@ -110,7 +110,11 @@ Page({
     selectedHeatmapCell: null,
     badgePopupShow: false,
     activeBadge: null,
+    badgeSpinningId: "",
+    badgePopupSpinning: false,
     posterLoading: false,
+    posterPreviewShow: false,
+    posterFilePath: "",
     userName: "",
     avatarSrc: "",
   },
@@ -126,14 +130,8 @@ Page({
 
   async _loadDetail() {
     try {
-      const [data, user] = await Promise.all([
-        cloudHelper.callCloudData("my/achievement", {}, { hint: false, title: "bar" }),
-        UserProfileBiz.fetch(),
-      ]);
-      let avatarSrc = "";
-      if (user && user.USER_PIC) {
-        avatarSrc = await UserProfileBiz.resolveAvatarUrl(user.USER_PIC);
-      }
+      // 首屏只依赖成就数据；头像文件地址解析可能较慢，放到首屏渲染之后。
+      const data = await cloudHelper.callCloudData("my/achievement", {}, { hint: false, title: "bar" });
       const heatmapStartDay =
         (data && data.heatmapStartDay) || addDays(todayYMD(), -83);
       const heatmapRows = buildHeatmapRows(
@@ -142,7 +140,9 @@ Page({
       );
       const calendarMonth = todayYMD().slice(0, 7);
       const heatmapActiveDays = countMonth((data && data.heatmap) || {}, calendarMonth);
-      const badges = (data && data.badges) || [];
+      const badges = ((data && data.badges) || []).map((badge) =>
+        Object.assign({}, badge, { iconSrc: achievementAssetHelper.getBadgeIcon(badge.id) }),
+      );
       this.setData({
         isLoad: true,
         streak: (data && data.streak) || {},
@@ -157,9 +157,10 @@ Page({
         calendarMonthLabel: monthLabel(calendarMonth),
         calendarRows: buildMonthCalendar(calendarMonth, (data && data.heatmap) || {}),
         heatmapMap: (data && data.heatmap) || {},
-        userName: (user && user.USER_NAME) || "瑜伽爱好者",
-        avatarSrc,
+        userName: "瑜伽爱好者",
+        avatarSrc: "",
       });
+      this._loadPosterProfile();
     } catch (e) {
       console.error(e);
       const heatmapStartDay = addDays(todayYMD(), -83);
@@ -174,6 +175,23 @@ Page({
         heatmapMap: {},
         heatmapHint: "成就数据加载失败，请下拉刷新；若仍为空请确认云函数已部署",
       });
+    }
+  },
+
+  async _loadPosterProfile() {
+    try {
+      const user = await UserProfileBiz.fetch();
+      let avatarSrc = "";
+      if (user && user.USER_PIC) {
+        avatarSrc = await UserProfileBiz.resolveAvatarUrl(user.USER_PIC);
+      }
+      this.setData({
+        userName: (user && user.USER_NAME) || "瑜伽爱好者",
+        avatarSrc,
+      });
+    } catch (e) {
+      // 头像仅用于海报，不应影响成就页的正常进入。
+      console.warn("[achievement] profile deferred load failed", e);
     }
   },
 
@@ -208,11 +226,30 @@ Page({
     const index = Number(e.currentTarget.dataset.index);
     const badge = this.data.badges[index];
     if (!badge) return;
-    this.setData({ badgePopupShow: true, activeBadge: badge });
+    clearTimeout(this._badgeSpinTimer);
+    this.setData({
+      badgePopupShow: true,
+      activeBadge: badge,
+      badgeSpinningId: badge.id,
+      badgePopupSpinning: true,
+    });
+    this._badgeSpinTimer = setTimeout(() => {
+      this.setData({ badgeSpinningId: "", badgePopupSpinning: false });
+    }, 950);
   },
 
   bindBadgePopupClose() {
-    this.setData({ badgePopupShow: false, activeBadge: null });
+    clearTimeout(this._badgeSpinTimer);
+    this.setData({
+      badgePopupShow: false,
+      activeBadge: null,
+      badgeSpinningId: "",
+      badgePopupSpinning: false,
+    });
+  },
+
+  onUnload() {
+    clearTimeout(this._badgeSpinTimer);
   },
 
   async bindPosterTap() {
@@ -235,7 +272,7 @@ Page({
         },
       );
       wx.hideLoading();
-      wx.previewImage({ urls: [filePath], current: filePath });
+      this.setData({ posterFilePath: filePath, posterPreviewShow: true });
     } catch (e) {
       wx.hideLoading();
       console.error(e);
@@ -247,23 +284,11 @@ Page({
 
   async bindSavePosterTap() {
     if (this.data.posterLoading) return;
+    const filePath = this.data.posterFilePath;
+    if (!filePath) return;
     this.setData({ posterLoading: true });
-    wx.showLoading({ title: "生成中", mask: true });
+    wx.showLoading({ title: "保存中", mask: true });
     try {
-      const filePath = await achievementPosterHelper.exportAchievementPoster(
-        this,
-        {
-          userName: this.data.userName,
-          avatarSrc: this.data.avatarSrc,
-          heroSrc: this.data.heroSrc,
-          streak: this.data.streak,
-          badges: this.data.badges,
-          heatmap: this._flatHeatmap(),
-          heatmapStartDay: this.data.heatmapStartDay,
-          tenantName: pageHelper.getTenantName(),
-          themeColor: this.data.themeColor,
-        },
-      );
       await achievementPosterHelper.saveToAlbum(filePath);
       wx.hideLoading();
       pageHelper.showSuccToast("已保存到相册");
@@ -275,6 +300,19 @@ Page({
       this.setData({ posterLoading: false });
     }
   },
+
+  bindPosterPreviewClose() {
+    this.setData({ posterPreviewShow: false });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: "我的瑜伽成就",
+      path: "/pages/default/my/achievement/my_achievement",
+    };
+  },
+
+  noop() {},
 
   _flatHeatmap() {
     const map = {};

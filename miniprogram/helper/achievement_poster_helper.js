@@ -1,4 +1,5 @@
 const picHelper = require("./pic_helper.js");
+const achievementAssetHelper = require("./achievement_asset_helper.js");
 
 const W = 750;
 const H = 1100;
@@ -78,7 +79,7 @@ function _drawHeatmap(ctx, heatmap, startDay, x, y, totalW, totalH, themeColor) 
   }
 }
 
-function _drawBadges(ctx, badges, x, y, totalW, themeColor) {
+async function _drawBadges(canvas, ctx, badges, x, y, totalW, themeColor) {
   const unlocked = (badges || []).filter((b) => b.unlocked).slice(0, 4);
   const colW = totalW / 4;
   if (!unlocked.length) {
@@ -88,7 +89,18 @@ function _drawBadges(ctx, badges, x, y, totalW, themeColor) {
     ctx.fillText("继续练习，解锁你的第一枚徽章", x + totalW / 2, y + 52);
     return;
   }
-  unlocked.forEach((badge, i) => {
+  // 本地徽章同时解码，避免海报生成时逐枚等待造成明显卡顿。
+  const icons = await Promise.all(
+    unlocked.map(async (badge) => {
+      try {
+        return await _createImage(canvas, achievementAssetHelper.getBadgePosterIcon(badge.id));
+      } catch (e) {
+        return null;
+      }
+    }),
+  );
+  for (let i = 0; i < unlocked.length; i++) {
+    const badge = unlocked[i];
     const cx = x + colW * i + colW / 2;
     ctx.fillStyle = `${themeColor}22`;
     ctx.beginPath();
@@ -97,16 +109,21 @@ function _drawBadges(ctx, badges, x, y, totalW, themeColor) {
     ctx.strokeStyle = `${themeColor}66`;
     ctx.lineWidth = 2;
     ctx.stroke();
-    ctx.font = "38px sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#4D675A";
-    ctx.fillText(badge.emoji || "🏅", cx, y + 36);
+    const icon = icons[i];
+    if (icon) {
+      ctx.drawImage(icon, cx - 40, y - 4, 80, 80);
+    } else {
+      ctx.font = "38px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#4D675A";
+      ctx.fillText(badge.emoji || "🏅", cx, y + 36);
+    }
     ctx.textBaseline = "alphabetic";
     ctx.font = "18px sans-serif";
     ctx.fillStyle = "#59635D";
     ctx.fillText(_truncate(ctx, badge.name || "成就", colW - 12), cx, y + 102);
-  });
+  }
 }
 
 async function drawAchievementPoster(canvas, ctx, opts) {
@@ -229,7 +246,7 @@ async function drawAchievementPoster(canvas, ctx, opts) {
   ctx.fillStyle = "#8A968D";
   ctx.font = "20px sans-serif";
   ctx.fillText(`${(opts.badges || []).filter((b) => b.unlocked).length} 枚成就已点亮`, 60, 718);
-  _drawBadges(ctx, opts.badges, 58, 748, 634, themeColor);
+  await _drawBadges(canvas, ctx, opts.badges, 58, 748, 634, themeColor);
 
   ctx.fillStyle = themeColor;
   ctx.fillRect(0, H - FOOT_H, W, FOOT_H);

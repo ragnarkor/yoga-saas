@@ -20,12 +20,14 @@
       <image class="ach-hero-bg" src="{{heroSrc}}" mode="aspectFill" />
       <view class="ach-hero-overlay" />
       <view class="ach-hero-emojis">
-        <text
-          class="ach-hero-emoji"
+        <image
+          class="ach-hero-badge"
           wx:for="{{heroEmojis}}"
           wx:key="index"
           style="{{item.style}}"
-        >{{item.emoji}}</text>
+          src="{{item.iconSrc}}"
+          mode="aspectFit"
+        />
       </view>
       <view class="ach-hero-text">
         <text class="ach-hero-label">我的成就</text>
@@ -128,13 +130,18 @@
 
         <view class="ach-badge-grid">
           <view
-            class="ach-badge-item ach-badge-item--{{item.rarity}} {{item.unlocked ? '' : 'ach-badge-item--locked'}}"
+            class="ach-badge-item ach-badge-item--{{item.rarity}} {{item.unlocked ? '' : 'ach-badge-item--locked'}} {{badgeSpinningId === item.id ? 'ach-badge-item--spinning' : ''}}"
             wx:for="{{badges}}"
             wx:key="id"
             data-index="{{index}}"
             bindtap="bindBadgeTap"
           >
-            <text class="ach-badge-emoji">{{item.emoji}}</text>
+            <view class="ach-badge-flip-scene">
+              <view class="ach-badge-flip-card">
+                <image class="ach-badge-icon ach-badge-icon--front" src="{{item.iconSrc}}" mode="aspectFit" />
+                <image class="ach-badge-icon ach-badge-icon--back" src="/images/achievement/poster_badge_back.png" mode="aspectFit" />
+              </view>
+            </view>
             <text class="ach-badge-name">{{item.name}}</text>
             <text class="ach-badge-meta">{{item.categoryName}} · {{item.rarityName}}</text>
             <view class="ach-badge-progress" wx:if="{{!item.unlocked && item.target}}">
@@ -162,8 +169,6 @@
 
         >生成海报</button>
 
-        <button class="ach-btn ach-btn--ghost" loading="{{posterLoading}}" bindtap="bindSavePosterTap">保存海报</button>
-
       </view>
 
     </view>
@@ -174,11 +179,36 @@
 
   <canvas type="2d" id="achievementCanvas" class="ach-canvas" />
 
+  <view wx:if="{{posterPreviewShow && posterFilePath}}" class="ach-fullscreen-modal ach-fullscreen-modal--poster" bindtap="bindPosterPreviewClose">
+    <view class="ach-fullscreen-poster" catchtap="noop">
+      <image class="ach-poster-preview-image" src="{{posterFilePath}}" mode="widthFix" show-menu-by-longpress="{{true}}" />
+      <view class="ach-poster-tools">
+        <button class="ach-poster-tool" hover-class="ach-poster-tool--pressed" loading="{{posterLoading}}" bindtap="bindSavePosterTap">
+          <van-icon name="down" size="34rpx" color="{{themeColor}}" />
+          <text>保存</text>
+        </button>
+        <button class="ach-poster-tool" hover-class="ach-poster-tool--pressed" open-type="share">
+          <van-icon name="share-o" size="34rpx" color="{{themeColor}}" />
+          <text>转发</text>
+        </button>
+        <button class="ach-poster-tool" hover-class="ach-poster-tool--pressed" bindtap="bindPosterPreviewClose">
+          <van-icon name="success" size="34rpx" color="{{themeColor}}" />
+          <text>完成</text>
+        </button>
+      </view>
+    </view>
+  </view>
 
 
-  <van-popup show="{{badgePopupShow}}" position="bottom" round bind:close="bindBadgePopupClose">
-    <view class="ach-badge-popup" wx:if="{{activeBadge}}">
-      <text class="ach-badge-popup-emoji">{{activeBadge.emoji}}</text>
+
+  <view wx:if="{{badgePopupShow && activeBadge}}" class="ach-fullscreen-modal" bindtap="bindBadgePopupClose">
+    <view class="ach-fullscreen-badge" catchtap="noop">
+      <view class="ach-badge-popup-scene {{badgePopupSpinning ? 'ach-badge-popup-scene--spinning' : ''}}">
+        <view class="ach-badge-popup-card">
+          <image class="ach-badge-popup-icon ach-badge-popup-icon--front" src="{{activeBadge.iconSrc}}" mode="aspectFit" />
+          <image class="ach-badge-popup-icon ach-badge-popup-icon--back" src="/images/achievement/poster_badge_back.png" mode="aspectFit" />
+        </view>
+      </view>
       <text class="ach-badge-popup-name">{{activeBadge.name}}</text>
 
       <text class="ach-badge-popup-desc">{{activeBadge.desc}}</text>
@@ -204,8 +234,7 @@
       </view>
 
     </view>
-
-  </van-popup>
+  </view>
 
   <van-popup show="{{heatmapPopupShow}}" position="bottom" round bind:close="bindHeatmapPopupClose">
     <view class="ach-heatmap-popup" wx:if="{{selectedHeatmapCell}}">
