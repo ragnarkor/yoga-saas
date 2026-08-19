@@ -52,6 +52,19 @@ class AdminTenantController extends BaseAdminController {
     );
   }
 
+  async getRoomList() {
+    await this.isAdmin();
+    const pid = global.PID || this.getParameter("pid") || "";
+    return await new AdminTenantService().getRooms(pid);
+  }
+
+  async saveRoomList() {
+    await this.isAdmin();
+    const input = this.validateData({ rooms: "must|array|name=教室" });
+    const pid = global.PID || this.getParameter("pid") || "";
+    return await new AdminTenantService().saveRooms(pid, input.rooms, this._adminType);
+  }
+
   /** 客户 Tab 会员统计 */
   async getMemberStats() {
     await this.isAdmin();

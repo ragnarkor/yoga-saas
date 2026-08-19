@@ -10,6 +10,7 @@ const JoinModel = require("../../model/join_model.js");
 const AdminModel = require("../../model/admin_model.js");
 const PlatformLogModel = require("../../model/platform_log_model.js");
 const cloudUtil = require("../../../framework/cloud/cloud_util.js");
+const dataUtil = require("../../../framework/utils/data_util.js");
 const timeUtil = require("../../../framework/utils/time_util.js");
 const tenantSetupHelper = require("../tenant_setup_helper.js");
 const tenantExpireUtil = require("../../utils/tenant_expire_util.js");
@@ -31,7 +32,9 @@ class AdminTenantService extends BaseAdminService {
   }
 
   _joinActivityTime(join) {
-    return Number(join.JOIN_START_TIME || join.JOIN_ADD_TIME) || 0;
+    const raw = Number(join.JOIN_START_TIME || join.JOIN_ADD_TIME) || 0;
+    // 兼容早期数据的秒级时间戳与当前毫秒级时间戳。
+    return raw > 0 && raw < 100000000000 ? raw * 1000 : raw;
   }
 
   _parseTimeHm(value, fallback, label) {
@@ -111,6 +114,28 @@ class AdminTenantService extends BaseAdminService {
     return list;
   }
 
+  _normalizeRooms(rooms) {
+    const names = new Set();
+    const list = [];
+    for (const raw of Array.isArray(rooms) ? rooms : []) {
+      const name = String((raw && raw.name) || "").trim().slice(0, 20);
+      if (!name) continue;
+      const key = name.toLowerCase();
+      if (names.has(key)) this.AppError("教室名称不能重复");
+      names.add(key);
+      list.push({
+        id: String((raw && raw.id) || "R" + dataUtil.genRandomAlpha(8)).replace(/[^a-zA-Z0-9_-]/g, ""),
+        name,
+        location: String((raw && raw.location) || "").trim().slice(0, 30),
+        capacity: Math.max(0, Math.min(500, Number(raw && raw.capacity) || 0)),
+        equipment: String((raw && raw.equipment) || "").trim().slice(0, 100),
+        enabled: !(raw && raw.enabled === false),
+      });
+    }
+    if (list.length > 20) this.AppError("最多可设置20间教室");
+    return list;
+  }
+
   _buildMeetTypeStr(categories) {
     if (!Array.isArray(categories) || !categories.length) {
       return this._defaultMeetType();
@@ -160,6 +185,7 @@ class AdminTenantService extends BaseAdminService {
       tenant: mergedTenant,
       categories: this._parseCategories(meetTypeStr),
       privateSchedule: (setup && setup.SETUP_FEATURES && setup.SETUP_FEATURES.privateSchedule) || null,
+	  rooms: this._normalizeRooms((setup && setup.SETUP_FEATURES && setup.SETUP_FEATURES.rooms) || []),
       about: (setup && setup.SETUP_ABOUT) || "",
       aboutPics: (setup && setup.SETUP_ABOUT_PIC) || [],
       contact: {
@@ -169,6 +195,25 @@ class AdminTenantService extends BaseAdminService {
         longitude: (setup && setup.SETUP_LONGITUDE) || "",
       },
     };
+  }
+
+  async getRooms(pid) {
+    const store = await this.getStore(pid);
+    return { rooms: store.rooms || [] };
+  }
+
+  async saveRooms(pid, rooms, operatorType) {
+    if (!pid) this.AppError("请先选择瑜伽馆");
+    if (operatorType !== AdminModel.TYPE.SUPER && operatorType !== AdminModel.TYPE.OWNER) {
+      this.AppError("仅馆主可修改教室");
+    }
+    const normalized = this._normalizeRooms(rooms);
+    const existingSetup = await tenantSetupHelper.getSetupForPid(pid, "SETUP_FEATURES");
+    const features = (existingSetup && existingSetup.SETUP_FEATURES) || {};
+    await this._saveSetupForPid(pid, {
+      SETUP_FEATURES: { ...features, rooms: normalized },
+    });
+    return { rooms: normalized };
   }
 
   async saveMeetCategories(
@@ -530,11 +575,11 @@ class AdminTenantService extends BaseAdminService {
     tenantList = tenantList || [];
 
     // 2. 跨租户拉有效预约，按 _pid 聚合「最近一次活跃时间」
-    let joins = await JoinModel.getAll(
+    let joins = await JoinModel.getAllBig(
       { JOIN_STATUS: JoinModel.STATUS.SUCC },
       "_pid,JOIN_START_TIME,JOIN_ADD_TIME",
-      {},
-      20000,
+      { JOIN_START_TIME: "desc", JOIN_ADD_TIME: "desc" },
+      1000,
       false,
     );
     let lastActiveByPid = {}; // _pid -> 最近活跃时间戳
@@ -548,11 +593,11 @@ class AdminTenantService extends BaseAdminService {
     }
 
     // 3. 跨租户拉会员，按 _pid 聚合「总数 / 近30天新增」
-    let userRows = await UserModel.getAll(
+    let userRows = await UserModel.getAllBig(
       {},
       "_pid,USER_ADD_TIME",
-      {},
-      20000,
+      { USER_ADD_TIME: "desc" },
+      1000,
       false,
     );
     let memberCntByPid = {};

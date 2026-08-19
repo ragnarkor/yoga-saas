@@ -75,6 +75,9 @@ module.exports = {
   "admin/tenant_store": "admin/admin_tenant_controller@getStore",
   "admin/tenant_store_save":
     "admin/admin_tenant_controller@saveMeetCategories#noDemo",
+  "admin/tenant_room_list": "admin/admin_tenant_controller@getRoomList",
+  "admin/tenant_room_save":
+    "admin/admin_tenant_controller@saveRoomList#noDemo",
   "admin/member_stats": "admin/admin_tenant_controller@getMemberStats",
   "admin/attention_members": "admin/admin_tenant_controller@getAttentionMembers",
   "admin/platform_overview":

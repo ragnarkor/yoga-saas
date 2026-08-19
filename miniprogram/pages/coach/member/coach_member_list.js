@@ -32,6 +32,10 @@ Page({
     this._loadMembers();
   },
 
+  onShow() {
+    if (!this.data.loading) this._loadMembers();
+  },
+
   onPullDownRefresh() {
     this._loadMembers().finally(() => wx.stopPullDownRefresh());
   },

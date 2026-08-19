@@ -125,9 +125,11 @@ Component({
       if (this.data.mode !== "scope") return;
       const ids = (this.data.scopeCategoryIds || []).map(String);
       const isCategories = this.data.scopeMode === "categories";
+      const meets = this.data.meets || [];
       const scopeCategories = (this.data.categories || []).map((c) => ({
         ...c,
         selected: isCategories && ids.includes(String(c.id)),
+        meetCount: meets.filter((m) => String(m.typeId || "") === String(c.id)).length,
       }));
       this.setData({ scopeCategories });
     },
@@ -153,7 +155,7 @@ Component({
         this._syncScopeDesc();
         this._syncScopeCategories();
         // 编辑已存在的 meets 卡时，进入即加载课程以显示名称/高亮
-        if (this.data.mode === "scope" && this.data.scopeMode === "meets") {
+        if (this.data.mode === "scope" && (this.data.scopeMode === "meets" || this.data.scopeMode === "categories")) {
           this._ensureMeets();
         }
       } catch (e) {
@@ -221,6 +223,7 @@ Component({
           id: String(m._id || m.MEET_ID || ""),
           name: m.MEET_TITLE || "未命名课程",
           typeName: m.MEET_TYPE_NAME || "",
+          typeId: String(m.MEET_TYPE_ID || ""),
         }));
         this.setData({ meets, meetsLoaded: true }, () => {
           this._syncScopeMeets();
@@ -303,6 +306,7 @@ Component({
 
     // 切到「按分类」分段（多选，不关面板）
     bindScopeCategoryModeTap() {
+      this._ensureMeets();
       if (this.data.scopeMode !== "categories") {
         this._applyScope("categories", this.data.scopeCategoryIds || [], []);
       }
@@ -316,6 +320,12 @@ Component({
       if (ids.includes(id)) ids = ids.filter((x) => x !== id);
       else ids = ids.concat(id);
       this._applyScope("categories", ids, []);
+    },
+
+    // 分类默认是整类适用；只有需要排除部分课程时才进入课程明细。
+    bindScopeCustomTap() {
+      this._ensureMeets();
+      this._applyScope("meets", [], this.data.scopeMeetIds || []);
     },
 
     // 切到「指定课程」分段（多选，不关面板）

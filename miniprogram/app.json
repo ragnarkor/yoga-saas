@@ -55,6 +55,8 @@
         "course/coach_course_edit",
         "schedule/coach_schedule",
         "schedule/coach_schedule_edit",
+        "room/coach_room",
+        "room/coach_room_edit",
         "booking/coach_booking",
         "booking/coach_booking_detail",
         "private/coach_private_list",

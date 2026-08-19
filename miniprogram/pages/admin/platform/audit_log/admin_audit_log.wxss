@@ -1,20 +1,22 @@
 .audit-list {
-  padding: 16rpx 24rpx;
+  padding: 18rpx 24rpx 36rpx;
 }
 
 .audit-total {
-  padding: 12rpx 4rpx 20rpx;
-  font-size: 24rpx;
-  color: #969799;
+  padding: 0 4rpx 18rpx;
+  font-size: 23rpx;
+  color: var(--adminTextSecondary);
 }
 
 .audit-item {
-  margin-bottom: 20rpx;
-  padding: 24rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  margin-bottom: 18rpx;
+  padding: 22rpx 24rpx 18rpx;
+  background: var(--adminSurface);
+  border-radius: var(--adminRadiusLg);
+  box-shadow: var(--adminShadowSm);
 }
+.audit-head-left { display: flex; align-items: center; min-width: 0; }
+.audit-symbol { display:flex; align-items:center; justify-content:center; width:58rpx; height:58rpx; margin-right:16rpx; border-radius:18rpx; background:var(--adminColorLight); color:var(--adminColor); font-size:25rpx; font-weight:700; }
 
 .audit-head {
   display: flex;
@@ -23,48 +25,51 @@
 }
 
 .audit-action {
-  padding: 4rpx 16rpx;
-  font-size: 24rpx;
-  color: #4a7c8c;
-  background: #eaf2f4;
-  border-radius: 24rpx;
+  font-size: 28rpx;
+  color: var(--adminText);
+  font-weight: 600;
 }
 
 /* 删除馆等高危动作醒目标红 */
 .audit-action--tenant_del {
-  color: #e34d59;
-  background: #fdeced;
+  color: var(--adminRedColor);
 }
+.audit-operator { display:block; margin-top:4rpx; color:var(--adminTextSecondary); font-size:22rpx; }
 
 .audit-time {
-  font-size: 22rpx;
-  color: #969799;
+  font-size: 21rpx;
+  color: var(--adminTextTertiary);
 }
 
 .audit-content {
-  margin-top: 16rpx;
-  font-size: 28rpx;
-  color: #323233;
-  line-height: 1.5;
+  margin-top: 20rpx;
+  padding: 17rpx 18rpx;
+  border-radius: var(--adminRadiusSm);
+  background: #f7f9fa;
+  font-size: 25rpx;
+  color: #405057;
+  line-height: 1.65;
+  word-break: break-all;
 }
 
 .audit-meta {
-  margin-top: 12rpx;
+  margin-top: 14rpx;
   display: flex;
   flex-direction: column;
   gap: 4rpx;
 }
 
 .audit-meta-item {
-  font-size: 22rpx;
-  color: #969799;
+  font-size: 21rpx;
+  color: var(--adminTextSecondary);
 }
 
 .audit-diff {
-  margin-top: 12rpx;
-  padding-top: 12rpx;
-  border-top: 1rpx dashed #ebedf0;
-  font-size: 24rpx;
+  margin-top: 16rpx;
+  padding: 14rpx 16rpx;
+  border-radius: var(--adminRadiusSm);
+  background: #f9fafb;
+  font-size: 23rpx;
 }
 
 .audit-diff-before {

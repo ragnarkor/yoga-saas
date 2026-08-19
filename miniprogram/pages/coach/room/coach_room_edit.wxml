@@ -1,0 +1,17 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page room-edit-page">
+  <coach-tenant-switch title="{{pageTitle}}" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
+  <view wx:if="{{loading}}" class="room-edit-loading"><van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading></view>
+  <view wx:else class="room-edit-content">
+    <view class="room-edit-section">基本信息</view>
+    <van-cell-group custom-class="room-edit-group">
+      <van-field label="教室名称" required value="{{form.name}}" placeholder="例如：大教室" data-field="name" bind:change="bindFieldChange" />
+      <van-field label="所在位置" value="{{form.location}}" placeholder="例如：2F · 201" data-field="location" bind:change="bindFieldChange" />
+      <van-field label="默认容量" type="number" value="{{form.capacity}}" placeholder="留空表示不限制" data-field="capacity" bind:change="bindFieldChange" />
+      <van-field label="配套设施" value="{{form.equipment}}" placeholder="例如：镜面、空中挂点、普拉提床" data-field="equipment" bind:change="bindFieldChange" />
+    </van-cell-group>
+    <view class="room-edit-section">排课设置</view>
+    <van-cell-group custom-class="room-edit-group"><van-cell title="开放排课" label="停用后不会出现在排课选择中" center><switch slot="right-icon" checked="{{form.enabled !== false}}" color="{{themeColor}}" bindchange="bindEnabledChange" /></van-cell></van-cell-group>
+    <view class="room-save-wrap"><van-button block color="{{themeColor}}" loading="{{saving}}" bindtap="bindSaveTap">保存教室</van-button></view>
+  </view>
+</view>

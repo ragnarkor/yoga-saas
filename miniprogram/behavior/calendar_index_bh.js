@@ -195,6 +195,13 @@ module.exports = Behavior({
       }
     },
 
+    // 预约完成时由详情页直接调用：清除内存缓存并立即同步余位/已预约状态。
+    _refreshDayAfterBooking: async function (day) {
+      const targetDay = day || this.data.day;
+      if (this._dayCourseCache && targetDay) delete this._dayCourseCache[targetDay];
+      if (targetDay && this.data.day === targetDay) await this._loadList();
+    },
+
     _transformCourseData: async function (rawList, activeTab = this.data.activeTab) {
       if (!rawList) return [];
 
@@ -220,8 +227,8 @@ module.exports = Behavior({
           slots = 99;
         }
 
-        let status = "available";
-        if (slots === 0) status = "full";
+        let status = item.isBooked ? "booked" : "available";
+        if (!item.isBooked && slots === 0) status = "full";
 
         let duration = "";
         if (timeStart && timeEnd) {
@@ -324,7 +331,14 @@ module.exports = Behavior({
         this._initDateList();
       } else {
         const today = timeHelper.time("Y-M-D");
-        this.setData({ day: today, selectedDate: today });
+        const previousDay = this.data.selectedDate || this.data.day;
+        const isStillVisible = this.data.dateList.some(
+          (item) => item.day === previousDay,
+        );
+        const day = isStillVisible ? previousDay : today;
+        this.setData({ day, selectedDate: day });
+		// 从预约详情返回时，刷新当前所选日期，避免继续使用预约前的余位缓存。
+		if (this._dayCourseCache) delete this._dayCourseCache[day];
       }
 
       const prevTabId =

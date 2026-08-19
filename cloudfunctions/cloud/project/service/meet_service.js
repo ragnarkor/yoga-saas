@@ -1024,10 +1024,12 @@ class MeetService extends BaseService {
     } catch (err) {
       console.error("[meet/cancel] mark streak dirty failed:", err.message);
     }
-    this.statJoinCnt(join.JOIN_MEET_ID, join.JOIN_MEET_TIME_MARK);
+    await this.statJoinCnt(join.JOIN_MEET_ID, join.JOIN_MEET_TIME_MARK);
 
     let cardService = new UserCardService();
     await cardService.refundForJoinCancel(joinId);
+
+    return { day: join.JOIN_MEET_DAY };
   }
 
   /** 取得我的预约详情 */

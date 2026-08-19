@@ -52,15 +52,45 @@ class MeetController extends BaseController {
 
 		let cacheKey = CACHE_CALENDAR_INDEX + '_' + globalThis.PID + '_' + input.day;
 		let list = await cacheUtil.get(cacheKey);
-		if (list) {
-			return list;
-		} else {
+		if (!list) {
 			let service = new MeetService();
-			let list = await service.getMeetListByDay(input.day);
+			list = await service.getMeetListByDay(input.day);
 			cacheUtil.set(cacheKey, list, config.CACHE_CALENDAR_TIME);
-			return list;
 		}
 
+		// 课表主体可跨会员缓存；“我是否已预约”必须在返回前按当前会员单独标记。
+		return await this._markMyBookedSlots(list, input.day);
+
+	}
+
+	async _clearCalendarDayCache(day) {
+		if (!day) return;
+		await cacheUtil.remove(
+			CACHE_CALENDAR_INDEX + '_' + globalThis.PID + '_' + day,
+		);
+	}
+
+	async _markMyBookedSlots(list, day) {
+		if (!this._userId || !list || !list.length) return list || [];
+
+		let joins = await JoinModel.getAll(
+			{
+				JOIN_USER_ID: this._userId,
+				JOIN_MEET_DAY: day,
+				JOIN_STATUS: JoinModel.STATUS.SUCC,
+			},
+			'JOIN_MEET_ID,JOIN_MEET_TIME_MARK',
+			{},
+			100,
+		);
+		let bookedKeys = new Set(
+			(joins || []).map((item) => item.JOIN_MEET_ID + '_' + item.JOIN_MEET_TIME_MARK),
+		);
+
+		return list.map((item) => ({
+			...item,
+			isBooked: bookedKeys.has(item._id + '_' + item.timeMark),
+		}));
 	}
 
 	/** 按周获取预约项目 */
@@ -284,7 +314,9 @@ class MeetController extends BaseController {
 		let input = this.validateData(rules);
 
 		let service = new MeetService();
-		return await service.cancelMyJoin(this._userId, input.joinId);
+		let result = await service.cancelMyJoin(this._userId, input.joinId);
+		await this._clearCalendarDayCache(result && result.day);
+		return result;
 	}
 
 	/** 用户自助签到 */
@@ -411,7 +443,9 @@ class MeetController extends BaseController {
 		let input = this.validateData(rules);
 
 		let service = new MeetService();
-		return await service.join(this._userId, input.meetId, input.timeMark, input.forms, input.cardId);
+		let result = await service.join(this._userId, input.meetId, input.timeMark, input.forms, input.cardId);
+		await this._clearCalendarDayCache(service.getDayByTimeMark(input.timeMark));
+		return result;
 	}
 
 

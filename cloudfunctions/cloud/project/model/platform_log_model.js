@@ -37,7 +37,9 @@ PlatformLogModel.DB_STRUCTURE = {
   PLOG_AFTER: "string|false|comment=变更后值",
 
   PLOG_ADD_TIME: "int|true",
+  PLOG_EDIT_TIME: "int|true",
   PLOG_ADD_IP: "string|false",
+  PLOG_EDIT_IP: "string|false",
 };
 
 // 字段前缀

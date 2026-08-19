@@ -28,7 +28,7 @@ Page({
       { name: '会员', icon: 'friends-o', color: '#4fc3f7', url: '/pages/coach/member/coach_member_list' },
       { name: '员工管理', icon: 'friends-o', color: '#9575cd', action: 'staff' },
       { name: '会员卡', icon: 'coupon-o', color: '#ffb74d', url: '/pages/coach/card/coach_card_list' },
-      { name: '教室', icon: 'shop-o', color: '#ce93d8', url: '' },
+      { name: '教室', icon: 'shop-o', color: '#ce93d8', url: '/pages/coach/room/coach_room' },
       { name: '数据统计', icon: 'bar-chart-o', color: '#64b5f6', url: '/pages/coach/stats/coach_stats_index' },
     ],
   },

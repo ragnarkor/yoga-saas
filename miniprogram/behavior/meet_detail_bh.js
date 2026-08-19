@@ -304,6 +304,8 @@ module.exports = Behavior({
 				meet.coachName ||
 				styleSet.teacherName ||
 				'专业教练';
+			const roomName = timeNode.roomName || timeNode.room || '';
+			const locationText = (pageHelper.getTenantName() || '本馆') + (roomName ? ' · ' + roomName : '');
 
 			this.setData({
 				selectedDayIdx: dayIdx,
@@ -311,6 +313,7 @@ module.exports = Behavior({
 				timeMark: timeNode.mark,
 				classTimeText,
 				coachName,
+				locationText,
 				seatText,
 				seatPercent,
 				limitHint,
@@ -550,6 +553,14 @@ module.exports = Behavior({
 				}
 
 				await this._loadDetail();
+
+				// 详情页会被 redirectTo 替换；在跳转前主动同步底下的约课页，
+				// 避免返回后仍展示预约前的余位和按钮状态。
+				const pages = getCurrentPages();
+				const calendarPage = pages[pages.length - 2];
+				if (calendarPage && typeof calendarPage._refreshDayAfterBooking === 'function') {
+					await calendarPage._refreshDayAfterBooking(this.data.day);
+				}
 
 				wx.showModal({
 					title: '温馨提示',

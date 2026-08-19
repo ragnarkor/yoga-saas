@@ -123,6 +123,13 @@ Page({
         },
         { title: "发卡中" },
       );
+      const pages = getCurrentPages();
+      const previous = pages[pages.length - 2];
+      if (previous && typeof previous._loadCards === "function") {
+        await previous._loadCards();
+      } else if (previous && typeof previous._loadMembers === "function") {
+        await previous._loadMembers();
+      }
       wx.showToast({ title: "发卡成功", icon: "success" });
       setTimeout(() => wx.navigateBack(), 600);
     } catch (e) {

@@ -439,8 +439,46 @@ class AdminMeetService extends BaseAdminService {
           tenantConfig,
           privateCategoryIds,
         ),
+      loadRoomBlocks: (roomId, scheduleDay) =>
+        this._loadRoomBlocksForDay(roomId, scheduleDay, tenantConfig, privateCategoryIds),
       onError: (message) => this.AppError(message),
     });
+  }
+
+  async _loadRoomBlocksForDay(roomId, day, tenantConfig, privateCategoryIds) {
+    if (!roomId || !day) return [];
+    const records = await DayModel.getAll(
+      { day },
+      "DAY_MEET_ID,times",
+      {},
+      500,
+    );
+    const meetIds = [...new Set((records || []).map((item) => item.DAY_MEET_ID).filter(Boolean))];
+    const meets = meetIds.length
+      ? await MeetModel.getAll({ _id: ["in", meetIds] }, "MEET_TITLE,MEET_STYLE_SET,MEET_TYPE_ID", {}, meetIds.length)
+      : [];
+    const meetMap = {};
+    for (const item of meets || []) meetMap[item._id] = item;
+
+    const blocks = [];
+    for (const record of records || []) {
+      const meet = meetMap[record.DAY_MEET_ID];
+      if (!meet) continue;
+      for (const slot of record.times || []) {
+        if (!slot || slot.status === 0 || String(slot.roomId || "") !== String(roomId)) continue;
+        const isPrivate = slot.slotType === "private" || privateMeetUtil.isPrivateMeet(meet, privateCategoryIds);
+        const buffer = bufferUtil.resolveBufferForSlot(slot, isPrivate ? "private" : "group", tenantConfig);
+        const block = bufferUtil.computeBlock(slot.start, slot.end, buffer.bufferBefore, buffer.bufferAfter);
+        blocks.push({
+          ...block,
+          meetId: record.DAY_MEET_ID,
+          mark: slot.mark || "",
+          title: meet.MEET_TITLE || "",
+          roomId: String(roomId),
+        });
+      }
+    }
+    return blocks;
   }
 
   /** 更新日期设置 */
@@ -951,6 +989,9 @@ class AdminMeetService extends BaseAdminService {
           typeId: meet.MEET_TYPE_ID,
           teacherName: t.teacherName || style.teacherName || "",
           teacherId: slotTeacherId,
+          roomId: t.roomId || "",
+          roomName: t.roomName || t.room || "",
+          room: t.roomName || t.room || "",
           isPrivate,
           slotType: t.slotType || (isPrivate ? "private" : "group"),
           color: this._resolveCourseColor(

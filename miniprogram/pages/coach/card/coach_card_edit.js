@@ -174,6 +174,11 @@ Page({
         },
         { title: '保存中' },
       );
+      const pages = getCurrentPages();
+      const previous = pages[pages.length - 2];
+      if (previous && typeof previous._loadCards === 'function') {
+        await previous._loadCards();
+      }
       wx.showToast({ title: '已保存', icon: 'success' });
       setTimeout(() => wx.navigateBack(), 500);
     } catch (e) {

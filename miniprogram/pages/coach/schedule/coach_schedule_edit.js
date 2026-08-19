@@ -8,6 +8,18 @@ function pad2(n) {
   return n < 10 ? '0' + n : '' + n;
 }
 
+// 统一处理从日历、dataset 或 query 传入的时间，避免对象值被直接渲染成乱码。
+function normalizeTime(value, fallback = '') {
+  const raw = typeof value === 'string'
+    ? value
+    : value && (value.time || value.start || value.value);
+  const match = String(raw || '').match(/(\d{1,2})\s*[:：]\s*(\d{1,2})/);
+  if (!match) return fallback;
+  const hour = Math.max(0, Math.min(23, Number(match[1])));
+  const minute = Math.max(0, Math.min(59, Number(match[2])));
+  return pad2(hour) + ':' + pad2(minute);
+}
+
 function formatDayStr(d) {
   return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
 }
@@ -80,6 +92,11 @@ Page({
     formTimeSlots: [],
     formTeacherId: '',
     formTeacherName: '',
+    roomOptions: [],
+    roomPickerShow: false,
+    formRoomId: '',
+    formRoomName: '',
+    formRoomPickerIndex: 0,
     formLimit: '',
     datePickerShow: false,
     timePickerShow: false,
@@ -97,6 +114,8 @@ Page({
     this._applyCoachTheme();
     const formDays = options.day ? [options.day] : [];
     const minDay = formatDayStr(new Date());
+    const initialStart = normalizeTime(options.start || options.time, '09:00');
+    const initialEnd = normalizeTime(options.end, '');
     const teacherName = options.teacherName
       ? decodeURIComponent(options.teacherName)
       : '';
@@ -107,9 +126,9 @@ Page({
       formMeetId: options.meetId || '',
       formDays,
       formDayDisplay: formatDaysDisplay(formDays),
-      formStartTime: options.start || options.time || '09:00',
-      formEndTime: options.end || '',
-      formTimeSlots: [{ start: options.start || options.time || '09:00', end: options.end || '' }],
+      formStartTime: initialStart,
+      formEndTime: initialEnd,
+      formTimeSlots: [{ start: initialStart, end: initialEnd }],
       formTeacherId: options.teacherId || '',
       formTeacherName: teacherName,
       calendarDefaultDate: formDays.length
@@ -134,9 +153,11 @@ Page({
     }
 
     if (this.data.isEdit && this.data.formMeetId && this.data.mark) {
-      await this._loadEditSlot();
+      await Promise.all([this._loadRooms(), this._loadEditSlot()]);
     } else if (this.data.formMeetId) {
-      await this._loadCourseMeta(this.data.formMeetId);
+      await Promise.all([this._loadRooms(), this._loadCourseMeta(this.data.formMeetId)]);
+    } else {
+      await this._loadRooms();
     }
 
     this.setData({ loading: false });
@@ -183,14 +204,18 @@ Page({
       };
 
       if (slot) {
-        patch.formStartTime = slot.start || this.data.formStartTime;
-        patch.formEndTime = slot.end || this.data.formEndTime;
+        const start = normalizeTime(slot.start, this.data.formStartTime);
+        const end = normalizeTime(slot.end, this.data.formEndTime);
+        patch.formStartTime = start;
+        patch.formEndTime = end;
         patch.formTimeSlots = [{
-          start: slot.start || this.data.formStartTime,
-          end: slot.end || this.data.formEndTime,
+          start,
+          end,
         }];
         patch.formTeacherId = slot.teacherId || style.teacherId || '';
         patch.formTeacherName = slot.teacherName || style.teacherName || '';
+        patch.formRoomId = slot.roomId || '';
+        patch.formRoomName = slot.roomName || slot.room || '';
         patch.formLimit =
           slot.isLimit && slot.limit > 0
             ? String(slot.limit)
@@ -202,6 +227,24 @@ Page({
       this.setData(patch, () => this._recalcEndTime());
     } catch (e) {
       console.error(e);
+    }
+  },
+
+  async _loadRooms() {
+    try {
+      const data = await cloudHelper.callCloudData('admin/tenant_room_list', {}, { hint: false });
+      const rooms = [{ id: '', name: '不指定教室' }].concat(
+        ((data && data.rooms) || []).filter((item) => item.enabled !== false),
+      );
+      const selectedId = this.data.formRoomId;
+      const index = rooms.findIndex((item) => item.id === selectedId);
+      this.setData({
+        roomOptions: rooms,
+        formRoomPickerIndex: index >= 0 ? index : 0,
+      });
+    } catch (err) {
+      console.warn('[schedule/rooms]', err);
+      this.setData({ roomOptions: [] });
     }
   },
 
@@ -235,15 +278,20 @@ Page({
   },
 
   _recalcEndTime() {
+    const formStartTime = normalizeTime(this.data.formStartTime, '09:00');
     const formEndTime = scheduleSlotHelper.addMinutesToTime(
-      this.data.formStartTime,
+      formStartTime,
       this.data.duration,
     );
     const formTimeSlots = (this.data.formTimeSlots || []).map((slot) => ({
       ...slot,
-      end: scheduleSlotHelper.addMinutesToTime(slot.start, this.data.duration),
+      start: normalizeTime(slot.start, formStartTime),
+      end: scheduleSlotHelper.addMinutesToTime(
+        normalizeTime(slot.start, formStartTime),
+        this.data.duration,
+      ),
     }));
-    this.setData({ formEndTime, formTimeSlots });
+    this.setData({ formStartTime, formEndTime, formTimeSlots });
   },
 
   onCoachPick(e) {
@@ -251,6 +299,29 @@ Page({
     this.setData({
       formTeacherId: teacherId || '',
       formTeacherName: teacherName || '',
+    });
+  },
+
+  bindRoomPickerOpen() {
+    if (this.data.roomOptions.length > 1) this.setData({ roomPickerShow: true });
+  },
+
+  bindRoomPickerClose() {
+    this.setData({ roomPickerShow: false });
+  },
+
+  bindRoomPick(e) {
+    const index = Number(e.currentTarget.dataset.index);
+    const room = this.data.roomOptions[index];
+    if (!room) return;
+    this.setData({
+      roomPickerShow: false,
+      formRoomId: room.id,
+      formRoomName: room.name,
+      formRoomPickerIndex: index,
+      formLimit: !this.data.formLimit && Number(room.capacity) > 0
+        ? String(room.capacity)
+        : this.data.formLimit,
     });
   },
 
@@ -299,7 +370,7 @@ Page({
     this.setData(
       {
         timePickerShow: false,
-        formStartTime: e.detail,
+        formStartTime: normalizeTime(e.detail, this.data.formStartTime),
       },
       () => this._recalcEndTime(),
     );
@@ -340,7 +411,9 @@ Page({
   bindSlotStartChange(e) {
     const index = Number(e.currentTarget.dataset.index);
     const formTimeSlots = (this.data.formTimeSlots || []).map((slot, i) =>
-      i === index ? { ...slot, start: e.detail.value } : slot,
+      i === index
+        ? { ...slot, start: normalizeTime(e.detail.value, slot.start || '09:00') }
+        : slot,
     );
     this.setData({ formTimeSlots }, () => this._recalcEndTime());
   },
@@ -383,6 +456,8 @@ Page({
       formTimeSlots,
       formTeacherId,
       formTeacherName,
+      formRoomId,
+      formRoomName,
       formLimit,
       mark,
       isEdit,
@@ -444,8 +519,10 @@ Page({
             end: slot.end,
             limit,
             mark: isEdit ? mark : '',
-            teacherId: formTeacherId,
-            teacherName: formTeacherName,
+          teacherId: formTeacherId,
+          teacherName: formTeacherName,
+          roomId: formRoomId,
+          roomName: formRoomName,
           });
         }
       }

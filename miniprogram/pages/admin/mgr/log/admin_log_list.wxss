@@ -1,9 +1,14 @@
 @import "../../../../style/project/base/admin.wxss";
 
-page {
-  background-color: var(--adminPageBg);
-}
-
-.admin-comm-list .item .info {
-  padding: 15rpx 20rpx 0rpx;
-}
+page { background: var(--adminPageBg); }
+.operation-log-list { padding: 18rpx 24rpx 36rpx; }
+.log-list-summary { padding: 0 4rpx 18rpx; color: var(--adminTextSecondary); font-size: 23rpx; }
+.operation-log-card { margin-bottom: 18rpx; padding: 22rpx 24rpx 18rpx; background: var(--adminSurface); border-radius: var(--adminRadiusLg); box-shadow: var(--adminShadowSm); }
+.operation-log-top { display: flex; align-items: center; min-width: 0; }
+.operation-log-badge { display: flex; align-items: center; justify-content: center; width: 58rpx; height: 58rpx; margin-right: 16rpx; border-radius: 18rpx; background: var(--adminColorLight); color: var(--adminColor); font-size: 25rpx; font-weight: 700; flex: 0 0 auto; }
+.operation-log-title { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 4rpx; }
+.operation-log-title text:first-child { overflow: hidden; color: var(--adminText); font-size: 28rpx; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.operation-log-title text:last-child { color: var(--adminTextSecondary); font-size: 22rpx; }
+.operation-log-time { margin-left: 12rpx; color: var(--adminTextTertiary); font-size: 21rpx; white-space: nowrap; }
+.operation-log-content { margin-top: 20rpx; padding: 17rpx 18rpx; border-radius: var(--adminRadiusSm); background: #f7f9fa; color: #405057; font-size: 25rpx; line-height: 1.65; word-break: break-all; }
+.operation-log-footer { margin-top: 14rpx; color: var(--adminTextTertiary); font-size: 21rpx; }

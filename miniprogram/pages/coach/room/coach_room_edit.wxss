@@ -1,0 +1,2 @@
+@import "../coach_common.wxss";
+.room-edit-page{min-height:100vh;padding-bottom:48rpx}.room-edit-loading{padding:180rpx 0;text-align:center}.room-edit-section{padding:32rpx 32rpx 12rpx;color:var(--neutralTextSecondary,#646a73);font-size:26rpx;font-weight:600;letter-spacing:1rpx}.room-edit-group{margin:0!important}.room-save-wrap{margin:48rpx 32rpx 32rpx}

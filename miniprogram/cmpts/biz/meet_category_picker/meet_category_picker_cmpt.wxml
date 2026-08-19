@@ -64,18 +64,36 @@
 
       <!-- scope + categories：分类多选 -->
       <block wx:elif="{{scopeMode === 'categories'}}">
-        <view
-          class="course-edit-type-item {{item.selected ? 'is-active' : ''}}"
-          wx:for="{{scopeCategories}}"
-          wx:key="id"
-          data-id="{{item.id}}"
-          bindtap="bindScopeCategoryTap"
-        >
-          <view class="course-edit-type-dot"></view>
-          <text class="course-edit-type-name">{{item.name}}</text>
-          <view class="course-edit-type-check" wx:if="{{item.selected}}">
-            <van-icon name="success" size="32rpx" color="{{themeColor}}" />
+        <scroll-view scroll-x class="mcp-category-tabs" enhanced show-scrollbar="{{false}}">
+          <view class="mcp-category-tabs-inner">
+            <view
+              class="mcp-category-tab {{item.selected ? 'is-active' : ''}}"
+              wx:for="{{scopeCategories}}"
+              wx:key="id"
+              data-id="{{item.id}}"
+              bindtap="bindScopeCategoryTap"
+            >
+              <text>{{item.name}}</text>
+              <van-icon wx:if="{{item.selected}}" name="success" size="24rpx" color="{{themeColor}}" />
+            </view>
           </view>
+        </scroll-view>
+        <view class="mcp-category-hint">点击分类 Tab，可直接选择该分类下全部课程</view>
+        <view class="mcp-selected-category-list">
+          <block wx:for="{{scopeCategories}}" wx:key="id">
+            <view class="mcp-selected-category-chip" wx:if="{{item.selected}}">
+              <text>{{item.name}} · {{item.meetCount || 0}} 门</text>
+              <van-icon name="cross" size="22rpx" color="{{themeColor}}" data-id="{{item.id}}" bindtap="bindScopeCategoryTap" />
+            </view>
+          </block>
+          <text wx:if="{{!scopeCategoryIds.length}}" class="mcp-no-category">还没有选择课程分类</text>
+        </view>
+        <view class="mcp-custom-entry" bindtap="bindScopeCustomTap">
+          <view>
+            <text class="mcp-custom-entry-title">自定义课程</text>
+            <text class="mcp-custom-entry-sub">只选择部分课程时使用</text>
+          </view>
+          <van-icon name="arrow" size="30rpx" color="#b5b8b5" />
         </view>
         <van-empty
           wx:if="{{!categories.length && !loading}}"

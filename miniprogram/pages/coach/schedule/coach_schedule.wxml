@@ -78,6 +78,7 @@
                 >
                   <text class="schedule-card-teacher">{{slot.teacherName || '教练'}}</text>
                   <text class="schedule-card-title">{{slot.title}}</text>
+                  <text wx:if="{{slot.room}}" class="schedule-card-room">{{slot.room}}</text>
                 </view>
                 <view
                   wx:if="{{cell.overflow > 0}}"
@@ -102,6 +103,7 @@
               <text class="schedule-card-title">{{cell.title}}</text>
               <text class="schedule-stars">{{cell.starText}}</text>
               <text class="schedule-card-meta">{{cell.duration}}m · {{cell.typeName}}</text>
+              <text wx:if="{{cell.room}}" class="schedule-card-room">{{cell.room}}</text>
             </view>
             <view wx:else class="schedule-empty-hint">+</view>
           </view>

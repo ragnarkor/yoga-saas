@@ -280,6 +280,7 @@
   font-size: 20rpx;
   opacity: 0.92;
 }
+.schedule-card-room { display:block; margin-top:4rpx; color:#8a958d; font-size:20rpx; }
 
 .schedule-bottom {
   position: fixed;

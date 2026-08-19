@@ -3,11 +3,11 @@
 
 		<!-- List Begin -->
 		<view class="audit-list">
-			<view wx:if="{{dataList && dataList.total }}" class="audit-total">共 {{dataList.total}} 条平台操作记录</view>
+			<view wx:if="{{dataList && dataList.total }}" class="audit-total">共 {{dataList.total}} 条平台审计记录</view>
 
 			<view class="audit-item" wx:for="{{dataList.list}}" wx:key="_id">
 				<view class="audit-head">
-					<view class="audit-action audit-action--{{item.PLOG_ACTION}}">{{item.actionDesc}}</view>
+					<view class="audit-head-left"><view class="audit-symbol">审</view><view><view class="audit-action audit-action--{{item.PLOG_ACTION}}">{{item.actionDesc}}</view><text class="audit-operator">{{item.PLOG_ADMIN_NAME || '系统管理员'}}</text></view></view>
 					<view class="audit-time">{{item.timeDesc}}</view>
 				</view>
 				<view class="audit-content">{{item.PLOG_CONTENT}}</view>

@@ -28,6 +28,7 @@ function buildSlotBlock(meet, slot, tenantConfig, privateCategoryIds) {
   return {
     ...block,
     teacherId: String(teacherId),
+    roomId: String(slot.roomId || ""),
     mark: slot.mark || "",
     title: meet.MEET_TITLE || "",
   };
@@ -41,6 +42,7 @@ async function validateDayTeacherTimes({
   tenantConfig,
   privateCategoryIds,
   loadTeacherBlocks,
+  loadRoomBlocks,
   onError,
 }) {
   const activeSlots = (times || []).filter(
@@ -59,7 +61,7 @@ async function validateDayTeacherTimes({
 
     const existing = await loadTeacherBlocks(candidate.teacherId, day);
     const external = (existing || []).filter(
-      (block) => String(block.meetId) !== String(meetId),
+      (block) => !(String(block.meetId) === String(meetId) && String(block.mark) === String(candidate.mark)),
     );
 
     for (const block of external) {
@@ -77,6 +79,20 @@ async function validateDayTeacherTimes({
       );
     }
 
+    if (candidate.roomId && loadRoomBlocks) {
+      const roomBlocks = await loadRoomBlocks(candidate.roomId, day);
+      for (const block of roomBlocks || []) {
+        if (String(block.meetId) === String(meetId) && String(block.mark) === String(candidate.mark)) continue;
+        if (!bufferUtil.blocksOverlap(candidate, block)) continue;
+        onError(
+          "与教室已有排课冲突：「" +
+            (block.title || "课程") +
+            "」" +
+            bufferUtil.formatBlockLabel(block),
+        );
+      }
+    }
+
     for (const block of batchBlocks) {
       if (block.teacherId !== candidate.teacherId) continue;
       if (String(block.mark) === String(candidate.mark)) continue;
@@ -92,6 +108,15 @@ async function validateDayTeacherTimes({
           candidate.blockEnd +
           "）",
       );
+    }
+
+    if (candidate.roomId) {
+      for (const block of batchBlocks) {
+        if (!block.roomId || block.roomId !== candidate.roomId) continue;
+        if (String(block.mark) === String(candidate.mark)) continue;
+        if (!bufferUtil.blocksOverlap(candidate, block)) continue;
+        onError("时段 " + slot.start + "-" + slot.end + " 与同教室的其他时段冲突");
+      }
     }
 
     batchBlocks.push(candidate);

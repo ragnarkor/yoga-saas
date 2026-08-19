@@ -12,7 +12,7 @@ module.exports = Behavior({
       { label: "已签到", type: "checkin" },
       { label: "已取消", type: "cancel" },
     ],
-    activeFilter: "",
+    activeFilter: "succ",
     page: 1,
     size: 20,
     hasMore: true,

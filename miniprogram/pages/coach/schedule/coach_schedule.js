@@ -6,6 +6,17 @@ const schedulePoster = require('../../../helper/schedule_poster_helper.js');
 const scheduleSlotHelper = require('../../../helper/schedule_slot_helper.js');
 const bookingWeekHelper = require('../../../helper/booking_week_helper.js');
 
+function normalizeScheduleTime(value) {
+  const raw = typeof value === 'string'
+    ? value
+    : value && (value.time || value.start || value.value);
+  const match = String(raw || '').match(/(\d{1,2})\s*[:：]\s*(\d{1,2})/);
+  if (!match) return '';
+  const hour = Math.max(0, Math.min(23, Number(match[1])));
+  const minute = Math.max(0, Math.min(59, Number(match[2])));
+  return (hour < 10 ? '0' : '') + hour + ':' + (minute < 10 ? '0' : '') + minute;
+}
+
 const WEEK_NAMES = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
 function pad2(n) {
@@ -61,6 +72,7 @@ Page({
     tabsReady: false,
     activeTab: 0,
     activeTypeId: '0',
+    activeRoom: '',
     gridRows: [],
     navBarHeight: 64,
     topControlsHeight: 104,
@@ -182,7 +194,11 @@ Page({
         };
       });
 
-      const slots = (res && res.slots) || [];
+      const rawSlots = (res && res.slots) || [];
+      const rooms = Array.from(new Set(rawSlots.map((s) => String(s.room || '').trim()).filter(Boolean))).sort();
+      const hasRoomTabs = rooms.length > 0;
+      const activeRoom = hasRoomTabs ? this.data.activeRoom : '';
+      const slots = activeRoom ? rawSlots.filter((s) => String(s.room || '').trim() === activeRoom) : rawSlots;
       let timeRows = (res && res.timeRows) || [];
       const weekDays = this.data.weekDays;
 
@@ -202,7 +218,12 @@ Page({
         ),
       }));
 
-      this.setData({ loading: false, gridRows });
+      this.setData({
+        loading: false,
+        gridRows,
+        activeRoom,
+        ...(hasRoomTabs ? { tabs: [{ id: 'all', name: '全部' }].concat(rooms.map((room) => ({ id: room, name: room }))), activeTab: Math.max(0, rooms.indexOf(activeRoom) + 1) } : {}),
+      });
     } catch (e) {
       console.error(e);
       this.setData({ loading: false, gridRows: [] });
@@ -242,7 +263,7 @@ Page({
     const ds = e.currentTarget.dataset;
     this._openScheduleForm({
       day: ds.day,
-      time: ds.time,
+      time: normalizeScheduleTime(ds.time) || '09:00',
     });
   },
 
@@ -256,6 +277,7 @@ Page({
       start: slot.start,
       end: slot.end,
       teacherName: slot.teacherName || '',
+      room: slot.room || '',
     });
   },
 
@@ -277,6 +299,7 @@ Page({
           start: slot.start,
           end: slot.end,
           teacherName: slot.teacherName || '',
+          room: slot.room || '',
         });
       },
     });
@@ -358,8 +381,11 @@ Page({
     const idx = e.detail.index;
     const tab = this.data.tabs[idx];
     if (!tab) return;
+    const roomMode = this.data.tabs.some((item) => item.id !== '0' && item.id === 'all');
     this.setData(
-      { activeTab: idx, activeTypeId: tab.id },
+      roomMode
+        ? { activeTab: idx, activeRoom: idx === 0 ? '' : tab.id }
+        : { activeTab: idx, activeTypeId: tab.id },
       () => this._loadSchedule(),
     );
   },

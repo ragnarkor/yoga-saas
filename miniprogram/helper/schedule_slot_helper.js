@@ -130,7 +130,7 @@ function formatScheduleSlot(slot, meetMeta) {
   };
 }
 
-function upsertTimeSlot(daysSet, { day, start, end, limit, mark, teacherId, teacherName }) {
+function upsertTimeSlot(daysSet, { day, start, end, limit, mark, teacherId, teacherName, roomId, roomName }) {
   const list = (daysSet || []).slice();
   let dayNode = list.find((d) => d.day === day);
   if (!dayNode) {
@@ -146,6 +146,8 @@ function upsertTimeSlot(daysSet, { day, start, end, limit, mark, teacherId, teac
       dayNode.times[idx].end = end;
       dayNode.times[idx].teacherId = teacherId || '';
       dayNode.times[idx].teacherName = teacherName || '';
+      dayNode.times[idx].roomId = roomId || '';
+      dayNode.times[idx].roomName = roomName || '';
       if (limit > 0) {
         dayNode.times[idx].limit = limit;
         dayNode.times[idx].isLimit = true;
@@ -161,6 +163,8 @@ function upsertTimeSlot(daysSet, { day, start, end, limit, mark, teacherId, teac
   node.end = end;
   node.teacherId = teacherId || '';
   node.teacherName = teacherName || '';
+  node.roomId = roomId || '';
+  node.roomName = roomName || '';
   if (limit > 0) {
     node.limit = limit;
     node.isLimit = true;
