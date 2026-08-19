@@ -101,6 +101,7 @@ class AdminHomeController extends BaseAdminController {
       ANNOUNCE_ORDER: input.order,
       ANNOUNCE_CONTENT: input.content || [{ type: "text", val: input.desc || input.title }],
       ANNOUNCE_CONTENT_DELTA: input.delta,
+      ANNOUNCE_AUTHOR_NAME: (this._admin && this._admin.ADMIN_NAME) || "场馆管理员",
     });
     await homeCacheUtil.invalidateHomeCache();
     return { id };

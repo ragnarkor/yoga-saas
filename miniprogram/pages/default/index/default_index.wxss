@@ -105,6 +105,12 @@
   color: #596057;
   font-size: 23rpx;
 }
+.home-studio-announce-time {
+  flex-shrink: 0;
+  color: #a4aaa3;
+  font-size: 20rpx;
+  white-space: nowrap;
+}
 
 .home-studio-announce:active {
   opacity: 0.85;
@@ -186,6 +192,9 @@
 }
 
 .section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 0 24rpx;
   margin-bottom: 20rpx;
 }
@@ -194,6 +203,11 @@
   font-size: 34rpx;
   font-weight: 700;
   color: #1a1a1a;
+}
+
+.section-more {
+  color: #8a958c;
+  font-size: 23rpx;
 }
 
 /* ---- 横向滚动通用 ---- */
@@ -211,13 +225,13 @@
 /* ---- 金牌老师 ---- */
 
 .teacher-card {
-  display: inline-flex;
-  flex-direction: column;
-  width: 220rpx;
-  padding: 16rpx;
-  background: #fff;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 20rpx rgba(31, 35, 41, 0.06);
+  position: relative;
+  width: 258rpx;
+  height: 340rpx;
+  overflow: hidden;
+  border-radius: 24rpx;
+  background: #dfe6df;
+  box-shadow: 0 10rpx 28rpx rgba(31, 35, 41, 0.13);
   flex-shrink: 0;
 }
 
@@ -226,18 +240,41 @@
 }
 
 .teacher-cover {
-  width: 188rpx;
-  height: 188rpx;
-  border-radius: 12rpx;
-  background: #f0f1f3;
+  width: 100%;
+  height: 100%;
+  background: #e8ece8;
+}
+
+.teacher-shade {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 55%;
+  background: linear-gradient(transparent, rgba(17, 29, 23, 0.78));
+}
+
+.teacher-info {
+  position: absolute;
+  right: 22rpx;
+  bottom: 22rpx;
+  left: 22rpx;
+}
+
+.teacher-name, .teacher-specialty {
+  display: block;
+  color: #fff;
 }
 
 .teacher-name {
-  margin-top: 14rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #1a1a1a;
-  text-align: center;
+  font-size: 31rpx;
+  font-weight: 700;
+}
+
+.teacher-specialty {
+  margin-top: 7rpx;
+  color: rgba(255,255,255,.78);
+  font-size: 21rpx;
 }
 
 /* ---- 照片墙（相册） ---- */
@@ -246,10 +283,11 @@
   display: inline-flex;
   flex-direction: column;
   width: 280rpx;
-  padding: 16rpx;
+  overflow: hidden;
+  padding: 0;
   background: #fff;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 20rpx rgba(31, 35, 41, 0.06);
+  border-radius: 22rpx;
+  box-shadow: 0 8rpx 24rpx rgba(31, 35, 41, 0.08);
   flex-shrink: 0;
 }
 
@@ -258,9 +296,9 @@
 }
 
 .photo-album-thumbs {
-  width: 248rpx;
+  width: 280rpx;
   height: 186rpx;
-  border-radius: 12rpx;
+  border-radius: 0;
   overflow: hidden;
   display: grid;
   gap: 4rpx;
@@ -306,12 +344,22 @@
   justify-content: center;
 }
 
+.photo-album-meta {
+  padding: 17rpx 18rpx 18rpx;
+}
+
 .photo-title {
-  margin-top: 14rpx;
+  display: block;
   font-size: 28rpx;
   font-weight: 600;
   color: #1a1a1a;
-  text-align: center;
+}
+
+.photo-count {
+  display: block;
+  margin-top: 7rpx;
+  color: #929991;
+  font-size: 20rpx;
 }
 
 .home-safe-bottom {

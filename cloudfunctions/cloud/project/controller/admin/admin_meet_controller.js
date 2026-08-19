@@ -259,6 +259,29 @@ class AdminMeetController extends BaseAdminController {
     return result;
   }
 
+  /** 教练端：将当前周课表连续复制到未来四周 */
+  async copyScheduleMonth() {
+    await this.isAdmin();
+    let input = this.validateData({
+      startDay: "must|date|name=开始日期",
+      endDay: "must|date|name=结束日期",
+      excludeDays: "array|name=排除日期",
+    });
+    let service = new AdminMeetService();
+    let copiedSlots = 0;
+    let skippedSlots = 0;
+    for (let week = 1; week <= 4; week++) {
+      let result = await service.copyScheduleWeek({
+        ...input,
+        targetOffset: week * 7,
+      });
+      copiedSlots += result.copiedSlots || 0;
+      skippedSlots += result.skippedSlots || 0;
+    }
+    cacheUtil.clear();
+    return { copiedSlots, skippedSlots };
+  }
+
   /** 教练端：删除单个排课时段 */
   async removeScheduleSlot() {
     await this.isAdmin();

@@ -29,6 +29,39 @@ function dayToTimestamp(day) {
   return new Date(day.replace(/-/g, '/')).getTime();
 }
 
+function addDays(day, offset) {
+  const date = new Date(String(day).replace(/-/g, '/') + ' 12:00:00');
+  date.setDate(date.getDate() + Number(offset || 0));
+  return formatDayStr(date);
+}
+
+function buildWeekOptions(selected = []) {
+  const selectedSet = new Set((selected || []).map(Number));
+  return [
+    { value: 1, label: '周一', selected: selectedSet.has(1) },
+    { value: 2, label: '周二', selected: selectedSet.has(2) },
+    { value: 3, label: '周三', selected: selectedSet.has(3) },
+    { value: 4, label: '周四', selected: selectedSet.has(4) },
+    { value: 5, label: '周五', selected: selectedSet.has(5) },
+    { value: 6, label: '周六', selected: selectedSet.has(6) },
+    { value: 0, label: '周日', selected: selectedSet.has(0) },
+  ];
+}
+
+function buildRepeatDays(startDay, endDay, weekdays = []) {
+  if (!startDay || !endDay || startDay > endDay || !weekdays.length) return [];
+  const weekdaySet = new Set(weekdays.map(Number));
+  const days = [];
+  let day = startDay;
+  // 限制单次最多生成一年，避免误选超长区间导致页面卡顿。
+  for (let i = 0; i < 366 && day <= endDay; i++) {
+    const date = new Date(day.replace(/-/g, '/') + ' 12:00:00');
+    if (weekdaySet.has(date.getDay())) days.push(day);
+    day = addDays(day, 1);
+  }
+  return days;
+}
+
 Page({
   behaviors: [require('../../../behavior/coach_page_bh.js')],
 
@@ -44,6 +77,7 @@ Page({
     formDayDisplay: '',
     formStartTime: '09:00',
     formEndTime: '10:00',
+    formTimeSlots: [],
     formTeacherId: '',
     formTeacherName: '',
     formLimit: '',
@@ -51,11 +85,18 @@ Page({
     timePickerShow: false,
     datePickerMin: new Date().getTime(),
     calendarDefaultDate: [],
+    minDay: '',
+    batchStartDay: '',
+    batchEndDay: '',
+    batchWeekdays: [],
+    weekOptions: [],
+    scheduleMode: 'repeat',
   },
 
   onLoad(options) {
     this._applyCoachTheme();
     const formDays = options.day ? [options.day] : [];
+    const minDay = formatDayStr(new Date());
     const teacherName = options.teacherName
       ? decodeURIComponent(options.teacherName)
       : '';
@@ -68,11 +109,18 @@ Page({
       formDayDisplay: formatDaysDisplay(formDays),
       formStartTime: options.start || options.time || '09:00',
       formEndTime: options.end || '',
+      formTimeSlots: [{ start: options.start || options.time || '09:00', end: options.end || '' }],
       formTeacherId: options.teacherId || '',
       formTeacherName: teacherName,
       calendarDefaultDate: formDays.length
         ? formDays.map(dayToTimestamp)
         : [new Date().getTime()],
+      minDay,
+      batchStartDay: minDay,
+      batchEndDay: addDays(minDay, 27),
+      batchWeekdays: [],
+      weekOptions: buildWeekOptions(),
+      scheduleMode: options.mark ? 'day' : 'repeat',
     });
     this._recalcEndTime();
     this._initPage();
@@ -137,6 +185,10 @@ Page({
       if (slot) {
         patch.formStartTime = slot.start || this.data.formStartTime;
         patch.formEndTime = slot.end || this.data.formEndTime;
+        patch.formTimeSlots = [{
+          start: slot.start || this.data.formStartTime,
+          end: slot.end || this.data.formEndTime,
+        }];
         patch.formTeacherId = slot.teacherId || style.teacherId || '';
         patch.formTeacherName = slot.teacherName || style.teacherName || '';
         patch.formLimit =
@@ -187,7 +239,11 @@ Page({
       this.data.formStartTime,
       this.data.duration,
     );
-    this.setData({ formEndTime });
+    const formTimeSlots = (this.data.formTimeSlots || []).map((slot) => ({
+      ...slot,
+      end: scheduleSlotHelper.addMinutesToTime(slot.start, this.data.duration),
+    }));
+    this.setData({ formEndTime, formTimeSlots });
   },
 
   onCoachPick(e) {
@@ -249,6 +305,69 @@ Page({
     );
   },
 
+  bindBatchWeekdayTap(e) {
+    const value = Number(e.currentTarget.dataset.value);
+    const selected = new Set((this.data.batchWeekdays || []).map(Number));
+    if (selected.has(value)) selected.delete(value);
+    else selected.add(value);
+    const batchWeekdays = Array.from(selected).sort((a, b) => a - b);
+    this.setData({ batchWeekdays, weekOptions: buildWeekOptions(batchWeekdays) });
+  },
+
+  bindScheduleModeTap(e) {
+    const scheduleMode = e.currentTarget.dataset.mode;
+    if (scheduleMode !== 'day' && scheduleMode !== 'repeat') return;
+    this.setData({ scheduleMode });
+  },
+
+  bindBatchStartDayChange(e) {
+    const batchStartDay = e.detail.value;
+    const batchEndDay = this.data.batchEndDay < batchStartDay
+      ? batchStartDay
+      : this.data.batchEndDay;
+    this.setData({ batchStartDay, batchEndDay });
+  },
+
+  bindBatchEndDayChange(e) {
+    const batchEndDay = e.detail.value;
+    if (batchEndDay < this.data.batchStartDay) {
+      wx.showToast({ title: '结束日期不能早于开始日期', icon: 'none' });
+      return;
+    }
+    this.setData({ batchEndDay });
+  },
+
+  bindSlotStartChange(e) {
+    const index = Number(e.currentTarget.dataset.index);
+    const formTimeSlots = (this.data.formTimeSlots || []).map((slot, i) =>
+      i === index ? { ...slot, start: e.detail.value } : slot,
+    );
+    this.setData({ formTimeSlots }, () => this._recalcEndTime());
+  },
+
+  bindAddTimeSlot() {
+    const slots = (this.data.formTimeSlots || []).slice();
+    if (slots.length >= 6) {
+      wx.showToast({ title: '一次最多添加 6 个时段', icon: 'none' });
+      return;
+    }
+    const last = slots[slots.length - 1] || { end: this.data.formEndTime || '10:00' };
+    const start = last.end || '09:00';
+    slots.push({ start, end: scheduleSlotHelper.addMinutesToTime(start, this.data.duration) });
+    this.setData({ formTimeSlots: slots });
+  },
+
+  bindRemoveTimeSlot(e) {
+    const index = Number(e.currentTarget.dataset.index);
+    const slots = (this.data.formTimeSlots || []).slice();
+    if (slots.length <= 1) {
+      wx.showToast({ title: '至少保留一个上课时间', icon: 'none' });
+      return;
+    }
+    slots.splice(index, 1);
+    this.setData({ formTimeSlots: slots });
+  },
+
   bindLimitChange(e) {
     this.setData({ formLimit: e.detail });
   },
@@ -261,6 +380,7 @@ Page({
       formDays,
       formStartTime,
       formEndTime,
+      formTimeSlots,
       formTeacherId,
       formTeacherName,
       formLimit,
@@ -272,12 +392,25 @@ Page({
       wx.showToast({ title: '请选择课程', icon: 'none' });
       return;
     }
-    if (!formDays.length) {
-      wx.showToast({ title: '请选择上课日期', icon: 'none' });
+    const isRepeat = !isEdit && this.data.scheduleMode === 'repeat';
+    const targetDays = isEdit
+      ? formDays.slice(0, 1)
+      : isRepeat
+        ? buildRepeatDays(
+          this.data.batchStartDay,
+          this.data.batchEndDay,
+          this.data.batchWeekdays,
+        )
+        : formDays;
+    if (!targetDays.length) {
+      wx.showToast({
+        title: isEdit || !isRepeat ? '请选择上课日期' : '请选择星期与排课日期范围',
+        icon: 'none',
+      });
       return;
     }
-    if (!formStartTime) {
-      wx.showToast({ title: '请选择开始时间', icon: 'none' });
+    if (isRepeat && !formTimeSlots.length) {
+      wx.showToast({ title: '请添加上课时间', icon: 'none' });
       return;
     }
     if (!formTeacherId) {
@@ -289,7 +422,7 @@ Page({
     try {
       const meet = await cloudHelper.callCloudData(
         'admin/meet_detail',
-        { id: formMeetId, fromDay: formDays[0] },
+        { id: formMeetId, fromDay: targetDays[0] },
         { title: 'bar' },
       );
       if (!meet) {
@@ -299,18 +432,22 @@ Page({
 
       const limit = Number(formLimit) || 0;
       let daysSet = meet.MEET_DAYS_SET || [];
-      const targetDays = isEdit ? [formDays[0]] : formDays;
+      const targetSlots = isEdit || !isRepeat
+        ? [{ start: formStartTime, end: formEndTime }]
+        : formTimeSlots;
 
       for (const day of targetDays) {
-        daysSet = scheduleSlotHelper.upsertTimeSlot(daysSet, {
-          day,
-          start: formStartTime,
-          end: formEndTime,
-          limit,
-          mark: isEdit ? mark : '',
-          teacherId: formTeacherId,
-          teacherName: formTeacherName,
-        });
+        for (const slot of targetSlots) {
+          daysSet = scheduleSlotHelper.upsertTimeSlot(daysSet, {
+            day,
+            start: slot.start,
+            end: slot.end,
+            limit,
+            mark: isEdit ? mark : '',
+            teacherId: formTeacherId,
+            teacherName: formTeacherName,
+          });
+        }
       }
 
       await cloudHelper.callCloudSumbit(
@@ -329,7 +466,9 @@ Page({
       );
 
       wx.showToast({
-        title: isEdit ? '已更新' : targetDays.length > 1 ? '已排 ' + targetDays.length + ' 天' : '排课成功',
+        title: isEdit
+          ? '已更新'
+          : '已排 ' + targetDays.length * targetSlots.length + ' 个时段',
         icon: 'success',
       });
       setTimeout(() => wx.navigateBack(), 800);

@@ -62,6 +62,8 @@ Page({
     activeTab: 0,
     activeTypeId: '0',
     gridRows: [],
+    navBarHeight: 64,
+    topControlsHeight: 104,
     canvasHeight: 1200,
     previewShow: false,
     previewUrl: '',
@@ -74,6 +76,10 @@ Page({
   },
 
   onLoad() {
+    const app = getApp();
+    this.setData({
+      navBarHeight: app?.globalData?.customBar || 64,
+    });
     this._initWeek(0);
   },
 
@@ -155,6 +161,7 @@ Page({
             startDay,
             endDay,
             typeId: activeTypeId === '0' ? '' : activeTypeId,
+            // 课程表专注团课排班；私教实际预约由独立私教日程承载。
             excludePrivate: 1,
           },
           { hint: false, title: 'bar' },
@@ -185,6 +192,7 @@ Page({
 
       const gridRows = timeRows.map((time) => ({
         time,
+        end: bookingWeekHelper.getTimeRowEnd(time, slots),
         cells: bookingWeekHelper.buildGridCellsForRow(
           weekDays,
           time,
@@ -366,18 +374,18 @@ Page({
     this._loadSchedule();
   },
 
-  bindCopyNextWeek() {
+  bindCopyMonth() {
     const { startDay, endDay } = this.data;
     if (!startDay || !endDay) return;
     wx.showModal({
-      title: '复制课表',
-      content: `将 ${startDay} 至 ${endDay} 的团课排课复制到下周？\n私教动态时段不会复制。`,
+      title: '复制月课表',
+      content: `将 ${startDay} 至 ${endDay} 的团课排课复制到之后 4 周（共一个月）？\n私教动态时段不会复制。`,
       success: async (res) => {
         if (!res.confirm) return;
         this.setData({ copying: true });
         try {
           const result = await cloudHelper.callCloudSumbit(
-            'admin/schedule_copy_week',
+            'admin/schedule_copy_month',
             { startDay, endDay },
             { title: '复制中' },
           );
@@ -386,7 +394,6 @@ Page({
             title: copied ? `已复制 ${copied} 个时段` : '无可复制时段',
             icon: copied ? 'success' : 'none',
           });
-          this._initWeek(this.data.weekOffset + 1);
           await this._loadSchedule();
         } catch (e) {
           console.error(e);
@@ -407,6 +414,7 @@ Page({
     try {
       const posterRows = this.data.gridRows.map((row) => ({
         time: row.time,
+        end: row.end,
         cells: row.cells,
       }));
 
@@ -438,6 +446,8 @@ Page({
   bindClosePreview() {
     this.setData({ previewShow: false, previewUrl: '' });
   },
+
+  noop() {},
 
   async bindConfirmSave() {
     const url = this.data.previewUrl;

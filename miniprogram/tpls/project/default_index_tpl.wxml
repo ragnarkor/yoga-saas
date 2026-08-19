@@ -33,6 +33,7 @@
 			<view class="home-studio-announce" wx:if="{{announcements.length}}" bindtap="bindAnnounceStripTap">
 				<van-icon name="volume-o" size="25rpx" color="{{themeColor}}" />
 				<text class="home-studio-announce-title text-cut">{{announcements[0].title}}</text>
+				<text wx:if="{{announcements[0].publishAgo}}" class="home-studio-announce-time">{{announcements[0].publishAgo}}</text>
 				<van-icon name="arrow" size="24rpx" color="#b2b5ae" />
 			</view>
 		</view>
@@ -81,12 +82,17 @@
 		<view class="home-section" wx:if="{{teachers.length > 0}}">
 			<view class="section-head">
 				<text class="section-title">金牌老师</text>
+				<text class="section-more" bindtap="bindTeacherMoreTap">认识老师</text>
 			</view>
 			<scroll-view class="hscroll" scroll-x enhanced show-scrollbar="{{false}}">
 				<view class="hscroll-inner">
 					<view class="teacher-card" wx:for="{{teachers}}" wx:key="_id" bindtap="bindTeacherTap" data-id="{{item._id}}">
 						<image class="teacher-cover" mode="aspectFill" src="{{item.cover || item.avatar}}" />
-						<view class="teacher-name text-cut">{{item.name}}</view>
+						<view class="teacher-shade" />
+						<view class="teacher-info">
+							<text class="teacher-name text-cut">{{item.name}}</text>
+							<text class="teacher-specialty text-cut">{{item.specialty || '瑜伽教练'}}</text>
+						</view>
 					</view>
 				</view>
 			</scroll-view>
@@ -96,6 +102,7 @@
 		<view class="home-section" wx:if="{{photoAlbums.length > 0}}">
 			<view class="section-head">
 				<text class="section-title">照片墙</text>
+				<text class="section-more" bindtap="bindPhotoWallTap">查看相册</text>
 			</view>
 			<scroll-view class="hscroll" scroll-x enhanced show-scrollbar="{{false}}">
 				<view class="hscroll-inner">
@@ -122,7 +129,10 @@
 								<van-icon name="photo-o" size="48rpx" color="#c8c9cc" />
 							</view>
 						</view>
-						<view class="photo-title text-cut">{{item.title}}</view>
+						<view class="photo-album-meta">
+							<text class="photo-title text-cut">{{item.title}}</text>
+							<text class="photo-count">{{item.count}} 张回忆</text>
+						</view>
 					</view>
 				</view>
 			</scroll-view>

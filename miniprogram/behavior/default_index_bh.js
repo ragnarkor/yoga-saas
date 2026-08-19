@@ -37,6 +37,23 @@ function mapBanner(item) {
   };
 }
 
+function formatPublishAgo(timestamp) {
+  const publishTime = Number(timestamp || 0);
+  const diff = Date.now() - publishTime;
+  if (!publishTime || diff < 0) return '';
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return '刚刚';
+  if (minutes < 60) return `${minutes} 分钟前`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} 小时前`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} 天前`;
+
+  // 过了一周后继续显示“X 天前”没有辨识度，直接给出发布日期。
+  const date = new Date(publishTime);
+  return `${date.getMonth() + 1}月${date.getDate()}日`;
+}
+
 function mapTeacher(item) {
   let pics = (item.pics || []).map((p) => pageHelper.fmtImgUrl(p));
   let avatar = pageHelper.fmtImgUrl(item.avatar);
@@ -139,6 +156,7 @@ module.exports = Behavior({
           banners: (data.banners || []).map(mapBanner),
           announcements: (data.announcements || []).map((item) => ({
             ...item,
+            publishAgo: formatPublishAgo(item.publishTime),
           })),
           teachers: [],
           photos: [],
@@ -288,6 +306,14 @@ module.exports = Behavior({
       });
     },
 
+    bindTeacherMoreTap: function () {
+      const first = (this.data.teachers || [])[0];
+      if (!first || !first._id) return;
+      wx.navigateTo({
+        url: "/pages/default/teacher/detail/teacher_detail?id=" + first._id,
+      });
+    },
+
     bindHomeAlbumTap: function (e) {
       const index = e.currentTarget.dataset.index;
       const album = this.data.photoAlbums[index];
@@ -297,6 +323,10 @@ module.exports = Behavior({
           "/pages/default/photo/photo_wall?album=" +
           encodeURIComponent(album.title),
       });
+    },
+
+    bindPhotoWallTap: function () {
+      wx.navigateTo({ url: "/pages/default/photo/photo_wall" });
     },
 
     bindPhotoTap: function (e) {

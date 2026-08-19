@@ -167,7 +167,10 @@
 
           bindtap="bindPosterTap"
 
-        >生成海报</button>
+        >
+          <van-icon name="photo-o" size="32rpx" color="#fff" />
+          <text>生成海报</text>
+        </button>
 
       </view>
 
@@ -184,16 +187,16 @@
       <image class="ach-poster-preview-image" src="{{posterFilePath}}" mode="widthFix" show-menu-by-longpress="{{true}}" />
       <view class="ach-poster-tools">
         <button class="ach-poster-tool" hover-class="ach-poster-tool--pressed" loading="{{posterLoading}}" bindtap="bindSavePosterTap">
-          <van-icon name="down" size="34rpx" color="{{themeColor}}" />
-          <text>保存</text>
+          <view class="ach-poster-tool-icon" style="background:{{themeColor}}">
+            <van-icon name="down" size="32rpx" color="#fff" />
+          </view>
+          <text>保存到相册</text>
         </button>
         <button class="ach-poster-tool" hover-class="ach-poster-tool--pressed" open-type="share">
-          <van-icon name="share-o" size="34rpx" color="{{themeColor}}" />
+          <view class="ach-poster-tool-icon ach-poster-tool-icon--share">
+            <van-icon name="share-o" size="34rpx" color="{{themeColor}}" />
+          </view>
           <text>转发</text>
-        </button>
-        <button class="ach-poster-tool" hover-class="ach-poster-tool--pressed" bindtap="bindPosterPreviewClose">
-          <van-icon name="success" size="34rpx" color="{{themeColor}}" />
-          <text>完成</text>
         </button>
       </view>
     </view>

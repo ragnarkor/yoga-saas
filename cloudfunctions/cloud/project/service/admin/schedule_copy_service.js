@@ -9,7 +9,7 @@ class ScheduleCopyService {
     this._syncMeetDaysAfterChange = syncMeetDaysAfterChange;
   }
 
-  async copyScheduleWeek({ startDay, endDay, excludeDays = [] }) {
+  async copyScheduleWeek({ startDay, endDay, excludeDays = [], targetOffset = 7 }) {
     if (!startDay || !endDay) this.AppError("请选择复制范围");
     const excludeSet = new Set((excludeDays || []).map(String));
     const dayRecords = await DayModel.getAllBig(
@@ -26,7 +26,7 @@ class ScheduleCopyService {
     const meetIds = new Set();
 
     for (const rec of dayRecords || []) {
-      const targetDay = scheduleDateUtil.addDays(rec.day, 7);
+      const targetDay = scheduleDateUtil.addDays(rec.day, targetOffset);
       if (excludeSet.has(targetDay)) continue;
 
       const sourceTimes = (rec.times || []).filter(
@@ -93,8 +93,8 @@ class ScheduleCopyService {
       copiedDays,
       copiedSlots,
       skippedSlots,
-      targetStartDay: scheduleDateUtil.addDays(startDay, 7),
-      targetEndDay: scheduleDateUtil.addDays(endDay, 7),
+      targetStartDay: scheduleDateUtil.addDays(startDay, targetOffset),
+      targetEndDay: scheduleDateUtil.addDays(endDay, targetOffset),
     };
   }
 

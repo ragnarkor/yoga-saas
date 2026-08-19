@@ -13,53 +13,108 @@
 
   <block wx:else>
 
-    <van-cell-group title="排课信息" custom-class="schedule-edit-group">
-      <meet-course-picker
-        value="{{formMeetId}}"
-        theme-color="{{themeColor}}"
-        label="课程"
-        required="{{true}}"
-        disabled="{{isEdit}}"
-        empty-text="请先在课程管理中添加课程"
-        bind:pick="onCoursePick"
-      />
-      <van-cell
-        title="上课日期"
-        required
-        is-link="{{!isEdit}}"
-        value="{{formDayDisplay || '请选择'}}"
-        label="{{isEdit ? '编辑时不可改日期' : '支持多选'}}"
-        bind:click="bindDayTap"
-      />
-      <van-cell
-        title="开始时间"
-        required
-        is-link
-        value="{{formStartTime || '请选择'}}"
-        bind:click="bindStartTimeTap"
-      />
-      <van-cell
-        title="结束时间"
-        value="{{formEndTime}}"
-        label="按课程时长 {{duration}} 分钟自动计算"
-      />
-      <coach-picker
-        id-mode="teacher"
-        value="{{formTeacherId}}"
-        theme-color="{{themeColor}}"
-        label="授课老师"
-        required="{{true}}"
-        field-class="schedule-edit-coach-field"
-        bind:pick="onCoachPick"
-      />
-      <van-field
-        label="人数上限"
-        type="number"
-        value="{{formLimit}}"
-        placeholder="0 表示不限"
-        bind:change="bindLimitChange"
-      />
-    </van-cell-group>
+    <view class="schedule-common-card">
+      <text class="schedule-form-card-title">排课信息</text>
+      <van-cell-group custom-class="schedule-edit-group">
+        <meet-course-picker
+          value="{{formMeetId}}"
+          theme-color="{{themeColor}}"
+          label="课程"
+          required="{{true}}"
+          disabled="{{isEdit}}"
+          empty-text="请先在课程管理中添加课程"
+          bind:pick="onCoursePick"
+        />
+        <coach-picker
+          id-mode="teacher"
+          value="{{formTeacherId}}"
+          theme-color="{{themeColor}}"
+          label="授课老师"
+          required="{{true}}"
+          field-class="schedule-edit-coach-field"
+          bind:pick="onCoachPick"
+        />
+        <van-field
+          label="人数上限"
+          type="number"
+          value="{{formLimit}}"
+          placeholder="0 表示不限"
+          bind:change="bindLimitChange"
+        />
+      </van-cell-group>
+    </view>
+
+    <view wx:if="{{!isEdit}}" class="schedule-mode-switch">
+      <view class="schedule-mode-item {{scheduleMode === 'repeat' ? 'is-active' : ''}}" style="{{scheduleMode === 'repeat' ? 'color:' + themeColor + ';background:' + themeColor + '18;' : ''}}" data-mode="repeat" bindtap="bindScheduleModeTap">周期排课</view>
+      <view class="schedule-mode-item {{scheduleMode === 'day' ? 'is-active' : ''}}" style="{{scheduleMode === 'day' ? 'color:' + themeColor + ';background:' + themeColor + '18;' : ''}}" data-mode="day" bindtap="bindScheduleModeTap">按天排课</view>
+    </view>
+
+    <view wx:if="{{isEdit || scheduleMode === 'day'}}" class="schedule-repeat-card schedule-day-card">
+      <view class="schedule-repeat-head">
+        <view>
+          <text class="schedule-repeat-title">{{isEdit ? '编辑上课时间' : '按天排课'}}</text>
+          <text class="schedule-repeat-sub">{{isEdit ? '仅修改当前课程时段' : '可一次选择多个指定日期'}} </text>
+        </view>
+        <text class="schedule-repeat-duration">每节 {{duration}} 分钟</text>
+      </view>
+      <view class="schedule-repeat-label">上课日期 <text>*</text></view>
+      <view class="schedule-day-picker" bindtap="bindDayTap">
+        <text class="schedule-day-picker-value">{{formDayDisplay || '请选择日期'}}</text>
+        <van-icon wx:if="{{!isEdit}}" name="arrow" size="26rpx" color="#9ca29b" />
+      </view>
+      <view class="schedule-repeat-label">上课时间 <text>*</text></view>
+      <view class="schedule-time-row">
+        <view class="schedule-time-picker" bindtap="bindStartTimeTap">{{formStartTime || '请选择'}} <van-icon name="arrow-down" size="22rpx" /></view>
+        <text class="schedule-time-to">—</text>
+        <text class="schedule-time-end">{{formEndTime}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{!isEdit && scheduleMode === 'repeat'}}" class="schedule-repeat-card">
+      <view class="schedule-repeat-head">
+        <view>
+          <text class="schedule-repeat-title">周期排课</text>
+          <text class="schedule-repeat-sub">按星期和日期范围批量生成课程</text>
+        </view>
+        <text class="schedule-repeat-duration">每节 {{duration}} 分钟</text>
+      </view>
+
+      <view class="schedule-repeat-label">上课星期 <text>*</text></view>
+      <view class="schedule-weekdays">
+        <view
+          wx:for="{{weekOptions}}"
+          wx:key="value"
+          class="schedule-weekday {{item.selected ? 'is-selected' : ''}}"
+          style="{{item.selected ? 'border-color:' + themeColor + ';background:' + themeColor + ';' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="bindBatchWeekdayTap"
+        >{{item.label}}</view>
+      </view>
+
+      <view class="schedule-repeat-label">排课日期 <text>*</text></view>
+      <view class="schedule-date-range">
+        <picker mode="date" start="{{minDay}}" value="{{batchStartDay}}" bindchange="bindBatchStartDayChange">
+          <view class="schedule-date-picker"><text>{{batchStartDay}}</text><van-icon name="arrow-down" size="24rpx" /></view>
+        </picker>
+        <text class="schedule-date-range-line">至</text>
+        <picker mode="date" start="{{batchStartDay}}" value="{{batchEndDay}}" bindchange="bindBatchEndDayChange">
+          <view class="schedule-date-picker"><text>{{batchEndDay}}</text><van-icon name="arrow-down" size="24rpx" /></view>
+        </picker>
+      </view>
+
+      <view class="schedule-repeat-label">上课时间 <text>*</text></view>
+      <view class="schedule-time-list">
+        <view class="schedule-time-row" wx:for="{{formTimeSlots}}" wx:key="index">
+          <picker mode="time" value="{{item.start}}" data-index="{{index}}" bindchange="bindSlotStartChange">
+            <view class="schedule-time-picker">{{item.start}} <van-icon name="arrow-down" size="22rpx" /></view>
+          </picker>
+          <text class="schedule-time-to">—</text>
+          <text class="schedule-time-end">{{item.end}}</text>
+          <van-icon wx:if="{{formTimeSlots.length > 1}}" name="cross" size="28rpx" color="#a8aba4" data-index="{{index}}" bindtap="bindRemoveTimeSlot" />
+        </view>
+      </view>
+      <view class="schedule-add-time" style="color:{{themeColor}}" bindtap="bindAddTimeSlot"><van-icon name="plus" size="27rpx" />添加上课时间</view>
+    </view>
 
     <view class="schedule-edit-save">
       <van-button

@@ -171,6 +171,8 @@ module.exports = {
   "admin/schedule_week": "admin/admin_meet_controller@getScheduleWeek",
   "admin/schedule_copy_week":
     "admin/admin_meet_controller@copyScheduleWeek#noDemo",
+  "admin/schedule_copy_month":
+    "admin/admin_meet_controller@copyScheduleMonth#noDemo",
   "admin/schedule_slot_remove":
     "admin/admin_meet_controller@removeScheduleSlot#noDemo",
   "admin/meet_join_list": "admin/admin_meet_controller@getJoinList",

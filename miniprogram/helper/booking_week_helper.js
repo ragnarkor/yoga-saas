@@ -315,6 +315,16 @@ function buildGridCellsForRow(weekDays, time, slots, formatFn, maxVisible = MAX_
   });
 }
 
+/** 同一开课点可能有不同课程时长，左侧时间轴展示该行最晚结束时间。 */
+function getTimeRowEnd(time, slots) {
+  let end = '';
+  for (const slot of slots || []) {
+    if (slot.start !== time || !slot.end) continue;
+    if (!end || String(slot.end) > String(end)) end = slot.end;
+  }
+  return end;
+}
+
 function getCellSlot(cell, itemIdx) {
   if (!cell) return null;
   if (cell.items && cell.items.length) {
@@ -338,6 +348,7 @@ function buildBookingGrid(weekDays, slots, activeTabId, options = {}) {
 
   const gridRows = timeRows.map((time) => ({
     time,
+    end: getTimeRowEnd(time, filtered),
     cells: buildGridCellsForRow(weekDays, time, filtered, (s) =>
       formatBookingGridCell(s, options),
     ),
@@ -355,6 +366,7 @@ module.exports = {
   buildWeekColumnsFromSlots,
   buildBookingGrid,
   buildGridCellsForRow,
+  getTimeRowEnd,
   packGridCell,
   getCellSlot,
   getStatusLegend,

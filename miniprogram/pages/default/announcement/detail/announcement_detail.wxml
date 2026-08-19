@@ -11,14 +11,27 @@
   </view>
 
   <view class="announce-detail" wx:else>
-    <view class="title">{{detail.title}}</view>
-    <view class="desc" wx:if="{{detail.desc}}">{{detail.desc}}</view>
-    <rich-text wx:if="{{detail.contentDelta}}" nodes="{{contentNodes}}" class="content-rich" />
-    <block wx:else>
-      <view class="content" wx:for="{{detail.content}}" wx:key="index">
-		  <text wx:if="{{item.type=='text'}}">{{item.val}}</text>
-		  <image wx:if="{{item.type=='img'}}" src="{{item.val}}" mode="widthFix" class="content-image" />
-	      </view>
-    </block>
+    <view class="announce-article">
+      <view class="title">{{detail.title}}</view>
+      <view class="desc" wx:if="{{detail.desc}}">{{detail.desc}}</view>
+      <view class="announce-meta" wx:if="{{detail.authorName || detail.publishTime}}">
+        <view class="announce-author-avatar" wx:if="{{detail.authorName}}">
+          <image wx:if="{{detail.authorAvatar}}" src="{{detail.authorAvatar}}" mode="aspectFill" />
+          <text wx:else>{{detail.authorName.slice(0, 1)}}</text>
+        </view>
+        <text>{{detail.authorName}}</text>
+        <text wx:if="{{detail.publishTime}}">{{detail.publishTime}}</text>
+      </view>
+      <view class="announce-divider" />
+      <view class="announce-content">
+        <rich-text wx:if="{{detail.contentDelta}}" nodes="{{contentNodes}}" class="content-rich" />
+        <block wx:else>
+          <view class="content" wx:for="{{detail.content}}" wx:key="index">
+            <text wx:if="{{item.type=='text'}}">{{item.val}}</text>
+            <image wx:if="{{item.type=='img'}}" src="{{item.val}}" mode="widthFix" class="content-image" />
+          </view>
+        </block>
+      </view>
+    </view>
   </view>
 </view>

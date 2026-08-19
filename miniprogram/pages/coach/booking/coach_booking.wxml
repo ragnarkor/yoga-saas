@@ -40,7 +40,11 @@
           </view>
         </view>
         <view class="schedule-row" wx:for="{{gridRows}}" wx:for-index="rowIdx" wx:key="time">
-          <view class="schedule-time-col">{{item.time}}</view>
+          <view class="schedule-time-col">
+            <text class="schedule-time-start">{{item.time}}</text>
+            <view wx:if="{{item.end}}" class="schedule-time-axis-line"></view>
+            <text wx:if="{{item.end}}" class="schedule-time-end-label">{{item.end}}</text>
+          </view>
           <view
             class="schedule-day-col {{cell ? 'schedule-day-col--filled' : 'schedule-day-col--empty'}}"
             wx:for="{{item.cells}}"

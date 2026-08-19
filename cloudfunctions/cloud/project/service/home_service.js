@@ -139,7 +139,7 @@ class HomeService extends BaseService {
       this._safeGetAll(
         AnnouncementModel,
         { ANNOUNCE_STATUS: 1 },
-        "ANNOUNCE_TITLE,ANNOUNCE_DESC",
+        "ANNOUNCE_TITLE,ANNOUNCE_DESC,ANNOUNCE_ADD_TIME",
         { ANNOUNCE_ORDER: "asc", ANNOUNCE_ADD_TIME: "desc" },
         10,
       ),
@@ -159,6 +159,7 @@ class HomeService extends BaseService {
       _id: item._id,
       title: item.ANNOUNCE_TITLE,
       desc: item.ANNOUNCE_DESC || "",
+      publishTime: item.ANNOUNCE_ADD_TIME || 0,
     }));
 
     return { phone, banners, announcements };
@@ -491,13 +492,18 @@ class HomeService extends BaseService {
   async getAnnounceDetail(id) {
     let item = await AnnouncementModel.getOne(
       { _id: id, ANNOUNCE_STATUS: 1 },
-      "ANNOUNCE_TITLE,ANNOUNCE_DESC,ANNOUNCE_CONTENT,ANNOUNCE_CONTENT_DELTA",
+      "ANNOUNCE_TITLE,ANNOUNCE_DESC,ANNOUNCE_CONTENT,ANNOUNCE_CONTENT_DELTA,ANNOUNCE_ADD_TIME,ANNOUNCE_AUTHOR_NAME,ANNOUNCE_AUTHOR_AVATAR",
     );
     if (!item) return null;
     return {
       _id: item._id,
       title: item.ANNOUNCE_TITLE,
       desc: item.ANNOUNCE_DESC || "",
+      publishTime: item.ANNOUNCE_ADD_TIME
+        ? timeUtil.timestamp2Time(item.ANNOUNCE_ADD_TIME, "Y-M-D")
+        : "",
+      authorName: item.ANNOUNCE_AUTHOR_NAME || "",
+      authorAvatar: item.ANNOUNCE_AUTHOR_AVATAR || "",
       content: item.ANNOUNCE_CONTENT || [],
       contentDelta: item.ANNOUNCE_CONTENT_DELTA || null,
     };

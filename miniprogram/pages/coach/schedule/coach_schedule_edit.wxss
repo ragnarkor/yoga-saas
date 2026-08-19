@@ -11,7 +11,219 @@
 }
 
 .schedule-edit-group {
-  margin-top: 24rpx !important;
+  margin: 0 !important;
+}
+
+.schedule-common-card {
+  margin: 24rpx 24rpx 0;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 22rpx;
+  box-shadow: 0 6rpx 22rpx rgba(40, 70, 56, 0.05);
+}
+
+.schedule-form-card-title {
+  display: block;
+  padding: 28rpx 28rpx 14rpx;
+  color: #34463a;
+  font-size: 31rpx;
+  font-weight: 700;
+}
+
+.schedule-mode-switch {
+  display: flex;
+  gap: 12rpx;
+  margin: 24rpx 24rpx 0;
+  padding: 8rpx;
+  background: #edf0ec;
+  border-radius: 18rpx;
+}
+
+.schedule-mode-item {
+  flex: 1;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b9289;
+  font-size: 25rpx;
+  border-radius: 13rpx;
+}
+
+.schedule-mode-item.is-active {
+  font-weight: 700;
+}
+
+.schedule-repeat-card {
+  margin: 24rpx;
+  padding: 28rpx;
+  border-radius: 22rpx;
+  background: #fff;
+  box-shadow: 0 6rpx 22rpx rgba(40, 70, 56, 0.05);
+}
+
+.schedule-day-picker {
+  min-height: 70rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 0 18rpx;
+  color: #4b554d;
+  font-size: 25rpx;
+  background: #fafaf8;
+  border: 1rpx solid #e8e9e5;
+  border-radius: 14rpx;
+}
+
+.schedule-day-picker-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.schedule-repeat-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.schedule-repeat-title {
+  display: block;
+  color: #34463a;
+  font-size: 31rpx;
+  font-weight: 700;
+}
+
+.schedule-repeat-sub {
+  display: block;
+  margin-top: 7rpx;
+  color: #989c94;
+  font-size: 22rpx;
+}
+
+.schedule-repeat-duration {
+  flex-shrink: 0;
+  padding: 7rpx 14rpx;
+  color: var(--themeColor, #5b8a72);
+  font-size: 21rpx;
+  background: var(--projectColorLight, #edf5f0);
+  border-radius: 999rpx;
+}
+
+.schedule-repeat-label {
+  margin: 24rpx 0 14rpx;
+  color: #4c554d;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.schedule-repeat-label text {
+  color: #ee0a24;
+}
+
+.schedule-weekdays {
+  display: flex;
+  justify-content: space-between;
+  gap: 10rpx;
+}
+
+.schedule-weekday {
+  width: 76rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  color: #7e857d;
+  font-size: 22rpx;
+  background: #fafaf8;
+  border: 1rpx solid #e6e8e2;
+  border-radius: 14rpx;
+}
+
+.schedule-weekday.is-selected {
+  color: #fff;
+  font-weight: 600;
+}
+
+.schedule-date-range {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.schedule-date-range picker {
+  flex: 1;
+  min-width: 0;
+}
+
+.schedule-date-picker,
+.schedule-time-picker,
+.schedule-time-end {
+  height: 70rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 0 18rpx;
+  color: #4b554d;
+  font-size: 25rpx;
+  background: #fafaf8;
+  border: 1rpx solid #e8e9e5;
+  border-radius: 14rpx;
+}
+
+.schedule-date-range-line,
+.schedule-time-to {
+  flex-shrink: 0;
+  color: #a4a7a0;
+  font-size: 23rpx;
+}
+
+.schedule-time-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.schedule-time-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.schedule-time-row picker,
+.schedule-time-picker,
+.schedule-time-end {
+  flex: 1;
+  min-width: 0;
+}
+
+.schedule-time-end {
+  height: 70rpx;
+  justify-content: flex-start;
+  padding: 0;
+  color: #667066;
+  font-weight: 600;
+  background: transparent;
+  border: 0;
+}
+
+.schedule-add-time {
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  margin-top: 18rpx;
+  font-size: 25rpx;
+  background: #fafbf9;
+  border: 1rpx dashed #d9ddd5;
+  border-radius: 14rpx;
 }
 
 .schedule-edit-coach-field.coach-picker-field {
@@ -47,6 +259,10 @@
   padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
 }
 
+.schedule-calendar-popup {
+  min-height: 930rpx;
+}
+
 .schedule-calendar-head {
   padding: 28rpx 32rpx 8rpx;
   font-size: 30rpx;
@@ -55,7 +271,7 @@
 }
 
 .schedule-calendar-wrap .van-calendar {
-  height: 640rpx !important;
+  height: 800rpx !important;
 }
 
 .schedule-course-field {

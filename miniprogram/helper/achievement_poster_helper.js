@@ -81,7 +81,8 @@ function _drawHeatmap(ctx, heatmap, startDay, x, y, totalW, totalH, themeColor) 
 
 async function _drawBadges(canvas, ctx, badges, x, y, totalW, themeColor) {
   const unlocked = (badges || []).filter((b) => b.unlocked).slice(0, 4);
-  const colW = totalW / 4;
+  const slotCount = 4;
+  const colW = totalW / slotCount;
   if (!unlocked.length) {
     ctx.textAlign = "center";
     ctx.fillStyle = "#9A9A92";
@@ -99,9 +100,12 @@ async function _drawBadges(canvas, ctx, badges, x, y, totalW, themeColor) {
       }
     }),
   );
+  const startSlot = (slotCount - unlocked.length) / 2;
+  ctx.textAlign = "center";
   for (let i = 0; i < unlocked.length; i++) {
     const badge = unlocked[i];
-    const cx = x + colW * i + colW / 2;
+    // 始终占用四个等宽槽位，但按已解锁数量居中，避免两枚徽章贴在左边。
+    const cx = x + colW * (startSlot + i) + colW / 2;
     ctx.fillStyle = `${themeColor}22`;
     ctx.beginPath();
     ctx.arc(cx, y + 36, 40, 0, Math.PI * 2);

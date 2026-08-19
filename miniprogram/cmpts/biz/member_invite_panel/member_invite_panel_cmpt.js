@@ -81,6 +81,8 @@ Component({
       this.triggerEvent('close');
     },
 
+    noop() {},
+
     async bindSaveTap() {
       const { qrUrl, tenantName, accentColor, slogan } = this.data;
       if (!qrUrl) return;

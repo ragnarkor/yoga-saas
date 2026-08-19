@@ -2,25 +2,28 @@
 <view class="coach-page schedule-page">
   <coach-tenant-switch title="排课" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
 
-  <van-tabs
-    wx:if="{{tabsReady}}"
-    id="scheduleTabs"
-    active="{{activeTab}}"
-    color="{{themeColor}}"
-    title-active-color="{{themeColor}}"
-    line-width="40rpx"
-    line-height="6rpx"
-    ellipsis="{{false}}"
-    bind:change="bindTabChange"
-    custom-class="schedule-tabs"
-  >
-    <van-tab wx:for="{{tabs}}" wx:key="id" title="{{item.name}}" />
-  </van-tabs>
+  <view class="schedule-top-placeholder" style="height:{{topControlsHeight}}px;"></view>
+  <view class="schedule-top-controls" style="top:{{navBarHeight}}px;">
+    <van-tabs
+      wx:if="{{tabsReady}}"
+      id="scheduleTabs"
+      active="{{activeTab}}"
+      color="{{themeColor}}"
+      title-active-color="{{themeColor}}"
+      line-width="40rpx"
+      line-height="6rpx"
+      ellipsis="{{false}}"
+      bind:change="bindTabChange"
+      custom-class="schedule-tabs"
+    >
+      <van-tab wx:for="{{tabs}}" wx:key="id" title="{{item.name}}" />
+    </van-tabs>
 
-  <view class="schedule-week-bar">
-    <view class="schedule-week-btn" bindtap="bindPrevWeek">◀ 上周</view>
-    <view class="schedule-week-range">{{weekLabel}}</view>
-    <view class="schedule-week-btn" bindtap="bindNextWeek">下周 ▶</view>
+    <view class="schedule-week-bar">
+      <view class="schedule-week-btn" bindtap="bindPrevWeek">◀ 上周</view>
+      <view class="schedule-week-range">{{weekLabel}}</view>
+      <view class="schedule-week-btn" bindtap="bindNextWeek">下周 ▶</view>
+    </view>
   </view>
 
   <view wx:if="{{loading}}" class="schedule-loading">
@@ -42,7 +45,11 @@
           </view>
         </view>
         <view class="schedule-row" wx:for="{{gridRows}}" wx:for-index="rowIdx" wx:key="time">
-          <view class="schedule-time-col">{{item.time}}</view>
+          <view class="schedule-time-col">
+            <text class="schedule-time-start">{{item.time}}</text>
+            <view wx:if="{{item.end}}" class="schedule-time-axis-line"></view>
+            <text wx:if="{{item.end}}" class="schedule-time-end-label">{{item.end}}</text>
+          </view>
           <view
             class="schedule-day-col {{cell ? 'schedule-day-col--filled' : 'schedule-day-col--empty'}}"
             wx:for="{{item.cells}}"
@@ -105,7 +112,7 @@
 
   <view class="schedule-bottom">
     <view class="schedule-bottom-item schedule-bottom-item--side">
-      <van-button block icon="photo-o" color="{{themeColor}}" plain bind:click="bindSaveImageTap">保存图片</van-button>
+      <van-button block icon="photo-o" color="{{themeColor}}" plain custom-class="schedule-bottom-button" bind:click="bindSaveImageTap">保存图片</van-button>
     </view>
     <view class="schedule-bottom-item schedule-bottom-item--copy">
       <van-button
@@ -114,11 +121,12 @@
         color="{{themeColor}}"
         plain
         loading="{{copying}}"
-        bind:click="bindCopyNextWeek"
-      >复制到下周</van-button>
+        custom-class="schedule-bottom-button"
+        bind:click="bindCopyMonth"
+      >复制月课表</van-button>
     </view>
     <view class="schedule-bottom-item schedule-bottom-item--side">
-      <van-button block icon="plus" color="{{themeColor}}" bind:click="bindGoSchedule">排课</van-button>
+      <van-button block icon="plus" color="{{themeColor}}" custom-class="schedule-bottom-button" bind:click="bindGoSchedule">排课</van-button>
     </view>
   </view>
 
@@ -129,15 +137,21 @@
     style="height: {{canvasHeight}}px;"
   />
 
-  <van-popup show="{{previewShow}}" round bind:close="bindClosePreview">
-    <view class="schedule-preview">
-      <image wx:if="{{previewUrl}}" class="schedule-preview-img" src="{{previewUrl}}" mode="widthFix" />
-      <view class="schedule-preview-actions">
-        <van-button block plain bind:click="bindClosePreview">关闭</van-button>
-        <van-button block color="{{themeColor}}" bind:click="bindConfirmSave">保存到相册</van-button>
+  <view wx:if="{{previewShow && previewUrl}}" class="schedule-poster-modal" bindtap="bindClosePreview">
+    <view class="schedule-poster-preview" catchtap="noop">
+      <image class="schedule-preview-img" src="{{previewUrl}}" mode="widthFix" show-menu-by-longpress="{{true}}" />
+      <view class="schedule-poster-tools">
+        <button class="schedule-poster-tool" hover-class="schedule-poster-tool--pressed" bindtap="bindConfirmSave">
+          <view class="schedule-poster-tool-icon" style="background:{{themeColor}}"><van-icon name="down" size="32rpx" color="#fff" /></view>
+          <text>保存到相册</text>
+        </button>
+        <button class="schedule-poster-tool" hover-class="schedule-poster-tool--pressed" bindtap="bindClosePreview">
+          <view class="schedule-poster-tool-icon schedule-poster-tool-icon--done"><van-icon name="success" size="32rpx" color="{{themeColor}}" /></view>
+          <text>完成</text>
+        </button>
       </view>
     </view>
-  </van-popup>
+  </view>
 
   <van-action-sheet
     show="{{slotActionShow}}"
