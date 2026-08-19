@@ -62,7 +62,7 @@ class AdminCardService extends BaseAdminService {
     return CardTplModel.TYPE_DESC[type] || "次数卡";
   }
 
-  _formatTpl(item, nameMap = {}) {
+  _formatTpl(item, nameMap = {}, meetNameMap = {}) {
     const scope = cardScopeUtil.normalizeScope(item.CARD_TPL_SCOPE);
     const coverId = cardCoverUtil.normalizeCover(item.CARD_TPL_COVER);
     return {
@@ -72,8 +72,26 @@ class AdminCardService extends BaseAdminService {
       typeDesc: this._typeDesc(item.CARD_TPL_TYPE),
       metaText: this._buildTplMeta(item),
       scope,
-      scopeDesc: cardScopeUtil.buildScopeDesc(scope, nameMap),
+      scopeDesc: cardScopeUtil.buildScopeDesc(scope, nameMap, meetNameMap),
     };
+  }
+
+  /** 课程 ID → 课程名 映射（mode=meets 文案用） */
+  async _getMeetNameMap() {
+    try {
+      const MeetModel = require("../../model/meet_model.js");
+      const list = await MeetModel.getAll({}, "_id,MEET_ID,MEET_TITLE", {}, 500);
+      const map = {};
+      for (const m of list || []) {
+        const title = m.MEET_TITLE || "";
+        if (m._id) map[String(m._id)] = title;
+        if (m.MEET_ID) map[String(m.MEET_ID)] = title;
+      }
+      return map;
+    } catch (err) {
+      console.error("[AdminCardService] meet map:", err.message);
+      return {};
+    }
   }
 
   async _getMeetCategoryNameMap() {
@@ -112,16 +130,27 @@ class AdminCardService extends BaseAdminService {
       { CARD_TPL_ORDER: "asc", CARD_TPL_ADD_TIME: "desc" },
       200,
     );
-    const nameMap = await this._getMeetCategoryNameMap();
-    return (list || []).map((item) => this._formatTpl(item, nameMap));
+    const hasMeetsScope = (list || []).some((it) => {
+      const s = cardScopeUtil.normalizeScope(it.CARD_TPL_SCOPE);
+      return s.mode === "meets";
+    });
+    const [nameMap, meetNameMap] = await Promise.all([
+      this._getMeetCategoryNameMap(),
+      hasMeetsScope ? this._getMeetNameMap() : Promise.resolve({}),
+    ]);
+    return (list || []).map((item) => this._formatTpl(item, nameMap, meetNameMap));
   }
 
   async getCardTplDetail(id) {
     await this._ensureCardCollections();
     let item = await CardTplModel.getOne({ CARD_TPL_ID: id }, "*");
     if (!item) this.AppError("会员卡不存在");
-    const nameMap = await this._getMeetCategoryNameMap();
-    return this._formatTpl(item, nameMap);
+    const scope = cardScopeUtil.normalizeScope(item.CARD_TPL_SCOPE);
+    const [nameMap, meetNameMap] = await Promise.all([
+      this._getMeetCategoryNameMap(),
+      scope.mode === "meets" ? this._getMeetNameMap() : Promise.resolve({}),
+    ]);
+    return this._formatTpl(item, nameMap, meetNameMap);
   }
 
   async saveCardTpl(input, operatorType) {
@@ -147,6 +176,9 @@ class AdminCardService extends BaseAdminService {
     let scope = cardScopeUtil.normalizeScope(input.scope);
     if (scope.mode === "categories" && !scope.categoryIds.length) {
       this.AppError("请选择适用课程分类");
+    }
+    if (scope.mode === "meets" && !scope.meetIds.length) {
+      this.AppError("请选择适用课程");
     }
     let cover = cardCoverUtil.normalizeCover(input.cover);
 

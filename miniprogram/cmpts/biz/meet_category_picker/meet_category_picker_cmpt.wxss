@@ -141,3 +141,77 @@
   padding: 8rpx 24rpx calc(32rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
+
+/* scope 三段切换 */
+.mcp-seg {
+  display: flex;
+  gap: 8rpx;
+  margin: 4rpx 24rpx 16rpx;
+  padding: 6rpx;
+  background: var(--neutralBg, #f7f8fa);
+  border-radius: 16rpx;
+  flex-shrink: 0;
+}
+
+.mcp-seg-item {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 26rpx;
+  color: #646566;
+  border-radius: 12rpx;
+  transition: all 0.2s ease;
+}
+
+.mcp-seg-item.is-active {
+  background: #fff;
+  color: var(--themeColor, #5b8a72);
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.mcp-hint {
+  padding: 40rpx 24rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #969799;
+}
+
+/* 指定课程条目：主标题 + 分类副标题 */
+.mcp-meet-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mcp-meet-text .course-edit-type-name {
+  flex: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mcp-meet-sub {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #969799;
+}
+
+/* 多选底部完成条 */
+.mcp-sheet-foot {
+  flex-shrink: 0;
+  padding: 16rpx 24rpx calc(20rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid var(--neutralBorder, #ebedf0);
+}
+
+.mcp-done-btn {
+  height: 84rpx;
+  line-height: 84rpx;
+  text-align: center;
+  border-radius: 16rpx;
+  background: var(--themeColor, #5b8a72);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+}

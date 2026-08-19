@@ -57,6 +57,7 @@
         theme-color="{{themeColor}}"
         scope-mode="{{scopeMode}}"
         scope-category-ids="{{scopeCategoryIds}}"
+        scope-meet-ids="{{scopeMeetIds}}"
         bind:scopeChange="onScopeChange"
       />
     </van-cell-group>

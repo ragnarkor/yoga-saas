@@ -24,7 +24,7 @@ const MS_PER_DAY = 86400 * 1000;
 class UserCardService extends BaseService {
   /** 只读准备扣卡信息，实际写入由预约事务服务完成。 */
   async prepareJoinCard(userId, meetId, timeMark, cardId) {
-    const meet = await MeetModel.getOne({ _id: meetId }, "MEET_TITLE,MEET_TYPE_NAME,MEET_STYLE_SET,MEET_DAYS_SET");
+    const meet = await MeetModel.getOne({ _id: meetId }, "_id,MEET_ID,MEET_TITLE,MEET_TYPE_ID,MEET_TYPE_NAME,MEET_STYLE_SET,MEET_DAYS_SET");
     if (!meet) this.AppError("课程不存在");
     const needTimes = this._getMeetCardTimes(meet);
     const card = await this._resolveCardForJoin(userId, needTimes, cardId, meet, this._meetDayFromTimeMark(timeMark));
@@ -704,7 +704,7 @@ class UserCardService extends BaseService {
 
     let meet = await MeetModel.getOne(
       { _id: meetId },
-      "MEET_STYLE_SET,MEET_TYPE_ID,MEET_TYPE_NAME",
+      "_id,MEET_ID,MEET_STYLE_SET,MEET_TYPE_ID,MEET_TYPE_NAME",
     );
     if (!meet) this.AppError("课程不存在");
 
@@ -855,7 +855,7 @@ class UserCardService extends BaseService {
     }
     const scope = this._resolveCardScopeSync(card, scopeMap);
     if (meet && !this._cardMatchesMeetScope(scope, meet)) {
-      this.AppError("该会员卡不适用于本课程分类");
+      this.AppError("该会员卡不适用于本课程");
     }
 
     const type = this._resolveCardType(card, typeMap);
@@ -872,7 +872,7 @@ class UserCardService extends BaseService {
 
     let meet = await MeetModel.getOne(
       { _id: meetId },
-      "MEET_STYLE_SET,MEET_TYPE_ID,MEET_TYPE_NAME",
+      "_id,MEET_ID,MEET_STYLE_SET,MEET_TYPE_ID,MEET_TYPE_NAME",
     );
     if (!meet) this.AppError("课程不存在");
 
@@ -958,7 +958,7 @@ class UserCardService extends BaseService {
     await this._ensureCardCollections();
     let meet = await MeetModel.getOne(
       { _id: meetId },
-      "MEET_TITLE,MEET_TYPE_NAME,MEET_TYPE_ID,MEET_STYLE_SET,MEET_DAYS_SET,MEET_ADMIN_ID",
+      "_id,MEET_ID,MEET_TITLE,MEET_TYPE_NAME,MEET_TYPE_ID,MEET_STYLE_SET,MEET_DAYS_SET,MEET_ADMIN_ID",
     );
     if (!meet) return;
 

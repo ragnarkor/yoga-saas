@@ -6,7 +6,7 @@ const AdminMeetBiz = require("../../../biz/admin_meet_biz.js");
 
 const SHEET_SUB = {
   single: "课程类型用于排课分类与筛选",
-  scope: "指定分类后，该卡仅可用于对应课程",
+  scope: "限定后，该卡仅可用于对应课程",
 };
 
 /**
@@ -52,11 +52,18 @@ Component({
       type: Array,
       value: [],
     },
+    scopeMeetIds: {
+      type: Array,
+      value: [],
+    },
   },
 
   data: {
     categories: [],
     scopeCategories: [],
+    meets: [],
+    scopeMeets: [],
+    meetsLoaded: false,
     sheetShow: false,
     loading: true,
     typeName: "",
@@ -74,9 +81,10 @@ Component({
     value(typeId) {
       this._syncTypeName(typeId);
     },
-    "scopeMode, scopeCategoryIds, categories"() {
+    "scopeMode, scopeCategoryIds, scopeMeetIds, categories, meets"() {
       this._syncScopeDesc();
       this._syncScopeCategories();
+      this._syncScopeMeets();
     },
   },
 
@@ -144,6 +152,10 @@ Component({
         this._syncTypeName(this.data.value);
         this._syncScopeDesc();
         this._syncScopeCategories();
+        // 编辑已存在的 meets 卡时，进入即加载课程以显示名称/高亮
+        if (this.data.mode === "scope" && this.data.scopeMode === "meets") {
+          this._ensureMeets();
+        }
       } catch (e) {
         console.error("meet_category_picker load error:", e);
         this.setData({ loading: false, categories: [] });
@@ -165,32 +177,86 @@ Component({
       this.setData({ typeName: name || "" }, () => this._syncFieldDisplay());
     },
 
+    _syncScopeMeets() {
+      if (this.data.mode !== "scope") return;
+      const ids = (this.data.scopeMeetIds || []).map(String);
+      const isMeets = this.data.scopeMode === "meets";
+      const scopeMeets = (this.data.meets || []).map((m) => ({
+        ...m,
+        selected: isMeets && ids.includes(String(m.id)),
+      }));
+      this.setData({ scopeMeets });
+    },
+
     _syncScopeDesc() {
       if (this.data.mode !== "scope") return;
       const scope = {
         mode: this.data.scopeMode,
         categoryIds: this.data.scopeCategoryIds || [],
+        meetIds: this.data.scopeMeetIds || [],
       };
       this.setData(
         {
           scopeDescText: cardScopeHelper.buildScopeDesc(
             scope,
             this.data.categories,
+            this.data.meets,
           ),
         },
         () => this._syncFieldDisplay(),
       );
     },
 
-    _applyScope(mode, categoryIds) {
-      const scope = { mode, categoryIds };
-      const desc = cardScopeHelper.buildScopeDesc(scope, this.data.categories);
-      this.setData({ sheetShow: false, scopeDescText: desc }, () =>
-        this._syncFieldDisplay(),
+    // 首次切到「指定课程」时懒加载课程列表
+    async _ensureMeets() {
+      if (this.data.meetsLoaded) return;
+      try {
+        const res = await cloudHelper.callCloudData(
+          "admin/meet_list",
+          { page: 1, size: 200 },
+          { hint: false },
+        );
+        const rawList = (res && (res.list || res.dataList?.list)) || [];
+        const meets = rawList.map((m) => ({
+          id: String(m._id || m.MEET_ID || ""),
+          name: m.MEET_TITLE || "未命名课程",
+          typeName: m.MEET_TYPE_NAME || "",
+        }));
+        this.setData({ meets, meetsLoaded: true }, () => {
+          this._syncScopeMeets();
+          this._syncScopeDesc();
+        });
+      } catch (e) {
+        console.error("meet_category_picker load meets error:", e);
+        this.setData({ meets: [], meetsLoaded: true });
+      }
+    },
+
+    _applyScope(mode, categoryIds, meetIds) {
+      const scope = { mode, categoryIds, meetIds };
+      const desc = cardScopeHelper.buildScopeDesc(
+        scope,
+        this.data.categories,
+        this.data.meets,
+      );
+      // 本地同步 scopeMode（property 回传前先更新，保证分段高亮/分区即时切换）
+      this.setData(
+        {
+          scopeMode: mode,
+          scopeCategoryIds: (categoryIds || []).map(String),
+          scopeMeetIds: (meetIds || []).map(String),
+          scopeDescText: desc,
+        },
+        () => {
+          this._syncFieldDisplay();
+          this._syncScopeCategories();
+          this._syncScopeMeets();
+        },
       );
       this.triggerEvent("scopeChange", {
         mode,
-        categoryIds: categoryIds.slice(),
+        categoryIds: (categoryIds || []).slice(),
+        meetIds: (meetIds || []).slice(),
         desc,
       });
     },
@@ -200,7 +266,8 @@ Component({
         wx.showToast({ title: "加载中，请稍候", icon: "none" });
         return;
       }
-      if (!this.data.categories.length) {
+      // single 模式仍需分类；scope 模式可只用「指定课程」，不强制有分类
+      if (this.data.mode === "single" && !this.data.categories.length) {
         wx.showToast({
           title: "请先在「我的门店」配置分类",
           icon: "none",
@@ -229,13 +296,44 @@ Component({
     },
 
     bindScopeAllTap() {
-      this._applyScope("all", []);
+      this._applyScope("all", [], []);
+      // 全馆无需选择，直接收起
+      this.setData({ sheetShow: false });
     },
 
+    // 切到「按分类」分段（多选，不关面板）
+    bindScopeCategoryModeTap() {
+      if (this.data.scopeMode !== "categories") {
+        this._applyScope("categories", this.data.scopeCategoryIds || [], []);
+      }
+    },
+
+    // 多选切换单个分类
     bindScopeCategoryTap(e) {
       const id = String(e.currentTarget.dataset.id || "");
       if (!id) return;
-      this._applyScope("categories", [id]);
+      let ids = (this.data.scopeCategoryIds || []).map(String);
+      if (ids.includes(id)) ids = ids.filter((x) => x !== id);
+      else ids = ids.concat(id);
+      this._applyScope("categories", ids, []);
+    },
+
+    // 切到「指定课程」分段（多选，不关面板）
+    bindScopeMeetModeTap() {
+      this._ensureMeets();
+      if (this.data.scopeMode !== "meets") {
+        this._applyScope("meets", [], this.data.scopeMeetIds || []);
+      }
+    },
+
+    // 多选切换单门课程
+    bindScopeMeetTap(e) {
+      const id = String(e.currentTarget.dataset.id || "");
+      if (!id) return;
+      let ids = (this.data.scopeMeetIds || []).map(String);
+      if (ids.includes(id)) ids = ids.filter((x) => x !== id);
+      else ids = ids.concat(id);
+      this._applyScope("meets", [], ids);
     },
   },
 });

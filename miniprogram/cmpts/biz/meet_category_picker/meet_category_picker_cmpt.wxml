@@ -19,19 +19,24 @@
       <text class="course-edit-sheet-title">{{sheetTitle}}</text>
       <text class="course-edit-sheet-sub">{{sheetSub}}</text>
     </view>
-    <scroll-view scroll-y class="course-edit-sheet-scroll" enhanced show-scrollbar="{{false}}">
+    <!-- scope 模式：三段切换（全馆 / 按分类 / 指定课程） -->
+    <view wx:if="{{mode === 'scope'}}" class="mcp-seg">
       <view
-        wx:if="{{mode === 'scope'}}"
-        class="course-edit-type-item {{scopeMode === 'all' ? 'is-active' : ''}}"
+        class="mcp-seg-item {{scopeMode === 'all' ? 'is-active' : ''}}"
         bindtap="bindScopeAllTap"
-      >
-        <view class="course-edit-type-dot"></view>
-        <text class="course-edit-type-name">全馆课程</text>
-        <view class="course-edit-type-check" wx:if="{{scopeMode === 'all'}}">
-          <van-icon name="success" size="32rpx" color="{{themeColor}}" />
-        </view>
-      </view>
+      >全馆课程</view>
+      <view
+        class="mcp-seg-item {{scopeMode === 'categories' ? 'is-active' : ''}}"
+        bindtap="bindScopeCategoryModeTap"
+      >按分类</view>
+      <view
+        class="mcp-seg-item {{scopeMode === 'meets' ? 'is-active' : ''}}"
+        bindtap="bindScopeMeetModeTap"
+      >指定课程</view>
+    </view>
 
+    <scroll-view scroll-y class="course-edit-sheet-scroll" enhanced show-scrollbar="{{false}}">
+      <!-- single：课程类型单选 -->
       <block wx:if="{{mode === 'single'}}">
         <view
           class="course-edit-type-item {{value === item.id ? 'is-active' : ''}}"
@@ -46,8 +51,19 @@
             <van-icon name="success" size="32rpx" color="{{themeColor}}" />
           </view>
         </view>
+        <van-empty
+          wx:if="{{!categories.length && !loading}}"
+          description="暂无课程分类，请先在「我的门店」配置"
+        />
       </block>
-      <block wx:else>
+
+      <!-- scope + all：无需列表 -->
+      <block wx:elif="{{scopeMode === 'all'}}">
+        <view class="mcp-hint">该会员卡可用于全馆所有课程。</view>
+      </block>
+
+      <!-- scope + categories：分类多选 -->
+      <block wx:elif="{{scopeMode === 'categories'}}">
         <view
           class="course-edit-type-item {{item.selected ? 'is-active' : ''}}"
           wx:for="{{scopeCategories}}"
@@ -61,12 +77,41 @@
             <van-icon name="success" size="32rpx" color="{{themeColor}}" />
           </view>
         </view>
+        <van-empty
+          wx:if="{{!categories.length && !loading}}"
+          description="暂无课程分类，请先在「我的门店」配置"
+        />
       </block>
 
-      <van-empty
-        wx:if="{{!categories.length && !loading}}"
-        description="暂无课程分类，请先在「我的门店」配置"
-      />
+      <!-- scope + meets：具体课程多选 -->
+      <block wx:elif="{{scopeMode === 'meets'}}">
+        <view
+          class="course-edit-type-item {{item.selected ? 'is-active' : ''}}"
+          wx:for="{{scopeMeets}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="bindScopeMeetTap"
+        >
+          <view class="course-edit-type-dot"></view>
+          <view class="mcp-meet-text">
+            <text class="course-edit-type-name">{{item.name}}</text>
+            <text wx:if="{{item.typeName}}" class="mcp-meet-sub">{{item.typeName}}</text>
+          </view>
+          <view class="course-edit-type-check" wx:if="{{item.selected}}">
+            <van-icon name="success" size="32rpx" color="{{themeColor}}" />
+          </view>
+        </view>
+        <van-empty
+          wx:if="{{!scopeMeets.length && meetsLoaded}}"
+          description="暂无课程，请先创建课程"
+        />
+        <view wx:if="{{!meetsLoaded}}" class="mcp-hint">课程加载中…</view>
+      </block>
     </scroll-view>
+
+    <!-- 多选模式底部确认 -->
+    <view wx:if="{{mode === 'scope' && (scopeMode === 'categories' || scopeMode === 'meets')}}" class="mcp-sheet-foot">
+      <view class="mcp-done-btn" bindtap="bindCloseSheet">完成</view>
+    </view>
   </view>
 </van-popup>
