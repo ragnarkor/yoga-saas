@@ -60,15 +60,18 @@ Page({
       };
       let res = await cloudHelper.callCloudData("admin/home", {}, opts);
       if (admin.type === "super") {
-        const overview = await cloudHelper.callCloudData(
-          "admin/platform_overview",
-          {},
-          { hint: false },
-        );
+        const [overview, health] = await Promise.all([
+          cloudHelper.callCloudData("admin/platform_overview", {}, { hint: false }),
+          cloudHelper
+            .callCloudData("admin/platform_health", {}, { hint: false })
+            .catch(() => null),
+        ]);
         res = res || {};
         res.tenantList = (overview && overview.tenantList) || [];
         res.tenantCount = (overview && overview.tenantCount) || 0;
         res.adminCount = (overview && overview.adminCount) || 0;
+        res.health = (health && health.summary) || null;
+        res.healthDetail = health || null;
       }
       this.setData({
         data: res,
@@ -109,6 +112,40 @@ Page({
 
   bindStaffManageTap: function () {
     wx.navigateTo({ url: "/pages/admin/platform/staff/admin_platform_staff" });
+  },
+
+  // 点健康度卡片：弹出该类馆明细（复用已加载的 healthDetail，无需再请求）
+  bindHealthDetailTap: function (e) {
+    const type = e.currentTarget.dataset.type;
+    const detail = this.data.data && this.data.data.healthDetail;
+    if (!detail) return;
+    const TITLE = {
+      zombie: "僵尸馆（30天零预约）",
+      expiring: "到期预警",
+      stagnant: "增长停滞（本月零新增）",
+    };
+    const list = (detail[type] || []).slice(0, 50);
+    this.setData({
+      healthModalShow: true,
+      healthModalTitle: TITLE[type] || "健康度明细",
+      healthModalList: list,
+      healthModalType: type,
+    });
+  },
+
+  bindHealthModalCloseTap: function () {
+    this.setData({ healthModalShow: false });
+  },
+
+  // 从健康度明细一键进入该馆后台
+  bindHealthEnterTap: function (e) {
+    const pid = e.currentTarget.dataset.pid;
+    const name = e.currentTarget.dataset.name || "";
+    if (!pid) return;
+    this.setData({ healthModalShow: false });
+    wx.navigateTo({
+      url: `/pages/admin/platform/tenant_expire/admin_tenant_expire?pid=${pid}&name=${encodeURIComponent(name)}`,
+    });
   },
 
   bindPlatformTenantTabTap: function () {

@@ -13,6 +13,7 @@ const config = require("../../../config/config.js");
 
 const AdminModel = require("../../model/admin_model.js");
 const LogModel = require("../../model/log_model.js");
+const PlatformLogModel = require("../../model/platform_log_model.js");
 const MeetModel = require("../../model/meet_model.js");
 const UserModel = require("../../model/user_model.js");
 const NewsModel = require("../../model/news_model.js");
@@ -158,6 +159,50 @@ class BaseAdminService extends BaseService {
       LOG_TYPE: type,
     };
     await LogModel.insert(data);
+  }
+
+  /**
+   * 写入平台超管审计日志（跨租户操作）
+   * 固定落在 PlatformLogModel.PLATFORM_PID，与馆级 ax_log 分离，_pid 不随 global.PID 漂移。
+   * @param {string} action     动作码，取 PlatformLogModel.ACTION
+   * @param {object} operator   操作人（this._admin）：{ADMIN_ID, ADMIN_NAME, ADMIN_PHONE, ADMIN_TYPE}
+   * @param {object} extra      { content, targetPid, targetName, before, after }
+   */
+  async insertPlatformLog(action, operator, extra = {}) {
+    if (!operator) return;
+
+    // 打码账号不落审计（与 insertLog 口径一致）
+    if (
+      config.MASK_IS_OPEN &&
+      config.MASK_ADMIN_PHONE &&
+      operator.ADMIN_PHONE == config.MASK_ADMIN_PHONE
+    )
+      return;
+
+    const desc = PlatformLogModel.ACTION_DESC[action] || action;
+    let data = {
+      _pid: PlatformLogModel.PLATFORM_PID,
+
+      PLOG_ACTION: action,
+      PLOG_CONTENT: extra.content || desc,
+
+      PLOG_ADMIN_ID: operator.ADMIN_ID || "",
+      PLOG_ADMIN_NAME: operator.ADMIN_NAME || "",
+      PLOG_ADMIN_PHONE: operator.ADMIN_PHONE || "",
+      PLOG_ADMIN_TYPE: operator.ADMIN_TYPE || "",
+
+      PLOG_TARGET_PID: extra.targetPid || "",
+      PLOG_TARGET_NAME: extra.targetName || "",
+      PLOG_BEFORE: extra.before != null ? String(extra.before) : "",
+      PLOG_AFTER: extra.after != null ? String(extra.after) : "",
+    };
+
+    // mustPID=false：不注入 global.PID，用上面固定的 PLATFORM_PID
+    try {
+      await PlatformLogModel.insert(data, false);
+    } catch (e) {
+      // 审计写入失败不应阻断主业务
+    }
   }
 
   /** 日志操作前获取名称 */

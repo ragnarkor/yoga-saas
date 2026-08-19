@@ -89,6 +89,7 @@
         "platform/tenant_expire/admin_tenant_expire",
         "platform/mgr_form/admin_mgr_form",
         "platform/staff/admin_platform_staff",
+        "platform/audit_log/admin_audit_log",
         "bind/admin_bind",
         "mgr/log/admin_log_list",
         "setup/about/admin_setup_about",

@@ -6,6 +6,7 @@ const BaseAdminService = require("./base_admin_service.js");
 const AdminModel = require("../../model/admin_model.js");
 const TenantModel = require("../../model/tenant_model.js");
 const LogModel = require("../../model/log_model.js");
+const PlatformLogModel = require("../../model/platform_log_model.js");
 const util = require("../../../framework/utils/util.js");
 const dataUtil = require("../../../framework/utils/data_util.js");
 const MeetModel = require("../../model/meet_model.js");
@@ -133,11 +134,19 @@ class AdminMgrService extends BaseAdminService {
     };
 
     await AdminModel.insert(data, false);
-    await this.insertLog(
-      `为「${tenant.TENANT_NAME}」新建${adminType === AdminModel.TYPE.OWNER ? "馆长" : "教练"} ${name}`,
-      operator,
-      LogModel.TYPE.SYS,
-    );
+    const roleName = adminType === AdminModel.TYPE.OWNER ? "馆长" : "教练";
+    const staffLogDesc = `为「${tenant.TENANT_NAME}」新建${roleName} ${name}`;
+    await this.insertLog(staffLogDesc, operator, LogModel.TYPE.SYS);
+
+    // 仅超管的跨馆建员工动作进平台审计（馆长在本馆加教练不算平台级操作）
+    if (operator.ADMIN_TYPE === AdminModel.TYPE.SUPER) {
+      await this.insertPlatformLog(PlatformLogModel.ACTION.STAFF_INSERT, operator, {
+        content: staffLogDesc,
+        targetPid: pid,
+        targetName: tenant.TENANT_NAME,
+        after: `${roleName} ${name}`,
+      });
+    }
 
     return { adminName: name, phone, adminType };
   }

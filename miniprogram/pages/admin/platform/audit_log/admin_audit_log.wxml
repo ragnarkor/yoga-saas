@@ -1,0 +1,33 @@
+<block wx:if="{{isAdmin}}">
+	<cmpt-comm-list type="admin_platform_log_list" search="{{search}}" _menus="{{sortMenus}}" _items="{{sortItems}}" sortMenusDefaultIndex="0" route="admin/platform_log_list" topBottom="50" placeholder="搜索内容/操作人/馆名" bind:list="bindCommListCmpt">
+
+		<!-- List Begin -->
+		<view class="audit-list">
+			<view wx:if="{{dataList && dataList.total }}" class="audit-total">共 {{dataList.total}} 条平台操作记录</view>
+
+			<view class="audit-item" wx:for="{{dataList.list}}" wx:key="_id">
+				<view class="audit-head">
+					<view class="audit-action audit-action--{{item.PLOG_ACTION}}">{{item.actionDesc}}</view>
+					<view class="audit-time">{{item.timeDesc}}</view>
+				</view>
+				<view class="audit-content">{{item.PLOG_CONTENT}}</view>
+				<view class="audit-meta">
+					<text class="audit-meta-item">操作人：{{item.PLOG_ADMIN_NAME || '—'}}<text wx:if="{{item.PLOG_ADMIN_PHONE}}"> · {{item.PLOG_ADMIN_PHONE}}</text></text>
+					<text class="audit-meta-item" wx:if="{{item.PLOG_TARGET_NAME}}">目标馆：{{item.PLOG_TARGET_NAME}}</text>
+				</view>
+				<view class="audit-diff" wx:if="{{item.PLOG_BEFORE || item.PLOG_AFTER}}">
+					<text class="audit-diff-before" wx:if="{{item.PLOG_BEFORE}}">{{item.PLOG_BEFORE}}</text>
+					<text class="audit-diff-arrow" wx:if="{{item.PLOG_BEFORE && item.PLOG_AFTER}}"> → </text>
+					<text class="audit-diff-after" wx:if="{{item.PLOG_AFTER}}">{{item.PLOG_AFTER}}</text>
+				</view>
+			</view>
+		</view>
+		<!-- List END -->
+
+		<!--load begin-->
+		<import src="../../../../tpls/public/list_load_tpl.wxml" />
+		<template is="listLoadTpl" data="{{dataList, skin:'text-grey'}}" />
+		<!--load end-->
+
+	</cmpt-comm-list>
+</block>

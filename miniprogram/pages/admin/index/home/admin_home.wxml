@@ -52,6 +52,34 @@
 
 <!-- Tab 0: 概览 -->
 <block wx:if="{{platformTab === 0}}">
+  <!-- 租户健康度看板 -->
+  <view class="platform-section" wx:if="{{data.health}}">
+    <view class="platform-section-head">
+      <text class="platform-section-title">运营健康度</text>
+      <text class="platform-health-time">{{data.healthDetail.generatedAt}}</text>
+    </view>
+    <view class="platform-health-grid">
+      <view class="platform-health-item {{data.health.zombieCount > 0 ? 'is-warn' : ''}}"
+        bindtap="bindHealthDetailTap" data-type="zombie">
+        <text class="platform-health-num">{{data.health.zombieCount}}</text>
+        <text class="platform-health-label">僵尸馆</text>
+        <text class="platform-health-hint">30天零预约</text>
+      </view>
+      <view class="platform-health-item {{data.health.expiringCount > 0 ? 'is-warn' : ''}}"
+        bindtap="bindHealthDetailTap" data-type="expiring">
+        <text class="platform-health-num">{{data.health.expiringCount}}</text>
+        <text class="platform-health-label">到期预警</text>
+        <text class="platform-health-hint">即将/已到期</text>
+      </view>
+      <view class="platform-health-item {{data.health.stagnantCount > 0 ? 'is-warn' : ''}}"
+        bindtap="bindHealthDetailTap" data-type="stagnant">
+        <text class="platform-health-num">{{data.health.stagnantCount}}</text>
+        <text class="platform-health-label">增长停滞</text>
+        <text class="platform-health-hint">本月零新增</text>
+      </view>
+    </view>
+  </view>
+
   <view class="platform-section">
     <view class="platform-section-head">
       <text class="platform-section-title">快捷操作</text>
@@ -93,6 +121,11 @@
       <text class="platform-menu-text">操作日志</text>
       <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
     </view>
+    <view class="platform-menu-item" bindtap="url" data-url="/pages/admin/platform/audit_log/admin_audit_log">
+      <van-icon name="shield-o" size="32rpx" color="#4a7c8c" />
+      <text class="platform-menu-text">平台审计日志</text>
+      <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
+    </view>
     <view class="platform-menu-item" bindtap="bindSettingTap">
       <van-icon name="delete-o" size="32rpx" color="#4a7c8c" />
       <text class="platform-menu-text">清除缓存</text>
@@ -132,6 +165,28 @@
     </view>
   </view>
 </block>
+
+<!-- 健康度明细弹层 -->
+<van-popup show="{{ healthModalShow }}" position="bottom" round bind:close="bindHealthModalCloseTap" custom-style="max-height:70%;">
+  <view class="health-modal">
+    <view class="health-modal-head">
+      <text class="health-modal-title">{{ healthModalTitle }}</text>
+      <van-icon name="cross" size="36rpx" color="#969799" bindtap="bindHealthModalCloseTap" />
+    </view>
+    <view wx:if="{{ !healthModalList.length }}" class="empty-block">暂无相关瑜伽馆</view>
+    <scroll-view scroll-y class="health-modal-list" wx:else>
+      <view class="health-modal-item" wx:for="{{ healthModalList }}" wx:key="_pid">
+        <view class="health-modal-item-main">
+          <text class="health-modal-item-name">{{ item.TENANT_NAME }}</text>
+          <text class="health-modal-item-meta" wx:if="{{ healthModalType === 'zombie' }}">最近活跃：{{ item.lastActiveDesc }} · 会员 {{ item.members }}</text>
+          <text class="health-modal-item-meta" wx:elif="{{ healthModalType === 'expiring' }}">{{ item.expireDesc }} · 近30天预约 {{ item.recentJoins }}</text>
+          <text class="health-modal-item-meta" wx:else>会员 {{ item.members }} · 本月新增 {{ item.newMembers }}</text>
+        </view>
+        <view class="health-modal-item-btn" data-pid="{{ item._pid }}" data-name="{{ item.TENANT_NAME }}" bindtap="bindHealthEnterTap">管理</view>
+      </view>
+    </scroll-view>
+  </view>
+</van-popup>
 <!-- [AI_END LINES=70 TIMESTAMP=2025-01-27 11:10:00] -->
   </block>
 

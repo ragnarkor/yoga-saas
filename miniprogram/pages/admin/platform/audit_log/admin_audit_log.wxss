@@ -1,0 +1,81 @@
+.audit-list {
+  padding: 16rpx 24rpx;
+}
+
+.audit-total {
+  padding: 12rpx 4rpx 20rpx;
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.audit-item {
+  margin-bottom: 20rpx;
+  padding: 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.audit-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.audit-action {
+  padding: 4rpx 16rpx;
+  font-size: 24rpx;
+  color: #4a7c8c;
+  background: #eaf2f4;
+  border-radius: 24rpx;
+}
+
+/* 删除馆等高危动作醒目标红 */
+.audit-action--tenant_del {
+  color: #e34d59;
+  background: #fdeced;
+}
+
+.audit-time {
+  font-size: 22rpx;
+  color: #969799;
+}
+
+.audit-content {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: #323233;
+  line-height: 1.5;
+}
+
+.audit-meta {
+  margin-top: 12rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.audit-meta-item {
+  font-size: 22rpx;
+  color: #969799;
+}
+
+.audit-diff {
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx dashed #ebedf0;
+  font-size: 24rpx;
+}
+
+.audit-diff-before {
+  color: #969799;
+  text-decoration: line-through;
+}
+
+.audit-diff-arrow {
+  color: #c8c9cc;
+}
+
+.audit-diff-after {
+  color: #323233;
+}

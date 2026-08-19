@@ -80,6 +80,29 @@ class AdminTenantController extends BaseAdminController {
     return await service.getPlatformOverview();
   }
 
+  /** 超管：租户健康度看板 */
+  async getPlatformHealth() {
+    await this.isSuperAdmin();
+    let service = new AdminTenantService();
+    return await service.getPlatformHealth();
+  }
+
+  /** 超管：平台操作审计日志（comm-list 回传 sortType/sortVal/search/page/size） */
+  async getPlatformLogList() {
+    await this.isSuperAdmin();
+    let rules = {
+      sortType: "string|false|name=筛选类型",
+      sortVal: "string|false|name=筛选值",
+      search: "string|false|max:30|name=搜索条件",
+      page: "int|default=1",
+      size: "int|default=20",
+      oldTotal: "int|default=0",
+    };
+    let input = this.validateData(rules);
+    let service = new AdminTenantService();
+    return await service.getPlatformLogList(input);
+  }
+
   /** 超管：新建瑜伽馆 */
   async insertTenant() {
     await this.isSuperAdmin();

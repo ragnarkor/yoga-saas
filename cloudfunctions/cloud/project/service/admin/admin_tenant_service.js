@@ -8,6 +8,7 @@ const SetupModel = require("../../model/setup_model.js");
 const UserModel = require("../../model/user_model.js");
 const JoinModel = require("../../model/join_model.js");
 const AdminModel = require("../../model/admin_model.js");
+const PlatformLogModel = require("../../model/platform_log_model.js");
 const cloudUtil = require("../../../framework/cloud/cloud_util.js");
 const timeUtil = require("../../../framework/utils/time_util.js");
 const tenantSetupHelper = require("../tenant_setup_helper.js");
@@ -407,11 +408,18 @@ class AdminTenantService extends BaseAdminService {
       global.PID = prevPid;
     }
 
+    const insertDesc = `新建瑜伽馆「${name}」${expireTime ? `，有效期至 ${tenantExpireUtil.expireTimeToDay(expireTime)}` : "，长期有效"}`;
     await this.insertLog(
-      `新建瑜伽馆「${name}」${expireTime ? `，有效期至 ${tenantExpireUtil.expireTimeToDay(expireTime)}` : "，长期有效"}`,
+      insertDesc,
       operator,
       require("../../model/log_model.js").TYPE.SYS,
     );
+    await this.insertPlatformLog(PlatformLogModel.ACTION.TENANT_INSERT, operator, {
+      content: insertDesc,
+      targetPid: pid,
+      targetName: name,
+      after: expireTime ? tenantExpireUtil.expireTimeToDay(expireTime) : "长期有效",
+    });
 
     return { pid, tenantName: name };
   }
@@ -444,6 +452,170 @@ class AdminTenantService extends BaseAdminService {
       tenantCount: enriched.length,
       tenantOpenCount: enriched.filter((item) => item.TENANT_STATUS === TenantModel.STATUS.OPEN).length,
       adminCount: adminCount || 0,
+    };
+  }
+
+  /** 超管：平台操作审计日志（分页，comm-list 回传 sortType/sortVal/search） */
+  async getPlatformLogList({
+    sortType,
+    sortVal,
+    search,
+    page = 1,
+    size = 20,
+    oldTotal = 0,
+  } = {}) {
+    let where = { _pid: PlatformLogModel.PLATFORM_PID };
+
+    // sortType=action 时按动作码过滤
+    let action = "";
+    if (String(sortType || "").trim() === "action") {
+      action = String(sortVal || "").trim();
+      if (action) where.PLOG_ACTION = action;
+    }
+
+    search = String(search || "").trim();
+    if (search) {
+      // 固定 _pid 走 and，模糊匹配走 or（与 getAttentionMembers 的 and 写法一致）
+      where = {
+        and: { _pid: PlatformLogModel.PLATFORM_PID },
+        or: [
+          { PLOG_CONTENT: ["like", search] },
+          { PLOG_ADMIN_NAME: ["like", search] },
+          { PLOG_TARGET_NAME: ["like", search] },
+        ],
+      };
+      if (action) where.and.PLOG_ACTION = action;
+    }
+
+    let result = await PlatformLogModel.getList(
+      where,
+      "*",
+      { PLOG_ADD_TIME: "desc" },
+      page,
+      size,
+      true, // isTotal：返回分页总数
+      oldTotal,
+      false, // mustPID=false，用固定 PLATFORM_PID
+    );
+
+    const list = (result.list || []).map((item) => ({
+      ...item,
+      actionDesc: PlatformLogModel.ACTION_DESC[item.PLOG_ACTION] || item.PLOG_ACTION,
+      timeDesc: timeUtil.timestamp2Time(item.PLOG_ADD_TIME, "Y-M-D h:m"),
+    }));
+
+    return { ...result, list };
+  }
+
+  /**
+   * 超管：租户健康度看板
+   * 复用 getPlatformOverview 的跨租户拉取（mustPID=false），补充按 _pid 分组的活跃度指标。
+   * 输出：僵尸馆（30天零预约）、即将/已到期、会员增长停滞（近30天零新增）。
+   */
+  async getPlatformHealth() {
+    const now = timeUtil.time();
+    const day30 = this._msDaysAgo(30, now);
+    const monthStart = timeUtil.time2Timestamp(
+      timeUtil.time("Y-M") + "-01 00:00:00",
+    );
+
+    // 1. 全部租户
+    let tenantList = await TenantModel.getAll(
+      {},
+      "_pid,TENANT_ID,TENANT_NAME,TENANT_STATUS,TENANT_EXPIRE_TIME,TENANT_ADD_TIME",
+      { TENANT_ADD_TIME: "desc" },
+      500,
+      false,
+    );
+    tenantList = tenantList || [];
+
+    // 2. 跨租户拉有效预约，按 _pid 聚合「最近一次活跃时间」
+    let joins = await JoinModel.getAll(
+      { JOIN_STATUS: JoinModel.STATUS.SUCC },
+      "_pid,JOIN_START_TIME,JOIN_ADD_TIME",
+      {},
+      20000,
+      false,
+    );
+    let lastActiveByPid = {}; // _pid -> 最近活跃时间戳
+    let recentJoinCntByPid = {}; // _pid -> 近30天预约数
+    for (let j of joins || []) {
+      const pid = j._pid;
+      if (!pid) continue;
+      const t = this._joinActivityTime(j);
+      if (t > (lastActiveByPid[pid] || 0)) lastActiveByPid[pid] = t;
+      if (t >= day30) recentJoinCntByPid[pid] = (recentJoinCntByPid[pid] || 0) + 1;
+    }
+
+    // 3. 跨租户拉会员，按 _pid 聚合「总数 / 近30天新增」
+    let userRows = await UserModel.getAll(
+      {},
+      "_pid,USER_ADD_TIME",
+      {},
+      20000,
+      false,
+    );
+    let memberCntByPid = {};
+    let newMemberCntByPid = {};
+    for (let u of userRows || []) {
+      const pid = u._pid;
+      if (!pid) continue;
+      memberCntByPid[pid] = (memberCntByPid[pid] || 0) + 1;
+      if (Number(u.USER_ADD_TIME) >= monthStart) {
+        newMemberCntByPid[pid] = (newMemberCntByPid[pid] || 0) + 1;
+      }
+    }
+
+    // 4. 逐馆判定健康度
+    let zombie = []; // 30天零预约
+    let expiring = []; // 即将/已到期
+    let stagnant = []; // 会员增长停滞
+    const enriched = tenantList.map((t) => {
+      const pid = t._pid;
+      const closed = t.TENANT_STATUS === TenantModel.STATUS.CLOSE;
+      const exp = tenantExpireUtil.enrichTenantExpire(t, now);
+      const recentJoins = recentJoinCntByPid[pid] || 0;
+      const members = memberCntByPid[pid] || 0;
+      const newMembers = newMemberCntByPid[pid] || 0;
+      const lastActive = lastActiveByPid[pid] || 0;
+
+      const item = {
+        _pid: pid,
+        TENANT_NAME: t.TENANT_NAME,
+        isClosed: closed,
+        isExpired: exp.isExpired,
+        isExpiringSoon: exp.isExpiringSoon,
+        expireDesc: exp.expireDesc,
+        recentJoins,
+        members,
+        newMembers,
+        lastActiveDesc: lastActive
+          ? timeUtil.timestamp2Time(lastActive, "Y-M-D")
+          : "无记录",
+      };
+
+      // 僵尸馆：运营中但近30天零预约（停用馆不算，已是明确关闭）
+      if (!closed && recentJoins === 0) zombie.push(item);
+      // 到期预警：即将到期或已到期（未主动停用）
+      if (!closed && (exp.isExpired || exp.isExpiringSoon)) expiring.push(item);
+      // 增长停滞：运营中、有会员基数但本月零新增
+      if (!closed && members > 0 && newMembers === 0) stagnant.push(item);
+
+      return item;
+    });
+
+    return {
+      generatedAt: timeUtil.timestamp2Time(now, "Y-M-D h:m"),
+      summary: {
+        tenantTotal: tenantList.length,
+        zombieCount: zombie.length,
+        expiringCount: expiring.length,
+        stagnantCount: stagnant.length,
+      },
+      zombie,
+      expiring,
+      stagnant,
+      tenantList: enriched,
     };
   }
 
@@ -504,11 +676,19 @@ class AdminTenantService extends BaseAdminService {
     );
 
     const action = nextStatus === TenantModel.STATUS.CLOSE ? "停用" : "启用";
+    const statusDesc = `${action}瑜伽馆「${tenant.TENANT_NAME}」`;
     await this.insertLog(
-      `${action}瑜伽馆「${tenant.TENANT_NAME}」`,
+      statusDesc,
       operator,
       require("../../model/log_model.js").TYPE.SYS,
     );
+    await this.insertPlatformLog(PlatformLogModel.ACTION.TENANT_STATUS, operator, {
+      content: statusDesc,
+      targetPid: pid,
+      targetName: tenant.TENANT_NAME,
+      before: tenant.TENANT_STATUS === TenantModel.STATUS.CLOSE ? "已停用" : "运营中",
+      after: nextStatus === TenantModel.STATUS.CLOSE ? "已停用" : "运营中",
+    });
 
     let updated = await TenantModel.getOne(
       { _pid: pid },
@@ -569,11 +749,17 @@ class AdminTenantService extends BaseAdminService {
 
     await TenantModel.del({ _pid: pid }, false);
 
+    const delDesc = `删除瑜伽馆「${tenant.TENANT_NAME}」（含 ${(admins || []).length} 个管理员账号）`;
     await this.insertLog(
       `删除瑜伽馆「${tenant.TENANT_NAME}」`,
       operator,
       require("../../model/log_model.js").TYPE.SYS,
     );
+    await this.insertPlatformLog(PlatformLogModel.ACTION.TENANT_DEL, operator, {
+      content: delDesc,
+      targetPid: pid,
+      targetName: tenant.TENANT_NAME,
+    });
 
     return { pid, tenantName: tenant.TENANT_NAME };
   }
@@ -585,7 +771,7 @@ class AdminTenantService extends BaseAdminService {
 
     let tenant = await TenantModel.getOne(
       { _pid: pid },
-      "TENANT_NAME",
+      "TENANT_NAME,TENANT_EXPIRE_TIME",
       {},
       false,
     );
@@ -607,11 +793,19 @@ class AdminTenantService extends BaseAdminService {
     );
 
     const desc = tenantExpireUtil.formatExpireDesc(expireTime);
+    const expireLogDesc = `设置瑜伽馆「${tenant.TENANT_NAME}」有效期：${desc}`;
     await this.insertLog(
-      `设置瑜伽馆「${tenant.TENANT_NAME}」有效期：${desc}`,
+      expireLogDesc,
       operator,
       require("../../model/log_model.js").TYPE.SYS,
     );
+    await this.insertPlatformLog(PlatformLogModel.ACTION.TENANT_EXPIRE, operator, {
+      content: expireLogDesc,
+      targetPid: pid,
+      targetName: tenant.TENANT_NAME,
+      before: tenantExpireUtil.formatExpireDesc(tenant.TENANT_EXPIRE_TIME || 0),
+      after: desc,
+    });
 
     return tenantExpireUtil.enrichTenantExpire({
       _pid: pid,

@@ -79,6 +79,10 @@ module.exports = {
   "admin/attention_members": "admin/admin_tenant_controller@getAttentionMembers",
   "admin/platform_overview":
     "admin/admin_tenant_controller@getPlatformOverview",
+  "admin/platform_health":
+    "admin/admin_tenant_controller@getPlatformHealth",
+  "admin/platform_log_list":
+    "admin/admin_tenant_controller@getPlatformLogList",
   "admin/platform_staff_list": "admin/admin_home_controller@listPlatformStaff",
   "admin/tenant_insert": "admin/admin_tenant_controller@insertTenant#noDemo",
   "admin/tenant_expire_detail":

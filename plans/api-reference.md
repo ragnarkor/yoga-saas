@@ -61,6 +61,7 @@
 | `my/my_card_list` | 我的会员卡列表 | — | `{list, total}` |
 | `my/my_card_summary` | 持卡概要（首页用） | — | `{hasCard, canBook, timesTotal, hasPeriod}` |
 | `my/my_card_detail` | 会员卡详情 + 使用记录 | `cardId` | `{card, usageList}` |
+| `my/achievement` | 我的成就（累计/连续/徽章/热力图） | — | `{streak, badges, heatmap, heatmapStartDay, heatmapHint}` |
 
 ### 1.5 私教预约
 

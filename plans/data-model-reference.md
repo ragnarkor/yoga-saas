@@ -276,7 +276,8 @@ ADMIN_CANCEL = 99  管理员/系统取消
 | `ADMIN_ID` | string | ✅ | 管理员 ID |
 | `ADMIN_NAME` | string | ✅ | 姓名 |
 | `ADMIN_PHONE` | string | ✅ | 手机号（登录用） |
-| `ADMIN_PWD` | string | ✅ | 登录密码（当前明文，待加密） |
+| `ADMIN_PWD` | string | ✅ | 登录密码，`sha256:` 前缀的 SHA256(pwd+salt) 哈希（旧明文数据兼容校验） |
+| `ADMIN_PWD_SALT` | string | — | 密码盐（`hashNewPwd` 随机生成，旧明文账号可能无此字段） |
 | `ADMIN_TYPE` | string | ✅ | 角色（见常量） |
 | `ADMIN_STATUS` | int | ✅ | `0`=禁用 `1`=启用 |
 | `ADMIN_MINI_OPENID` | string | — | 绑定的微信 openid |

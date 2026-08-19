@@ -23,12 +23,14 @@
 | 角色权限分离 | ✅ | super/owner/teacher 三级 |
 | 会员邀请 | ✅ | 生成邀请小程序码 |
 | 数据导出 | ✅ | 收入/预约/会员 CSV |
+| 平台操作审计日志 | ✅ | 超管跨租户操作独立留痕（见 F15） |
+| 租户健康度看板 | ✅ | 僵尸馆/到期预警/增长停滞（见 F16） |
 
 ### 已知问题 / 技术债
 
 | 问题 | 严重程度 | 说明 |
 |---|---|---|
-| 密码明文存储 | 🔴 高 | `ADMIN_PWD` 当前未加密，上线前必须处理 |
+| ~~密码明文存储~~ | ✅ 已解决 | `pwd_util.js` 已用 SHA256+salt 哈希，旧明文数据兼容校验（见 T1） |
 | 期限卡在选卡器中不显示 | 🔴 高 | `_selfHealCardEndTime` 方法名错误（已修复） |
 | 收入计算无法处理储值卡 | 🟡 中 | 当前仅次数卡/期限卡，储值卡类型缺失 |
 | 预约冲突校验非原子性 | 🟡 中 | 高并发下可能超报（云数据库无事务） |
@@ -53,20 +55,24 @@ P3 — 长期探索（6个月以上，生态扩展）
 
 ## 三、P0：上线前必做
 
-### T1 · 密码加密存储
+### T1 · 密码加密存储 ✅ 已完成
 
-**问题**：管理员密码当前明文存 DB，一旦数据库泄露所有账号即暴露。  
-**方案**：登录时对密码做 `SHA256(password + salt)` 后存储，同时迁移已有密码。
+**问题**：管理员密码曾明文存 DB，一旦数据库泄露所有账号即暴露。  
+**方案**：密码做 `SHA256(pwd + salt)` 后存储，哈希值带 `sha256:` 前缀；旧明文数据在校验时兼容（`verifyPwd` 检测无前缀则按明文比对），无需一次性迁移。
 
+实现：`cloudfunctions/cloud/project/utils/pwd_util.js`
 ```javascript
-// admin_home_service.js — adminLogin 中
-const crypto = require('crypto')
 function hashPwd(pwd, salt) {
-  return crypto.createHash('sha256').update(pwd + salt).digest('hex')
+  return "sha256:" + crypto.createHash("sha256").update(String(pwd) + String(salt)).digest("hex");
+}
+function verifyPwd(pwd, stored, salt) {
+  if (!stored) return false;
+  if (isHashed(stored)) return hashPwd(pwd, salt) === stored; // 新数据
+  return String(pwd) === String(stored);                       // 旧明文兼容
 }
 ```
 
-改动点：`admin_home_service.js`（登录校验）、`admin_mgr_service.js`（创建/改密）、`base_service.js`（初始化）
+字段：`ax_admin.ADMIN_PWD`（哈希）、`ax_admin.ADMIN_PWD_SALT`（随机盐）。创建/改密走 `hashNewPwd()`。
 
 ---
 
@@ -191,13 +197,15 @@ USER_CARD_BALANCE_INIT // 初始余额
 **背景**：当前 `SETUP_FEATURES.payment` 开关已存在但功能未实现，是明确规划的方向。  
 **价值**：实现闭环消费，减少现金收款的对账成本。
 
-**方案**：
-- 会员端约课时可选择在线购卡（走微信支付）
-- 后端新增 `ax_order` 订单集合，状态机：待支付→已支付→已发卡
-- 退款走微信退款 API，同步更新 ax_user_card 状态
-- 馆长端增加收款记录和对账视图
+**方案**（详见 [f7-card-purchase.md](./f7-card-purchase.md) 完整设计）：
+- 会员端自助下单 → 微信支付 → 支付回调**复用现有 `issueUserCard` 自动发卡**，不新造发卡逻辑
+- 后端新增 `ax_order` 订单集合，状态机：待支付(INIT)→已支付(PAID)→已发卡(ISSUED)，另含关闭/退款态
+- **幂等**：订单号唯一 + 状态 CAS，杜绝回调重试造成一单发两卡的资损
+- 实付价（含优惠）写入 `USER_CARD_PRICE`，保证收入统计不虚高
+- 退款走微信退款 API，馆长端增加订单/对账/退款视图
+- 营销工具（优惠券/体验课）作为下单前"价格插件"挂载，不污染发卡与核销
 
-**注意**：需要微信商户号，涉及资金合规，需提前准备主体资质。
+**注意**：需要微信商户号，涉及资金合规。资金模型（馆自有商户号 vs 平台服务商分账）需产品先拍板，见文档 §7、§10 待决策清单。
 
 ---
 
@@ -240,6 +248,38 @@ USER_CARD_BALANCE_INIT // 初始余额
 
 ---
 
+### F15 · 平台操作审计日志 ✅ 已实现
+
+**背景**：馆级已有 `ax_log`，但超管跨租户的操作（建馆/删馆/改到期/启停馆/加员工）散落在各馆 `_pid`（或漂到 `'ONE'`），删了个馆查不到谁干的，规模化后是合规硬伤。
+
+**方案**：新增 `ax_platform_log` 集合，固定 `_pid = "PLATFORM"`，不随 `global.PID` 漂移。统一入口 `BaseAdminService.insertPlatformLog(action, operator, extra)` 写结构化字段：操作人快照（ID/名/手机/角色）、动作码、目标租户 pid+名、变更前后值。5 个超管动作在原有 `insertLog` 旁**追加**调用（不破坏馆级日志现状）；馆长在本馆加教练不算平台级操作，不记入。
+
+查询接口 `admin/platform_log_list`（超管专用，复用 `cmpt-comm-list` 分页），前端页 `pages/admin/platform/audit_log`，删馆等高危动作标红。
+
+实现：`platform_log_model.js`、`base_admin_service.js`、`admin_tenant_service.js`（查询 + 建馆/删馆/改期/启停）、`admin_mgr_service.js`（加员工）。
+
+---
+
+### F16 · 租户健康度看板 ✅ 已实现
+
+**背景**：`getPlatformOverview` 只聚合了馆数量和 admin 数，缺"哪些馆快死了"的视角，无法支撑续费转化和主动运营。
+
+**方案**：`admin/platform_health` 用 `mustPID=false` 跨租户拉取 `ax_tenant`/`ax_join`/`ax_user`，内存按 `_pid` 分组。口径完全复用现有逻辑（`_joinActivityTime` = `JOIN_START_TIME||JOIN_ADD_TIME`、`JOIN_STATUS=SUCC`、`tenantExpireUtil.isExpiringSoon`）。三类风险：
+
+| 风险 | 判定 |
+|---|---|
+| 僵尸馆 | 运营中但近 30 天零预约 |
+| 到期预警 | 即将到期 / 已到期（未主动停用） |
+| 增长停滞 | 有会员基数但本月零新增 |
+
+前端在超管首页概览 tab 顶部三格摘要卡（有风险标红），点击弹层看该类馆明细并可一键进入该馆管理。
+
+**规模隐患**：当前对 `ax_join`/`ax_user` 做 20000 条上限的全量拉取，租户规模大幅增长后需改分组聚合或加缓存（代码已用 size 上限兜底，无静默截断）。
+
+实现：`admin_tenant_service.js` `getPlatformHealth()`、`admin_home.js/.wxml/.wxss`。
+
+---
+
 ## 六、P3：长期探索（6个月以上）
 
 ### F11 · AI 智能排课建议
@@ -256,10 +296,12 @@ USER_CARD_BALANCE_INIT // 初始余额
 
 ---
 
-### F13 · 会员社群与打卡
+### F13 · 会员成就与打卡 ✅ 已实现
 
-**场景**：会员在小程序内记录锻炼打卡，生成成就海报，增强社区氛围。  
+**场景**：会员的上课记录自动沉淀为累计次数、连续周数、徽章墙、近 12 周热力图，可生成成就海报分享。  
 **价值**：提升会员活跃度和品牌黏性。
+
+数据口径为「预约成功」（`JOIN_STATUS=1`），非签到——小馆常不签到，用成功约课更准。聚合状态存 `ax_checkin_streak`，首次打开成就页自动回放历史约课回填。详见 [`f13-checkin-achievement.md`](./f13-checkin-achievement.md)。
 
 ---
 
