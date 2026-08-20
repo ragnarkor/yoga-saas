@@ -11,30 +11,24 @@
     <view class="marketing-hero-overlay"></view>
     <view class="marketing-hero-text">
       <text class="marketing-hero-title">营销</text>
-      <text class="marketing-hero-sub">会员卡与商城</text>
+      <text class="marketing-hero-sub">让会员更方便地购买课程套餐</text>
     </view>
   </view>
 
   <view class="marketing-body">
-    <view class="coach-revenue-card">
-      <view class="coach-revenue-sub">今日收款 {{todayCount}} 笔</view>
-      <view class="coach-revenue-num">¥{{todayAmount}}</view>
-      <view class="coach-revenue-link">查看订单</view>
+    <view wx:if="{{loading}}" class="marketing-loading"><van-loading size="44rpx" color="{{themeColor}}">加载中...</van-loading></view>
+    <view wx:else class="marketing-card-sale" bindtap="bindCardSaleTap">
+      <view class="marketing-card-sale-icon" style="background:{{themeColor}}18;"><van-icon name="coupon-o" size="48rpx" color="{{themeColor}}" /></view>
+      <view class="marketing-card-sale-main">
+        <view class="marketing-card-sale-title-row"><text class="marketing-card-sale-title">会员购卡</text><text class="marketing-card-sale-state {{purchaseEnabled ? 'marketing-card-sale-state--on' : ''}}">{{purchaseEnabled ? '已开启' : '未开启'}}</text></view>
+        <text class="marketing-card-sale-desc">{{purchaseEnabled ? '已有 ' + activeCount + ' 种套餐可提交购买申请' : '配置套餐与付款说明后，会员即可提交申请'}}</text>
+      </view>
+      <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
     </view>
 
-    <view class="coach-section">
-      <view class="coach-section-head">
-        <view class="coach-section-title">营销工具</view>
-      </view>
-      <view class="coach-grid coach-grid-3">
-        <view class="coach-grid-item" wx:for="{{malls}}" wx:key="name" bindtap="onMallTap">
-          <view class="coach-grid-icon" style="background: {{item.color}}20;">
-            <van-icon name="{{item.icon}}" color="{{item.color}}" size="40rpx" />
-          </view>
-          <text class="coach-grid-text">{{item.name}}</text>
-          <text class="coach-grid-text" wx:if="{{item.sub}}" style="font-size:20rpx;margin-top:4rpx;">{{item.sub}}</text>
-        </view>
-      </view>
+    <view wx:if="{{!loading}}" class="marketing-note">
+      <van-icon name="info-o" size="28rpx" color="{{themeColor}}" />
+      <text>当前为线下/转账付款后人工确认发卡，不接入微信支付。</text>
     </view>
   </view>
 

@@ -158,6 +158,22 @@ class AdminCardController extends BaseAdminController {
     await service.deleteUserCard(input.cardId);
     return { ok: true };
   }
+
+  async getCardMarketing() {
+    await this.isAdmin();
+    return await new AdminCardService().getCardMarketing();
+  }
+
+  async saveCardMarketing() {
+    await this.isAdmin();
+    const input = this.validateData({
+      enabled: "bool|false",
+      guide: "string|false|max:300",
+      contact: "string|false|max:100",
+      cards: "array|false",
+    });
+    return await new AdminCardService().saveCardMarketing(input, this._adminType);
+  }
 }
 
 module.exports = AdminCardController;

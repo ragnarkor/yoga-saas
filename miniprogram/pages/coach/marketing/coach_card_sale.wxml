@@ -1,0 +1,34 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page sale-page">
+  <coach-tenant-switch title="会员购卡" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
+
+  <view wx:if="{{loading}}" class="sale-loading"><van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading></view>
+
+  <block wx:else>
+    <view class="sale-intro">
+      <view class="sale-intro-icon" style="background:{{themeColor}}18;"><van-icon name="shopping-cart-o" size="50rpx" color="{{themeColor}}" /></view>
+      <view><text class="sale-intro-title">会员购卡申请</text><text class="sale-intro-desc">会员提交申请并线下付款后，由馆主确认发卡。</text></view>
+    </view>
+
+    <view class="sale-group">
+      <view class="sale-row sale-row--switch"><view><text class="sale-row-title">开启会员购卡</text><text class="sale-row-desc">开启后，会员端会展示可购买套餐</text></view><van-switch checked="{{enabled}}" active-color="{{themeColor}}" bind:change="bindEnabledChange" /></view>
+      <van-field label="付款说明" value="{{guide}}" data-field="guide" bind:input="bindTextInput" placeholder="例如：请到前台付款，或联系馆主核对转账" maxlength="300" border="{{false}}" />
+      <van-field label="联系提示" value="{{contact}}" data-field="contact" bind:input="bindTextInput" placeholder="例如：前台电话 12345678" maxlength="100" border="{{false}}" />
+    </view>
+
+    <view class="sale-section-head"><text class="sale-section-title">可购买套餐</text><text class="sale-section-tip">仅勾选的套餐会展示给会员</text></view>
+    <van-empty wx:if="{{!cards.length}}" description="请先在会员卡管理中创建卡模板" />
+    <view wx:else class="sale-group sale-card-list">
+      <view wx:for="{{cards}}" wx:key="id" class="sale-card-item">
+        <view class="sale-card-top"><view class="sale-card-title-wrap"><view class="sale-card-dot" style="background:{{item.color}};"></view><view><text class="sale-card-name">{{item.name}}</text><text class="sale-card-meta">{{item.typeDesc}} · 原价 ¥{{item.price}}</text></view></view><van-switch checked="{{item.saleEnabled}}" active-color="{{themeColor}}" data-index="{{index}}" bind:change="bindCardSwitch" /></view>
+        <view wx:if="{{item.saleEnabled}}" class="sale-card-fields">
+          <van-field label="展示价" value="{{item.salePriceYuan}}" data-index="{{index}}" data-field="salePriceYuan" bind:input="bindCardInput" type="digit" placeholder="留空则使用原价（元）" border="{{false}}" />
+          <van-field label="购买说明" value="{{item.saleDesc}}" data-index="{{index}}" data-field="saleDesc" bind:input="bindCardInput" maxlength="80" placeholder="例如：适合每周 2 次练习" border="{{false}}" />
+        </view>
+      </view>
+    </view>
+
+    <view class="sale-security"><van-icon name="shield-o" size="28rpx" color="{{themeColor}}" /><text>请勿在这里填写完整银行卡号、支付密码或收款凭证。</text></view>
+    <view class="sale-footer"><van-button block round custom-class="sale-submit-btn" color="{{themeColor}}" loading="{{saving}}" bind:click="bindSaveTap">保存购卡设置</van-button></view>
+  </block>
+</view>

@@ -10,6 +10,7 @@ const CardTplModel = require("../../model/card_tpl_model.js");
 const UserCardModel = require("../../model/user_card_model.js");
 const UserModel = require("../../model/user_model.js");
 const AdminModel = require("../../model/admin_model.js");
+const SetupModel = require("../../model/setup_model.js");
 const UserCardService = require("../user_card_service.js");
 const cardScopeUtil = require("../../utils/card_scope_util.js");
 const cardCoverUtil = require("../../utils/card_cover_util.js");
@@ -706,6 +707,73 @@ class AdminCardService extends BaseAdminService {
       expiringSoon,
       lowTimes,
     };
+  }
+
+  async getCardMarketing() {
+    await this._ensureCardCollections();
+    const setup = await new (require("../home_service.js"))().getSetup(
+      "SETUP_CARD_PURCHASE_ENABLED,SETUP_CARD_PURCHASE_GUIDE,SETUP_CARD_PURCHASE_CONTACT",
+    );
+    const cards = await this.getCardTplList();
+    const saleCards = (cards || []).map((card) => ({
+      id: card.CARD_TPL_ID,
+      name: card.CARD_TPL_NAME || "未命名会员卡",
+      typeDesc: card.typeDesc || "会员卡",
+      price: Number(card.CARD_TPL_PRICE) || 0,
+      saleEnabled: Number(card.CARD_TPL_SALE_STATUS) === 1,
+      salePriceFee: Number(card.CARD_TPL_SALE_PRICE_FEE) || 0,
+      saleDesc: card.CARD_TPL_SALE_DESC || "",
+      color: card.CARD_TPL_COLOR || DEFAULT_TPL_COLORS[0],
+    }));
+    return {
+      enabled: Number(setup && setup.SETUP_CARD_PURCHASE_ENABLED) === 1,
+      guide: (setup && setup.SETUP_CARD_PURCHASE_GUIDE) || "",
+      contact: (setup && setup.SETUP_CARD_PURCHASE_CONTACT) || "",
+      cards: saleCards,
+      activeCount: saleCards.filter((item) => item.saleEnabled).length,
+    };
+  }
+
+  async saveCardMarketing(input, operatorType) {
+    if (
+      operatorType !== AdminModel.TYPE.SUPER &&
+      operatorType !== AdminModel.TYPE.OWNER
+    ) {
+      this.AppError("仅馆主可修改购卡设置");
+    }
+    await this._ensureCardCollections();
+    await new (require("../home_service.js"))().getSetup("_id");
+
+    const enabled = input.enabled ? 1 : 0;
+    const guide = String(input.guide || "").trim().slice(0, 300);
+    const contact = String(input.contact || "").trim().slice(0, 100);
+    const rawCards = Array.isArray(input.cards) ? input.cards : [];
+    const cardMap = new Map(
+      (await this.getCardTplList()).map((card) => [String(card.CARD_TPL_ID), card]),
+    );
+
+    for (const item of rawCards) {
+      const id = String((item && item.id) || "").trim();
+      if (!id || !cardMap.has(id)) continue;
+      const saleFee = Math.max(0, Math.round(Number(item.salePriceFee) || 0));
+      await CardTplModel.edit(
+        { CARD_TPL_ID: id },
+        {
+          CARD_TPL_SALE_STATUS: item.saleEnabled ? 1 : 0,
+          CARD_TPL_SALE_PRICE_FEE: saleFee,
+          CARD_TPL_SALE_DESC: String(item.saleDesc || "").trim().slice(0, 80),
+          CARD_TPL_EDIT_TIME: timeUtil.time(),
+        },
+      );
+    }
+
+    await SetupModel.edit({}, {
+      SETUP_CARD_PURCHASE_ENABLED: enabled,
+      SETUP_CARD_PURCHASE_GUIDE: guide,
+      SETUP_CARD_PURCHASE_CONTACT: contact,
+      SETUP_EDIT_TIME: timeUtil.time(),
+    });
+    return await this.getCardMarketing();
   }
 }
 

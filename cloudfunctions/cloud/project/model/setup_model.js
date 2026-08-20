@@ -36,6 +36,12 @@ SetupModel.DB_STRUCTURE = {
 
   // [AI_START TIMESTAMP=2025-01-25 10:00:00]
   SETUP_FEATURES: "object|true|default={} |comment=功能开关配置",
+  SETUP_CARD_PURCHASE_ENABLED:
+    "int|false|default=0|comment=是否开启会员购卡申请",
+  SETUP_CARD_PURCHASE_GUIDE:
+    "string|false|comment=购卡付款说明（非敏感文本）",
+  SETUP_CARD_PURCHASE_CONTACT:
+    "string|false|comment=购卡联系提示（非敏感文本）",
   /*
 	{
 		booking: true,         // 预约功能

@@ -56,6 +56,9 @@ module.exports = {
   "my/my_card_list": "card_controller@getMyCardList",
   "my/my_card_summary": "card_controller@getMyCardSummary",
   "my/my_card_detail": "card_controller@getMyCardDetail",
+  "my/card_shop": "card_controller@getCardShop",
+  "my/card_order_create": "card_controller@createCardOrder#noDemo",
+  "my/card_order_list": "card_controller@getMyCardOrders",
   "my/achievement": "my_controller@getAchievement",
 
   "test/test": "test/test_controller@test",
@@ -104,6 +107,8 @@ module.exports = {
   "admin/card_tpl_detail": "admin/admin_card_controller@getCardTplDetail",
   "admin/card_tpl_save": "admin/admin_card_controller@saveCardTpl#noDemo",
   "admin/card_tpl_del": "admin/admin_card_controller@delCardTpl#noDemo",
+  "admin/card_marketing_get": "admin/admin_card_controller@getCardMarketing",
+  "admin/card_marketing_save": "admin/admin_card_controller@saveCardMarketing#noDemo",
   "admin/coach_member_list": "admin/admin_card_controller@getCoachMemberList",
   "admin/month_new_card_members":
     "admin/admin_card_controller@getMonthNewCardMembers",

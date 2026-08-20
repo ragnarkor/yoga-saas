@@ -64,5 +64,6 @@ module.exports = Behavior({
         url: `/pages/default/my/card_detail/my_card_detail?id=${id}`,
       });
     },
+    bindCardShopTap() { wx.navigateTo({ url: '/pages/default/my/card_shop/card_shop' }); },
   },
 });

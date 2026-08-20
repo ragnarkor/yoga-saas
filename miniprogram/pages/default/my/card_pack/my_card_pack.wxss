@@ -173,3 +173,5 @@
   border-color: #d9d9d9;
   color: #bfbfbf;
 }
+
+.card-pack-buy { display:flex; align-items:center; justify-content:center; gap:10rpx; height:76rpx; margin:20rpx 28rpx 8rpx; border-radius:16rpx; color:#fff; font-size:27rpx; font-weight:600; box-shadow:0 8rpx 18rpx rgba(91,138,114,.18); }

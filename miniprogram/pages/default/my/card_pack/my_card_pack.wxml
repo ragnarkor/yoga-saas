@@ -1,5 +1,6 @@
 <page-meta page-style="{{pageStyle}}" />
 <view class="card-pack-page theme-scope" style="{{pageStyle}}">
+  <view class="card-pack-buy" style="background:{{themeColor}}" bindtap="bindCardShopTap"><van-icon name="shopping-cart-o" size="30rpx" color="#fff" /><text>购买会员卡</text></view>
   <view class="card-pack-toolbar">
     <view
       class="card-pack-toggle {{showInvalid ? 'is-active' : ''}}"

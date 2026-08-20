@@ -2,20 +2,37 @@ Page({
   behaviors: [require('../../../behavior/coach_page_bh.js')],
 
   data: {
-    todayAmount: 0,
-    todayCount: 0,
-    malls: [
-      { name: '商城', sub: '（会员卡）', icon: 'shopping-cart-o', color: '#f48fb1' },
-      { name: '商城', sub: '（实物）', icon: 'shop-o', color: '#64b5f6' },
-      { name: '敬请期待', sub: '', icon: 'question-o', color: '#b39ddb' },
-    ],
+    loading: true,
+    purchaseEnabled: false,
+    activeCount: 0,
+    guide: '',
   },
 
   onShow() {
     this._coachOnShow();
+    this._loadCoachData();
   },
 
-  onMallTap() {
-    wx.showToast({ title: '功能开发中', icon: 'none' });
+  async _loadCoachData() {
+    const ok = await require('../../../biz/admin_wx_biz.js').ensureSession();
+    if (!ok) return this.setData({ loading: false });
+    try {
+      const res = await require('../../../helper/cloud_helper.js').callCloudData(
+        'admin/card_marketing_get', {}, { hint: false },
+      );
+      this.setData({
+        loading: false,
+        purchaseEnabled: !!(res && res.enabled),
+        activeCount: (res && res.activeCount) || 0,
+        guide: (res && res.guide) || '',
+      });
+    } catch (err) {
+      console.error(err);
+      this.setData({ loading: false });
+    }
+  },
+
+  bindCardSaleTap() {
+    wx.navigateTo({ url: '/pages/coach/marketing/coach_card_sale' });
   },
 });

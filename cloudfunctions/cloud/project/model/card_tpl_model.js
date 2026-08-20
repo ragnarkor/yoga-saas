@@ -19,6 +19,11 @@ CardTplModel.DB_STRUCTURE = {
     "object|false|default={}|comment=适用课程范围 mode=all|categories categoryIds=[]",
   CARD_TPL_ORDER: "int|true|default=9999",
   CARD_TPL_STATUS: "int|true|default=1|comment=1=在售 0=停售",
+  CARD_TPL_SALE_STATUS:
+    "int|false|default=0|comment=1=允许会员提交购卡申请 0=不展示",
+  CARD_TPL_SALE_PRICE_FEE:
+    "int|false|default=0|comment=会员申请展示价(分)，0=使用模板原价",
+  CARD_TPL_SALE_DESC: "string|false|comment=会员购卡说明",
   CARD_TPL_ADD_TIME: "int|true",
   CARD_TPL_EDIT_TIME: "int|true",
   CARD_TPL_ADD_IP: "string|false",
