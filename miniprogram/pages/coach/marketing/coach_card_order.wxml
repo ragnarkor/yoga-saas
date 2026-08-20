@@ -1,0 +1,65 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page card-order-page">
+  <coach-tenant-switch
+    title="购卡申请"
+    show-back="{{true}}"
+    theme-color="{{themeColor}}"
+    nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
+  />
+
+  <view class="co-tabs">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="key"
+      class="co-tab {{activeTab === item.key ? 'co-tab--on' : ''}}"
+      style="{{activeTab === item.key ? 'color:' + themeColor + ';border-color:' + themeColor : ''}}"
+      data-key="{{item.key}}"
+      bindtap="bindTabTap"
+    >{{item.label}}</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="co-loading">
+    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <view wx:elif="{{!orders.length}}" class="co-empty">暂无购卡申请</view>
+
+  <view wx:else class="co-list">
+    <view class="co-card" wx:for="{{orders}}" wx:key="id">
+      <view class="co-card-head">
+        <text class="co-user">{{item.userName}}</text>
+        <text class="co-status co-status--{{item.status}}">{{item.statusDesc}}</text>
+      </view>
+
+      <view class="co-tpl-row">
+        <text class="co-tpl">{{item.tplName}}</text>
+        <text class="co-fee" style="color:{{themeColor}}">¥{{item.payFeeYuan}}</text>
+      </view>
+
+      <view class="co-meta">
+        <text class="co-paytype {{item.isWechat ? 'co-paytype--wx' : ''}}">{{item.payType}}</text>
+        <text class="co-dot">·</text>
+        <text class="co-time">{{item.timeDesc}}</text>
+      </view>
+
+      <view wx:if="{{item.remark}}" class="co-remark">备注：{{item.remark}}</view>
+      <view wx:if="{{item.closeReason}}" class="co-close-reason">{{item.closeReason}}</view>
+
+      <view wx:if="{{item.canAct}}" class="co-actions">
+        <view
+          class="co-btn co-btn--ghost"
+          data-id="{{item.id}}"
+          catchtap="bindCloseTap"
+        >关闭</view>
+        <view
+          class="co-btn"
+          style="background:{{themeColor}}"
+          data-id="{{item.id}}"
+          data-name="{{item.userName}}"
+          catchtap="bindConfirmTap"
+        >确认收款发卡</view>
+      </view>
+    </view>
+  </view>
+</view>

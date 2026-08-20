@@ -46,6 +46,7 @@
         "customer/coach_customer",
         "marketing/coach_marketing",
         "marketing/coach_card_sale",
+        "marketing/coach_card_order",
         "my/coach_my",
         "store/coach_store",
         "home/coach_home_content",

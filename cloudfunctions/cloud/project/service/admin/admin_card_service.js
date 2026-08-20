@@ -11,6 +11,7 @@ const UserCardModel = require("../../model/user_card_model.js");
 const UserModel = require("../../model/user_model.js");
 const AdminModel = require("../../model/admin_model.js");
 const SetupModel = require("../../model/setup_model.js");
+const CardOrderModel = require("../../model/card_order_model.js");
 const UserCardService = require("../user_card_service.js");
 const cardScopeUtil = require("../../utils/card_scope_util.js");
 const cardCoverUtil = require("../../utils/card_cover_util.js");
@@ -774,6 +775,288 @@ class AdminCardService extends BaseAdminService {
       SETUP_EDIT_TIME: timeUtil.time(),
     });
     return await this.getCardMarketing();
+  }
+
+  // ============ 购卡订单：列表 / 确认发卡 / 关闭 ============
+
+  /**
+   * 购卡订单列表（教练可看、馆主可处理）
+   * @param {*} param0 status 可选筛选；不传默认全部
+   */
+  async getCardOrderList({ status, page = 1, size = 20, oldTotal = 0 } = {}) {
+    await this._ensureCardCollections();
+    let where = {};
+    if (status !== undefined && status !== "" && status !== null) {
+      where.ORDER_STATUS = Number(status);
+    }
+    let result = await CardOrderModel.getList(
+      where,
+      "*",
+      { ORDER_ADD_TIME: "desc" },
+      Number(page) || 1,
+      Number(size) || 20,
+      true,
+      Number(oldTotal) || 0,
+    );
+    const STATUS_DESC = {
+      [CardOrderModel.STATUS.PENDING]: "待确认",
+      [CardOrderModel.STATUS.PAID]: "已付待发",
+      [CardOrderModel.STATUS.CONFIRMING]: "确认中",
+      [CardOrderModel.STATUS.ISSUED]: "已发卡",
+      [CardOrderModel.STATUS.CLOSED]: "已关闭",
+    };
+    result.list = (result.list || []).map((o) => ({
+      ...o,
+      statusDesc: STATUS_DESC[o.ORDER_STATUS] || "未知",
+      payFeeYuan: ((Number(o.ORDER_PAY_FEE) || 0) / 100).toFixed(2),
+      timeDesc: timeUtil.timestamp2Time(o.ORDER_ADD_TIME, "Y-M-D h:m"),
+    }));
+    return result;
+  }
+
+  /**
+   * 确认收款并发卡（仅馆主）——幂等、防重发
+   * 严格顺序见 f7-card-purchase.md §6：先 CAS 抢状态，再按订单幂等发卡。
+   */
+  async confirmCardOrder(orderId, operator) {
+    await this._ensureCardCollections();
+    orderId = (orderId || "").trim();
+    if (!orderId) this.AppError("订单不存在");
+
+    // 1. 读订单并校验状态（本租户内，_pid 由框架注入）
+    let order = await CardOrderModel.getOne({ ORDER_ID: orderId }, "*");
+    if (!order) this.AppError("订单不存在");
+
+    // 幂等：已发卡直接返回，不重复处理
+    if (order.ORDER_STATUS === CardOrderModel.STATUS.ISSUED) {
+      return { ok: true, alreadyIssued: true, userCardId: order.ORDER_USER_CARD_ID };
+    }
+    if (order.ORDER_STATUS === CardOrderModel.STATUS.CLOSED) {
+      this.AppError("该申请已关闭，无法发卡");
+    }
+
+    let now = timeUtil.time();
+
+    // 2. 原子抢占 PENDING → CONFIRMING（CAS：edit 返回受影响行数）
+    let seized = await CardOrderModel.edit(
+      { ORDER_ID: orderId, ORDER_STATUS: CardOrderModel.STATUS.PENDING },
+      {
+        ORDER_STATUS: CardOrderModel.STATUS.CONFIRMING,
+        ORDER_CONFIRMED_BY_ID: (operator && operator._id) || "",
+        ORDER_CONFIRMED_BY_NAME: (operator && operator.ADMIN_NAME) || "",
+        ORDER_CONFIRMED_TIME: now,
+        ORDER_EDIT_TIME: now,
+      },
+    );
+    if (!seized) {
+      // 没抢到：要么并发有人在处理（CONFIRMING），要么状态已变
+      this.AppError("订单正在处理中，请稍后刷新查看");
+    }
+
+    try {
+      // 3. 幂等查重：该订单是否已发过卡
+      let existed = await UserCardModel.getOne(
+        { USER_CARD_ORDER_ID: orderId },
+        "_id",
+      );
+      let userCardId;
+      if (existed) {
+        // 已有卡（历史残留/重试），只回填不重发
+        userCardId = existed._id;
+      } else {
+        // 4. 按订单快照发卡
+        userCardId = await this._createUserCardFromOrder(order, now);
+      }
+
+      // 5. CONFIRMING → ISSUED，回填卡 ID
+      await CardOrderModel.edit(
+        { ORDER_ID: orderId },
+        {
+          ORDER_STATUS: CardOrderModel.STATUS.ISSUED,
+          ORDER_USER_CARD_ID: userCardId,
+          ORDER_EDIT_TIME: timeUtil.time(),
+        },
+      );
+      return { ok: true, userCardId };
+    } catch (err) {
+      // 6. 任一步失败：回滚到 PENDING，记录原因，可重试（绝不误标 ISSUED）
+      await CardOrderModel.edit(
+        { ORDER_ID: orderId },
+        {
+          ORDER_STATUS: CardOrderModel.STATUS.PENDING,
+          ORDER_CLOSE_REASON: "发卡失败：" + ((err && err.message) || "未知错误"),
+          ORDER_EDIT_TIME: timeUtil.time(),
+        },
+      );
+      throw err;
+    }
+  }
+
+  /**
+   * 按订单快照创建一张用户卡，返回卡 _id。
+   * 只吃订单快照，不重新读模板原价——保证会员付款那一刻的承诺。
+   */
+  async _createUserCardFromOrder(order, now) {
+    const snap = order.ORDER_TPL_SNAPSHOT || {};
+    // 快照结构见 card_purchase_service.getShop()：{id,name,type,days,quota,...}
+    let type = snap.type || CardTplModel.TYPE.TIMES;
+    let days = Number(snap.days) || 0;
+    if (days <= 0) this.AppError("卡有效期无效，请检查套餐配置");
+    let quota =
+      type === CardTplModel.TYPE.PERIOD ? 0 : Number(snap.quota) || 1;
+
+    // 激活方式：快照带则用，否则立即激活
+    let activate = snap.activate || UserCardModel.ACTIVATE.IMMEDIATE;
+    const validActivate = Object.values(UserCardModel.ACTIVATE);
+    if (!validActivate.includes(activate)) {
+      activate = UserCardModel.ACTIVATE.IMMEDIATE;
+    }
+
+    let startTime = 0;
+    let endTime = 0;
+    if (activate === UserCardModel.ACTIVATE.IMMEDIATE) {
+      startTime = now;
+      endTime = now + days * 86400 * 1000;
+    }
+
+    // 适用范围：优先快照 scope，否则全馆
+    let scope = cardScopeUtil.normalizeScope(snap.scope || { mode: "all" });
+
+    // 价格：沿用既有「元」口径写 USER_CARD_PRICE，保证与现有收入报表一致。
+    // 订单实收（分）另存 USER_CARD_ORDER_ID 关联，未来支付版再切真实成交额字段。
+    let price = Math.round((Number(order.ORDER_PAY_FEE) || 0) / 100);
+
+    let data = {
+      USER_CARD_USER_ID: order.ORDER_USER_ID,
+      USER_CARD_TPL_ID: order.ORDER_TPL_ID,
+      USER_CARD_NAME: order.ORDER_TPL_NAME || snap.name || "会员卡",
+      USER_CARD_TYPE: type,
+      USER_CARD_DAYS: days,
+      USER_CARD_PRICE: price,
+      USER_CARD_QUOTA: quota,
+      USER_CARD_QUOTA_INIT: quota,
+      USER_CARD_ACTIVATE: activate,
+      USER_CARD_SCOPE: scope,
+      USER_CARD_ORDER_ID: order.ORDER_ID,
+      USER_CARD_MEMO: "购卡申请确认",
+      USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,
+      USER_CARD_START_TIME: startTime,
+      USER_CARD_END_TIME: endTime,
+    };
+    return await UserCardModel.insert(data);
+  }
+
+  /**
+   * 微信支付成功后自动发卡（由支付回调触发，无操作人）。
+   * 与人工确认共用发卡核心 _createUserCardFromOrder，幂等三要素同样成立：
+   *   订单号唯一 + 状态 CAS + USER_CARD_ORDER_ID 查重。
+   * 状态流转：PENDING/PAID → CONFIRMING → ISSUED。
+   * 回调可能重放，本方法必须可重复安全调用。
+   * @param {*} notify 归一化回调 { transactionId, totalFee, payTime }
+   * @returns { ok, userCardId, alreadyIssued? }
+   */
+  async autoIssueByPay(orderId, notify) {
+    await this._ensureCardCollections();
+    orderId = (orderId || "").trim();
+    if (!orderId) this.AppError("订单不存在");
+    notify = notify || {};
+
+    let order = await CardOrderModel.getOne({ ORDER_ID: orderId }, "*");
+    if (!order) this.AppError("订单不存在");
+
+    // 幂等：已发卡直接返回（回调重放）
+    if (order.ORDER_STATUS === CardOrderModel.STATUS.ISSUED) {
+      return { ok: true, alreadyIssued: true, userCardId: order.ORDER_USER_CARD_ID };
+    }
+    if (order.ORDER_STATUS === CardOrderModel.STATUS.CLOSED) {
+      this.AppError("订单已关闭，无法发卡");
+    }
+
+    let now = timeUtil.time();
+
+    // 抢占 PENDING 或 PAID → CONFIRMING，并落库支付信息。
+    // 用 in 匹配两种可入状态，CAS 保证并发/重放下只有一次抢到。
+    let payFields = {
+      ORDER_TRANSACTION_ID: notify.transactionId || order.ORDER_TRANSACTION_ID || "",
+      ORDER_PAY_TIME: notify.payTime || order.ORDER_PAY_TIME || now,
+    };
+    let seized = await CardOrderModel.edit(
+      {
+        ORDER_ID: orderId,
+        ORDER_STATUS: ["in", [CardOrderModel.STATUS.PENDING, CardOrderModel.STATUS.PAID]],
+      },
+      Object.assign(
+        {
+          ORDER_STATUS: CardOrderModel.STATUS.CONFIRMING,
+          ORDER_EDIT_TIME: now,
+        },
+        payFields,
+      ),
+    );
+    if (!seized) {
+      // 没抢到：并发的另一次回调正在处理，或状态已推进。视为成功交由对方完成。
+      return { ok: true, inProgress: true };
+    }
+
+    try {
+      let existed = await UserCardModel.getOne({ USER_CARD_ORDER_ID: orderId }, "_id");
+      let userCardId = existed
+        ? existed._id
+        : await this._createUserCardFromOrder(order, now);
+
+      await CardOrderModel.edit(
+        { ORDER_ID: orderId },
+        {
+          ORDER_STATUS: CardOrderModel.STATUS.ISSUED,
+          ORDER_USER_CARD_ID: userCardId,
+          ORDER_EDIT_TIME: timeUtil.time(),
+        },
+      );
+      return { ok: true, userCardId };
+    } catch (err) {
+      // 已收款但发卡失败：回滚到 PAID（钱已到，绝不退回 PENDING 丢失支付事实），
+      // 记录原因，馆主可在待办里人工确认补发。
+      await CardOrderModel.edit(
+        { ORDER_ID: orderId },
+        Object.assign(
+          {
+            ORDER_STATUS: CardOrderModel.STATUS.PAID,
+            ORDER_CLOSE_REASON: "支付成功但发卡失败：" + ((err && err.message) || "未知错误"),
+            ORDER_EDIT_TIME: timeUtil.time(),
+          },
+          payFields,
+        ),
+      );
+      throw err;
+    }
+  }
+
+  /** 关闭/拒绝购卡申请（仅馆主，需填原因） */
+  async closeCardOrder(orderId, reason, operator) {
+    await this._ensureCardCollections();
+    orderId = (orderId || "").trim();
+    reason = (reason || "").trim().slice(0, 100);
+    if (!orderId) this.AppError("订单不存在");
+    if (!reason) this.AppError("请填写关闭原因");
+
+    let order = await CardOrderModel.getOne({ ORDER_ID: orderId }, "ORDER_STATUS");
+    if (!order) this.AppError("订单不存在");
+    if (order.ORDER_STATUS === CardOrderModel.STATUS.ISSUED) {
+      this.AppError("订单已发卡，不能关闭");
+    }
+    // 仅允许从 PENDING 关闭（CONFIRMING 说明正在发卡，不介入）
+    let updated = await CardOrderModel.edit(
+      { ORDER_ID: orderId, ORDER_STATUS: CardOrderModel.STATUS.PENDING },
+      {
+        ORDER_STATUS: CardOrderModel.STATUS.CLOSED,
+        ORDER_CLOSE_REASON: reason,
+        ORDER_CONFIRMED_BY_ID: (operator && operator._id) || "",
+        ORDER_CONFIRMED_BY_NAME: (operator && operator.ADMIN_NAME) || "",
+        ORDER_EDIT_TIME: timeUtil.time(),
+      },
+    );
+    if (!updated) this.AppError("订单状态已变化，请刷新后重试");
+    return { ok: true };
   }
 }
 

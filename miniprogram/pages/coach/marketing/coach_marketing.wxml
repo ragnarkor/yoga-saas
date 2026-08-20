@@ -26,9 +26,18 @@
       <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
     </view>
 
+    <view wx:if="{{!loading}}" class="marketing-card-sale marketing-card-order" bindtap="bindCardOrderTap">
+      <view class="marketing-card-sale-icon" style="background:{{themeColor}}18;"><van-icon name="orders-o" size="48rpx" color="{{themeColor}}" /></view>
+      <view class="marketing-card-sale-main">
+        <view class="marketing-card-sale-title-row"><text class="marketing-card-sale-title">购卡申请</text></view>
+        <text class="marketing-card-sale-desc">查看会员购卡申请，确认收款并发卡</text>
+      </view>
+      <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
+    </view>
+
     <view wx:if="{{!loading}}" class="marketing-note">
       <van-icon name="info-o" size="28rpx" color="{{themeColor}}" />
-      <text>当前为线下/转账付款后人工确认发卡，不接入微信支付。</text>
+      <text>支持线下/转账人工确认发卡；配置微信支付商户号后，会员付款即自动发卡。</text>
     </view>
   </view>
 

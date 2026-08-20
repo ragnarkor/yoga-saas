@@ -35,4 +35,8 @@ Page({
   bindCardSaleTap() {
     wx.navigateTo({ url: '/pages/coach/marketing/coach_card_sale' });
   },
+
+  bindCardOrderTap() {
+    wx.navigateTo({ url: '/pages/coach/marketing/coach_card_order' });
+  },
 });

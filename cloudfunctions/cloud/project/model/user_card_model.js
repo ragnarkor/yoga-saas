@@ -19,6 +19,8 @@ UserCardModel.DB_STRUCTURE = {
   USER_CARD_COACH_ID: "string|false|comment=归属教练adminId",
   USER_CARD_COACH_NAME: "string|false",
   USER_CARD_MEMO: "string|false|comment=备注",
+  USER_CARD_ORDER_ID:
+    "string|false|comment=购卡订单号(在线购卡发卡时回填，用于发卡幂等查重)",
   USER_CARD_SCOPE:
     "object|false|default={}|comment=适用课程范围快照",
   USER_CARD_STATUS: "int|true|default=1|comment=1=正常 0=停卡 9=已用完",

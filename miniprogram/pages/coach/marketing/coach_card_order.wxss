@@ -1,0 +1,132 @@
+.card-order-page {
+  min-height: 100vh;
+  background: #f5f6f8;
+  padding-bottom: 40rpx;
+}
+
+.co-tabs {
+  display: flex;
+  padding: 20rpx 24rpx 8rpx;
+  gap: 16rpx;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.co-tab {
+  flex: none;
+  padding: 12rpx 28rpx;
+  font-size: 26rpx;
+  color: #666;
+  background: #fff;
+  border: 1rpx solid #eee;
+  border-radius: 999rpx;
+}
+.co-tab--on {
+  font-weight: 600;
+  background: #fff;
+}
+
+.co-loading,
+.co-empty {
+  padding: 120rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.co-list {
+  padding: 12rpx 24rpx;
+}
+.co-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx 28rpx 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.03);
+}
+
+.co-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.co-user {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #222;
+}
+.co-status {
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  color: #ff9500;
+  background: #fff5e6;
+}
+/* 已发卡 */
+.co-status--10 { color: #34a853; background: #e8f6ec; }
+/* 已关闭 */
+.co-status--20 { color: #999; background: #f0f0f0; }
+/* 确认中 */
+.co-status--5 { color: #4a90a4; background: #e8f1f4; }
+/* 已付待发 */
+.co-status--8 { color: #d9534f; background: #fdecec; }
+
+.co-tpl-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 18rpx;
+}
+.co-tpl {
+  font-size: 28rpx;
+  color: #333;
+}
+.co-fee {
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.co-meta {
+  display: flex;
+  align-items: center;
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+.co-paytype {
+  color: #888;
+}
+.co-paytype--wx {
+  color: #34a853;
+}
+.co-dot {
+  margin: 0 10rpx;
+  color: #ccc;
+}
+
+.co-remark,
+.co-close-reason {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.5;
+}
+.co-close-reason {
+  color: #d9534f;
+}
+
+.co-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+.co-btn {
+  padding: 12rpx 32rpx;
+  font-size: 26rpx;
+  color: #fff;
+  border-radius: 999rpx;
+}
+.co-btn--ghost {
+  color: #666;
+  background: #f2f2f2;
+}

@@ -32,7 +32,7 @@ class CardController extends BaseController {
     return await service.getMyCardDetail(this._userId, input.cardId);
   }
   async getCardShop() { return await new CardPurchaseService().getShop(); }
-  async createCardOrder() { const input=this.validateData({tplId:'required|string',remark:'string|false|max:100'}); return await new CardPurchaseService().create(this._userId,input.tplId,input.remark); }
+  async createCardOrder() { const input=this.validateData({tplId:'required|string',remark:'string|false|max:100',payType:'string|false|default=offline'}); return await new CardPurchaseService().create(this._userId,input.tplId,input.remark,input.payType); }
   async getMyCardOrders() { return await new CardPurchaseService().myList(this._userId); }
 }
 
