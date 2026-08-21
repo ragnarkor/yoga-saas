@@ -1,0 +1,85 @@
+<page-meta page-style="{{pageStyle}}" />
+
+<view class="detail theme-scope" style="{{pageStyle}}">
+  <cmpt-tenant-switch title="套餐详情" theme-color="{{themeColor}}" show-back="{{true}}" />
+
+  <view wx:if="{{loading}}" class="detail-loading">
+    <van-loading color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <van-empty wx:elif="{{!card}}" description="该套餐已下架或不可购买" />
+
+  <block wx:else>
+    <!-- 卡面大图 -->
+    <view
+      class="detail-hero"
+      style="background:linear-gradient(135deg, {{card.color}} 0%, {{card.colorDark}} 100%);"
+    >
+      <view class="detail-hero-tag">{{card.typeDesc}}</view>
+      <view class="detail-hero-name">{{card.name}}</view>
+      <view class="detail-hero-vip">VIP CARD</view>
+    </view>
+
+    <!-- 价格区 -->
+    <view class="detail-card detail-price-card">
+      <view class="detail-price-wrap">
+        <text class="detail-price-cur" style="color:{{themeColor}}">¥</text>
+        <text class="detail-price" style="color:{{themeColor}}">{{card.priceYuan}}</text>
+        <text wx:if="{{card.hasDiscount}}" class="detail-price-origin">¥{{card.originYuan}}</text>
+        <view
+          wx:if="{{card.hasDiscount}}"
+          class="detail-price-off"
+          style="color:{{themeColor}};background:{{themeColor}}14;"
+        >限时优惠</view>
+      </view>
+      <view class="detail-price-desc">{{card.mainAttr}}</view>
+    </view>
+
+    <!-- 套餐权益 -->
+    <view class="detail-card">
+      <view class="detail-section-title">套餐权益</view>
+      <view class="detail-row">
+        <van-icon name="credit-pay" size="30rpx" color="{{themeColor}}" />
+        <text class="detail-row-label">卡类型</text>
+        <text class="detail-row-value">{{card.typeDesc}}</text>
+      </view>
+      <view class="detail-row">
+        <van-icon name="clock-o" size="30rpx" color="{{themeColor}}" />
+        <text class="detail-row-label">有效期</text>
+        <text class="detail-row-value">{{card.days}} 天</text>
+      </view>
+      <view class="detail-row" wx:if="{{card.type === 'times'}}">
+        <van-icon name="coupon-o" size="30rpx" color="{{themeColor}}" />
+        <text class="detail-row-label">可用次数</text>
+        <text class="detail-row-value">{{card.quota}} 次</text>
+      </view>
+      <view class="detail-row">
+        <van-icon name="cluster-o" size="30rpx" color="{{themeColor}}" />
+        <text class="detail-row-label">适用范围</text>
+        <text class="detail-row-value">{{card.scopeText}}</text>
+      </view>
+    </view>
+
+    <!-- 购买说明 -->
+    <view class="detail-card" wx:if="{{card.desc}}">
+      <view class="detail-section-title">购买说明</view>
+      <view class="detail-desc">{{card.desc}}</view>
+    </view>
+
+    <!-- 温馨提示 -->
+    <view class="detail-card" wx:if="{{guide || contact}}">
+      <view class="detail-section-title">温馨提示</view>
+      <view class="detail-desc" wx:if="{{guide}}">{{guide}}</view>
+      <view class="detail-desc detail-desc--sub" wx:if="{{contact}}">联系馆方：{{contact}}</view>
+    </view>
+  </block>
+
+  <!-- 吸底购买栏 -->
+  <view wx:if="{{!loading && card}}" class="detail-bar">
+    <view class="detail-bar-price">
+      <text class="detail-bar-cur" style="color:{{themeColor}}">¥</text>
+      <text class="detail-bar-num" style="color:{{themeColor}}">{{card.priceYuan}}</text>
+    </view>
+    <view class="detail-bar-btn" style="background:{{themeColor}}" bindtap="bindBuyTap">立即购买</view>
+  </view>
+</view>

@@ -1,1 +1,71 @@
-<view class="orders"><van-empty wx:if="{{!loading && !list.length}}" description="暂无购卡申请"/><view wx:for="{{list}}" wx:key="ORDER_ID" class="order"><text class="name">{{item.ORDER_TPL_NAME}}</text><text class="status">{{item.ORDER_STATUS === 10 ? '已发卡' : item.ORDER_STATUS === 20 ? '已关闭' : '待馆方确认'}}</text><text class="price">¥{{item.ORDER_PAY_FEE / 100}}</text><text class="guide">{{item.ORDER_PAY_GUIDE}}</text></view></view>
+<page-meta page-style="{{pageStyle}}" />
+
+<view class="orders theme-scope" style="{{pageStyle}}">
+	<cmpt-tenant-switch title="购卡订单" theme-color="{{themeColor}}" show-back="{{true}}" />
+
+	<!-- 状态筛选 -->
+	<view class="order-tabs">
+		<view
+			wx:for="{{tabs}}"
+			wx:key="key"
+			class="order-tab {{activeTab === item.key ? 'is-active' : ''}}"
+			style="{{activeTab === item.key ? 'color:' + themeColor + ';font-weight:600;' : ''}}"
+			data-key="{{item.key}}"
+			bindtap="bindTabTap"
+		>
+			{{item.name}}
+			<view wx:if="{{activeTab === item.key}}" class="order-tab-bar" style="background:{{themeColor}}"></view>
+		</view>
+	</view>
+
+	<view wx:if="{{loading}}" class="order-loading">
+		<van-loading color="{{themeColor}}">加载中...</van-loading>
+	</view>
+
+	<van-empty wx:elif="{{!showList.length}}" description="暂无相关订单" />
+
+	<view wx:else class="order-list">
+		<view wx:for="{{showList}}" wx:key="id" class="order-card">
+			<view class="order-head">
+				<text class="order-sn">下单时间：{{item.timeText}}</text>
+				<text class="order-status order-status--{{item.statusTone}}">{{item.statusDesc}}</text>
+			</view>
+
+			<view class="order-goods">
+				<view
+					class="order-goods-cover"
+					style="background:linear-gradient(135deg, {{item.color}} 0%, {{item.colorDark}} 100%);"
+				>
+					<text class="order-goods-type">{{item.typeDesc}}</text>
+				</view>
+				<view class="order-goods-info">
+					<view class="order-goods-name">{{item.name}}</view>
+					<view class="order-goods-attr">{{item.mainAttr}}</view>
+				</view>
+				<view class="order-goods-fee">
+					<view class="order-fee">
+						<text class="order-fee-cur">¥</text>
+						<text class="order-fee-num">{{item.payYuan}}</text>
+					</view>
+					<text class="order-pay-type">{{item.payType === 'wechat' ? '微信支付' : '线下付款'}}</text>
+				</view>
+			</view>
+
+			<view wx:if="{{item.showGuide}}" class="order-guide">
+				<van-icon name="info-o" size="26rpx" color="{{themeColor}}" />
+				<text>{{item.guide}}</text>
+			</view>
+
+			<view wx:if="{{item.canPay || item.canGoPack}}" class="order-foot">
+				<view wx:if="{{item.canGoPack}}" class="order-btn order-btn--ghost" bindtap="bindGoPackTap">查看卡包</view>
+				<view
+					wx:if="{{item.canPay}}"
+					class="order-btn order-btn--main"
+					style="background:{{themeColor}}"
+					data-id="{{item.id}}"
+					bindtap="bindRepayTap"
+				>继续支付</view>
+			</view>
+		</view>
+	</view>
+</view>

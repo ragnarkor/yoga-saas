@@ -1,10 +1,11 @@
 {
   "navigationStyle": "custom",
-  "navigationBarTitleText": "购卡订单",
+  "navigationBarTitleText": "确认订单",
   "usingComponents": {
     "cmpt-tenant-switch": "/cmpts/biz/tenant_switch/tenant_switch_cmpt",
     "van-loading": "@vant/weapp/loading/index",
     "van-empty": "/cmpts/public/empty/empty_cmpt",
+    "van-field": "@vant/weapp/field/index",
     "van-icon": "@vant/weapp/icon/index"
   }
 }

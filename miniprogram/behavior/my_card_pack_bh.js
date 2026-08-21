@@ -40,8 +40,10 @@ module.exports = Behavior({
       }
     },
 
-    bindToggleInvalidTap() {
-      this.setData({ showInvalid: !this.data.showInvalid }, () => {
+    bindSegTap(e) {
+      const invalid = pageHelper.dataset(e, "invalid") === "true";
+      if (invalid === this.data.showInvalid) return;
+      this.setData({ showInvalid: invalid }, () => {
         this._loadCards();
       });
     },
@@ -64,6 +66,8 @@ module.exports = Behavior({
         url: `/pages/default/my/card_detail/my_card_detail?id=${id}`,
       });
     },
-    bindCardShopTap() { wx.navigateTo({ url: '/pages/default/my/card_shop/card_shop' }); },
+    bindCardShopTap() {
+      wx.navigateTo({ url: "/pages/default/my/card_shop/card_shop" });
+    },
   },
 });

@@ -57,8 +57,10 @@ module.exports = {
   "my/my_card_summary": "card_controller@getMyCardSummary",
   "my/my_card_detail": "card_controller@getMyCardDetail",
   "my/card_shop": "card_controller@getCardShop",
+  "my/card_goods_detail": "card_controller@getCardGoodsDetail",
   "my/card_order_create": "card_controller@createCardOrder#noDemo",
   "my/card_order_list": "card_controller@getMyCardOrders",
+  "my/card_order_repay": "card_controller@repayCardOrder#noDemo",
   "my/achievement": "my_controller@getAchievement",
 
   "test/test": "test/test_controller@test",
@@ -79,16 +81,14 @@ module.exports = {
   "admin/tenant_store_save":
     "admin/admin_tenant_controller@saveMeetCategories#noDemo",
   "admin/tenant_room_list": "admin/admin_tenant_controller@getRoomList",
-  "admin/tenant_room_save":
-    "admin/admin_tenant_controller@saveRoomList#noDemo",
+  "admin/tenant_room_save": "admin/admin_tenant_controller@saveRoomList#noDemo",
   "admin/member_stats": "admin/admin_tenant_controller@getMemberStats",
-  "admin/attention_members": "admin/admin_tenant_controller@getAttentionMembers",
+  "admin/attention_members":
+    "admin/admin_tenant_controller@getAttentionMembers",
   "admin/platform_overview":
     "admin/admin_tenant_controller@getPlatformOverview",
-  "admin/platform_health":
-    "admin/admin_tenant_controller@getPlatformHealth",
-  "admin/platform_log_list":
-    "admin/admin_tenant_controller@getPlatformLogList",
+  "admin/platform_health": "admin/admin_tenant_controller@getPlatformHealth",
+  "admin/platform_log_list": "admin/admin_tenant_controller@getPlatformLogList",
   "admin/platform_staff_list": "admin/admin_home_controller@listPlatformStaff",
   "admin/tenant_insert": "admin/admin_tenant_controller@insertTenant#noDemo",
   "admin/tenant_expire_detail":
@@ -108,11 +108,14 @@ module.exports = {
   "admin/card_tpl_save": "admin/admin_card_controller@saveCardTpl#noDemo",
   "admin/card_tpl_del": "admin/admin_card_controller@delCardTpl#noDemo",
   "admin/card_marketing_get": "admin/admin_card_controller@getCardMarketing",
-  "admin/card_marketing_save": "admin/admin_card_controller@saveCardMarketing#noDemo",
+  "admin/card_marketing_save":
+    "admin/admin_card_controller@saveCardMarketing#noDemo",
   "admin/card_order_list": "admin/admin_card_controller@getCardOrderList",
-  "admin/card_order_confirm": "admin/admin_card_controller@confirmCardOrder#noDemo",
+  "admin/card_order_confirm":
+    "admin/admin_card_controller@confirmCardOrder#noDemo",
   "admin/card_order_close": "admin/admin_card_controller@closeCardOrder#noDemo",
-  "admin/card_order_refund": "admin/admin_card_controller@refundCardOrder#noDemo",
+  "admin/card_order_refund":
+    "admin/admin_card_controller@refundCardOrder#noDemo",
   "admin/coach_member_list": "admin/admin_card_controller@getCoachMemberList",
   "admin/month_new_card_members":
     "admin/admin_card_controller@getMonthNewCardMembers",
@@ -147,7 +150,8 @@ module.exports = {
   // [AI_START TIMESTAMP=2025-01-25 12:00:00]
   "admin/setup_feature": "admin/admin_setup_controller@setupFeature#noDemo",
   "admin/setup_feature_get": "admin/admin_setup_controller@getFeature",
-  "admin/db_indexes_ensure": "admin/admin_setup_controller@ensureDbIndexes#noDemo",
+  "admin/db_indexes_ensure":
+    "admin/admin_setup_controller@ensureDbIndexes#noDemo",
   // [AI_END LINES=2 TIMESTAMP=2025-01-25 12:00:00]
 
   "admin/home_banner_list": "admin/admin_home_controller@getBannerList",
@@ -170,7 +174,8 @@ module.exports = {
   "admin/home_photo_insert": "admin/admin_home_controller@insertPhoto#noDemo",
   "admin/home_photo_edit": "admin/admin_home_controller@editPhoto#noDemo",
   "admin/home_photo_del": "admin/admin_home_controller@delPhoto#noDemo",
-  "admin/home_photo_album_del": "admin/admin_home_controller@delPhotoAlbum#noDemo",
+  "admin/home_photo_album_del":
+    "admin/admin_home_controller@delPhotoAlbum#noDemo",
 
   "admin/news_list": "admin/admin_news_controller@getNewsList",
   "admin/news_insert": "admin/admin_news_controller@insertNews#noDemo",

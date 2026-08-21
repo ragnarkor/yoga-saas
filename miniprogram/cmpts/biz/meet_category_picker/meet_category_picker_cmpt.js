@@ -6,11 +6,13 @@ const AdminMeetBiz = require("../../../biz/admin_meet_biz.js");
 
 const SHEET_SUB = {
   single: "课程类型用于排课分类与筛选",
-  scope: "限定后，该卡仅可用于对应课程",
+  scope: "勾选可用的课程；勾「整个分类」含后续新增课程",
 };
 
 /**
- * 课程类型 / 适用课程分类选择器（field + picker 与课程编辑页一致，点选即生效）
+ * 课程类型 / 适用课程范围选择器
+ * single：课程类型单选，点选即生效（与课程编辑页一致）
+ * scope：分类 Tab + 课程多选，草稿式选择——点「确定」才生效
  */
 Component({
   options: {
@@ -60,9 +62,7 @@ Component({
 
   data: {
     categories: [],
-    scopeCategories: [],
     meets: [],
-    scopeMeets: [],
     meetsLoaded: false,
     sheetShow: false,
     loading: true,
@@ -72,6 +72,16 @@ Component({
     fieldValueIsPlaceholder: true,
     sheetTitle: "选择课程类型",
     sheetSub: SHEET_SUB.single,
+    // scope 草稿：整类适用的分类集合 + 散选课程集合；activeTab 为空串时是「全部」Tab
+    draftFullCateIds: [],
+    draftMeetIds: [],
+    draftActiveTab: "",
+    tabList: [],
+    activeMeets: [],
+    activeCateName: "",
+    activeCateFull: false,
+    draftAllChecked: false,
+    draftCountText: "",
   },
 
   observers: {
@@ -83,8 +93,6 @@ Component({
     },
     "scopeMode, scopeCategoryIds, scopeMeetIds, categories, meets"() {
       this._syncScopeDesc();
-      this._syncScopeCategories();
-      this._syncScopeMeets();
     },
   },
 
@@ -121,19 +129,6 @@ Component({
       });
     },
 
-    _syncScopeCategories() {
-      if (this.data.mode !== "scope") return;
-      const ids = (this.data.scopeCategoryIds || []).map(String);
-      const isCategories = this.data.scopeMode === "categories";
-      const meets = this.data.meets || [];
-      const scopeCategories = (this.data.categories || []).map((c) => ({
-        ...c,
-        selected: isCategories && ids.includes(String(c.id)),
-        meetCount: meets.filter((m) => String(m.typeId || "") === String(c.id)).length,
-      }));
-      this.setData({ scopeCategories });
-    },
-
     async reload() {
       this.setData({ loading: true });
       try {
@@ -153,9 +148,13 @@ Component({
         this.setData({ categories, loading: false });
         this._syncTypeName(this.data.value);
         this._syncScopeDesc();
-        this._syncScopeCategories();
-        // 编辑已存在的 meets 卡时，进入即加载课程以显示名称/高亮
-        if (this.data.mode === "scope" && (this.data.scopeMode === "meets" || this.data.scopeMode === "categories")) {
+        this._refreshDraftView();
+        // 编辑已限定范围的卡时，预加载课程让列表即时呈现
+        if (
+          this.data.mode === "scope" &&
+          (this.data.scopeMode === "meets" ||
+            this.data.scopeMode === "categories")
+        ) {
           this._ensureMeets();
         }
       } catch (e) {
@@ -179,17 +178,6 @@ Component({
       this.setData({ typeName: name || "" }, () => this._syncFieldDisplay());
     },
 
-    _syncScopeMeets() {
-      if (this.data.mode !== "scope") return;
-      const ids = (this.data.scopeMeetIds || []).map(String);
-      const isMeets = this.data.scopeMode === "meets";
-      const scopeMeets = (this.data.meets || []).map((m) => ({
-        ...m,
-        selected: isMeets && ids.includes(String(m.id)),
-      }));
-      this.setData({ scopeMeets });
-    },
-
     _syncScopeDesc() {
       if (this.data.mode !== "scope") return;
       const scope = {
@@ -209,7 +197,7 @@ Component({
       );
     },
 
-    // 首次切到「指定课程」时懒加载课程列表
+    // scope 面板打开即需要课程数据（列表/徽标依赖课程）
     async _ensureMeets() {
       if (this.data.meetsLoaded) return;
       try {
@@ -226,8 +214,8 @@ Component({
           typeId: String(m.MEET_TYPE_ID || ""),
         }));
         this.setData({ meets, meetsLoaded: true }, () => {
-          this._syncScopeMeets();
           this._syncScopeDesc();
+          this._refreshDraftView();
         });
       } catch (e) {
         console.error("meet_category_picker load meets error:", e);
@@ -235,6 +223,106 @@ Component({
       }
     },
 
+    // ============ scope 草稿视图 ============
+
+    // 面板打开时，把已提交范围反向转换为草稿
+    _initDraft() {
+      const mode = this.data.scopeMode || "all";
+      let fullCateIds = [];
+      let meetIds = [];
+      if (mode === "all") {
+        fullCateIds = (this.data.categories || []).map((c) => String(c.id));
+      } else if (mode === "categories") {
+        fullCateIds = (this.data.scopeCategoryIds || []).map(String);
+      } else {
+        meetIds = (this.data.scopeMeetIds || []).map(String);
+      }
+      this.setData({
+        draftFullCateIds: fullCateIds,
+        draftMeetIds: meetIds,
+        draftActiveTab: "",
+      });
+      this._refreshDraftView();
+    },
+
+    // 从草稿派生 Tab 徽标 / 当前列表 / 汇总计数
+    _buildDraftView() {
+      if (this.data.mode !== "scope") return;
+      const fullSet = new Set((this.data.draftFullCateIds || []).map(String));
+      const selSet = new Set((this.data.draftMeetIds || []).map(String));
+      const categories = this.data.categories || [];
+      const meets = this.data.meets || [];
+      const cateIds = new Set(categories.map((c) => String(c.id)));
+
+      // 分类 → 课程映射；未分类课程只在「全部」Tab 平铺
+      const meetsByCate = new Map();
+      const uncategorized = [];
+      meets.forEach((m) => {
+        const tid = String(m.typeId || "");
+        if (cateIds.has(tid)) {
+          if (!meetsByCate.has(tid)) meetsByCate.set(tid, []);
+          meetsByCate.get(tid).push(m);
+        } else {
+          uncategorized.push(m);
+        }
+      });
+
+      // Tab：全部 + 各分类（徽标实时反馈：整类 / 已选数）
+      let totalSelected = 0;
+      const tabList = [
+        { typeId: "", typeName: "全部", full: false, badge: "" },
+      ];
+      categories.forEach((c) => {
+        const tid = String(c.id);
+        const list = meetsByCate.get(tid) || [];
+        const full = fullSet.has(tid);
+        const part = full
+          ? 0
+          : list.filter((m) => selSet.has(String(m.id))).length;
+        totalSelected += full ? list.length : part;
+        tabList.push({
+          typeId: tid,
+          typeName: c.name,
+          full,
+          badge: full ? "整类" : part ? String(part) : "",
+        });
+      });
+      totalSelected += uncategorized.filter((m) =>
+        selSet.has(String(m.id)),
+      ).length;
+
+      // 当前 Tab 的课程列表
+      const activeTab = this.data.draftActiveTab || "";
+      const source =
+        activeTab === ""
+          ? meets
+          : meets.filter((m) => String(m.typeId || "") === activeTab);
+      const activeMeets = source.map((m) => ({
+        id: String(m.id),
+        name: m.name,
+        typeId: String(m.typeId || ""),
+        selected:
+          fullSet.has(String(m.typeId || "")) || selSet.has(String(m.id)),
+      }));
+
+      const activeCate = categories.find((c) => String(c.id) === activeTab);
+      this.setData({
+        tabList,
+        activeMeets,
+        activeCateName: activeCate ? activeCate.name : "",
+        activeCateFull: activeCate ? fullSet.has(activeTab) : false,
+        draftAllChecked: meets.length > 0 && totalSelected === meets.length,
+        draftCountText: totalSelected ? `（${totalSelected}门）` : "",
+      });
+    },
+
+    // 课程/分类异步加载完成后，若面板开着则重建草稿视图
+    _refreshDraftView() {
+      if (!this.data.sheetShow || this.data.mode !== "scope") return;
+      this._buildDraftView();
+    },
+
+    // 确定按钮：把草稿归一化为最简 scope 再提交
     _applyScope(mode, categoryIds, meetIds) {
       const scope = { mode, categoryIds, meetIds };
       const desc = cardScopeHelper.buildScopeDesc(
@@ -242,7 +330,7 @@ Component({
         this.data.categories,
         this.data.meets,
       );
-      // 本地同步 scopeMode（property 回传前先更新，保证分段高亮/分区即时切换）
+      // 本地先同步属性（页面回传前，field 文案即时更新）
       this.setData(
         {
           scopeMode: mode,
@@ -250,11 +338,7 @@ Component({
           scopeMeetIds: (meetIds || []).map(String),
           scopeDescText: desc,
         },
-        () => {
-          this._syncFieldDisplay();
-          this._syncScopeCategories();
-          this._syncScopeMeets();
-        },
+        () => this._syncFieldDisplay(),
       );
       this.triggerEvent("scopeChange", {
         mode,
@@ -264,12 +348,14 @@ Component({
       });
     },
 
+    // ============ 事件 ============
+
     bindFieldTap() {
       if (this.data.loading) {
         wx.showToast({ title: "加载中，请稍候", icon: "none" });
         return;
       }
-      // single 模式仍需分类；scope 模式可只用「指定课程」，不强制有分类
+      // single 模式仍需分类；scope 模式树依赖课程，不强制有分类
       if (this.data.mode === "single" && !this.data.categories.length) {
         wx.showToast({
           title: "请先在「我的门店」配置分类",
@@ -277,9 +363,14 @@ Component({
         });
         return;
       }
+      if (this.data.mode === "scope") {
+        this._initDraft();
+        this._ensureMeets();
+      }
       this.setData({ sheetShow: true });
     },
 
+    // 弹窗关闭/遮罩 = 丢弃草稿
     bindCloseSheet() {
       this.setData({ sheetShow: false });
     },
@@ -298,52 +389,117 @@ Component({
       });
     },
 
-    bindScopeAllTap() {
-      this._applyScope("all", [], []);
-      // 全馆无需选择，直接收起
+    // 切换分类 Tab（typeId 为空串 = 「全部」）
+    bindTabTap(e) {
+      const raw = e.currentTarget.dataset.typeId;
+      const typeId = raw === undefined || raw === null ? "" : String(raw);
+      if (typeId === (this.data.draftActiveTab || "")) return;
+      this.setData({ draftActiveTab: typeId });
+      this._buildDraftView();
+    },
+
+    // 「全部课程」总开关：所有分类整类 + 未分类课程全选 / 全部清空
+    bindDraftAllToggle() {
+      if (this.data.draftAllChecked) {
+        this.setData({ draftFullCateIds: [], draftMeetIds: [] });
+        this._buildDraftView();
+        return;
+      }
+      const fullCateIds = (this.data.categories || []).map((c) => String(c.id));
+      const cateIds = new Set(fullCateIds);
+      const meetIds = (this.data.meets || [])
+        .filter((m) => !cateIds.has(String(m.typeId || "")))
+        .map((m) => String(m.id));
+      this.setData({ draftFullCateIds: fullCateIds, draftMeetIds: meetIds });
+      this._buildDraftView();
+    },
+
+    // 「整个分类」快捷行：切换整类适用（取消时该分类课程一并清空）
+    bindDraftGroupToggle(e) {
+      const raw = e.currentTarget.dataset.typeId;
+      if (raw === undefined || raw === null) return;
+      const typeId = String(raw);
+      if (!typeId) return;
+      const groupMeetIds = (this.data.meets || [])
+        .filter((m) => String(m.typeId || "") === typeId)
+        .map((m) => String(m.id));
+      if (this.data.draftFullCateIds.includes(typeId)) {
+        this.setData({
+          draftFullCateIds: this.data.draftFullCateIds.filter(
+            (x) => x !== typeId,
+          ),
+          draftMeetIds: this.data.draftMeetIds.filter(
+            (x) => !groupMeetIds.includes(x),
+          ),
+        });
+      } else {
+        this.setData({
+          draftFullCateIds: this.data.draftFullCateIds.concat(typeId),
+          draftMeetIds: this.data.draftMeetIds.filter(
+            (x) => !groupMeetIds.includes(x),
+          ),
+        });
+      }
+      this._buildDraftView();
+    },
+
+    // 勾单课：整类分类下取消某课 → 该分类降级为散选（其余课程保持选中）
+    bindDraftMeetToggle(e) {
+      const id = String(e.currentTarget.dataset.id || "");
+      const typeId = String(e.currentTarget.dataset.typeId || "");
+      if (!id) return;
+
+      if (typeId && this.data.draftFullCateIds.includes(typeId)) {
+        const otherIds = (this.data.meets || [])
+          .filter(
+            (m) => String(m.typeId || "") === typeId && String(m.id) !== id,
+          )
+          .map((m) => String(m.id));
+        this.setData({
+          draftFullCateIds: this.data.draftFullCateIds.filter(
+            (x) => x !== typeId,
+          ),
+          draftMeetIds: this.data.draftMeetIds.concat(otherIds),
+        });
+      } else {
+        let meetIds = this.data.draftMeetIds.slice();
+        const idx = meetIds.indexOf(id);
+        if (idx >= 0) meetIds.splice(idx, 1);
+        else meetIds.push(id);
+        this.setData({ draftMeetIds: meetIds });
+      }
+      this._buildDraftView();
+    },
+
+    // 取消：丢弃草稿直接关闭
+    bindSheetCancel() {
       this.setData({ sheetShow: false });
     },
 
-    // 切到「按分类」分段（多选，不关面板）
-    bindScopeCategoryModeTap() {
-      this._ensureMeets();
-      if (this.data.scopeMode !== "categories") {
-        this._applyScope("categories", this.data.scopeCategoryIds || [], []);
+    // 确定：草稿归一化为最简 scope 后写回表单
+    // 覆盖全部课程 → all；纯整类 → categories；含散选 → meets（整类展开为具体课程）
+    bindSheetConfirm() {
+      const fullIds = this.data.draftFullCateIds.slice();
+      let meetIds = this.data.draftMeetIds.slice();
+      if (!fullIds.length && !meetIds.length) {
+        wx.showToast({ title: "请至少选择 1 门课程", icon: "none" });
+        return;
       }
-    },
-
-    // 多选切换单个分类
-    bindScopeCategoryTap(e) {
-      const id = String(e.currentTarget.dataset.id || "");
-      if (!id) return;
-      let ids = (this.data.scopeCategoryIds || []).map(String);
-      if (ids.includes(id)) ids = ids.filter((x) => x !== id);
-      else ids = ids.concat(id);
-      this._applyScope("categories", ids, []);
-    },
-
-    // 分类默认是整类适用；只有需要排除部分课程时才进入课程明细。
-    bindScopeCustomTap() {
-      this._ensureMeets();
-      this._applyScope("meets", [], this.data.scopeMeetIds || []);
-    },
-
-    // 切到「指定课程」分段（多选，不关面板）
-    bindScopeMeetModeTap() {
-      this._ensureMeets();
-      if (this.data.scopeMode !== "meets") {
-        this._applyScope("meets", [], this.data.scopeMeetIds || []);
+      if (this.data.draftAllChecked) {
+        this._applyScope("all", [], []);
+      } else if (!meetIds.length) {
+        this._applyScope("categories", fullIds, []);
+      } else {
+        const fullSet = new Set(fullIds);
+        (this.data.meets || [])
+          .filter((m) => fullSet.has(String(m.typeId || "")))
+          .forEach((m) => {
+            const mid = String(m.id);
+            if (!meetIds.includes(mid)) meetIds.push(mid);
+          });
+        this._applyScope("meets", [], meetIds);
       }
-    },
-
-    // 多选切换单门课程
-    bindScopeMeetTap(e) {
-      const id = String(e.currentTarget.dataset.id || "");
-      if (!id) return;
-      let ids = (this.data.scopeMeetIds || []).map(String);
-      if (ids.includes(id)) ids = ids.filter((x) => x !== id);
-      else ids = ids.concat(id);
-      this._applyScope("meets", [], ids);
+      this.setData({ sheetShow: false });
     },
   },
 });

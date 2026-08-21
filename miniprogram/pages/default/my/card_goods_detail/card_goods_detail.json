@@ -1,6 +1,6 @@
 {
   "navigationStyle": "custom",
-  "navigationBarTitleText": "购卡订单",
+  "navigationBarTitleText": "套餐详情",
   "usingComponents": {
     "cmpt-tenant-switch": "/cmpts/biz/tenant_switch/tenant_switch_cmpt",
     "van-loading": "@vant/weapp/loading/index",
