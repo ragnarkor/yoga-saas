@@ -1,9 +1,9 @@
-const pageHelper = require('../../../helper/page_helper.js');
-const cloudHelper = require('../../../helper/cloud_helper.js');
-const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
-const AdminBiz = require('../../../biz/admin_biz.js');
-const themeHelper = require('../../../helper/theme_helper.js');
-const setting = require('../../../setting/setting.js');
+const pageHelper = require("../../../helper/page_helper.js");
+const cloudHelper = require("../../../helper/cloud_helper.js");
+const AdminWxBiz = require("../../../biz/admin_wx_biz.js");
+const AdminBiz = require("../../../biz/admin_biz.js");
+const themeHelper = require("../../../helper/theme_helper.js");
+const setting = require("../../../setting/setting.js");
 
 function findThemePickIndex(color, presetColors) {
   const normalized = themeHelper.normalizeHex(color);
@@ -14,9 +14,7 @@ function findThemePickIndex(color, presetColors) {
 }
 
 function fmtPicList(list) {
-  return (list || [])
-    .filter(Boolean)
-    .map((item) => pageHelper.fmtImgUrl(item));
+  return (list || []).filter(Boolean).map((item) => pageHelper.fmtImgUrl(item));
 }
 
 function toFileList(list) {
@@ -26,7 +24,12 @@ function toFileList(list) {
 function hasMapPoint(lat, lng) {
   const latitude = Number(lat);
   const longitude = Number(lng);
-  return !Number.isNaN(latitude) && !Number.isNaN(longitude) && latitude !== 0 && longitude !== 0;
+  return (
+    !Number.isNaN(latitude) &&
+    !Number.isNaN(longitude) &&
+    latitude !== 0 &&
+    longitude !== 0
+  );
 }
 
 function buildMapMarkers(lat, lng, name) {
@@ -36,7 +39,7 @@ function buildMapMarkers(lat, lng, name) {
       id: 1,
       latitude: Number(lat),
       longitude: Number(lng),
-      title: name || '门店',
+      title: name || "门店",
       width: 28,
       height: 28,
     },
@@ -76,24 +79,26 @@ function withDragMeta(rows, rowH) {
 }
 
 Page({
-  behaviors: [require('../../../behavior/coach_page_bh.js')],
+  behaviors: [require("../../../behavior/coach_page_bh.js")],
 
   data: {
     loading: true,
     activeTab: 0,
     tabs: [
-      { id: 'basic', name: '基础' },
-      { id: 'contact', name: '联系' },
-      { id: 'course', name: '课程' },
-      { id: 'brand', name: '品牌' },
+      { id: "basic", name: "基础" },
+      { id: "contact", name: "联系" },
+      { id: "course", name: "课程" },
+      { id: "brand", name: "品牌" },
     ],
-    tenantName: '',
-    tenantDesc: '',
-    tenantAbout: '',
-    contactPhone: '',
-    contactAddress: '',
-    contactLatitude: '',
-    contactLongitude: '',
+    tenantName: "",
+    tenantDesc: "",
+    tenantAbout: "",
+    contactPhone: "",
+    contactAddress: "",
+    contactLatitude: "",
+    contactLongitude: "",
+    storeOpenTime: "",
+    storeCloseTime: "",
     hasMapPoint: false,
     mapMarkers: [],
     logoList: [],
@@ -111,10 +116,10 @@ Page({
     themePickIndex: 0,
     themeDirty: false,
     presetColors: themeHelper.PRESET_THEME_COLORS,
-    privateOpenTime: '07:00',
-    privateCloseTime: '22:00',
-    privateAdvanceHours: '2',
-    privateMaxBookDays: '14',
+    privateOpenTime: "07:00",
+    privateCloseTime: "22:00",
+    privateAdvanceHours: "2",
+    privateMaxBookDays: "14",
   },
 
   onLoad() {
@@ -132,9 +137,16 @@ Page({
   },
 
   _syncMapState(extra = {}) {
-    const lat = extra.contactLatitude !== undefined ? extra.contactLatitude : this.data.contactLatitude;
-    const lng = extra.contactLongitude !== undefined ? extra.contactLongitude : this.data.contactLongitude;
-    const name = extra.tenantName !== undefined ? extra.tenantName : this.data.tenantName;
+    const lat =
+      extra.contactLatitude !== undefined
+        ? extra.contactLatitude
+        : this.data.contactLatitude;
+    const lng =
+      extra.contactLongitude !== undefined
+        ? extra.contactLongitude
+        : this.data.contactLongitude;
+    const name =
+      extra.tenantName !== undefined ? extra.tenantName : this.data.tenantName;
     this.setData({
       hasMapPoint: hasMapPoint(lat, lng),
       mapMarkers: buildMapMarkers(lat, lng, name),
@@ -159,7 +171,7 @@ Page({
   },
 
   _syncSectionOrder(section, rows, dragId) {
-    const isPrivate = section === 'private';
+    const isPrivate = section === "private";
     const group = this.data.categories.filter((c) => c.isPrivate !== true);
     const priv = this.data.categories.filter((c) => c.isPrivate === true);
     const sorted = rows
@@ -187,7 +199,11 @@ Page({
 
   bindCategoryDragChange(e) {
     if (!this.data.canEdit) return;
-    if (e.detail.source !== 'touch' && e.detail.source !== 'touch-out-of-bounds') return;
+    if (
+      e.detail.source !== "touch" &&
+      e.detail.source !== "touch-out-of-bounds"
+    )
+      return;
     const section = e.currentTarget.dataset.section;
     const listIndex = Number(e.currentTarget.dataset.listIndex);
     if (Number.isNaN(listIndex)) return;
@@ -195,7 +211,7 @@ Page({
     const rowH = this._rowHeightPx;
     const y = e.detail.y;
     let targetIndex = Math.round(y / rowH);
-    const rowsKey = section === 'private' ? 'privateRows' : 'groupRows';
+    const rowsKey = section === "private" ? "privateRows" : "groupRows";
     const rows = this.data[rowsKey];
     targetIndex = Math.max(0, Math.min(rows.length - 1, targetIndex));
     if (targetIndex === listIndex) return;
@@ -214,18 +230,18 @@ Page({
     const section = e.currentTarget.dataset.section;
     const listIndex = Number(e.currentTarget.dataset.listIndex);
     if (Number.isNaN(listIndex)) return;
-    const rowsKey = section === 'private' ? 'privateRows' : 'groupRows';
+    const rowsKey = section === "private" ? "privateRows" : "groupRows";
     const rows = this.data[rowsKey].map((r, i) => ({
       ...r,
       dragEnabled: i === listIndex,
     }));
-    wx.vibrateShort({ type: 'light' });
+    wx.vibrateShort({ type: "light" });
     this.setData({ [rowsKey]: rows });
   },
 
   bindCategoryDragEnd(e) {
     const section = e.currentTarget.dataset.section;
-    const rowsKey = section === 'private' ? 'privateRows' : 'groupRows';
+    const rowsKey = section === "private" ? "privateRows" : "groupRows";
     const rowH = this._rowHeightPx;
     const rows = this.data[rowsKey].map((r, i) => ({
       ...r,
@@ -243,14 +259,13 @@ Page({
     }
 
     const admin = AdminBiz.getAdminToken();
-    const canEdit =
-      admin && (admin.type === 'owner' || admin.type === 'super');
+    const canEdit = admin && (admin.type === "owner" || admin.type === "super");
 
     try {
       const res = await cloudHelper.callCloudData(
-        'admin/tenant_store',
+        "admin/tenant_store",
         {},
-        { title: 'bar' },
+        { title: "bar" },
       );
       const tenant = (res && res.tenant) || {};
       const contact = (res && res.contact) || {};
@@ -260,24 +275,32 @@ Page({
       const themeColor = pageHelper.getThemeColor();
       const patch = {
         loading: false,
-        tenantName: tenant.TENANT_NAME || '',
-        tenantDesc: tenant.TENANT_DESC || '',
-        tenantAbout: (res && res.about) || '',
-        contactPhone: contact.phone || '',
-        contactAddress: contact.address || '',
-        contactLatitude: contact.latitude || '',
-        contactLongitude: contact.longitude || '',
+        tenantName: tenant.TENANT_NAME || "",
+        tenantDesc: tenant.TENANT_DESC || "",
+        tenantAbout: (res && res.about) || "",
+        contactPhone: contact.phone || "",
+        contactAddress: contact.address || "",
+        contactLatitude: contact.latitude || "",
+        contactLongitude: contact.longitude || "",
+        storeOpenTime: contact.openTime || "",
+        storeCloseTime: contact.closeTime || "",
         logoList: tenant.TENANT_LOGO ? fmtPicList([tenant.TENANT_LOGO]) : [],
-        logoFileList: tenant.TENANT_LOGO ? toFileList([tenant.TENANT_LOGO]) : [],
+        logoFileList: tenant.TENANT_LOGO
+          ? toFileList([tenant.TENANT_LOGO])
+          : [],
         aboutPics: fmtPicList((res && res.aboutPics) || []),
         aboutFileList: toFileList((res && res.aboutPics) || []),
         canEdit,
       };
       const ps = (res && res.privateSchedule) || {};
-      patch.privateOpenTime = ps.openTime || '07:00';
-      patch.privateCloseTime = ps.closeTime || '22:00';
-      patch.privateAdvanceHours = String(ps.advanceHours != null ? ps.advanceHours : 2);
-      patch.privateMaxBookDays = String(ps.maxBookDays != null ? ps.maxBookDays : 14);
+      patch.privateOpenTime = ps.openTime || "07:00";
+      patch.privateCloseTime = ps.closeTime || "22:00";
+      patch.privateAdvanceHours = String(
+        ps.advanceHours != null ? ps.advanceHours : 2,
+      );
+      patch.privateMaxBookDays = String(
+        ps.maxBookDays != null ? ps.maxBookDays : 14,
+      );
       if (!this.data.themeDirty) {
         patch.themeColor = themeColor;
         patch.themePickIndex = findThemePickIndex(
@@ -304,19 +327,25 @@ Page({
   bindFieldChange(e) {
     const field = e.currentTarget.dataset.field;
     if (!field) return;
-    this.setData({ [field]: e.detail || '' });
+    this.setData({ [field]: e.detail || "" });
+  },
+
+  bindStoreTimeChange(e) {
+    const field = e.currentTarget.dataset.field;
+    if (!field) return;
+    this.setData({ [field]: e.detail.value || "" });
   },
 
   bindCategoryFieldChange(e) {
     const idx = e.currentTarget.dataset.index;
     const key = `categories[${idx}].name`;
-    this.setData({ [key]: e.detail || '' });
+    this.setData({ [key]: e.detail || "" });
   },
 
   bindCategoryNameInput(e) {
     const idx = Number(e.currentTarget.dataset.idx);
     if (Number.isNaN(idx)) return;
-    const name = e.detail.value || '';
+    const name = e.detail.value || "";
     const categories = this.data.categories.slice();
     if (!categories[idx]) return;
     categories[idx] = { ...categories[idx], name };
@@ -361,7 +390,7 @@ Page({
     if (!this.data.canEdit) return;
     wx.chooseLocation({
       success: (res) => {
-        const address = res.address || res.name || '';
+        const address = res.address || res.name || "";
         this.setData({
           contactAddress: address,
           contactLatitude: res.latitude,
@@ -373,8 +402,8 @@ Page({
         });
       },
       fail: (err) => {
-        if (err && err.errMsg && err.errMsg.indexOf('cancel') >= 0) return;
-        wx.showToast({ title: '请授权位置后选点', icon: 'none' });
+        if (err && err.errMsg && err.errMsg.indexOf("cancel") >= 0) return;
+        wx.showToast({ title: "请授权位置后选点", icon: "none" });
       },
     });
   },
@@ -382,22 +411,22 @@ Page({
   bindClearLocationTap() {
     if (!this.data.canEdit) return;
     this.setData({
-      contactLatitude: '',
-      contactLongitude: '',
+      contactLatitude: "",
+      contactLongitude: "",
     });
-    this._syncMapState({ contactLatitude: '', contactLongitude: '' });
+    this._syncMapState({ contactLatitude: "", contactLongitude: "" });
   },
 
   bindPreviewMapTap() {
     if (!hasMapPoint(this.data.contactLatitude, this.data.contactLongitude)) {
-      wx.showToast({ title: '请先选择地图位置', icon: 'none' });
+      wx.showToast({ title: "请先选择地图位置", icon: "none" });
       return;
     }
     wx.openLocation({
       latitude: Number(this.data.contactLatitude),
       longitude: Number(this.data.contactLongitude),
-      name: this.data.tenantName || '门店',
-      address: this.data.contactAddress || '',
+      name: this.data.tenantName || "门店",
+      address: this.data.contactAddress || "",
       scale: 16,
     });
   },
@@ -405,7 +434,9 @@ Page({
   bindLogoAfterRead(e) {
     const file = e.detail.file;
     const files = Array.isArray(file) ? file : [file];
-    const logoFileList = files.slice(0, 1).map((f) => ({ url: f.url, isImage: true }));
+    const logoFileList = files
+      .slice(0, 1)
+      .map((f) => ({ url: f.url, isImage: true }));
     this.setData({
       logoFileList,
       logoList: logoFileList.map((f) => f.url),
@@ -439,13 +470,21 @@ Page({
 
   bindAddGroupCategory() {
     const categories = this.data.categories.slice();
-    categories.push({ id: String(categories.length + 1), name: '', isPrivate: false });
+    categories.push({
+      id: String(categories.length + 1),
+      name: "",
+      isPrivate: false,
+    });
     this._applyCategories(categories);
   },
 
   bindAddPrivateCategory() {
     const categories = this.data.categories.slice();
-    categories.push({ id: String(categories.length + 1), name: '', isPrivate: true });
+    categories.push({
+      id: String(categories.length + 1),
+      name: "",
+      isPrivate: true,
+    });
     this._applyCategories(categories);
   },
 
@@ -454,13 +493,13 @@ Page({
     if (Number.isNaN(idx)) return;
     const categories = this.data.categories.slice();
     if (categories.length <= 1) {
-      wx.showToast({ title: '至少保留一个分类', icon: 'none' });
+      wx.showToast({ title: "至少保留一个分类", icon: "none" });
       return;
     }
     const removing = categories[idx];
     const groupCount = categories.filter((c) => c.isPrivate !== true).length;
     if (removing && removing.isPrivate !== true && groupCount <= 1) {
-      wx.showToast({ title: '至少保留一个团课分类', icon: 'none' });
+      wx.showToast({ title: "至少保留一个团课分类", icon: "none" });
       return;
     }
     categories.splice(idx, 1);
@@ -469,7 +508,7 @@ Page({
 
   bindThemePick(e) {
     if (!this.data.canEdit) {
-      wx.showToast({ title: '仅馆主可修改主题色', icon: 'none' });
+      wx.showToast({ title: "仅馆主可修改主题色", icon: "none" });
       return;
     }
     const index = Number(e.currentTarget.dataset.index);
@@ -477,14 +516,18 @@ Page({
     if (!item) return;
 
     const color = themeHelper.normalizeHex(item.color);
-    this.setData({ themePickIndex: index, themeDirty: true, themeColor: color });
+    this.setData({
+      themePickIndex: index,
+      themeDirty: true,
+      themeColor: color,
+    });
     this._applyCoachTheme(color);
   },
 
   async bindSaveTap() {
-    const tenantName = (this.data.tenantName || '').trim();
+    const tenantName = (this.data.tenantName || "").trim();
     if (!tenantName) {
-      wx.showToast({ title: '请填写门店名称', icon: 'none' });
+      wx.showToast({ title: "请填写门店名称", icon: "none" });
       return;
     }
 
@@ -492,29 +535,29 @@ Page({
     const categories = ordered
       .map((c, i) => ({
         id: String(i + 1),
-        name: (c.name || '').trim(),
+        name: (c.name || "").trim(),
         isPrivate: c.isPrivate === true,
       }))
       .filter((c) => c.name);
 
     if (!categories.length) {
-      wx.showToast({ title: '请填写分类名称', icon: 'none' });
+      wx.showToast({ title: "请填写分类名称", icon: "none" });
       return;
     }
     if (!categories.some((c) => c.isPrivate !== true)) {
-      wx.showToast({ title: '请至少保留一个团课分类', icon: 'none' });
+      wx.showToast({ title: "请至少保留一个团课分类", icon: "none" });
       return;
     }
 
     try {
-      wx.showLoading({ title: '保存中', mask: true });
+      wx.showLoading({ title: "保存中", mask: true });
 
       let logoList = this.data.logoList.slice();
       if (logoList.length) {
         logoList = await cloudHelper.transTempPics(
           logoList,
           setting.SETUP_PIC_PATH,
-          'logo',
+          "logo",
         );
       }
 
@@ -523,17 +566,17 @@ Page({
         aboutPics = await cloudHelper.transTempPics(
           aboutPics,
           setting.SETUP_PIC_PATH,
-          'about',
+          "about",
         );
       }
 
       const res = await cloudHelper.callCloudSumbit(
-        'admin/tenant_store_save',
+        "admin/tenant_store_save",
         {
           tenantName,
           tenantDesc: this.data.tenantDesc,
           about: this.data.tenantAbout,
-          tenantLogo: logoList.length ? logoList[0] : '',
+          tenantLogo: logoList.length ? logoList[0] : "",
           aboutPic: aboutPics,
           categories,
           themeColor: this.data.themeColor,
@@ -541,14 +584,16 @@ Page({
           contactAddress: this.data.contactAddress,
           contactLatitude: this.data.contactLatitude,
           contactLongitude: this.data.contactLongitude,
+          storeOpenTime: this.data.storeOpenTime,
+          storeCloseTime: this.data.storeCloseTime,
           privateSchedule: {
-            openTime: (this.data.privateOpenTime || '07:00').trim(),
-            closeTime: (this.data.privateCloseTime || '22:00').trim(),
+            openTime: (this.data.privateOpenTime || "07:00").trim(),
+            closeTime: (this.data.privateCloseTime || "22:00").trim(),
             advanceHours: Number(this.data.privateAdvanceHours) || 0,
             maxBookDays: Number(this.data.privateMaxBookDays) || 14,
           },
         },
-        { title: '保存中' },
+        { title: "保存中" },
       );
       wx.hideLoading();
 
@@ -559,7 +604,7 @@ Page({
         ...tenant,
         TENANT_NAME: data.TENANT_NAME || tenantName,
         TENANT_DESC: data.TENANT_DESC || this.data.tenantDesc,
-        TENANT_LOGO: data.TENANT_LOGO || (logoList[0] || ''),
+        TENANT_LOGO: data.TENANT_LOGO || logoList[0] || "",
         TENANT_MEET_TYPE: data.TENANT_MEET_TYPE,
         TENANT_THEME_COLOR: this.data.themeColor,
       });
@@ -574,6 +619,8 @@ Page({
         contactAddress: contact.address || this.data.contactAddress,
         contactLatitude: contact.latitude || this.data.contactLatitude,
         contactLongitude: contact.longitude || this.data.contactLongitude,
+        storeOpenTime: contact.openTime || this.data.storeOpenTime,
+        storeCloseTime: contact.closeTime || this.data.storeCloseTime,
         logoList: fmtPicList(
           data.TENANT_LOGO
             ? [data.TENANT_LOGO]
@@ -595,10 +642,7 @@ Page({
           data.aboutPics !== undefined ? data.aboutPics : aboutPics,
         ),
         themeColor,
-        themePickIndex: findThemePickIndex(
-          themeColor,
-          this.data.presetColors,
-        ),
+        themePickIndex: findThemePickIndex(themeColor, this.data.presetColors),
         themeDirty: false,
       });
       this._applyCategories(data.categories || categories);
@@ -608,7 +652,7 @@ Page({
         contactLongitude: contact.longitude || this.data.contactLongitude,
       });
       this._applyCoachTheme(themeColor);
-      wx.showToast({ title: '已保存', icon: 'success' });
+      wx.showToast({ title: "已保存", icon: "success" });
     } catch (e) {
       wx.hideLoading();
       console.error(e);

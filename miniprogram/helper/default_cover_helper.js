@@ -36,7 +36,9 @@ function isLegacyDefaultCover(url) {
   if (!url || typeof url !== "string") return true;
   const trimmed = url.trim();
   if (!trimmed) return true;
-  return /default_cover_pic\.(gif|png|jpg|jpeg)/i.test(trimmed);
+  return /(default_cover_pic\.(gif|png|jpg|jpeg)|default_cover_\d+\.(gif|png))/i.test(
+    trimmed,
+  );
 }
 
 /** 解析封面：空值、旧 gif、历史占位路径 → 按 seed 选一张本地图 */

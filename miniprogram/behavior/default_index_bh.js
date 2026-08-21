@@ -40,9 +40,9 @@ function mapBanner(item) {
 function formatPublishAgo(timestamp) {
   const publishTime = Number(timestamp || 0);
   const diff = Date.now() - publishTime;
-  if (!publishTime || diff < 0) return '';
+  if (!publishTime || diff < 0) return "";
   const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return '刚刚';
+  if (minutes < 1) return "刚刚";
   if (minutes < 60) return `${minutes} 分钟前`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours} 小时前`;
@@ -52,6 +52,60 @@ function formatPublishAgo(timestamp) {
   // 过了一周后继续显示“X 天前”没有辨识度，直接给出发布日期。
   const date = new Date(publishTime);
   return `${date.getMonth() + 1}月${date.getDate()}日`;
+}
+
+function fmtNextJoinDay(day) {
+  if (!day) return "";
+  const target = new Date(String(day).replace(/-/g, "/"));
+  if (isNaN(target.getTime())) return String(day).slice(5);
+  const now = new Date();
+  const diff = Math.round(
+    (new Date(target.getFullYear(), target.getMonth(), target.getDate()) -
+      new Date(now.getFullYear(), now.getMonth(), now.getDate())) /
+      86400000,
+  );
+  if (diff === 0) return "今天";
+  if (diff === 1) return "明天";
+  if (diff === 2) return "后天";
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  return (
+    "周" +
+    weekdays[target.getDay()] +
+    " " +
+    (target.getMonth() + 1) +
+    "." +
+    target.getDate()
+  );
+}
+
+function mapNextJoin(next) {
+  if (!next) return null;
+  const dayLabel = fmtNextJoinDay(next.day);
+  const time = next.timeStart + "–" + next.timeEnd;
+  return {
+    ...next,
+    subText: dayLabel + " " + time + (next.checkedIn ? " · 已核销" : ""),
+  };
+}
+
+function fmtOpenStatus(openTime, closeTime) {
+  if (!openTime || !closeTime) return null;
+  const parseMinutes = (t) => {
+    const m = /^(\d{1,2}):(\d{2})$/.exec(String(t).trim());
+    return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+  };
+  const open = parseMinutes(openTime);
+  const close = parseMinutes(closeTime);
+  if (open === null || close === null || open === close) return null;
+  const now = new Date();
+  const cur = now.getHours() * 60 + now.getMinutes();
+  const isOpen =
+    open < close ? cur >= open && cur < close : cur >= open || cur < close;
+  return {
+    open: isOpen,
+    label: isOpen ? "营业中" : "已打烊",
+    timeText: openTime + "-" + closeTime,
+  };
 }
 
 function mapTeacher(item) {
@@ -110,6 +164,7 @@ module.exports = Behavior({
     nextJoin: null,
     recommendMeets: [],
     practiceProgress: { totalClasses: 0, currentStreak: 0, badgeCount: 0 },
+    openStatus: null,
   },
 
   methods: {
@@ -137,11 +192,9 @@ module.exports = Behavior({
       }
 
       // 会员初始化与首页公开内容无依赖关系，不阻塞首页数据请求。
-      const ensureMemberTask = cloudHelper.callCloudSumbit(
-          "passport/ensure_member",
-          {},
-          { hint: false },
-        ).catch((err) => console.warn("[home/ensure_member]", err));
+      const ensureMemberTask = cloudHelper
+        .callCloudSumbit("passport/ensure_member", {}, { hint: false })
+        .catch((err) => console.warn("[home/ensure_member]", err));
 
       try {
         let data = await cloudHelper.callCloudData(
@@ -153,6 +206,10 @@ module.exports = Behavior({
 
         this.setData({
           phone: data.phone || "",
+          studioAddress: data.address || "",
+          studioLatitude: data.latitude || 0,
+          studioLongitude: data.longitude || 0,
+          openStatus: fmtOpenStatus(data.openTime, data.closeTime),
           banners: (data.banners || []).map(mapBanner),
           announcements: (data.announcements || []).map((item) => ({
             ...item,
@@ -174,9 +231,13 @@ module.exports = Behavior({
 
     _fetchHomeDiscovery: async function () {
       try {
-        const data = await cloudHelper.callCloudData("home/discovery", {}, {
-          hint: false,
-        });
+        const data = await cloudHelper.callCloudData(
+          "home/discovery",
+          {},
+          {
+            hint: false,
+          },
+        );
         const photos = (data?.photos || []).map(mapPhoto);
         const photoAlbums = enrichPhotoAlbumList(
           data?.photoAlbums || buildPhotoAlbums(photos),
@@ -200,7 +261,7 @@ module.exports = Behavior({
         );
         this.setData({
           memberDashboardLoaded: true,
-          nextJoin: data?.nextJoin || null,
+          nextJoin: mapNextJoin(data?.nextJoin),
           recommendMeets: data?.recommends || [],
           practiceProgress: data?.progress || {
             totalClasses: 0,
@@ -237,6 +298,11 @@ module.exports = Behavior({
     },
 
     bindRecommendTap: function (e) {
+      const type = e.currentTarget.dataset.type;
+      if (type === "private") {
+        wx.navigateTo({ url: "/pages/default/private/book/private_book" });
+        return;
+      }
       const id = e.currentTarget.dataset.id;
       if (!id) return;
       wx.navigateTo({
@@ -268,6 +334,22 @@ module.exports = Behavior({
       wx.makePhoneCall({ phoneNumber: phone });
     },
 
+    bindStudioLocationTap: function () {
+      let lat = Number(this.data.studioLatitude);
+      let lng = Number(this.data.studioLongitude);
+      if (!lat || !lng) {
+        pageHelper.showNoneToast("门店暂未设置位置");
+        return;
+      }
+      wx.openLocation({
+        latitude: lat,
+        longitude: lng,
+        name: this.data.tenantName || "瑜伽馆",
+        address: this.data.studioAddress || "",
+        scale: 16,
+      });
+    },
+
     bindSearchTap: function () {
       wx.navigateTo({
         url: "/pages/default/search/search?type=home",
@@ -285,16 +367,6 @@ module.exports = Behavior({
       if (!id) return;
       wx.navigateTo({
         url: "/pages/default/announcement/detail/announcement_detail?id=" + id,
-      });
-    },
-
-    bindAnnounceStripTap: function () {
-      let list = this.data.announcements;
-      if (!list || !list.length) return;
-      wx.navigateTo({
-        url:
-          "/pages/default/announcement/detail/announcement_detail?id=" +
-          list[0]._id,
       });
     },
 

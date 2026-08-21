@@ -17,3 +17,4 @@ init/
 # WeChat Mini-Program npm build output
 miniprogram/miniprogram_npm/
 cloudfunctions/cloud/config/config.js
+project.private.config.json

@@ -262,6 +262,36 @@
   overflow: hidden;
 }
 
+.store-hours-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26rpx 32rpx;
+  font-size: 28rpx;
+}
+
+.store-hours-label {
+  color: #323233;
+}
+
+.store-hours-edit {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.store-hours-item {
+  padding: 10rpx 24rpx;
+  border-radius: 10rpx;
+  background: #f5f6f8;
+  color: #323233;
+  font-size: 26rpx;
+}
+
+.store-hours-sep {
+  color: #969799;
+}
+
 .store-map-tip {
   margin-top: 12rpx;
   font-size: 24rpx;

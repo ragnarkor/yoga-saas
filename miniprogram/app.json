@@ -16,6 +16,8 @@
     "pages/default/my/join_detail/my_join_detail",
     "pages/default/my/card_pack/my_card_pack",
     "pages/default/my/card_shop/card_shop",
+    "pages/default/my/card_goods_detail/card_goods_detail",
+    "pages/default/my/card_order_confirm/card_order_confirm",
     "pages/default/my/card_order/card_order",
     "pages/default/my/achievement/my_achievement",
     "pages/default/my/card_detail/my_card_detail",
@@ -109,9 +111,7 @@
     {
       "root": "cmpts/public/form/form_set/field",
       "name": "formField",
-      "pages": [
-        "form_set_field"
-      ]
+      "pages": ["form_set_field"]
     }
   ],
   "preloadRule": {
