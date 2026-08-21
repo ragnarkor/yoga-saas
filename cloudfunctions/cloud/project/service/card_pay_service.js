@@ -107,6 +107,48 @@ class CardPayService {
     };
   }
 
+  /**
+   * 发起微信退款（云开发 cloudPay.refund）。同步返回结果，不依赖回调。
+   * @param {*} order      ax_card_order 订单（含 ORDER_ID / ORDER_PAY_FEE / ORDER_TRANSACTION_ID）
+   * @param {string} outRefundNo 商户退款单号（幂等键，同号重复退不会多退）
+   * @param {number} refundFee    退款金额（分），默认全额
+   * @param {string} reason       退款原因
+   * @returns {{ refundId, refundFee }}
+   */
+  static async refund(order, outRefundNo, refundFee, reason) {
+    if (!CardPayService.isEnabled()) {
+      throw new Error("PAY_DISABLED");
+    }
+    const c = CardPayService._getPayConfig();
+    const cloud = cloudBase.getCloud();
+
+    const totalFee = Number(order.ORDER_PAY_FEE) || 0; // 原订单金额(分)
+    const fee = Number(refundFee) || totalFee; // 退款金额(分)
+    if (totalFee <= 0 || fee <= 0 || fee > totalFee) {
+      throw new Error("退款金额无效");
+    }
+
+    const res = await cloud.cloudPay.refund({
+      subMchId: c.mchId,
+      envId: c.envId,
+      // 定位原订单：优先微信支付单号，否则用商户订单号
+      transactionId: order.ORDER_TRANSACTION_ID || undefined,
+      outTradeNo: order.ORDER_TRANSACTION_ID ? undefined : order.ORDER_ID,
+      outRefundNo, // 退款幂等键：同号重复请求微信不会多退
+      totalFee, // 原订单总额(分)
+      refundFee: fee, // 本次退款(分)
+      refundDesc: (reason || "会员卡退款").slice(0, 80),
+      nonceStr: CardPayService._nonce(),
+    });
+
+    if (!res || res.returnCode !== "SUCCESS" || res.resultCode !== "SUCCESS") {
+      throw new Error(
+        "微信退款失败：" + ((res && (res.errCodeDes || res.returnMsg)) || "未知"),
+      );
+    }
+    return { refundId: res.refundId || outRefundNo, refundFee: fee };
+  }
+
   static _nonce() {
     // 无 Math.random 依赖的简单随机串（时间戳 + 计数）
     return (

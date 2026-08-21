@@ -60,6 +60,15 @@
           catchtap="bindConfirmTap"
         >确认收款发卡</view>
       </view>
+
+      <view wx:if="{{item.canRefund}}" class="co-actions">
+        <view
+          class="co-btn co-btn--danger"
+          data-id="{{item.id}}"
+          data-name="{{item.userName}}"
+          catchtap="bindRefundTap"
+        >原路退款</view>
+      </view>
     </view>
   </view>
 </view>

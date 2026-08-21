@@ -2,13 +2,22 @@ const cloudHelper = require('../../../helper/cloud_helper.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
 
 // 与后端 CardOrderModel.STATUS 对齐
-const STATUS = { PENDING: 1, PAID: 8, CONFIRMING: 5, ISSUED: 10, CLOSED: 20 };
+const STATUS = {
+  PENDING: 1,
+  PAID: 8,
+  CONFIRMING: 5,
+  ISSUED: 10,
+  REFUNDING: 15,
+  CLOSED: 20,
+  REFUNDED: 25,
+};
 
 // 顶部筛选：待处理（PENDING+PAID 分别拉再合并太重，这里默认展示待确认）
 const TABS = [
   { key: 'todo', label: '待处理', status: STATUS.PENDING },
   { key: 'paid', label: '已付待发', status: STATUS.PAID },
   { key: 'issued', label: '已发卡', status: STATUS.ISSUED },
+  { key: 'refunded', label: '已退款', status: STATUS.REFUNDED },
   { key: 'closed', label: '已关闭', status: STATUS.CLOSED },
   { key: 'all', label: '全部', status: '' },
 ];
@@ -81,6 +90,9 @@ Page({
         timeDesc: o.timeDesc,
         // 仅“待确认”的订单可人工确认/关闭（微信支付已发卡的走回调，不在此手动处理）
         canAct: o.ORDER_STATUS === STATUS.PENDING,
+        // 仅“微信支付 + 已发卡”的订单可原路退款
+        canRefund:
+          o.ORDER_STATUS === STATUS.ISSUED && o.ORDER_PAY_TYPE === 'wechat',
       }));
       this.setData({
         orders,
@@ -149,6 +161,40 @@ Page({
         { title: '处理中' },
       );
       wx.showToast({ title: '已关闭', icon: 'success' });
+      this._load();
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
+  bindRefundTap(e) {
+    const id = e.currentTarget.dataset.id;
+    const name = e.currentTarget.dataset.name || '会员';
+    if (!id) return;
+    wx.showModal({
+      title: '原路退款',
+      editable: true,
+      placeholderText: `将原路退款给「${name}」并停用该卡，请填写退款原因`,
+      success: (r) => {
+        if (!r.confirm) return;
+        const reason = (r.content || '').trim();
+        if (!reason) return wx.showToast({ title: '请填写退款原因', icon: 'none' });
+        this._doRefund(id, reason);
+      },
+    });
+  },
+
+  async _doRefund(orderId, reason) {
+    try {
+      const res = await cloudHelper.callCloudSumbit(
+        'admin/card_order_refund',
+        { orderId, reason },
+        { title: '退款中' },
+      );
+      wx.showToast({
+        title: res && res.alreadyRefunded ? '该订单已退款' : '退款成功',
+        icon: 'success',
+      });
       this._load();
     } catch (err) {
       console.error(err);

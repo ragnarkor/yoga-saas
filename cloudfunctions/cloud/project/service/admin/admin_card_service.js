@@ -803,6 +803,8 @@ class AdminCardService extends BaseAdminService {
       [CardOrderModel.STATUS.PAID]: "已付待发",
       [CardOrderModel.STATUS.CONFIRMING]: "确认中",
       [CardOrderModel.STATUS.ISSUED]: "已发卡",
+      [CardOrderModel.STATUS.REFUNDING]: "退款中",
+      [CardOrderModel.STATUS.REFUNDED]: "已退款",
       [CardOrderModel.STATUS.CLOSED]: "已关闭",
     };
     result.list = (result.list || []).map((o) => ({
@@ -1029,6 +1031,128 @@ class AdminCardService extends BaseAdminService {
       );
       throw err;
     }
+  }
+
+  /**
+   * 退款（仅馆主）——微信支付且已发卡的订单可退。
+   * 严格顺序（防资损）：先 CAS 抢 ISSUED→REFUNDING，再校验卡未使用，
+   * 再调微信退款，成功后停卡并落 REFUNDED；任一步失败回滚到 ISSUED。
+   * outRefundNo 由订单号派生（幂等键），重复退不会多退。
+   * @returns { ok, refundId, refundFee }
+   */
+  async refundCardOrder(orderId, reason, operator) {
+    await this._ensureCardCollections();
+    orderId = (orderId || "").trim();
+    reason = (reason || "").trim().slice(0, 100);
+    if (!orderId) this.AppError("订单不存在");
+    if (!reason) this.AppError("请填写退款原因");
+
+    let order = await CardOrderModel.getOne({ ORDER_ID: orderId }, "*");
+    if (!order) this.AppError("订单不存在");
+
+    // 幂等：已退款直接返回
+    if (order.ORDER_STATUS === CardOrderModel.STATUS.REFUNDED) {
+      return { ok: true, alreadyRefunded: true, refundId: order.ORDER_REFUND_ID };
+    }
+    // 仅微信支付可原路退款
+    if (order.ORDER_PAY_TYPE !== CardOrderModel.PAY_TYPE.WECHAT) {
+      this.AppError("非微信支付订单请线下退款，系统不代扣");
+    }
+    if (order.ORDER_STATUS !== CardOrderModel.STATUS.ISSUED) {
+      this.AppError("仅已发卡的订单可退款");
+    }
+
+    // 1. 校验卡未被使用（已用过则拒绝，须先人工处理消费争议）
+    let card = order.ORDER_USER_CARD_ID
+      ? await UserCardModel.getOne({ _id: order.ORDER_USER_CARD_ID }, "*")
+      : null;
+    if (card && this._isCardUsed(card)) {
+      this.AppError("该卡已产生使用记录，不能整单退款，请先线下核算");
+    }
+
+    let now = timeUtil.time();
+
+    // 2. CAS 抢占 ISSUED → REFUNDING（防并发/重复退款）
+    let seized = await CardOrderModel.edit(
+      { ORDER_ID: orderId, ORDER_STATUS: CardOrderModel.STATUS.ISSUED },
+      {
+        ORDER_STATUS: CardOrderModel.STATUS.REFUNDING,
+        ORDER_REFUND_REASON: reason,
+        ORDER_REFUND_BY_ID: (operator && operator._id) || "",
+        ORDER_REFUND_BY_NAME: (operator && operator.ADMIN_NAME) || "",
+        ORDER_EDIT_TIME: now,
+      },
+    );
+    if (!seized) this.AppError("订单正在处理中，请稍后刷新查看");
+
+    try {
+      // 3. 发起微信退款（幂等键：退款单号由订单号派生）
+      const outRefundNo = "RF" + order.ORDER_ID;
+      const CardPayService = require("../card_pay_service.js");
+      const refund = await CardPayService.refund(
+        order,
+        outRefundNo,
+        order.ORDER_PAY_FEE,
+        reason,
+      );
+
+      // 4. 退款成功 → 停卡（保留记录不删，便于追溯），订单落 REFUNDED
+      if (card) {
+        await UserCardModel.edit(
+          { _id: card._id, USER_CARD_STATUS: UserCardModel.STATUS.NORMAL },
+          {
+            USER_CARD_STATUS: UserCardModel.STATUS.STOP,
+            USER_CARD_MEMO: "购卡退款停用：" + reason,
+            USER_CARD_EDIT_TIME: timeUtil.time(),
+          },
+        );
+      }
+
+      await CardOrderModel.edit(
+        { ORDER_ID: orderId },
+        {
+          ORDER_STATUS: CardOrderModel.STATUS.REFUNDED,
+          ORDER_REFUND_ID: refund.refundId,
+          ORDER_REFUND_FEE: refund.refundFee,
+          ORDER_REFUND_TIME: timeUtil.time(),
+          ORDER_EDIT_TIME: timeUtil.time(),
+        },
+      );
+      return { ok: true, refundId: refund.refundId, refundFee: refund.refundFee };
+    } catch (err) {
+      // 5. 退款失败：回滚到 ISSUED（钱未退、卡仍有效），记录原因可重试
+      await CardOrderModel.edit(
+        { ORDER_ID: orderId },
+        {
+          ORDER_STATUS: CardOrderModel.STATUS.ISSUED,
+          ORDER_REFUND_REASON: "退款失败：" + ((err && err.message) || "未知错误"),
+          ORDER_EDIT_TIME: timeUtil.time(),
+        },
+      );
+      throw err;
+    }
+  }
+
+  /**
+   * 卡是否已产生使用（判据保守，宁可拦下交人工，不误退已用卡）：
+   *   - 次数卡：剩余次数少于初始 = 已消耗过 → 已使用
+   *   - 期限卡：已激活起算且超过无条件退款宽限期(24h) → 视为已使用
+   * 期限卡刚发卡即激活(immediate)，24h 宽限避免「发出即锁死不能退」。
+   */
+  _isCardUsed(card) {
+    if (!card) return false;
+    if (
+      card.USER_CARD_TYPE === CardTplModel.TYPE.TIMES &&
+      Number(card.USER_CARD_QUOTA) < Number(card.USER_CARD_QUOTA_INIT)
+    ) {
+      return true;
+    }
+    if (card.USER_CARD_TYPE === CardTplModel.TYPE.PERIOD) {
+      const start = Number(card.USER_CARD_START_TIME) || 0;
+      const GRACE_MS = 24 * 60 * 60 * 1000;
+      if (start > 0 && timeUtil.time() - start > GRACE_MS) return true;
+    }
+    return false;
   }
 
   /** 关闭/拒绝购卡申请（仅馆主，需填原因） */

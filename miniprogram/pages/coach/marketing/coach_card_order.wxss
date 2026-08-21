@@ -69,6 +69,10 @@
 .co-status--5 { color: #4a90a4; background: #e8f1f4; }
 /* 已付待发 */
 .co-status--8 { color: #d9534f; background: #fdecec; }
+/* 退款中 */
+.co-status--15 { color: #e0982b; background: #fcf2e0; }
+/* 已退款 */
+.co-status--25 { color: #999; background: #f0f0f0; }
 
 .co-tpl-row {
   display: flex;
@@ -129,4 +133,8 @@
 .co-btn--ghost {
   color: #666;
   background: #f2f2f2;
+}
+.co-btn--danger {
+  color: #d9534f;
+  background: #fdecec;
 }

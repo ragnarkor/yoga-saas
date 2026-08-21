@@ -209,6 +209,20 @@ class AdminCardController extends BaseAdminController {
     );
   }
 
+  async refundCardOrder() {
+    await this.isAdmin();
+    this._assertOwner();
+    const input = this.validateData({
+      orderId: "required|string",
+      reason: "required|string|max:100",
+    });
+    return await new AdminCardService().refundCardOrder(
+      input.orderId,
+      input.reason,
+      this._admin,
+    );
+  }
+
   /** 仅超管/馆主可处理订单，教练只能查看 */
   _assertOwner() {
     if (this._adminType !== "super" && this._adminType !== "owner") {
