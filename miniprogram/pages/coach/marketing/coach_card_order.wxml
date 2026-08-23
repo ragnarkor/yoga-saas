@@ -1,0 +1,29 @@
+<page-meta page-style="{{themeStyle}}" />
+<view class="coach-page card-order-page">
+  <coach-tenant-switch title="购卡申请" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" bind:change="bindCoachTenantChange" />
+
+  <scroll-view scroll-x class="order-tabs" enhanced show-scrollbar="{{false}}">
+    <view class="order-tabs-inner">
+      <view wx:for="{{tabs}}" wx:key="key" class="order-tab {{activeTab === item.key ? 'order-tab--active' : ''}}" style="{{activeTab === item.key ? 'color:' + themeColor + ';background:' + themeColor + '18' : ''}}" data-key="{{item.key}}" bindtap="bindTabTap">{{item.label}}</view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{loading}}" class="order-state"><van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading></view>
+  <view wx:elif="{{!orders.length}}" class="order-state order-empty">暂无购卡申请</view>
+
+  <view wx:else class="order-list">
+    <view class="order-card" wx:for="{{orders}}" wx:key="id">
+      <view class="order-head">
+        <view><text class="order-user">{{item.userName}}</text><text class="order-time">{{item.time}}</text></view>
+        <text class="order-status order-status--{{item.status}}">{{item.statusDesc}}</text>
+      </view>
+      <view class="order-main"><text class="order-card-name">{{item.cardName}}</text><text class="order-price" style="color:{{themeColor}}">¥{{item.price}}</text></view>
+      <view wx:if="{{item.remark}}" class="order-note">会员备注：{{item.remark}}</view>
+      <view wx:if="{{item.closeReason}}" class="order-note order-note--closed">{{item.closeReason}}</view>
+      <view wx:if="{{item.canAct}}" class="order-actions">
+        <view class="order-action order-action--secondary" data-id="{{item.id}}" catchtap="bindCloseTap">关闭</view>
+        <view class="order-action" style="background:{{themeColor}}" data-id="{{item.id}}" data-name="{{item.userName}}" data-card="{{item.cardName}}" catchtap="bindConfirmTap">确认收款发卡</view>
+      </view>
+    </view>
+  </view>
+</view>

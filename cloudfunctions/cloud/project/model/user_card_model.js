@@ -21,6 +21,8 @@ UserCardModel.DB_STRUCTURE = {
   USER_CARD_MEMO: "string|false|comment=备注",
   USER_CARD_SCOPE:
     "object|false|default={}|comment=适用课程范围快照",
+  USER_CARD_ORDER_ID: "string|false|comment=购卡申请订单ID",
+  USER_CARD_PAID_FEE: "int|false|default=0|comment=实际成交金额(分)",
   USER_CARD_STATUS: "int|true|default=1|comment=1=正常 0=停卡 9=已用完",
   USER_CARD_START_TIME: "int|true|default=0",
   USER_CARD_END_TIME: "int|true|default=0",

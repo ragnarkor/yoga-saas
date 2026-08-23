@@ -1,0 +1,26 @@
+@import "../coach_common.wxss";
+
+.card-order-page { min-height: 100vh; padding-bottom: calc(48rpx + env(safe-area-inset-bottom)); background: #f7f8f7; }
+.order-tabs { padding: 20rpx 24rpx 12rpx; white-space: nowrap; box-sizing: border-box; }
+.order-tabs-inner { display: inline-flex; gap: 14rpx; }
+.order-tab { padding: 14rpx 28rpx; border-radius: 999rpx; color: #7f8781; background: #fff; font-size: 26rpx; transition: all .2s ease; }
+.order-tab--active { font-weight: 600; }
+.order-state { min-height: 320rpx; display: flex; align-items: center; justify-content: center; color: #9aa09b; font-size: 28rpx; }
+.order-empty { display: flex; }
+.order-list { padding: 4rpx 24rpx; }
+.order-card { margin-bottom: 20rpx; padding: 28rpx; border-radius: 24rpx; background: #fff; box-shadow: 0 10rpx 30rpx rgba(47, 59, 49, .05); }
+.order-head, .order-main, .order-actions { display: flex; align-items: center; justify-content: space-between; }
+.order-user { display: block; color: #354239; font-size: 31rpx; font-weight: 700; }
+.order-time { display: block; margin-top: 7rpx; color: #a1a7a2; font-size: 22rpx; }
+.order-status { padding: 7rpx 14rpx; border-radius: 999rpx; color: #c58a27; background: #fff6df; font-size: 22rpx; }
+.order-status--10 { color: #54896c; background: #eaf5ed; }
+.order-status--20 { color: #929894; background: #f2f3f2; }
+.order-status--5 { color: #5d85a4; background: #eaf2f7; }
+.order-main { margin-top: 24rpx; }
+.order-card-name { color: #38423c; font-size: 29rpx; font-weight: 600; }
+.order-price { font-size: 38rpx; font-weight: 700; line-height: 1; }
+.order-note { margin-top: 18rpx; padding-top: 18rpx; border-top: 1rpx solid #eef0ee; color: #8d968f; font-size: 24rpx; line-height: 1.6; }
+.order-note--closed { color: #be7777; }
+.order-actions { justify-content: flex-end; gap: 16rpx; margin-top: 26rpx; }
+.order-action { min-width: 180rpx; padding: 17rpx 20rpx; box-sizing: border-box; border-radius: 999rpx; color: #fff; text-align: center; font-size: 26rpx; font-weight: 600; }
+.order-action--secondary { min-width: 112rpx; color: #7e8781; background: #f2f4f2; font-weight: 500; }

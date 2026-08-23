@@ -18,9 +18,18 @@ class CardPurchaseService extends BaseService {
     return {
       enabled: true, guide: setup.SETUP_CARD_PURCHASE_GUIDE || '', contact: setup.SETUP_CARD_PURCHASE_CONTACT || '',
       cards: (list || []).map((item) => ({
-        id: item.CARD_TPL_ID, name: item.CARD_TPL_NAME, type: item.CARD_TPL_TYPE, days: item.CARD_TPL_DAYS, quota: item.CARD_TPL_QUOTA,
+        id: item.CARD_TPL_ID,
+        name: item.CARD_TPL_NAME,
+        type: item.CARD_TPL_TYPE,
+        days: item.CARD_TPL_DAYS,
+        quota: item.CARD_TPL_QUOTA,
+        // 订单必须固化范围，模板后续改动不得影响已付款申请。
+        scope: item.CARD_TPL_SCOPE || { mode: 'all' },
+        // 当前卡模板未提供单独的激活方式配置，明确按立即激活处理。
+        activate: 'immediate',
         priceFee: Number(item.CARD_TPL_SALE_PRICE_FEE) || Math.round((Number(item.CARD_TPL_PRICE) || 0) * 100),
-        desc: item.CARD_TPL_SALE_DESC || '', color: item.CARD_TPL_COLOR || '#5b8a72',
+        desc: item.CARD_TPL_SALE_DESC || '',
+        color: item.CARD_TPL_COLOR || '#5b8a72',
       })),
     };
   }
@@ -31,7 +40,7 @@ class CardPurchaseService extends BaseService {
     if (old) return { id: old.ORDER_ID, reused: true };
     const user = await UserModel.getOne({ USER_MINI_OPENID: userId }, 'USER_NAME'); const now = timeUtil.time();
     const id = 'CO' + now + Math.random().toString(36).slice(2, 8).toUpperCase();
-    await CardOrderModel.insert({ ORDER_ID: id, ORDER_USER_ID: userId, ORDER_USER_NAME: (user && user.USER_NAME) || '', ORDER_TPL_ID: card.id, ORDER_TPL_NAME: card.name, ORDER_TPL_SNAPSHOT: card, ORDER_ORIGIN_FEE: card.priceFee, ORDER_PAY_FEE: card.priceFee, ORDER_PAY_GUIDE: shop.guide, ORDER_REMARK: String(remark || '').trim().slice(0, 100), ORDER_STATUS: CardOrderModel.STATUS.PENDING, ORDER_ADD_TIME: now, ORDER_EDIT_TIME: now });
+    await CardOrderModel.insert({ ORDER_ID: id, ORDER_USER_ID: userId, ORDER_USER_NAME: (user && user.USER_NAME) || '', ORDER_TPL_ID: card.id, ORDER_TPL_NAME: card.name, ORDER_TPL_SNAPSHOT: card, ORDER_ORIGIN_FEE: card.priceFee, ORDER_DISCOUNT_FEE: 0, ORDER_PAY_FEE: card.priceFee, ORDER_PAY_GUIDE: shop.guide, ORDER_REMARK: String(remark || '').trim().slice(0, 100), ORDER_STATUS: CardOrderModel.STATUS.PENDING, ORDER_ADD_TIME: now, ORDER_EDIT_TIME: now });
     return { id };
   }
   async myList(userId) { await this._ensure(); return { list: (await CardOrderModel.getAll({ ORDER_USER_ID: userId }, '*', { ORDER_ADD_TIME: 'desc' }, 100)) || [] }; }

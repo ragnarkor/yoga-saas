@@ -109,6 +109,9 @@ module.exports = {
   "admin/card_tpl_del": "admin/admin_card_controller@delCardTpl#noDemo",
   "admin/card_marketing_get": "admin/admin_card_controller@getCardMarketing",
   "admin/card_marketing_save": "admin/admin_card_controller@saveCardMarketing#noDemo",
+  "admin/card_order_list": "admin/admin_card_controller@getCardOrderList",
+  "admin/card_order_confirm": "admin/admin_card_controller@confirmCardOrder#noDemo",
+  "admin/card_order_close": "admin/admin_card_controller@closeCardOrder#noDemo",
   "admin/coach_member_list": "admin/admin_card_controller@getCoachMemberList",
   "admin/month_new_card_members":
     "admin/admin_card_controller@getMonthNewCardMembers",

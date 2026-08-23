@@ -19,20 +19,20 @@
       <text class="course-edit-sheet-title">{{sheetTitle}}</text>
       <text class="course-edit-sheet-sub">{{sheetSub}}</text>
     </view>
-    <!-- scope 模式：三段切换（全馆 / 按分类 / 指定课程） -->
+    <!-- scope 模式：保留原有三种范围选择，只强化说明和选中状态。 -->
     <view wx:if="{{mode === 'scope'}}" class="mcp-seg">
       <view
         class="mcp-seg-item {{scopeMode === 'all' ? 'is-active' : ''}}"
         bindtap="bindScopeAllTap"
-      >全馆课程</view>
+      ><text>全馆课程</text><text class="mcp-seg-desc">不限范围</text></view>
       <view
         class="mcp-seg-item {{scopeMode === 'categories' ? 'is-active' : ''}}"
         bindtap="bindScopeCategoryModeTap"
-      >按分类</view>
+      ><text>按分类</text><text class="mcp-seg-desc">整类可用</text></view>
       <view
         class="mcp-seg-item {{scopeMode === 'meets' ? 'is-active' : ''}}"
         bindtap="bindScopeMeetModeTap"
-      >指定课程</view>
+      ><text>指定课程</text><text class="mcp-seg-desc">精确选择</text></view>
     </view>
 
     <scroll-view scroll-y class="course-edit-sheet-scroll" enhanced show-scrollbar="{{false}}">
@@ -59,11 +59,15 @@
 
       <!-- scope + all：无需列表 -->
       <block wx:elif="{{scopeMode === 'all'}}">
-        <view class="mcp-hint">该会员卡可用于全馆所有课程。</view>
+        <view class="mcp-all-state">
+          <view class="mcp-all-state-icon">✓</view>
+          <view><text class="mcp-all-state-title">适用全馆所有课程</text><text class="mcp-all-state-sub">之后新增的课程也会自动可用</text></view>
+        </view>
       </block>
 
       <!-- scope + categories：分类多选 -->
       <block wx:elif="{{scopeMode === 'categories'}}">
+        <view class="mcp-section-title"><text>选择可用分类</text><text>{{scopeCategoryIds.length}} 个已选</text></view>
         <scroll-view scroll-x class="mcp-category-tabs" enhanced show-scrollbar="{{false}}">
           <view class="mcp-category-tabs-inner">
             <view
@@ -78,7 +82,7 @@
             </view>
           </view>
         </scroll-view>
-        <view class="mcp-category-hint">点击分类 Tab，可直接选择该分类下全部课程</view>
+        <view class="mcp-category-hint">选中后，该分类下全部课程都可使用此卡</view>
         <view class="mcp-selected-category-list">
           <block wx:for="{{scopeCategories}}" wx:key="id">
             <view class="mcp-selected-category-chip" wx:if="{{item.selected}}">
@@ -103,6 +107,7 @@
 
       <!-- scope + meets：具体课程多选 -->
       <block wx:elif="{{scopeMode === 'meets'}}">
+        <view class="mcp-section-title"><text>选择指定课程</text><text>{{scopeMeetIds.length}} 门已选</text></view>
         <view
           class="course-edit-type-item {{item.selected ? 'is-active' : ''}}"
           wx:for="{{scopeMeets}}"

@@ -11,12 +11,13 @@ const UserCardModel = require("../../model/user_card_model.js");
 const UserModel = require("../../model/user_model.js");
 const AdminModel = require("../../model/admin_model.js");
 const SetupModel = require("../../model/setup_model.js");
+const CardOrderModel = require("../../model/card_order_model.js");
 const UserCardService = require("../user_card_service.js");
 const cardScopeUtil = require("../../utils/card_scope_util.js");
 const cardCoverUtil = require("../../utils/card_cover_util.js");
 
 const DEFAULT_TPL_COLORS = ["#F5A623", "#4A90A4", "#E57373", "#81C784"];
-const CARD_COLLECTIONS = ["ax_card_tpl", "ax_user_card", "ax_user_card_log"];
+const CARD_COLLECTIONS = ["ax_card_tpl", "ax_user_card", "ax_user_card_log", "ax_card_order"];
 
 class AdminCardService extends BaseAdminService {
   async _ensureCardCollections() {
@@ -774,6 +775,163 @@ class AdminCardService extends BaseAdminService {
       SETUP_EDIT_TIME: timeUtil.time(),
     });
     return await this.getCardMarketing();
+  }
+
+  /** 教练可查看订单；是否允许处理由控制器按角色限制。 */
+  async getCardOrderList({ status, page = 1, size = 20, oldTotal = 0 } = {}) {
+    await this._ensureCardCollections();
+    const where = {};
+    if (status !== undefined && status !== "" && status !== null) {
+      where.ORDER_STATUS = Number(status);
+    }
+    const result = await CardOrderModel.getList(
+      where,
+      "*",
+      { ORDER_ADD_TIME: "desc" },
+      Math.max(1, Number(page) || 1),
+      Math.min(100, Math.max(1, Number(size) || 20)),
+      true,
+      Number(oldTotal) || 0,
+    );
+    const statusText = {
+      [CardOrderModel.STATUS.PENDING]: "待确认",
+      [CardOrderModel.STATUS.CONFIRMING]: "发卡处理中",
+      [CardOrderModel.STATUS.ISSUED]: "已发卡",
+      [CardOrderModel.STATUS.CLOSED]: "已关闭",
+    };
+    result.list = (result.list || []).map((order) => ({
+      ...order,
+      statusDesc: statusText[order.ORDER_STATUS] || "未知状态",
+      payFeeYuan: ((Number(order.ORDER_PAY_FEE) || 0) / 100).toFixed(2),
+      timeDesc: timeUtil.timestamp2Time(order.ORDER_ADD_TIME, "Y-M-D h:m"),
+    }));
+    return result;
+  }
+
+  /**
+   * 馆主确认线下到账并发卡。
+   * 以状态抢占 + USER_CARD_ORDER_ID 去重保证重复点击或网络重试不会重复发卡。
+   */
+  async confirmCardOrder(orderId, operator) {
+    await this._ensureCardCollections();
+    orderId = String(orderId || "").trim();
+    if (!orderId) this.AppError("订单不存在");
+
+    const order = await CardOrderModel.getOne({ ORDER_ID: orderId }, "*");
+    if (!order) this.AppError("订单不存在");
+    if (order.ORDER_STATUS === CardOrderModel.STATUS.ISSUED) {
+      return { ok: true, alreadyIssued: true, userCardId: order.ORDER_USER_CARD_ID };
+    }
+    if (order.ORDER_STATUS !== CardOrderModel.STATUS.PENDING) {
+      this.AppError(order.ORDER_STATUS === CardOrderModel.STATUS.CLOSED ? "该申请已关闭" : "订单正在处理中，请稍后刷新");
+    }
+
+    const now = timeUtil.time();
+    const seized = await CardOrderModel.edit(
+      { ORDER_ID: orderId, ORDER_STATUS: CardOrderModel.STATUS.PENDING },
+      {
+        ORDER_STATUS: CardOrderModel.STATUS.CONFIRMING,
+        ORDER_CONFIRMED_BY_ID: (operator && operator._id) || "",
+        ORDER_CONFIRMED_BY_NAME: (operator && operator.ADMIN_NAME) || "",
+        ORDER_CONFIRMED_TIME: now,
+        ORDER_CLOSE_REASON: "",
+        ORDER_EDIT_TIME: now,
+      },
+    );
+    if (!seized) this.AppError("订单状态已变化，请刷新后重试");
+
+    try {
+      const existed = await UserCardModel.getOne(
+        { USER_CARD_ORDER_ID: orderId },
+        "_id,USER_CARD_ID",
+      );
+      const userCardId = existed
+        ? (existed.USER_CARD_ID || existed._id)
+        : await this._createUserCardFromOrder(order, now);
+
+      await CardOrderModel.edit(
+        { ORDER_ID: orderId, ORDER_STATUS: CardOrderModel.STATUS.CONFIRMING },
+        {
+          ORDER_STATUS: CardOrderModel.STATUS.ISSUED,
+          ORDER_USER_CARD_ID: userCardId,
+          ORDER_EDIT_TIME: timeUtil.time(),
+        },
+      );
+      return { ok: true, userCardId };
+    } catch (err) {
+      // 发卡失败时恢复可处理状态，保留原因用于排查；确认人不作为成功确认记录展示。
+      await CardOrderModel.edit(
+        { ORDER_ID: orderId, ORDER_STATUS: CardOrderModel.STATUS.CONFIRMING },
+        {
+          ORDER_STATUS: CardOrderModel.STATUS.PENDING,
+          ORDER_CONFIRMED_BY_ID: "",
+          ORDER_CONFIRMED_BY_NAME: "",
+          ORDER_CONFIRMED_TIME: 0,
+          ORDER_CLOSE_REASON: "发卡失败：" + ((err && err.message) || "未知错误"),
+          ORDER_EDIT_TIME: timeUtil.time(),
+        },
+      );
+      throw err;
+    }
+  }
+
+  /** 只根据下单时的套餐快照创建用户卡，不重新读取已变化的模板。 */
+  async _createUserCardFromOrder(order, now) {
+    const snapshot = order.ORDER_TPL_SNAPSHOT || {};
+    const type = snapshot.type === CardTplModel.TYPE.PERIOD ? CardTplModel.TYPE.PERIOD : CardTplModel.TYPE.TIMES;
+    const days = Number(snapshot.days) || 0;
+    if (days <= 0) this.AppError("套餐有效期无效，请检查套餐配置");
+    const quota = type === CardTplModel.TYPE.PERIOD ? 0 : Math.max(1, Number(snapshot.quota) || 1);
+    const validActivations = Object.values(UserCardModel.ACTIVATE);
+    const activate = validActivations.includes(snapshot.activate)
+      ? snapshot.activate
+      : UserCardModel.ACTIVATE.IMMEDIATE;
+    const startTime = activate === UserCardModel.ACTIVATE.IMMEDIATE ? now : 0;
+    const endTime = startTime ? now + days * 86400 * 1000 : 0;
+    const scope = cardScopeUtil.normalizeScope(snapshot.scope || { mode: "all" });
+    const paidFee = Math.max(0, Number(order.ORDER_PAY_FEE) || 0);
+
+    return await UserCardModel.insert({
+      USER_CARD_USER_ID: order.ORDER_USER_ID,
+      USER_CARD_TPL_ID: order.ORDER_TPL_ID,
+      USER_CARD_NAME: order.ORDER_TPL_NAME || snapshot.name || "会员卡",
+      USER_CARD_TYPE: type,
+      USER_CARD_DAYS: days,
+      // 兼容旧报表的元字段；真实订单金额始终以分记录，供后续统计迁移使用。
+      USER_CARD_PRICE: Math.round(paidFee / 100),
+      USER_CARD_PAID_FEE: paidFee,
+      USER_CARD_QUOTA: quota,
+      USER_CARD_QUOTA_INIT: quota,
+      USER_CARD_ACTIVATE: activate,
+      USER_CARD_SCOPE: scope,
+      USER_CARD_ORDER_ID: order.ORDER_ID,
+      USER_CARD_MEMO: "购卡申请确认",
+      USER_CARD_STATUS: UserCardModel.STATUS.NORMAL,
+      USER_CARD_START_TIME: startTime,
+      USER_CARD_END_TIME: endTime,
+    });
+  }
+
+  /** 馆主关闭待确认申请；已发卡记录不可回退。 */
+  async closeCardOrder(orderId, reason, operator) {
+    await this._ensureCardCollections();
+    orderId = String(orderId || "").trim();
+    reason = String(reason || "").trim().slice(0, 100);
+    if (!orderId) this.AppError("订单不存在");
+    if (!reason) this.AppError("请填写关闭原因");
+
+    const updated = await CardOrderModel.edit(
+      { ORDER_ID: orderId, ORDER_STATUS: CardOrderModel.STATUS.PENDING },
+      {
+        ORDER_STATUS: CardOrderModel.STATUS.CLOSED,
+        ORDER_CLOSE_REASON: reason,
+        ORDER_CONFIRMED_BY_ID: (operator && operator._id) || "",
+        ORDER_CONFIRMED_BY_NAME: (operator && operator.ADMIN_NAME) || "",
+        ORDER_EDIT_TIME: timeUtil.time(),
+      },
+    );
+    if (!updated) this.AppError("订单状态已变化，请刷新后重试");
+    return { ok: true };
   }
 }
 

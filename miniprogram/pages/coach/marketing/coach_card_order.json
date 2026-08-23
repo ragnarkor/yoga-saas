@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "购卡申请",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index",
+    "van-icon": "@vant/weapp/icon/index",
+    "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt"
+  }
+}

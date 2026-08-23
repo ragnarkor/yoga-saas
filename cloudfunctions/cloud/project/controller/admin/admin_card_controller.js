@@ -174,6 +174,44 @@ class AdminCardController extends BaseAdminController {
     });
     return await new AdminCardService().saveCardMarketing(input, this._adminType);
   }
+
+  async getCardOrderList() {
+    await this.isAdmin();
+    const input = this.validateData({
+      status: "int|false",
+      page: "int|false|default=1",
+      size: "int|false|default=20",
+      oldTotal: "int|false|default=0",
+    });
+    return await new AdminCardService().getCardOrderList(input);
+  }
+
+  async confirmCardOrder() {
+    await this.isAdmin();
+    this._assertOrderOwner();
+    const input = this.validateData({ orderId: "required|string" });
+    return await new AdminCardService().confirmCardOrder(input.orderId, this._admin);
+  }
+
+  async closeCardOrder() {
+    await this.isAdmin();
+    this._assertOrderOwner();
+    const input = this.validateData({
+      orderId: "required|string",
+      reason: "required|string|max:100",
+    });
+    return await new AdminCardService().closeCardOrder(
+      input.orderId,
+      input.reason,
+      this._admin,
+    );
+  }
+
+  _assertOrderOwner() {
+    if (this._adminType !== "super" && this._adminType !== "owner") {
+      this.AppError("仅馆主可确认或关闭购卡申请");
+    }
+  }
 }
 
 module.exports = AdminCardController;
