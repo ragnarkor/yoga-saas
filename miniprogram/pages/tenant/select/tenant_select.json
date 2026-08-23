@@ -1,5 +1,6 @@
 {
   "navigationStyle": "custom",
+  "enablePullDownRefresh": true,
   "usingComponents": {
     "cmpt-tenant-switch": "/cmpts/biz/tenant_switch/tenant_switch_cmpt",
     "coach-tenant-switch": "/cmpts/biz/coach_tenant_switch/coach_tenant_switch_cmpt",

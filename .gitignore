@@ -18,3 +18,6 @@ init/
 miniprogram/miniprogram_npm/
 cloudfunctions/cloud/config/config.js
 project.private.config.json
+
+# Local Codex skills and workspace configuration
+.codex/

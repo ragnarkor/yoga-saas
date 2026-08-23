@@ -6,7 +6,7 @@ const AdminMeetBiz = require("../../../biz/admin_meet_biz.js");
 
 const SHEET_SUB = {
   single: "课程类型用于排课分类与筛选",
-  scope: "勾选可用的课程；勾「整个分类」含后续新增课程",
+  scope: "勾选适用课程；选择「分类全选」会自动包含后续新增课程",
 };
 
 /**
@@ -72,7 +72,7 @@ Component({
     fieldValueIsPlaceholder: true,
     sheetTitle: "选择课程类型",
     sheetSub: SHEET_SUB.single,
-    // scope 草稿：整类适用的分类集合 + 散选课程集合；activeTab 为空串时是「全部」Tab
+    // scope 草稿：分类全选集合 + 单独勾选课程集合；activeTab 为空串时是「全部」Tab
     draftFullCateIds: [],
     draftMeetIds: [],
     draftActiveTab: "",
@@ -82,6 +82,7 @@ Component({
     activeCateFull: false,
     draftAllChecked: false,
     draftCountText: "",
+    emptyMeetText: "暂无可选择课程",
   },
 
   observers: {
@@ -228,6 +229,7 @@ Component({
     // 面板打开时，把已提交范围反向转换为草稿
     _initDraft() {
       const mode = this.data.scopeMode || "all";
+      const categories = this.data.categories || [];
       let fullCateIds = [];
       let meetIds = [];
       if (mode === "all") {
@@ -237,10 +239,25 @@ Component({
       } else {
         meetIds = (this.data.scopeMeetIds || []).map(String);
       }
+      let draftActiveTab = fullCateIds.find((id) =>
+        categories.some((c) => String(c.id) === id),
+      );
+      if (!draftActiveTab && meetIds.length) {
+        const firstMeet = (this.data.meets || []).find(
+          (m) => String(m.id) === meetIds[0],
+        );
+        const firstTypeId = String(firstMeet?.typeId || "");
+        if (categories.some((c) => String(c.id) === firstTypeId)) {
+          draftActiveTab = firstTypeId;
+        }
+      }
+      if (!draftActiveTab && categories.length) {
+        draftActiveTab = String(categories[0].id);
+      }
       this.setData({
         draftFullCateIds: fullCateIds,
         draftMeetIds: meetIds,
-        draftActiveTab: "",
+        draftActiveTab: draftActiveTab || "",
       });
       this._refreshDraftView();
     },
@@ -267,7 +284,7 @@ Component({
         }
       });
 
-      // Tab：全部 + 各分类（徽标实时反馈：整类 / 已选数）
+      // Tab：全部 + 各分类（徽标实时反馈：已全选 / 已选数）
       let totalSelected = 0;
       const tabList = [
         { typeId: "", typeName: "全部", full: false, badge: "" },
@@ -284,7 +301,7 @@ Component({
           typeId: tid,
           typeName: c.name,
           full,
-          badge: full ? "整类" : part ? String(part) : "",
+          badge: full ? "全选" : part ? String(part) : "",
         });
       });
       totalSelected += uncategorized.filter((m) =>
@@ -313,6 +330,8 @@ Component({
         activeCateFull: activeCate ? fullSet.has(activeTab) : false,
         draftAllChecked: meets.length > 0 && totalSelected === meets.length,
         draftCountText: totalSelected ? `（${totalSelected}门）` : "",
+        emptyMeetText:
+          activeTab === "" ? "暂未添加课程" : "该分类暂无课程",
       });
     },
 
@@ -365,7 +384,11 @@ Component({
       }
       if (this.data.mode === "scope") {
         this._initDraft();
-        this._ensureMeets();
+        this.setData({ sheetShow: true }, () => {
+          this._buildDraftView();
+          this._ensureMeets();
+        });
+        return;
       }
       this.setData({ sheetShow: true });
     },
@@ -414,7 +437,7 @@ Component({
       this._buildDraftView();
     },
 
-    // 「整个分类」快捷行：切换整类适用（取消时该分类课程一并清空）
+    // 「分类全选」快捷行：切换分类全选（取消时该分类课程一并清空）
     bindDraftGroupToggle(e) {
       const raw = e.currentTarget.dataset.typeId;
       if (raw === undefined || raw === null) return;

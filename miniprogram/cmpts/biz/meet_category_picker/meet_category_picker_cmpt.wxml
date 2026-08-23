@@ -42,7 +42,7 @@
         />
       </block>
 
-      <!-- scope：分类 Tab + 课程多选（移动端点单范式）。勾「整类」= 该分类全部课程可用（含后续新增），勾单课 = 精确指定 -->
+      <!-- scope：分类 Tab + 课程多选。选择「分类全选」会自动包含后续新增课程，勾单课则精确指定 -->
       <block wx:elif="{{mode === 'scope'}}">
         <scroll-view scroll-x class="mcp-tabs" enhanced show-scrollbar="{{false}}">
           <view class="mcp-tabs-inner">
@@ -76,7 +76,7 @@
               <van-icon wx:if="{{draftAllChecked}}" name="success" size="32rpx" color="{{themeColor}}" />
             </view>
           </view>
-          <!-- 分类 Tab：整类快捷行 -->
+          <!-- 分类 Tab：分类全选快捷行 -->
           <view
             wx:elif="{{activeCateName}}"
             class="mcp-quick {{activeCateFull ? 'is-active' : ''}}"
@@ -84,8 +84,8 @@
             catchtap="bindDraftGroupToggle"
           >
             <view class="mcp-opt-text">
-              <text class="mcp-quick-name">整个{{activeCateName}}</text>
-              <text class="mcp-opt-sub">本分类全部课程都可用，含后续新增</text>
+              <text class="mcp-quick-name">全选{{activeCateName}}分类</text>
+              <text class="mcp-opt-sub">本分类现有及后续新增课程均可使用</text>
             </view>
             <view class="mcp-meet-check">
               <van-icon wx:if="{{activeCateFull}}" name="success" size="32rpx" color="{{themeColor}}" />
@@ -106,7 +106,7 @@
                 <van-icon wx:if="{{item.selected}}" name="success" size="28rpx" color="{{themeColor}}" />
               </view>
             </view>
-            <van-empty wx:if="{{!activeMeets.length}}" description="该分类暂无课程" />
+            <van-empty wx:if="{{!activeMeets.length}}" description="{{emptyMeetText}}" />
           </view>
         </block>
       </block>

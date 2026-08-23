@@ -113,9 +113,11 @@
 }
 
 .course-edit-sheet {
-  max-height: 75vh;
+  height: 72vh;
+  max-height: 72vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .course-edit-sheet-head {
@@ -138,8 +140,10 @@
 }
 
 .course-edit-sheet-scroll {
-  max-height: calc(75vh - 120rpx);
-  padding: 8rpx 24rpx calc(32rpx + env(safe-area-inset-bottom));
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  padding: 8rpx 24rpx 20rpx;
   box-sizing: border-box;
 }
 
@@ -214,7 +218,7 @@
   font-weight: 600;
 }
 
-/* 整类/全馆快捷行：虚线=快捷入口，选中变实线主题框 + 勾（多重反馈） */
+/* 分类全选/全馆快捷行：选中时展示主题框与勾选 */
 .mcp-quick {
   display: flex;
   align-items: center;
@@ -223,7 +227,7 @@
   padding: 20rpx 24rpx;
   margin-bottom: 16rpx;
   border-radius: 16rpx;
-  border: 2rpx dashed #dcdee1;
+  border: 2rpx solid #e8eaed;
   background: #fff;
   box-sizing: border-box;
   transition: all 0.2s ease;
@@ -295,7 +299,7 @@
   flex-shrink: 0;
   display: flex;
   gap: 20rpx;
-  padding: 16rpx 24rpx calc(20rpx + env(safe-area-inset-bottom));
+  padding: 16rpx 24rpx calc(16rpx + env(safe-area-inset-bottom));
   border-top: 1rpx solid var(--neutralBorder, #ebedf0);
 }
 

@@ -141,7 +141,7 @@ class HomeService extends BaseService {
       this._safeGetAll(
         AnnouncementModel,
         { ANNOUNCE_STATUS: 1 },
-        "ANNOUNCE_TITLE,ANNOUNCE_DESC,ANNOUNCE_ADD_TIME",
+        "ANNOUNCE_TITLE,ANNOUNCE_DESC,ANNOUNCE_ADD_TIME,ANNOUNCE_AUTHOR_NAME",
         { ANNOUNCE_ORDER: "asc", ANNOUNCE_ADD_TIME: "desc" },
         10,
       ),
@@ -161,6 +161,7 @@ class HomeService extends BaseService {
       _id: item._id,
       title: item.ANNOUNCE_TITLE,
       desc: item.ANNOUNCE_DESC || "",
+      authorName: item.ANNOUNCE_AUTHOR_NAME || "",
       publishTime: item.ANNOUNCE_ADD_TIME || 0,
     }));
 
@@ -552,6 +553,32 @@ class HomeService extends BaseService {
       categories,
       sessions,
     };
+  }
+
+  /** 公告分页列表（用户端公告列表页） */
+  async getAnnounceList({ page, size, isTotal = true, oldTotal = 0 }) {
+    let orderBy = { ANNOUNCE_ORDER: "asc", ANNOUNCE_ADD_TIME: "desc" };
+    let fields =
+      "ANNOUNCE_TITLE,ANNOUNCE_DESC,ANNOUNCE_ADD_TIME,ANNOUNCE_AUTHOR_NAME";
+
+    let result = await AnnouncementModel.getList(
+      { ANNOUNCE_STATUS: 1 },
+      fields,
+      orderBy,
+      page,
+      size,
+      isTotal,
+      oldTotal,
+    );
+
+    result.list = (result.list || []).map((item) => ({
+      _id: item._id,
+      title: item.ANNOUNCE_TITLE,
+      desc: item.ANNOUNCE_DESC || "",
+      authorName: item.ANNOUNCE_AUTHOR_NAME || "",
+      publishTime: item.ANNOUNCE_ADD_TIME || 0,
+    }));
+    return result;
   }
 
   async getAnnounceDetail(id) {

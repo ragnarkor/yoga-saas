@@ -71,6 +71,19 @@ class HomeController extends BaseController {
     return await service.getAnnounceDetail(input.id);
   }
 
+  /** 公告分页列表 */
+  async getAnnounceList() {
+    let rules = {
+      page: "must|int|default=1",
+      size: "int|default=10",
+      isTotal: "bool",
+      oldTotal: "int",
+    };
+    let input = this.validateData(rules);
+    let service = new HomeService();
+    return await service.getAnnounceList(input);
+  }
+
   async getPhotoAlbumList() {
     let rules = {};
     this.validateData(rules);

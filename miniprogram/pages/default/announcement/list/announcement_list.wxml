@@ -2,15 +2,26 @@
 <view class="theme-scope announce-list-page" style="{{pageStyle}}">
   <cmpt-tenant-switch title="公告通知" show-back="{{true}}" theme-color="{{themeColor}}" />
 
-  <view wx:if="{{loading}}" class="announce-list-loading">
-    <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
+  <!-- 加载骨架：与真实列表结构一致，避免内容到达后布局跳动 -->
+  <view wx:if="{{loading}}" class="announce-list" aria-hidden="true">
+    <view class="announce-list-item announce-skeleton-item" wx:for="{{[1, 2, 3]}}" wx:key="*this">
+      <view class="announce-skeleton-icon"></view>
+      <view class="announce-list-item-main">
+        <view class="announce-skeleton-line announce-skeleton-line--title"></view>
+        <view class="announce-skeleton-line announce-skeleton-line--desc"></view>
+        <view class="announce-skeleton-line announce-skeleton-line--meta"></view>
+      </view>
+    </view>
   </view>
 
   <view wx:elif="{{!list.length}}" class="announce-list-empty">
-    <van-empty description="暂无公告" />
+    <van-empty description="暂无公告，馆里有新动态会第一时间通知你">
+      <van-button round color="{{themeColor}}" size="small" bind:click="bindBackHome">回到首页</van-button>
+    </van-empty>
   </view>
 
-  <view wx:else class="announce-list">
+  <block wx:else>
+    <view class="announce-list">
     <view
       class="announce-list-item"
       wx:for="{{list}}"
@@ -18,11 +29,34 @@
       data-id="{{item._id}}"
       bindtap="bindItemTap"
     >
-      <view class="announce-list-item-main">
-        <text class="announce-list-title text-cut">{{item.title}}</text>
-        <text wx:if="{{item.desc}}" class="announce-list-desc text-cut">{{item.desc}}</text>
+      <view class="announce-list-item-icon">
+        <van-icon name="volume-o" size="30rpx" color="{{themeColor}}" />
       </view>
-      <van-icon name="arrow" size="28rpx" color="#c8c9cc" />
+      <view class="announce-list-item-main">
+        <view class="announce-list-title-row">
+          <text class="announce-list-title">{{item.title}}</text>
+          <text wx:if="{{item.isNew}}" class="announce-list-badge">NEW</text>
+        </view>
+        <text wx:if="{{item.desc}}" class="announce-list-desc">{{item.desc}}</text>
+        <view wx:if="{{item.authorName || item.publishAgo}}" class="announce-list-meta">
+          <text wx:if="{{item.authorName}}">{{item.authorName}}</text>
+          <view wx:if="{{item.authorName && item.publishAgo}}" class="announce-list-meta-sep"></view>
+          <text wx:if="{{item.publishAgo}}">{{item.publishAgo}}</text>
+        </view>
+      </view>
+      <view class="announce-list-arrow">
+        <van-icon name="arrow" size="28rpx" color="#c8c9cc" />
+      </view>
     </view>
-  </view>
+    </view>
+
+    <!-- 触底加载状态 -->
+    <view wx:if="{{page < count}}" class="announce-list-more">
+      <van-loading wx:if="{{loadingMore}}" size="28rpx" color="{{themeColor}}" />
+      <text wx:else class="announce-list-more-text">上拉加载更多</text>
+    </view>
+    <view wx:elif="{{page > 1}}" class="announce-list-more">
+      <text class="announce-list-more-text">— 已经到底啦 —</text>
+    </view>
+  </block>
 </view>

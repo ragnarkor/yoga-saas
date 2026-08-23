@@ -18,6 +18,7 @@ module.exports = {
   "home/teacher_detail": "home_controller@getTeacherDetail",
   "home/teacher_home": "home_controller@getTeacherHome",
   "home/announce_detail": "home_controller@getAnnounceDetail",
+  "home/announce_list": "home_controller@getAnnounceList",
   "home/photo_album_list": "home_controller@getPhotoAlbumList",
 
   "passport/phone": "passport_controller@getPhone",
