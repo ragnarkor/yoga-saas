@@ -71,6 +71,9 @@ Page({
     else if (status === 15) key = "refunding";
     else if (status === 25) key = "refunded";
     const meta = STATUS_META[key] || { desc: "未知状态", tone: "muted" };
+    const transferProof = o.ORDER_TRANSFER_PROOF || "";
+    const transferAccount = o.ORDER_TRANSFER_ACCOUNT || {};
+    const offlinePending = status === 1 && payType === "offline";
 
     const snapshot = o.ORDER_TPL_SNAPSHOT || {};
     return {
@@ -92,6 +95,19 @@ Page({
           ? `${snapshot.quota || "-"} 次 · 有效期 ${snapshot.days || "-"} 天`
           : `有效期 ${snapshot.days || "-"} 天`,
       showGuide: status === 1 && payType === "offline" && !!o.ORDER_PAY_GUIDE,
+      isOfflinePending: offlinePending,
+      transferProof,
+      transferReference: o.ORDER_TRANSFER_REFERENCE || "",
+      transferAccount,
+      hasTransferAccount: !!(
+        transferAccount.receiver ||
+        transferAccount.bank ||
+        transferAccount.account
+      ),
+      transferStatusText: transferProof
+        ? "已上传凭证，等待馆方核对"
+        : "请完成转账后上传凭证",
+      canUploadProof: offlinePending,
       canPay: status === 1 && payType === "wechat",
       canGoPack: status === 10,
     };
@@ -161,6 +177,69 @@ Page({
 
   bindGoPackTap() {
     wx.navigateTo({ url: "/pages/default/my/card_pack/my_card_pack" });
+  },
+
+  bindCopyAccountTap(e) {
+    const account = e.currentTarget.dataset.account || "";
+    if (!account) return;
+    wx.setClipboardData({
+      data: account,
+      success: () => wx.showToast({ title: "账号已复制", icon: "success" }),
+    });
+  },
+
+  bindPreviewProofTap(e) {
+    const url = e.currentTarget.dataset.url;
+    if (url) wx.previewImage({ urls: [url], current: url });
+  },
+
+  bindUploadProofTap(e) {
+    const id = e.currentTarget.dataset.id;
+    if (!id || this._uploadingOrderId) return;
+    wx.chooseImage({
+      count: 1,
+      sizeType: ["compressed"],
+      sourceType: ["album", "camera"],
+      success: (res) => {
+        const path = res.tempFilePaths && res.tempFilePaths[0];
+        if (!path) return;
+        wx.showModal({
+          title: "提交转账凭证",
+          editable: true,
+          placeholderText: "转账流水号或备注（选填）",
+          success: (modal) => {
+            if (!modal.confirm) return;
+            this._submitTransferProof(id, path, modal.content || "");
+          },
+        });
+      },
+    });
+  },
+
+  async _submitTransferProof(orderId, tempPath, reference) {
+    this._uploadingOrderId = orderId;
+    try {
+      wx.showLoading({ title: "上传凭证中", mask: true });
+      const proof = await cloudHelper.transTempPicOne(
+        tempPath,
+        "card_order/transfer",
+        orderId,
+      );
+      if (!proof || typeof proof !== "string") throw new Error("凭证上传失败");
+      await cloudHelper.callCloudSumbit(
+        "my/card_order_transfer_submit",
+        { orderId, proof, reference },
+        { hint: false },
+      );
+      wx.showToast({ title: "凭证已提交", icon: "success" });
+      await this.load();
+    } catch (err) {
+      console.error(err);
+      wx.showToast({ title: "提交失败，请重试", icon: "none" });
+    } finally {
+      wx.hideLoading();
+      this._uploadingOrderId = "";
+    }
   },
 
   _yuan(fee) {

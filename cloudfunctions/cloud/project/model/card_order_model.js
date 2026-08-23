@@ -13,6 +13,10 @@ CardOrderModel.DB_STRUCTURE = {
   ORDER_DISCOUNT_FEE: 'int|true|default=0|comment=优惠金额(分)',
   ORDER_PAY_FEE: 'int|true|default=0',
   ORDER_PAY_GUIDE: 'string|false',
+  ORDER_TRANSFER_ACCOUNT: 'object|false|comment=下单时固化的银行卡收款信息',
+  ORDER_TRANSFER_PROOF: 'string|false|comment=会员上传的转账凭证 cloudId',
+  ORDER_TRANSFER_REFERENCE: 'string|false|comment=会员填写的转账流水号或备注',
+  ORDER_TRANSFER_SUBMIT_TIME: 'int|false|default=0|comment=转账凭证提交时间',
   ORDER_REMARK: 'string|false',
   ORDER_STATUS: 'int|true|default=1',
   // 支付方式：offline=线下人工确认 wechat=微信支付

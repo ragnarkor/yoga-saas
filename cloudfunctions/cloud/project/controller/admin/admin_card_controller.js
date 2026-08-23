@@ -170,6 +170,9 @@ class AdminCardController extends BaseAdminController {
       enabled: "bool|false",
       guide: "string|false|max:300",
       contact: "string|false|max:100",
+      receiver: "string|false|max:50",
+      bank: "string|false|max:100",
+      account: "string|false|max:50",
       cards: "array|false",
     });
     return await new AdminCardService().saveCardMarketing(input, this._adminType);

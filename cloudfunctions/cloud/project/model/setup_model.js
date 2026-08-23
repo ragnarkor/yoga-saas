@@ -43,6 +43,12 @@ SetupModel.DB_STRUCTURE = {
   SETUP_CARD_PURCHASE_GUIDE: "string|false|comment=购卡付款说明（非敏感文本）",
   SETUP_CARD_PURCHASE_CONTACT:
     "string|false|comment=购卡联系提示（非敏感文本）",
+  SETUP_CARD_PURCHASE_RECEIVER:
+    "string|false|comment=购卡银行卡收款人",
+  SETUP_CARD_PURCHASE_BANK:
+    "string|false|comment=购卡收款银行及支行",
+  SETUP_CARD_PURCHASE_ACCOUNT:
+    "string|false|comment=购卡收款银行卡号",
   /*
 	{
 		booking: true,         // 预约功能

@@ -62,6 +62,8 @@ module.exports = {
   "my/card_order_create": "card_controller@createCardOrder#noDemo",
   "my/card_order_list": "card_controller@getMyCardOrders",
   "my/card_order_repay": "card_controller@repayCardOrder#noDemo",
+  "my/card_order_transfer_submit":
+    "card_controller@submitCardOrderTransfer#noDemo",
   "my/achievement": "my_controller@getAchievement",
 
   "test/test": "test/test_controller@test",

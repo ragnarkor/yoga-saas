@@ -86,6 +86,9 @@ Page({
         status: o.ORDER_STATUS,
         statusDesc: o.statusDesc,
         remark: o.ORDER_REMARK || '',
+        transferProof: o.ORDER_TRANSFER_PROOF || '',
+        transferReference: o.ORDER_TRANSFER_REFERENCE || '',
+        hasTransferProof: !!o.ORDER_TRANSFER_PROOF,
         closeReason: o.ORDER_CLOSE_REASON || '',
         timeDesc: o.timeDesc,
         // 仅“待确认”的订单可人工确认/关闭（微信支付已发卡的走回调，不在此手动处理）
@@ -111,13 +114,18 @@ Page({
     if (!id) return;
     wx.showModal({
       title: '确认收款并发卡',
-      content: `确认已收到「${name}」的购卡款项？确认后将立即为其发卡。`,
+      content: `请核对「${name}」的转账凭证与到账金额。确认后将立即为其发卡。`,
       confirmText: '确认发卡',
       confirmColor: this.data.themeColor,
       success: (r) => {
         if (r.confirm) this._doConfirm(id);
       },
     });
+  },
+
+  bindPreviewProofTap(e) {
+    const url = e.currentTarget.dataset.url;
+    if (url) wx.previewImage({ urls: [url], current: url });
   },
 
   async _doConfirm(orderId) {

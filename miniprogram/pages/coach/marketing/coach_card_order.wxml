@@ -44,6 +44,11 @@
       </view>
 
       <view wx:if="{{item.remark}}" class="co-remark">备注：{{item.remark}}</view>
+      <view wx:if="{{item.hasTransferProof}}" class="co-proof">
+        <image class="co-proof-image" src="{{item.transferProof}}" mode="aspectFill" data-url="{{item.transferProof}}" catchtap="bindPreviewProofTap" />
+        <view><text class="co-proof-title">会员已上传转账凭证</text><text wx:if="{{item.transferReference}}" class="co-proof-ref">转账备注：{{item.transferReference}}</text></view>
+      </view>
+      <view wx:elif="{{item.status === 1 && !item.isWechat}}" class="co-proof co-proof--empty"><van-icon name="photo-o" size="30rpx" color="#a6afa9" /><text>会员尚未上传转账凭证</text></view>
       <view wx:if="{{item.closeReason}}" class="co-close-reason">{{item.closeReason}}</view>
 
       <view wx:if="{{item.canAct}}" class="co-actions">
@@ -58,7 +63,7 @@
           data-id="{{item.id}}"
           data-name="{{item.userName}}"
           catchtap="bindConfirmTap"
-        >确认收款发卡</view>
+        >核对后发卡</view>
       </view>
 
       <view wx:if="{{item.canRefund}}" class="co-actions">

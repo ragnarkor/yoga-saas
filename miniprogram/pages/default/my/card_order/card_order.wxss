@@ -180,6 +180,24 @@
   margin-top: 2rpx;
 }
 
+/* 银行转账进度：让会员在订单内完成付款信息查看与凭证提交 */
+.order-transfer { margin-top: 2rpx; padding: 20rpx; border-radius: 16rpx; background: #f8faf8; }
+.order-transfer-head { display:flex; align-items:center; justify-content:space-between; }
+.order-transfer-title { display:block; color:#36443c; font-size:27rpx; font-weight:600; }
+.order-transfer-status { display:block; margin-top:6rpx; color:#a87937; font-size:22rpx; }
+.order-transfer-status.is-done { color:#4f9871; }
+.order-transfer-account { margin-top:16rpx; padding:12rpx 16rpx; border-radius:12rpx; background:#fff; }
+.order-transfer-row { display:flex; align-items:center; gap:16rpx; min-height:48rpx; color:#69756d; font-size:23rpx; }
+.order-transfer-row text:last-child:not(.order-copy) { flex:1; min-width:0; color:#34423a; text-align:right; word-break:break-all; }
+.order-transfer-row--account { border-top:1rpx solid #f0f2f0; }
+.order-copy { margin-left:10rpx; padding:4rpx 12rpx; color:var(--themeColor,#5b8a72); border-radius:999rpx; background:var(--projectColorLight,#e8f2ed); font-size:21rpx; }
+.order-proof-row { display:flex; align-items:center; gap:16rpx; margin-top:16rpx; }
+.order-proof-image,.order-proof-placeholder { width:92rpx; height:92rpx; border-radius:12rpx; flex:0 0 auto; }
+.order-proof-image { background:#edf0ed; }
+.order-proof-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4rpx; color:#9aa49e; background:#fff; font-size:19rpx; }
+.order-proof-action { margin-left:auto; padding:13rpx 20rpx; border:1rpx solid; border-radius:999rpx; font-size:24rpx; }
+.order-transfer-reference { display:block; margin-top:12rpx; color:#88928c; font-size:22rpx; }
+
 /* 底部操作 */
 .order-foot {
   display: flex;

@@ -58,6 +58,19 @@ class CardController extends BaseController {
     const input = this.validateData({ orderId: "required|string|name=订单ID" });
     return await new CardPurchaseService().repay(this._userId, input.orderId);
   }
+  async submitCardOrderTransfer() {
+    const input = this.validateData({
+      orderId: "required|string|name=订单ID",
+      proof: "required|string|max:500|name=转账凭证",
+      reference: "string|false|max:50|name=转账流水号",
+    });
+    return await new CardPurchaseService().submitTransferProof(
+      this._userId,
+      input.orderId,
+      input.proof,
+      input.reference,
+    );
+  }
 }
 
 module.exports = CardController;

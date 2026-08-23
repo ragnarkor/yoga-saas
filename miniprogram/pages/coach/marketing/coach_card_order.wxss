@@ -114,6 +114,7 @@
   color: #999;
   line-height: 1.5;
 }
+.co-proof{display:flex;align-items:center;gap:14rpx;margin-top:14rpx;padding:14rpx;border-radius:12rpx;background:#f7faf8}.co-proof--empty{color:#8d9891;font-size:23rpx}.co-proof-image{width:74rpx;height:74rpx;border-radius:10rpx;background:#edf0ed;flex:0 0 auto}.co-proof-title,.co-proof-ref{display:block}.co-proof-title{color:#4d5d52;font-size:24rpx}.co-proof-ref{margin-top:5rpx;color:#929b94;font-size:21rpx}
 .co-close-reason {
   color: #d9534f;
 }

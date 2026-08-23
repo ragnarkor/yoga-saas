@@ -10,6 +10,9 @@ Page({
     enabled: false,
     guide: '',
     contact: '',
+    receiver: '',
+    bank: '',
+    account: '',
     cards: [],
   },
 
@@ -37,6 +40,9 @@ Page({
         enabled: !!(res && res.enabled),
         guide: (res && res.guide) || '',
         contact: (res && res.contact) || '',
+        receiver: (res && res.receiver) || '',
+        bank: (res && res.bank) || '',
+        account: (res && res.account) || '',
         cards: ((res && res.cards) || []).map((card) => ({
           ...card,
           salePriceYuan: card.salePriceFee ? (card.salePriceFee / 100).toFixed(2).replace(/\.00$/, '') : '',
@@ -80,12 +86,18 @@ Page({
     if (this.data.enabled && !String(this.data.guide || '').trim()) {
       return wx.showToast({ title: '请填写付款说明', icon: 'none' });
     }
+    if (this.data.enabled && (!String(this.data.receiver).trim() || !String(this.data.bank).trim() || !String(this.data.account).trim())) {
+      return wx.showToast({ title: '请补充完整银行卡收款信息', icon: 'none' });
+    }
     this.setData({ saving: true });
     try {
       await cloudHelper.callCloudSumbit('admin/card_marketing_save', {
         enabled: this.data.enabled,
         guide: this.data.guide,
         contact: this.data.contact,
+        receiver: this.data.receiver,
+        bank: this.data.bank,
+        account: this.data.account,
         cards: this.data.cards.map((card) => ({
           id: card.id,
           saleEnabled: !!card.saleEnabled,

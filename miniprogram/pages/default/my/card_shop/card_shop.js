@@ -53,6 +53,11 @@ Page({
       typeDesc: c.type === "times" ? "次数卡" : "期限卡",
       mainAttr:
         c.type === "times" ? `${c.quota} 次课程` : `有效期 ${c.days} 天`,
+      scopeText: c.scopeAll ? "全馆课程可用" : "指定课程可用",
+      sellingPoint: c.desc || (c.type === "times" ? "灵活安排每一次练习" : "适合稳定规律的练习节奏"),
+      coverStyle: c.cover
+        ? `background-image:url(${c.cover});background-size:cover;background-position:center;`
+        : "",
       colorDark: this._darken(c.color || "#5b8a72"),
     });
   },
@@ -95,5 +100,9 @@ Page({
     wx.navigateTo({
       url: `/pages/default/my/card_order_confirm/card_order_confirm?id=${id}`,
     });
+  },
+
+  bindOrderTap() {
+    wx.navigateTo({ url: "/pages/default/my/card_order/card_order" });
   },
 });

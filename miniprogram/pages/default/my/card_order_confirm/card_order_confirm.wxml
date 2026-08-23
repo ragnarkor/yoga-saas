@@ -84,6 +84,13 @@
         <van-icon name="info-o" size="26rpx" color="{{themeColor}}" />
         <text>{{guide}}</text>
       </view>
+      <view wx:if="{{payType === 'offline'}}" class="confirm-transfer">
+        <view class="confirm-transfer-title"><van-icon name="balance-list-o" size="28rpx" color="{{themeColor}}" /><text>下单后转账并上传凭证</text></view>
+        <view wx:if="{{transferAccount.receiver}}" class="confirm-transfer-row"><text>收款人</text><text>{{transferAccount.receiver}}</text></view>
+        <view wx:if="{{transferAccount.bank}}" class="confirm-transfer-row"><text>开户行</text><text>{{transferAccount.bank}}</text></view>
+        <view wx:if="{{transferAccount.account}}" class="confirm-transfer-row"><text>银行卡号</text><text>{{transferAccount.account}}</text><text class="confirm-copy" style="color:{{themeColor}}" bindtap="bindCopyAccountTap">复制</text></view>
+        <text wx:if="{{!transferAccount.account}}" class="confirm-transfer-empty">馆方暂未填写银行卡信息，下单后请按付款说明联系馆方。</text>
+      </view>
     </view>
 
     <!-- 金额汇总 -->

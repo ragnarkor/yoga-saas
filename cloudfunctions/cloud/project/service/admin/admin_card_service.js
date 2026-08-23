@@ -714,7 +714,7 @@ class AdminCardService extends BaseAdminService {
   async getCardMarketing() {
     await this._ensureCardCollections();
     const setup = await new (require("../home_service.js"))().getSetup(
-      "SETUP_CARD_PURCHASE_ENABLED,SETUP_CARD_PURCHASE_GUIDE,SETUP_CARD_PURCHASE_CONTACT",
+      "SETUP_CARD_PURCHASE_ENABLED,SETUP_CARD_PURCHASE_GUIDE,SETUP_CARD_PURCHASE_CONTACT,SETUP_CARD_PURCHASE_RECEIVER,SETUP_CARD_PURCHASE_BANK,SETUP_CARD_PURCHASE_ACCOUNT",
     );
     const cards = await this.getCardTplList();
     const saleCards = (cards || []).map((card) => ({
@@ -731,6 +731,9 @@ class AdminCardService extends BaseAdminService {
       enabled: Number(setup && setup.SETUP_CARD_PURCHASE_ENABLED) === 1,
       guide: (setup && setup.SETUP_CARD_PURCHASE_GUIDE) || "",
       contact: (setup && setup.SETUP_CARD_PURCHASE_CONTACT) || "",
+      receiver: (setup && setup.SETUP_CARD_PURCHASE_RECEIVER) || "",
+      bank: (setup && setup.SETUP_CARD_PURCHASE_BANK) || "",
+      account: (setup && setup.SETUP_CARD_PURCHASE_ACCOUNT) || "",
       cards: saleCards,
       activeCount: saleCards.filter((item) => item.saleEnabled).length,
     };
@@ -749,6 +752,12 @@ class AdminCardService extends BaseAdminService {
     const enabled = input.enabled ? 1 : 0;
     const guide = String(input.guide || "").trim().slice(0, 300);
     const contact = String(input.contact || "").trim().slice(0, 100);
+    const receiver = String(input.receiver || "").trim().slice(0, 50);
+    const bank = String(input.bank || "").trim().slice(0, 100);
+    const account = String(input.account || "").replace(/\s/g, "").slice(0, 50);
+    if (enabled && (!receiver || !bank || !account)) {
+      this.AppError("开启会员卡商店前，请填写完整银行卡收款信息");
+    }
     const rawCards = Array.isArray(input.cards) ? input.cards : [];
     const cardMap = new Map(
       (await this.getCardTplList()).map((card) => [String(card.CARD_TPL_ID), card]),
@@ -773,6 +782,9 @@ class AdminCardService extends BaseAdminService {
       SETUP_CARD_PURCHASE_ENABLED: enabled,
       SETUP_CARD_PURCHASE_GUIDE: guide,
       SETUP_CARD_PURCHASE_CONTACT: contact,
+      SETUP_CARD_PURCHASE_RECEIVER: receiver,
+      SETUP_CARD_PURCHASE_BANK: bank,
+      SETUP_CARD_PURCHASE_ACCOUNT: account,
       SETUP_EDIT_TIME: timeUtil.time(),
     });
     return await this.getCardMarketing();
@@ -810,7 +822,12 @@ class AdminCardService extends BaseAdminService {
     };
     result.list = (result.list || []).map((o) => ({
       ...o,
-      statusDesc: STATUS_DESC[o.ORDER_STATUS] || "未知",
+      statusDesc:
+        o.ORDER_STATUS === CardOrderModel.STATUS.PENDING &&
+        o.ORDER_PAY_TYPE === CardOrderModel.PAY_TYPE.OFFLINE &&
+        o.ORDER_TRANSFER_PROOF
+          ? "已提交凭证"
+          : STATUS_DESC[o.ORDER_STATUS] || "未知",
       payFeeYuan: ((Number(o.ORDER_PAY_FEE) || 0) / 100).toFixed(2),
       timeDesc: timeUtil.timestamp2Time(o.ORDER_ADD_TIME, "Y-M-D h:m"),
     }));

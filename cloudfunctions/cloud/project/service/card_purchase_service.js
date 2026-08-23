@@ -17,7 +17,7 @@ class CardPurchaseService extends BaseService {
   async getShop() {
     await this._ensure();
     const setup = await new HomeService().getSetup(
-      "SETUP_CARD_PURCHASE_ENABLED,SETUP_CARD_PURCHASE_GUIDE,SETUP_CARD_PURCHASE_CONTACT",
+      "SETUP_CARD_PURCHASE_ENABLED,SETUP_CARD_PURCHASE_GUIDE,SETUP_CARD_PURCHASE_CONTACT,SETUP_CARD_PURCHASE_RECEIVER,SETUP_CARD_PURCHASE_BANK,SETUP_CARD_PURCHASE_ACCOUNT",
     );
     if (Number(setup.SETUP_CARD_PURCHASE_ENABLED) !== 1)
       return { enabled: false, cards: [] };
@@ -31,6 +31,7 @@ class CardPurchaseService extends BaseService {
       enabled: true,
       guide: setup.SETUP_CARD_PURCHASE_GUIDE || "",
       contact: setup.SETUP_CARD_PURCHASE_CONTACT || "",
+      transferAccount: this._getTransferAccount(setup),
       // 是否开通微信支付：未配置商户号则前端只显示线下付款
       wechatPay: CardPayService.isEnabled(),
       cards: (list || []).map((item) => {
@@ -65,7 +66,7 @@ class CardPurchaseService extends BaseService {
   async getDetail(tplId) {
     await this._ensure();
     const setup = await new HomeService().getSetup(
-      "SETUP_CARD_PURCHASE_ENABLED,SETUP_CARD_PURCHASE_GUIDE,SETUP_CARD_PURCHASE_CONTACT",
+      "SETUP_CARD_PURCHASE_ENABLED,SETUP_CARD_PURCHASE_GUIDE,SETUP_CARD_PURCHASE_CONTACT,SETUP_CARD_PURCHASE_RECEIVER,SETUP_CARD_PURCHASE_BANK,SETUP_CARD_PURCHASE_ACCOUNT",
     );
     if (Number(setup.SETUP_CARD_PURCHASE_ENABLED) !== 1)
       this.AppError("购卡通道未开放");
@@ -83,6 +84,7 @@ class CardPurchaseService extends BaseService {
     return {
       guide: setup.SETUP_CARD_PURCHASE_GUIDE || "",
       contact: setup.SETUP_CARD_PURCHASE_CONTACT || "",
+      transferAccount: this._getTransferAccount(setup),
       wechatPay: CardPayService.isEnabled(),
       card: {
         id: item.CARD_TPL_ID,
@@ -185,10 +187,11 @@ class CardPurchaseService extends BaseService {
         ORDER_TPL_ID: card.id,
         ORDER_TPL_NAME: card.name,
         ORDER_TPL_SNAPSHOT: card,
-        ORDER_ORIGIN_FEE: card.priceFee,
+        ORDER_ORIGIN_FEE: card.originFee,
         ORDER_DISCOUNT_FEE: Math.max(0, (Number(card.originFee) || card.priceFee) - card.priceFee),
         ORDER_PAY_FEE: card.priceFee,
         ORDER_PAY_GUIDE: shop.guide,
+        ORDER_TRANSFER_ACCOUNT: shop.transferAccount,
         ORDER_PAY_TYPE: payTypeFinal,
         ORDER_REMARK: String(remark || "")
           .trim()
@@ -235,6 +238,44 @@ class CardPurchaseService extends BaseService {
     } catch (err) {
       this.AppError("发起支付失败：" + ((err && err.message) || "请稍后重试"));
     }
+  }
+
+  /**
+   * 会员在线下完成银行卡转账后提交凭证。订单仍保持 PENDING，
+   * 但馆主端会明确显示“已上传凭证”，避免把付款确认误做成自动发卡。
+   */
+  async submitTransferProof(userId, orderId, proof, reference) {
+    await this._ensure();
+    proof = String(proof || "").trim();
+    if (!proof.startsWith("cloud://")) {
+      this.AppError("转账凭证上传失败，请重新选择图片");
+    }
+    const order = await CardOrderModel.getOne({ ORDER_ID: orderId }, "*");
+    if (!order || order.ORDER_USER_ID !== userId) this.AppError("订单不存在");
+    if (order.ORDER_PAY_TYPE !== CardOrderModel.PAY_TYPE.OFFLINE) {
+      this.AppError("该订单不需要提交转账凭证");
+    }
+    if (order.ORDER_STATUS !== CardOrderModel.STATUS.PENDING) {
+      this.AppError("订单状态已变更，无法补充凭证");
+    }
+    await CardOrderModel.edit(
+      { ORDER_ID: orderId, ORDER_USER_ID: userId },
+      {
+        ORDER_TRANSFER_PROOF: proof,
+        ORDER_TRANSFER_REFERENCE: String(reference || "").trim().slice(0, 50),
+        ORDER_TRANSFER_SUBMIT_TIME: timeUtil.time(),
+        ORDER_EDIT_TIME: timeUtil.time(),
+      },
+    );
+    return { ok: true };
+  }
+
+  _getTransferAccount(setup = {}) {
+    return {
+      receiver: setup.SETUP_CARD_PURCHASE_RECEIVER || "",
+      bank: setup.SETUP_CARD_PURCHASE_BANK || "",
+      account: setup.SETUP_CARD_PURCHASE_ACCOUNT || "",
+    };
   }
 
   async myList(userId) {

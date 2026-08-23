@@ -56,6 +56,28 @@
 				<text>{{item.guide}}</text>
 			</view>
 
+			<!-- 银行卡转账订单：账户、凭证和确认进度都在同一张订单里，避免会员下单后找不到下一步 -->
+			<view wx:if="{{item.isOfflinePending}}" class="order-transfer">
+				<view class="order-transfer-head">
+					<view>
+						<text class="order-transfer-title">银行卡转账</text>
+						<text class="order-transfer-status {{item.transferProof ? 'is-done' : ''}}">{{item.transferStatusText}}</text>
+					</view>
+					<van-icon name="certificate" size="34rpx" color="{{themeColor}}" />
+				</view>
+				<view wx:if="{{item.hasTransferAccount}}" class="order-transfer-account">
+					<view wx:if="{{item.transferAccount.receiver}}" class="order-transfer-row"><text>收款人</text><text>{{item.transferAccount.receiver}}</text></view>
+					<view wx:if="{{item.transferAccount.bank}}" class="order-transfer-row"><text>开户行</text><text>{{item.transferAccount.bank}}</text></view>
+					<view wx:if="{{item.transferAccount.account}}" class="order-transfer-row order-transfer-row--account"><text>银行卡号</text><text>{{item.transferAccount.account}}</text><text class="order-copy" data-account="{{item.transferAccount.account}}" catchtap="bindCopyAccountTap">复制</text></view>
+				</view>
+				<view class="order-proof-row">
+					<image wx:if="{{item.transferProof}}" class="order-proof-image" src="{{item.transferProof}}" mode="aspectFill" data-url="{{item.transferProof}}" catchtap="bindPreviewProofTap" />
+					<view wx:else class="order-proof-placeholder"><van-icon name="photo-o" size="36rpx" color="#b8c0bb" /><text>上传银行转账凭证</text></view>
+					<view class="order-proof-action" style="color:{{themeColor}};border-color:{{themeColor}}" data-id="{{item.id}}" catchtap="bindUploadProofTap">{{item.transferProof ? '更新凭证' : '上传凭证'}}</view>
+				</view>
+				<text wx:if="{{item.transferReference}}" class="order-transfer-reference">转账备注：{{item.transferReference}}</text>
+			</view>
+
 			<view wx:if="{{item.canPay || item.canGoPack}}" class="order-foot">
 				<view wx:if="{{item.canGoPack}}" class="order-btn order-btn--ghost" bindtap="bindGoPackTap">查看卡包</view>
 				<view

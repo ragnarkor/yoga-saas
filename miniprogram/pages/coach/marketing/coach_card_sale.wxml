@@ -7,12 +7,17 @@
   <block wx:else>
     <view class="sale-intro">
       <view class="sale-intro-icon" style="background:{{themeColor}}18;"><van-icon name="shopping-cart-o" size="50rpx" color="{{themeColor}}" /></view>
-      <view><text class="sale-intro-title">会员购卡申请</text><text class="sale-intro-desc">会员提交申请并线下付款后，由馆主确认发卡。</text></view>
+      <view><text class="sale-intro-title">会员卡商店</text><text class="sale-intro-desc">配置商品、银行卡收款信息与会员下单后的处理流程。</text></view>
     </view>
 
     <view class="sale-group">
-      <view class="sale-row sale-row--switch"><view><text class="sale-row-title">开启会员购卡</text><text class="sale-row-desc">开启后，会员端会展示可购买套餐</text></view><van-switch checked="{{enabled}}" active-color="{{themeColor}}" bind:change="bindEnabledChange" /></view>
-      <van-field label="付款说明" value="{{guide}}" data-field="guide" bind:input="bindTextInput" placeholder="例如：请到前台付款，或联系馆主核对转账" maxlength="300" border="{{false}}" />
+      <view class="sale-row sale-row--switch"><view><text class="sale-row-title">开启会员卡商店</text><text class="sale-row-desc">开启后，会员可浏览套餐、下单并提交转账凭证</text></view><van-switch checked="{{enabled}}" active-color="{{themeColor}}" bind:change="bindEnabledChange" /></view>
+      <view class="sale-row-label">银行卡收款账户</view>
+      <van-field label="收款人" value="{{receiver}}" data-field="receiver" bind:input="bindTextInput" placeholder="例如：静心瑜伽馆 / 张三" maxlength="50" border="{{false}}" />
+      <van-field label="开户行" value="{{bank}}" data-field="bank" bind:input="bindTextInput" placeholder="例如：中国银行 XX 支行" maxlength="100" border="{{false}}" />
+      <van-field label="银行卡号" value="{{account}}" data-field="account" bind:input="bindTextInput" placeholder="会员下单后可复制转账" maxlength="50" border="{{false}}" />
+      <view class="sale-row-label sale-row-label--minor">下单说明</view>
+      <van-field label="付款说明" value="{{guide}}" data-field="guide" bind:input="bindTextInput" placeholder="例如：转账后请上传凭证，馆主核对后发卡" maxlength="300" border="{{false}}" />
       <van-field label="联系提示" value="{{contact}}" data-field="contact" bind:input="bindTextInput" placeholder="例如：前台电话 12345678" maxlength="100" border="{{false}}" />
     </view>
 
@@ -28,7 +33,7 @@
       </view>
     </view>
 
-    <view class="sale-security"><van-icon name="shield-o" size="28rpx" color="{{themeColor}}" /><text>请勿在这里填写完整银行卡号、支付密码或收款凭证。</text></view>
+    <view class="sale-security"><van-icon name="shield-o" size="28rpx" color="{{themeColor}}" /><text>银行卡号仅用于已登录会员的购卡转账；不要填写支付密码、身份证号等敏感信息。</text></view>
     <view class="sale-footer"><van-button block round custom-class="sale-submit-btn" color="{{themeColor}}" loading="{{saving}}" bind:click="bindSaveTap">保存购卡设置</van-button></view>
   </block>
 </view>

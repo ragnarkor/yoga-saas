@@ -12,6 +12,7 @@ Page({
     card: null,
     guide: "",
     contact: "",
+    transferAccount: {},
     wechatPay: false,
     // wechat=微信支付（商户号可用时默认） offline=线下付款
     payType: "offline",
@@ -42,6 +43,7 @@ Page({
         card: r && r.card ? this._decorate(r.card) : null,
         guide: (r && r.guide) || "",
         contact: (r && r.contact) || "",
+        transferAccount: (r && r.transferAccount) || {},
         wechatPay,
         payType: wechatPay ? "wechat" : "offline",
       });
@@ -115,13 +117,8 @@ Page({
         return this._pay(r.payment);
       }
 
-      // 线下付款：提交即完成，提示后进订单列表
-      wx.showModal({
-        title: "订单已提交",
-        content: "请按馆方付款说明完成付款，馆主确认到账后会自动为你发卡。",
-        showCancel: false,
-        success: () => this._goOrderList(),
-      });
+      wx.showToast({ title: "订单已创建", icon: "success" });
+      setTimeout(() => this._goOrderList(), 500);
     } catch (err) {
       console.error(err);
       this.setData({ submitting: false });
@@ -150,5 +147,14 @@ Page({
 
   _goOrderList() {
     wx.redirectTo({ url: "/pages/default/my/card_order/card_order" });
+  },
+
+  bindCopyAccountTap() {
+    const account = (this.data.transferAccount || {}).account || "";
+    if (!account) return;
+    wx.setClipboardData({
+      data: account,
+      success: () => wx.showToast({ title: "账号已复制", icon: "success" }),
+    });
   },
 });
