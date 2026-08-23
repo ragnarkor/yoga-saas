@@ -58,7 +58,9 @@ class AdminTenantService extends BaseAdminService {
       base.closeTime || "22:00",
       "营业结束时间",
     );
-    if (bufferUtil.timeToMinutes(openTime) >= bufferUtil.timeToMinutes(closeTime)) {
+    if (
+      bufferUtil.timeToMinutes(openTime) >= bufferUtil.timeToMinutes(closeTime)
+    ) {
       this.AppError("营业结束时间须晚于开始时间");
     }
     return {
@@ -106,7 +108,10 @@ class AdminTenantService extends BaseAdminService {
       if (eq <= 0) continue;
       const id = seg.slice(0, eq).trim();
       const rest = seg.slice(eq + 1).trim();
-      const segments = rest.split("|").map((s) => s.trim()).filter(Boolean);
+      const segments = rest
+        .split("|")
+        .map((s) => s.trim())
+        .filter(Boolean);
       const name = segments[0] || "";
       const isPrivate = segments.includes("private");
       if (id && name) list.push({ id, name, isPrivate });
@@ -118,17 +123,26 @@ class AdminTenantService extends BaseAdminService {
     const names = new Set();
     const list = [];
     for (const raw of Array.isArray(rooms) ? rooms : []) {
-      const name = String((raw && raw.name) || "").trim().slice(0, 20);
+      const name = String((raw && raw.name) || "")
+        .trim()
+        .slice(0, 20);
       if (!name) continue;
       const key = name.toLowerCase();
       if (names.has(key)) this.AppError("教室名称不能重复");
       names.add(key);
       list.push({
-        id: String((raw && raw.id) || "R" + dataUtil.genRandomAlpha(8)).replace(/[^a-zA-Z0-9_-]/g, ""),
+        id: String((raw && raw.id) || "R" + dataUtil.genRandomAlpha(8)).replace(
+          /[^a-zA-Z0-9_-]/g,
+          "",
+        ),
         name,
-        location: String((raw && raw.location) || "").trim().slice(0, 30),
+        location: String((raw && raw.location) || "")
+          .trim()
+          .slice(0, 30),
         capacity: Math.max(0, Math.min(500, Number(raw && raw.capacity) || 0)),
-        equipment: String((raw && raw.equipment) || "").trim().slice(0, 100),
+        equipment: String((raw && raw.equipment) || "")
+          .trim()
+          .slice(0, 100),
         enabled: !(raw && raw.enabled === false),
       });
     }
@@ -175,17 +189,21 @@ class AdminTenantService extends BaseAdminService {
         TENANT_MEET_TYPE: meetTypeStr,
         TENANT_MEET_NAME: tenant.TENANT_MEET_NAME || "约课",
         TENANT_THEME_COLOR:
-          (setup && setup.SETUP_THEME_COLOR) ||
-          tenant.TENANT_THEME_COLOR ||
-          "",
+          (setup && setup.SETUP_THEME_COLOR) || tenant.TENANT_THEME_COLOR || "",
       },
       setup,
     );
     return {
       tenant: mergedTenant,
       categories: this._parseCategories(meetTypeStr),
-      privateSchedule: (setup && setup.SETUP_FEATURES && setup.SETUP_FEATURES.privateSchedule) || null,
-	  rooms: this._normalizeRooms((setup && setup.SETUP_FEATURES && setup.SETUP_FEATURES.rooms) || []),
+      privateSchedule:
+        (setup &&
+          setup.SETUP_FEATURES &&
+          setup.SETUP_FEATURES.privateSchedule) ||
+        null,
+      rooms: this._normalizeRooms(
+        (setup && setup.SETUP_FEATURES && setup.SETUP_FEATURES.rooms) || [],
+      ),
       about: (setup && setup.SETUP_ABOUT) || "",
       aboutPics: (setup && setup.SETUP_ABOUT_PIC) || [],
       contact: {
@@ -193,6 +211,8 @@ class AdminTenantService extends BaseAdminService {
         address: (setup && setup.SETUP_ADDRESS) || "",
         latitude: (setup && setup.SETUP_LATITUDE) || "",
         longitude: (setup && setup.SETUP_LONGITUDE) || "",
+        openTime: (setup && setup.SETUP_OPEN_TIME) || "",
+        closeTime: (setup && setup.SETUP_CLOSE_TIME) || "",
       },
     };
   }
@@ -204,11 +224,17 @@ class AdminTenantService extends BaseAdminService {
 
   async saveRooms(pid, rooms, operatorType) {
     if (!pid) this.AppError("请先选择瑜伽馆");
-    if (operatorType !== AdminModel.TYPE.SUPER && operatorType !== AdminModel.TYPE.OWNER) {
+    if (
+      operatorType !== AdminModel.TYPE.SUPER &&
+      operatorType !== AdminModel.TYPE.OWNER
+    ) {
       this.AppError("仅馆主可修改教室");
     }
     const normalized = this._normalizeRooms(rooms);
-    const existingSetup = await tenantSetupHelper.getSetupForPid(pid, "SETUP_FEATURES");
+    const existingSetup = await tenantSetupHelper.getSetupForPid(
+      pid,
+      "SETUP_FEATURES",
+    );
     const features = (existingSetup && existingSetup.SETUP_FEATURES) || {};
     await this._saveSetupForPid(pid, {
       SETUP_FEATURES: { ...features, rooms: normalized },
@@ -230,6 +256,8 @@ class AdminTenantService extends BaseAdminService {
     contactAddress,
     contactLatitude,
     contactLongitude,
+    storeOpenTime,
+    storeCloseTime,
     privateSchedule,
   ) {
     if (!pid) this.AppError("请先选择瑜伽馆");
@@ -263,7 +291,9 @@ class AdminTenantService extends BaseAdminService {
       savedThemeColor = color;
     }
     if (tenantDesc !== undefined && tenantDesc !== null) {
-      editData.TENANT_DESC = String(tenantDesc || "").trim().slice(0, 200);
+      editData.TENANT_DESC = String(tenantDesc || "")
+        .trim()
+        .slice(0, 200);
     }
     if (tenantName !== undefined && tenantName !== null) {
       let name = String(tenantName || "").trim();
@@ -272,7 +302,12 @@ class AdminTenantService extends BaseAdminService {
       editData.TENANT_NAME = name;
     }
     if (tenantLogo !== undefined && tenantLogo !== null) {
-      let tenant = await TenantModel.getOne({ _pid: pid }, "TENANT_LOGO", {}, false);
+      let tenant = await TenantModel.getOne(
+        { _pid: pid },
+        "TENANT_LOGO",
+        {},
+        false,
+      );
       let oldLogo = (tenant && tenant.TENANT_LOGO) || "";
       let nextLogo = await cloudUtil.handlerCloudFiles(
         oldLogo ? [oldLogo] : [],
@@ -281,10 +316,15 @@ class AdminTenantService extends BaseAdminService {
       editData.TENANT_LOGO = nextLogo.length ? nextLogo[0] : "";
     }
     if (about !== undefined || aboutPic !== undefined) {
-      let setup = await tenantSetupHelper.getSetupForPid(pid, "SETUP_ABOUT_PIC");
+      let setup = await tenantSetupHelper.getSetupForPid(
+        pid,
+        "SETUP_ABOUT_PIC",
+      );
       let oldPics = (setup && setup.SETUP_ABOUT_PIC) || [];
       if (about !== undefined && about !== null) {
-        setupData.SETUP_ABOUT = String(about || "").trim().slice(0, 50000);
+        setupData.SETUP_ABOUT = String(about || "")
+          .trim()
+          .slice(0, 50000);
       }
       if (aboutPic !== undefined && aboutPic !== null) {
         setupData.SETUP_ABOUT_PIC = await cloudUtil.handlerCloudFiles(
@@ -296,10 +336,14 @@ class AdminTenantService extends BaseAdminService {
       savedAbout = setupData.SETUP_ABOUT;
     }
     if (contactPhone !== undefined && contactPhone !== null) {
-      setupData.SETUP_PHONE = String(contactPhone || "").trim().slice(0, 30);
+      setupData.SETUP_PHONE = String(contactPhone || "")
+        .trim()
+        .slice(0, 30);
     }
     if (contactAddress !== undefined && contactAddress !== null) {
-      setupData.SETUP_ADDRESS = String(contactAddress || "").trim().slice(0, 200);
+      setupData.SETUP_ADDRESS = String(contactAddress || "")
+        .trim()
+        .slice(0, 200);
     }
     if (contactLatitude !== undefined && contactLatitude !== null) {
       let lat = contactLatitude === "" ? "" : Number(contactLatitude);
@@ -314,6 +358,20 @@ class AdminTenantService extends BaseAdminService {
         this.AppError("经度格式不正确");
       }
       setupData.SETUP_LONGITUDE = lng === "" ? "" : lng;
+    }
+    if (storeOpenTime !== undefined && storeOpenTime !== null) {
+      let t = String(storeOpenTime || "").trim();
+      if (t && !/^([01]\d|2[0-3]):[0-5]\d$/.test(t)) {
+        this.AppError("营业开始时间格式不正确，请使用如 09:00");
+      }
+      setupData.SETUP_OPEN_TIME = t;
+    }
+    if (storeCloseTime !== undefined && storeCloseTime !== null) {
+      let t = String(storeCloseTime || "").trim();
+      if (t && !/^([01]\d|2[0-3]):[0-5]\d$/.test(t)) {
+        this.AppError("营业结束时间格式不正确，请使用如 21:00");
+      }
+      setupData.SETUP_CLOSE_TIME = t;
     }
 
     if (privateSchedule !== undefined && privateSchedule !== null) {
@@ -355,7 +413,9 @@ class AdminTenantService extends BaseAdminService {
         savedAbout !== undefined
           ? savedAbout
           : about !== undefined && about !== null
-            ? String(about || "").trim().slice(0, 50000)
+            ? String(about || "")
+                .trim()
+                .slice(0, 50000)
             : undefined,
       aboutPics:
         savedAboutPics !== undefined
@@ -368,6 +428,8 @@ class AdminTenantService extends BaseAdminService {
         address: (savedSetup && savedSetup.SETUP_ADDRESS) || "",
         latitude: (savedSetup && savedSetup.SETUP_LATITUDE) || "",
         longitude: (savedSetup && savedSetup.SETUP_LONGITUDE) || "",
+        openTime: (savedSetup && savedSetup.SETUP_OPEN_TIME) || "",
+        closeTime: (savedSetup && savedSetup.SETUP_CLOSE_TIME) || "",
       },
     };
   }
@@ -422,7 +484,9 @@ class AdminTenantService extends BaseAdminService {
       _pid: pid,
       TENANT_ID: pid,
       TENANT_NAME: name,
-      TENANT_DESC: String(desc || "").trim().slice(0, 200),
+      TENANT_DESC: String(desc || "")
+        .trim()
+        .slice(0, 200),
       TENANT_TEMPLATE: template || "default",
       TENANT_STATUS: TenantModel.STATUS.OPEN,
       TENANT_MEET_TYPE: this._defaultMeetType(),
@@ -459,12 +523,18 @@ class AdminTenantService extends BaseAdminService {
       operator,
       require("../../model/log_model.js").TYPE.SYS,
     );
-    await this.insertPlatformLog(PlatformLogModel.ACTION.TENANT_INSERT, operator, {
-      content: insertDesc,
-      targetPid: pid,
-      targetName: name,
-      after: expireTime ? tenantExpireUtil.expireTimeToDay(expireTime) : "长期有效",
-    });
+    await this.insertPlatformLog(
+      PlatformLogModel.ACTION.TENANT_INSERT,
+      operator,
+      {
+        content: insertDesc,
+        targetPid: pid,
+        targetName: name,
+        after: expireTime
+          ? tenantExpireUtil.expireTimeToDay(expireTime)
+          : "长期有效",
+      },
+    );
 
     return { pid, tenantName: name };
   }
@@ -495,7 +565,9 @@ class AdminTenantService extends BaseAdminService {
     return {
       tenantList: enriched,
       tenantCount: enriched.length,
-      tenantOpenCount: enriched.filter((item) => item.TENANT_STATUS === TenantModel.STATUS.OPEN).length,
+      tenantOpenCount: enriched.filter(
+        (item) => item.TENANT_STATUS === TenantModel.STATUS.OPEN,
+      ).length,
       adminCount: adminCount || 0,
     };
   }
@@ -545,7 +617,8 @@ class AdminTenantService extends BaseAdminService {
 
     const list = (result.list || []).map((item) => ({
       ...item,
-      actionDesc: PlatformLogModel.ACTION_DESC[item.PLOG_ACTION] || item.PLOG_ACTION,
+      actionDesc:
+        PlatformLogModel.ACTION_DESC[item.PLOG_ACTION] || item.PLOG_ACTION,
       timeDesc: timeUtil.timestamp2Time(item.PLOG_ADD_TIME, "Y-M-D h:m"),
     }));
 
@@ -589,7 +662,8 @@ class AdminTenantService extends BaseAdminService {
       if (!pid) continue;
       const t = this._joinActivityTime(j);
       if (t > (lastActiveByPid[pid] || 0)) lastActiveByPid[pid] = t;
-      if (t >= day30) recentJoinCntByPid[pid] = (recentJoinCntByPid[pid] || 0) + 1;
+      if (t >= day30)
+        recentJoinCntByPid[pid] = (recentJoinCntByPid[pid] || 0) + 1;
     }
 
     // 3. 跨租户拉会员，按 _pid 聚合「总数 / 近30天新增」
@@ -727,13 +801,20 @@ class AdminTenantService extends BaseAdminService {
       operator,
       require("../../model/log_model.js").TYPE.SYS,
     );
-    await this.insertPlatformLog(PlatformLogModel.ACTION.TENANT_STATUS, operator, {
-      content: statusDesc,
-      targetPid: pid,
-      targetName: tenant.TENANT_NAME,
-      before: tenant.TENANT_STATUS === TenantModel.STATUS.CLOSE ? "已停用" : "运营中",
-      after: nextStatus === TenantModel.STATUS.CLOSE ? "已停用" : "运营中",
-    });
+    await this.insertPlatformLog(
+      PlatformLogModel.ACTION.TENANT_STATUS,
+      operator,
+      {
+        content: statusDesc,
+        targetPid: pid,
+        targetName: tenant.TENANT_NAME,
+        before:
+          tenant.TENANT_STATUS === TenantModel.STATUS.CLOSE
+            ? "已停用"
+            : "运营中",
+        after: nextStatus === TenantModel.STATUS.CLOSE ? "已停用" : "运营中",
+      },
+    );
 
     let updated = await TenantModel.getOne(
       { _pid: pid },
@@ -778,7 +859,10 @@ class AdminTenantService extends BaseAdminService {
       }
     }
 
-    let setup = await tenantSetupHelper.getSetupForPid(pid, "_pid,SETUP_ABOUT_PIC,SETUP_SERVICE_PIC,SETUP_OFFICE_PIC");
+    let setup = await tenantSetupHelper.getSetupForPid(
+      pid,
+      "_pid,SETUP_ABOUT_PIC,SETUP_SERVICE_PIC,SETUP_OFFICE_PIC",
+    );
     if (setup) {
       let files = []
         .concat(setup.SETUP_ABOUT_PIC || [])
@@ -844,13 +928,19 @@ class AdminTenantService extends BaseAdminService {
       operator,
       require("../../model/log_model.js").TYPE.SYS,
     );
-    await this.insertPlatformLog(PlatformLogModel.ACTION.TENANT_EXPIRE, operator, {
-      content: expireLogDesc,
-      targetPid: pid,
-      targetName: tenant.TENANT_NAME,
-      before: tenantExpireUtil.formatExpireDesc(tenant.TENANT_EXPIRE_TIME || 0),
-      after: desc,
-    });
+    await this.insertPlatformLog(
+      PlatformLogModel.ACTION.TENANT_EXPIRE,
+      operator,
+      {
+        content: expireLogDesc,
+        targetPid: pid,
+        targetName: tenant.TENANT_NAME,
+        before: tenantExpireUtil.formatExpireDesc(
+          tenant.TENANT_EXPIRE_TIME || 0,
+        ),
+        after: desc,
+      },
+    );
 
     return tenantExpireUtil.enrichTenantExpire({
       _pid: pid,
@@ -1026,8 +1116,7 @@ class AdminTenantService extends BaseAdminService {
         if (lastJoinByUser[uid] < day90) {
           targetIds.add(uid);
           hintsByUser[uid] =
-            "最近上课 " +
-            timeUtil.timestamp2Time(lastJoinByUser[uid], "Y-M-D");
+            "最近上课 " + timeUtil.timestamp2Time(lastJoinByUser[uid], "Y-M-D");
         }
       }
     } else {

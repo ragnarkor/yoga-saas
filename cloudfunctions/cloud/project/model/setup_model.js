@@ -33,13 +33,14 @@ SetupModel.DB_STRUCTURE = {
   SETUP_PHONE: "string|false|comment=电话",
   SETUP_LATITUDE: "float|false|comment=门店纬度",
   SETUP_LONGITUDE: "float|false|comment=门店经度",
+  SETUP_OPEN_TIME: "string|false|comment=营业开始时间 HH:mm",
+  SETUP_CLOSE_TIME: "string|false|comment=营业结束时间 HH:mm",
 
   // [AI_START TIMESTAMP=2025-01-25 10:00:00]
   SETUP_FEATURES: "object|true|default={} |comment=功能开关配置",
   SETUP_CARD_PURCHASE_ENABLED:
     "int|false|default=0|comment=是否开启会员购卡申请",
-  SETUP_CARD_PURCHASE_GUIDE:
-    "string|false|comment=购卡付款说明（非敏感文本）",
+  SETUP_CARD_PURCHASE_GUIDE: "string|false|comment=购卡付款说明（非敏感文本）",
   SETUP_CARD_PURCHASE_CONTACT:
     "string|false|comment=购卡联系提示（非敏感文本）",
   /*

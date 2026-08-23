@@ -175,6 +175,8 @@ class AdminCardController extends BaseAdminController {
     return await new AdminCardService().saveCardMarketing(input, this._adminType);
   }
 
+  // ============ 购卡订单 ============
+
   async getCardOrderList() {
     await this.isAdmin();
     const input = this.validateData({
@@ -188,14 +190,14 @@ class AdminCardController extends BaseAdminController {
 
   async confirmCardOrder() {
     await this.isAdmin();
-    this._assertOrderOwner();
+    this._assertOwner();
     const input = this.validateData({ orderId: "required|string" });
     return await new AdminCardService().confirmCardOrder(input.orderId, this._admin);
   }
 
   async closeCardOrder() {
     await this.isAdmin();
-    this._assertOrderOwner();
+    this._assertOwner();
     const input = this.validateData({
       orderId: "required|string",
       reason: "required|string|max:100",
@@ -207,7 +209,22 @@ class AdminCardController extends BaseAdminController {
     );
   }
 
-  _assertOrderOwner() {
+  async refundCardOrder() {
+    await this.isAdmin();
+    this._assertOwner();
+    const input = this.validateData({
+      orderId: "required|string",
+      reason: "required|string|max:100",
+    });
+    return await new AdminCardService().refundCardOrder(
+      input.orderId,
+      input.reason,
+      this._admin,
+    );
+  }
+
+  /** 仅超管/馆主可处理订单，教练只能查看 */
+  _assertOwner() {
     if (this._adminType !== "super" && this._adminType !== "owner") {
       this.AppError("仅馆主可确认或关闭购卡申请");
     }

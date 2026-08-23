@@ -24,49 +24,83 @@
 		<!-- 场馆名 + 电话 -->
 		<view class="home-studio-card">
 			<view class="home-studio-main">
-				<text class="home-studio-name text-cut">{{tenantName || '瑜伽馆'}}</text>
+				<view class="home-studio-info" bindtap="bindStudioLocationTap">
+					<view class="home-studio-name-row">
+						<text class="home-studio-name text-cut">{{tenantName || '瑜伽馆'}}</text>
+						<view wx:if="{{openStatus}}" class="home-open-badge {{openStatus.open ? 'is-open' : 'is-closed'}}">
+							<view class="home-open-dot"></view>
+							<text>{{openStatus.label}} {{openStatus.timeText}}</text>
+						</view>
+					</view>
+					<view wx:if="{{studioAddress}}" class="home-studio-addr">
+						<van-icon name="location-o" size="22rpx" color="#9a9d96" />
+						<text class="text-cut">{{studioAddress}}</text>
+					</view>
+				</view>
 				<view class="home-studio-divider"></view>
 				<view class="home-studio-phone" bindtap="bindPhoneTap">
 					<van-icon name="phone-o" size="40rpx" color="{{themeColor}}" />
 				</view>
 			</view>
-			<view class="home-studio-announce" wx:if="{{announcements.length}}" bindtap="bindAnnounceStripTap">
+			<view class="home-studio-announce" wx:if="{{announcements.length}}">
 				<van-icon name="volume-o" size="25rpx" color="{{themeColor}}" />
-				<text class="home-studio-announce-title text-cut">{{announcements[0].title}}</text>
-				<text wx:if="{{announcements[0].publishAgo}}" class="home-studio-announce-time">{{announcements[0].publishAgo}}</text>
-				<van-icon name="arrow" size="24rpx" color="#b2b5ae" />
+				<swiper class="home-announce-swiper" vertical circular autoplay="{{announcements.length > 1}}" interval="4000" duration="500">
+					<swiper-item wx:for="{{announcements}}" wx:key="_id">
+						<view class="home-announce-row" bindtap="bindAnnounceTap" data-id="{{item._id}}">
+							<text class="home-studio-announce-title text-cut">{{item.title}}</text>
+							<text wx:if="{{item.publishAgo}}" class="home-studio-announce-time">{{item.publishAgo}}</text>
+							<van-icon name="arrow" size="24rpx" color="#b2b5ae" />
+						</view>
+					</swiper-item>
+				</swiper>
 			</view>
 		</view>
 
-		<!-- 统一行动卡：会员一眼完成查看、复约和私教预约 -->
+		<!-- 统一行动卡：下一节课 + 推荐（无推荐时兜底私教入口） -->
 		<view class="home-action-card" wx:if="{{memberDashboardLoaded}}">
 			<view wx:if="{{nextJoin}}" class="home-action-item" data-id="{{nextJoin.id}}" bindtap="bindNextJoinTap">
-				<van-icon name="records" size="32rpx" color="{{themeColor}}" />
-				<text class="home-action-label">最新预约</text>
-				<text class="home-action-main text-cut">{{nextJoin.title}}</text>
-				<text class="home-action-sub">{{nextJoin.timeStart}}–{{nextJoin.timeEnd}}</text>
+				<view class="home-action-icon">
+					<van-icon name="records" size="34rpx" color="{{themeColor}}" />
+				</view>
+				<view class="home-action-info">
+					<text class="home-action-label">下一节课</text>
+					<text class="home-action-main text-cut">{{nextJoin.title}}</text>
+					<text class="home-action-sub text-cut">{{nextJoin.subText}}</text>
+				</view>
 			</view>
 			<view wx:else class="home-action-item" bindtap="bindHomeBookingTap">
-				<van-icon name="records" size="32rpx" color="{{themeColor}}" />
-				<text class="home-action-label">最新预约</text>
-				<text class="home-action-main">暂无预约</text>
-				<text class="home-action-sub">去看看课程</text>
+				<view class="home-action-icon">
+					<van-icon name="records" size="34rpx" color="{{themeColor}}" />
+				</view>
+				<view class="home-action-info">
+					<text class="home-action-label">去约课</text>
+					<text class="home-action-main">暂无预约</text>
+					<text class="home-action-sub">看看本周排课</text>
+				</view>
 			</view>
-			<view class="home-action-item" bindtap="bindHomeBookingTap">
-				<van-icon name="replay" size="32rpx" color="{{themeColor}}" />
-				<text class="home-action-label">再约一次</text>
-				<text class="home-action-main">课程预约</text>
-				<text class="home-action-sub">查看本周排课</text>
+			<view wx:if="{{recommendMeets.length > 0}}" class="home-action-item" data-id="{{recommendMeets[0].meetId}}" data-type="{{recommendMeets[0].type}}" bindtap="bindRecommendTap">
+				<view class="home-action-icon">
+					<van-icon name="{{recommendMeets[0].type === 'private' ? 'friends-o' : 'star-o'}}" size="34rpx" color="{{themeColor}}" />
+				</view>
+				<view class="home-action-info">
+					<text class="home-action-label">{{recommendMeets[0].type === 'private' ? '私教体验' : '为你推荐'}}</text>
+					<text class="home-action-main text-cut">{{recommendMeets[0].title}}</text>
+					<text class="home-action-sub text-cut">{{recommendMeets[0].subText}}</text>
+				</view>
 			</view>
-			<view class="home-action-item" bindtap="bindPrivateBookingTap">
-				<van-icon name="friends-o" size="32rpx" color="{{themeColor}}" />
-				<text class="home-action-label">私教预约</text>
-				<text class="home-action-main">一对一定制</text>
-				<text class="home-action-sub">自选教练与时间</text>
+			<view wx:else class="home-action-item" bindtap="bindPrivateBookingTap">
+				<view class="home-action-icon">
+					<van-icon name="friends-o" size="34rpx" color="{{themeColor}}" />
+				</view>
+				<view class="home-action-info">
+					<text class="home-action-label">私教预约</text>
+					<text class="home-action-main">一对一定制</text>
+					<text class="home-action-sub">自选教练与时间</text>
+				</view>
 			</view>
 		</view>
 
-		<view class="home-practice-card" wx:if="{{memberDashboardLoaded}}" bindtap="bindAchievementTap">
+		<view class="home-practice-card" wx:if="{{memberDashboardLoaded && practiceProgress.totalClasses > 0}}" bindtap="bindAchievementTap">
 			<view>
 				<text class="home-practice-title">练习进度</text>
 				<text class="home-practice-sub">每一次来到垫上，都会成为积累</text>
@@ -76,6 +110,14 @@
 				<view><text>{{practiceProgress.currentStreak || 0}}</text><text>周连续</text></view>
 				<view><text>{{practiceProgress.badgeCount || 0}}</text><text>枚徽章</text></view>
 			</view>
+		</view>
+		<view class="home-practice-teaser" wx:elif="{{memberDashboardLoaded}}" bindtap="bindHomeBookingTap">
+			<van-icon name="flower-o" size="32rpx" color="{{themeColor}}" />
+			<view class="home-practice-teaser-text">
+				<text class="home-practice-teaser-main">开始你的第一节瑜伽课</text>
+				<text class="home-practice-teaser-sub">每一次来到垫上，都会成为积累</text>
+			</view>
+			<van-icon name="arrow" size="24rpx" color="#b2b5ae" />
 		</view>
 
 		<!-- 金牌老师（横向滑动） -->

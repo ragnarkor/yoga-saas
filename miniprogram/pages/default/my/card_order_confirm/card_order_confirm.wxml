@@ -1,0 +1,119 @@
+<page-meta page-style="{{pageStyle}}" />
+
+<view class="confirm theme-scope" style="{{pageStyle}}">
+  <cmpt-tenant-switch title="确认订单" theme-color="{{themeColor}}" show-back="{{true}}" />
+
+  <view wx:if="{{loading}}" class="confirm-loading">
+    <van-loading color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <van-empty wx:elif="{{!card}}" description="该套餐已下架或不可购买" />
+
+  <block wx:else>
+    <!-- 商品快照 -->
+    <view class="confirm-card">
+      <view class="confirm-goods">
+        <view
+          class="confirm-goods-cover"
+          style="background:linear-gradient(135deg, {{card.color}} 0%, {{card.colorDark}} 100%);"
+        >
+          <text class="confirm-goods-type">{{card.typeDesc}}</text>
+        </view>
+        <view class="confirm-goods-info">
+          <view class="confirm-goods-name">{{card.name}}</view>
+          <view class="confirm-goods-attr">{{card.mainAttr}}</view>
+          <view class="confirm-goods-price">
+            <text class="confirm-goods-cur" style="color:{{themeColor}}">¥</text>
+            <text class="confirm-goods-num" style="color:{{themeColor}}">{{card.priceYuan}}</text>
+            <text wx:if="{{card.hasDiscount}}" class="confirm-goods-origin">¥{{card.originYuan}}</text>
+          </view>
+        </view>
+        <text class="confirm-goods-count">x1</text>
+      </view>
+    </view>
+
+    <!-- 订单备注 -->
+    <view class="confirm-card">
+      <van-field
+        label="订单备注"
+        value="{{remark}}"
+        placeholder="选填，给馆主留言（100 字内）"
+        maxlength="100"
+        bind:input="bindRemarkInput"
+        border="{{false}}"
+      />
+    </view>
+
+    <!-- 支付方式 -->
+    <view class="confirm-card">
+      <view class="confirm-section-title">支付方式</view>
+      <view
+        wx:if="{{wechatPay}}"
+        class="confirm-pay-item {{payType === 'wechat' ? 'is-active' : ''}}"
+        data-type="wechat"
+        bindtap="bindPayTypeTap"
+      >
+        <van-icon name="wechat-pay" size="40rpx" color="#09bb07" />
+        <view class="confirm-pay-info">
+          <view class="confirm-pay-name">微信支付</view>
+          <view class="confirm-pay-desc">支付成功后自动发卡</view>
+        </view>
+        <van-icon
+          name="checked"
+          size="36rpx"
+          color="{{payType === 'wechat' ? themeColor : '#dcdee0'}}"
+        />
+      </view>
+      <view
+        class="confirm-pay-item {{payType === 'offline' ? 'is-active' : ''}}"
+        data-type="offline"
+        bindtap="bindPayTypeTap"
+      >
+        <van-icon name="gold-coin-o" size="40rpx" color="#ff9c3f" />
+        <view class="confirm-pay-info">
+          <view class="confirm-pay-name">线下付款</view>
+          <view class="confirm-pay-desc">提交申请，馆主确认到账后发卡</view>
+        </view>
+        <van-icon
+          name="checked"
+          size="36rpx"
+          color="{{payType === 'offline' ? themeColor : '#dcdee0'}}"
+        />
+      </view>
+      <view wx:if="{{payType === 'offline' && guide}}" class="confirm-pay-guide">
+        <van-icon name="info-o" size="26rpx" color="{{themeColor}}" />
+        <text>{{guide}}</text>
+      </view>
+    </view>
+
+    <!-- 金额汇总 -->
+    <view class="confirm-card">
+      <view class="confirm-sum-row">
+        <text class="confirm-sum-label">商品金额</text>
+        <text class="confirm-sum-value">¥{{card.priceYuan}}</text>
+      </view>
+      <view class="confirm-sum-row">
+        <text class="confirm-sum-label">购买数量</text>
+        <text class="confirm-sum-value">1 张</text>
+      </view>
+      <view class="confirm-sum-row confirm-sum-row--total">
+        <text class="confirm-sum-label">合计</text>
+        <text class="confirm-sum-value" style="color:{{themeColor}};font-weight:600;">¥{{card.priceYuan}}</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 吸底提交栏 -->
+  <view wx:if="{{!loading && card}}" class="confirm-bar">
+    <view class="confirm-bar-price">
+      <text class="confirm-bar-label">应付</text>
+      <text class="confirm-bar-cur" style="color:{{themeColor}}">¥</text>
+      <text class="confirm-bar-num" style="color:{{themeColor}}">{{card.priceYuan}}</text>
+    </view>
+    <view
+      class="confirm-bar-btn {{submitting ? 'is-disabled' : ''}}"
+      style="background:{{themeColor}}"
+      bindtap="bindSubmitTap"
+    >{{submitting ? '提交中...' : '提交订单'}}</view>
+  </view>
+</view>

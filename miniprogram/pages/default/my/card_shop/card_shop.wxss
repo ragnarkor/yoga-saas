@@ -1,1 +1,143 @@
-.shop{min-height:100vh;padding:28rpx;background:#f7f8f7}.loading{display:flex;justify-content:center;padding:120rpx}.shop-tip,.shop-contact{margin-bottom:20rpx;color:#7d887f;font-size:25rpx;line-height:1.65}.shop-contact{margin-top:28rpx}.shop-card{display:flex;align-items:center;gap:18rpx;margin-bottom:18rpx;padding:24rpx;border-radius:20rpx;background:#fff}.shop-color{width:12rpx;height:88rpx;border-radius:99rpx}.shop-info{flex:1;min-width:0}.shop-name,.shop-meta,.shop-desc{display:block}.shop-name{color:#34423a;font-size:30rpx;font-weight:700}.shop-meta{margin-top:8rpx;color:#7d887f;font-size:24rpx}.shop-desc{margin-top:5rpx;color:#a0a8a2;font-size:22rpx}
+.shop {
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+.shop-loading {
+  display: flex;
+  justify-content: center;
+  padding: 160rpx 0;
+}
+
+/* 商品卡列表：底部留白，避免被置底指引栏遮挡 */
+.shop-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding: 24rpx 24rpx 200rpx;
+}
+.goods {
+  background: #fff;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 6rpx 24rpx rgba(0, 0, 0, 0.04);
+}
+
+/* 卡面头图 */
+.goods-cover {
+  position: relative;
+  height: 200rpx;
+  padding: 32rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.goods-cover-name {
+  color: #fff;
+  font-size: 40rpx;
+  font-weight: 800;
+  letter-spacing: 1rpx;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.12);
+}
+.goods-cover-tag {
+  align-self: flex-start;
+  margin-top: 14rpx;
+  padding: 4rpx 18rpx;
+  font-size: 22rpx;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.24);
+  border-radius: 999rpx;
+}
+
+.goods-body {
+  padding: 24rpx 28rpx 28rpx;
+}
+
+/* 权益标签 */
+.goods-attrs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28rpx;
+}
+.goods-attr {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  color: #4a5550;
+  font-size: 25rpx;
+}
+
+.goods-desc {
+  margin-top: 18rpx;
+  padding: 16rpx 20rpx;
+  color: #7d887f;
+  font-size: 24rpx;
+  line-height: 1.6;
+  background: #f7f8f7;
+  border-radius: 12rpx;
+}
+
+/* 价格 + 按钮 */
+.goods-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24rpx;
+}
+.goods-price-wrap {
+  display: flex;
+  align-items: baseline;
+}
+.goods-price-cur {
+  font-size: 28rpx;
+  font-weight: 700;
+}
+.goods-price {
+  font-size: 48rpx;
+  font-weight: 800;
+  line-height: 1;
+}
+.goods-price-origin {
+  margin-left: 14rpx;
+  color: #b5bcb7;
+  font-size: 26rpx;
+  text-decoration: line-through;
+}
+.goods-btn {
+  min-width: 180rpx;
+  height: 72rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+/* 置底购卡指引栏（参照成就页 .ach-actions） */
+.shop-guide-bar {
+  position: fixed;
+  z-index: 100;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background: #fff;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
+}
+.shop-guide-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+}
+.shop-guide-row--contact {
+  margin-top: 10rpx;
+}
+.shop-guide-text {
+  flex: 1;
+  color: #4a5550;
+  font-size: 25rpx;
+  line-height: 1.55;
+}
+.shop-guide-text--sub {
+  color: #a0a8a2;
+  font-size: 24rpx;
+}

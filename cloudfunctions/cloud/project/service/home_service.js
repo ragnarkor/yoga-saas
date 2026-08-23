@@ -125,7 +125,9 @@ class HomeService extends BaseService {
   }
 
   async getHomeIndex() {
-    let setup = await this.getSetup("SETUP_PHONE");
+    let setup = await this.getSetup(
+      "SETUP_PHONE,SETUP_ADDRESS,SETUP_LATITUDE,SETUP_LONGITUDE,SETUP_OPEN_TIME,SETUP_CLOSE_TIME",
+    );
     let phone = setup ? setup.SETUP_PHONE || "" : "";
 
     let [rawBanners, rawAnnounces] = await Promise.all([
@@ -162,7 +164,16 @@ class HomeService extends BaseService {
       publishTime: item.ANNOUNCE_ADD_TIME || 0,
     }));
 
-    return { phone, banners, announcements };
+    return {
+      phone,
+      address: setup ? setup.SETUP_ADDRESS || "" : "",
+      latitude: setup ? Number(setup.SETUP_LATITUDE) || 0 : 0,
+      longitude: setup ? Number(setup.SETUP_LONGITUDE) || 0 : 0,
+      openTime: setup ? setup.SETUP_OPEN_TIME || "" : "",
+      closeTime: setup ? setup.SETUP_CLOSE_TIME || "" : "",
+      banners,
+      announcements,
+    };
   }
 
   /** 首页第二阶段内容：图片资源较多，首屏展示后再加载。 */
@@ -216,25 +227,78 @@ class HomeService extends BaseService {
     );
 
     let recommends = [];
-    if (!next) {
+    {
       const today = timeUtil.time("Y-M-D");
       const endDay = timeUtil.time("Y-M-D", 6 * 86400);
-      const slots = await new (require("./meet_service.js"))().getMeetListByWeek(
-        today,
-        endDay,
+      const slots =
+        await new (require("./meet_service.js"))().getMeetListByWeek(
+          today,
+          endDay,
+        );
+
+      // 个性化：从用户历史约课统计课程偏好；已约过的未来课不再重复推荐。
+      const bookedIds = new Set(
+        (joins || [])
+          .filter(
+            (item) => `${item.JOIN_MEET_DAY} ${item.JOIN_MEET_TIME_END}` >= now,
+          )
+          .map((item) => item.JOIN_MEET_ID),
       );
-      recommends = (slots || [])
-        .filter((item) => `${item.day} ${item.timeStart}` > now)
-        .slice(0, 3)
-        .map((item) => ({
-          meetId: item._id,
-          title: item.title,
-          day: item.day,
-          dayLabel: String(item.day || "").slice(5),
-          timeStart: item.timeStart,
-          timeEnd: item.timeEnd,
-          coachName: item.coachName || "",
-        }));
+      const titleFreq = {};
+      for (const item of joins || []) {
+        const t = (item.JOIN_MEET_TITLE || "").trim();
+        if (t) titleFreq[t] = (titleFreq[t] || 0) + 1;
+      }
+
+      const futureSlots = (slots || []).filter(
+        (item) =>
+          `${item.day} ${item.timeStart}` > now && !bookedIds.has(item._id),
+      );
+      // 偏好优先（历史约得多的课排前），同级按开课时间就近。
+      futureSlots.sort((a, b) => {
+        const fa = titleFreq[(a.title || "").trim()] || 0;
+        const fb = titleFreq[(b.title || "").trim()] || 0;
+        if (fa !== fb) return fb - fa;
+        return `${a.day} ${a.timeStart}` <= `${b.day} ${b.timeStart}` ? -1 : 1;
+      });
+
+      recommends = futureSlots.slice(0, next ? 1 : 3).map((item) => ({
+        type: "meet",
+        meetId: item._id,
+        title: item.title,
+        day: item.day,
+        dayLabel: String(item.day || "").slice(5),
+        timeStart: item.timeStart,
+        timeEnd: item.timeEnd,
+        coachName: item.coachName || "",
+        subText:
+          String(item.day || "").slice(5) +
+          (item.timeStart ? " " + item.timeStart : ""),
+      }));
+    }
+
+    // 推荐位软性私教推广：每次请求约 1/3 概率把私教体验置顶混入推荐，避免刻意硬广。
+    if (Math.random() * 3 < 1) {
+      try {
+        const privateTeachers =
+          await teacherAdminHelper.listBoundStaffForHome();
+        if (privateTeachers && privateTeachers.length) {
+          const coach = privateTeachers[0];
+          recommends = [
+            {
+              type: "private",
+              title: "一对一私教课",
+              subText: `${coach.TEACHER_NAME}教练 · 时间自选`,
+            },
+            ...recommends,
+          ];
+        }
+      } catch (err) {
+        console.warn(
+          "[home/member_dashboard] private mix skipped:",
+          err.message,
+        );
+      }
     }
 
     let streak = {};
@@ -322,7 +386,8 @@ class HomeService extends BaseService {
       "TEACHER_NAME,TEACHER_AVATAR,TEACHER_PIC,TEACHER_SPECIALTY,TEACHER_DESC,TEACHER_ADMIN_ID,TEACHER_HOME,TEACHER_STATUS",
     );
     if (!teacher) return null;
-    if (!(await teacherAdminHelper.isTeacherVisibleOnHome(teacher))) return null;
+    if (!(await teacherAdminHelper.isTeacherVisibleOnHome(teacher)))
+      return null;
 
     return {
       _id: teacher._id,
@@ -361,7 +426,8 @@ class HomeService extends BaseService {
       "TEACHER_NAME,TEACHER_AVATAR,TEACHER_PIC,TEACHER_SPECIALTY,TEACHER_DESC,TEACHER_ADMIN_ID,TEACHER_HOME,TEACHER_STATUS",
     );
     if (!teacher) return null;
-    if (!(await teacherAdminHelper.isTeacherVisibleOnHome(teacher))) return null;
+    if (!(await teacherAdminHelper.isTeacherVisibleOnHome(teacher)))
+      return null;
 
     let adminId = teacher.TEACHER_ADMIN_ID || "";
     let setup = await this.getSetup("SETUP_MEET_TYPE");
@@ -431,8 +497,7 @@ class HomeService extends BaseService {
         if (!t || t.status != 1) continue;
 
         let limit = Number(t.limit) || 0;
-        let succCnt =
-          t.stat && t.stat.succCnt ? Number(t.stat.succCnt) : 0;
+        let succCnt = t.stat && t.stat.succCnt ? Number(t.stat.succCnt) : 0;
         let slotsLeft = limit > 0 ? Math.max(0, limit - succCnt) : 99;
         let isShowLimit = meet.MEET_IS_SHOW_LIMIT !== 0;
         let level = Number(style.difficulty || style.level || 3);
@@ -554,9 +619,7 @@ class HomeService extends BaseService {
         type: "news",
         title: item.NEWS_TITLE,
         desc: item.NEWS_DESC || "",
-        pic: await this._fmtMediaUrl(
-          (item.NEWS_PIC && item.NEWS_PIC[0]) || "",
-        ),
+        pic: await this._fmtMediaUrl((item.NEWS_PIC && item.NEWS_PIC[0]) || ""),
       })),
     );
 

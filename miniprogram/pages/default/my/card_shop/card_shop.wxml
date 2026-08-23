@@ -1,1 +1,78 @@
-<view class="shop"><view wx:if="{{loading}}" class="loading"><van-loading color="{{themeColor}}">加载中...</van-loading></view><van-empty wx:elif="{{!cards.length}}" description="暂无可购买套餐"/><block wx:else><view class="shop-tip">{{guide || '提交申请后，请按馆方说明付款，到账后自动发卡。'}}</view><view wx:for="{{cards}}" wx:key="id" class="shop-card"><view class="shop-color" style="background:{{item.color}}"></view><view class="shop-info"><text class="shop-name">{{item.name}}</text><text class="shop-meta">{{item.type === 'times' ? item.quota + ' 次' : item.days + ' 天'}} · ¥{{item.priceFee / 100}}</text><text wx:if="{{item.desc}}" class="shop-desc">{{item.desc}}</text></view><van-button round size="small" color="{{themeColor}}" data-id="{{item.id}}" bind:click="buy">申请购买</van-button></view><view wx:if="{{contact}}" class="shop-contact">联系馆方：{{contact}}</view></block></view>
+<page-meta page-style="{{pageStyle}}" />
+
+<view class="shop theme-scope" style="{{pageStyle}}">
+  <cmpt-tenant-switch title="购买会员卡" theme-color="{{themeColor}}" show-back="{{true}}" />
+
+  <view wx:if="{{loading}}" class="shop-loading">
+    <van-loading color="{{themeColor}}">加载中...</van-loading>
+  </view>
+
+  <van-empty wx:elif="{{!cards.length}}" description="暂无可购买套餐" />
+
+  <block wx:else>
+    <!-- 商品卡列表 -->
+    <view class="shop-list">
+      <view
+        wx:for="{{cards}}"
+        wx:key="id"
+        class="goods"
+        data-id="{{item.id}}"
+        bindtap="bindCardTap"
+      >
+        <!-- 卡面头图：主题色渐变 + 卡名 -->
+        <view
+          class="goods-cover"
+          style="background:linear-gradient(135deg, {{item.color}} 0%, {{item.colorDark}} 100%);"
+        >
+          <view class="goods-cover-name">{{item.name}}</view>
+          <view class="goods-cover-tag">{{item.typeDesc}}</view>
+        </view>
+
+        <view class="goods-body">
+          <!-- 权益标签 -->
+          <view class="goods-attrs">
+            <view class="goods-attr">
+              <van-icon name="{{item.type === 'times' ? 'coupon-o' : 'clock-o'}}" size="26rpx" color="{{themeColor}}" />
+              <text>{{item.mainAttr}}</text>
+            </view>
+            <view class="goods-attr">
+              <van-icon name="cluster-o" size="26rpx" color="{{themeColor}}" />
+              <text>{{item.scopeAll ? '全部课程可用' : '指定课程可用'}}</text>
+            </view>
+          </view>
+
+          <!-- 购买说明 -->
+          <view wx:if="{{item.desc}}" class="goods-desc">{{item.desc}}</view>
+
+          <!-- 价格 + 购买 -->
+          <view class="goods-foot">
+            <view class="goods-price-wrap">
+              <text class="goods-price-cur" style="color:{{themeColor}}">¥</text>
+              <text class="goods-price" style="color:{{themeColor}}">{{item.priceYuan}}</text>
+              <text wx:if="{{item.hasDiscount}}" class="goods-price-origin">¥{{item.originYuan}}</text>
+            </view>
+            <van-button
+              round
+              custom-class="goods-btn"
+              color="{{themeColor}}"
+              mark:id="{{item.id}}"
+              catch:click="buy"
+            >立即购买</van-button>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 置底购卡指引栏（参照成就页置底操作栏） -->
+  <view wx:if="{{!loading && (guide || contact)}}" class="shop-guide-bar">
+    <view wx:if="{{guide}}" class="shop-guide-row">
+      <van-icon name="info-o" size="28rpx" color="{{themeColor}}" />
+      <text class="shop-guide-text">{{guide}}</text>
+    </view>
+    <view wx:if="{{contact}}" class="shop-guide-row shop-guide-row--contact">
+      <van-icon name="phone-o" size="28rpx" color="#a0a8a2" />
+      <text class="shop-guide-text shop-guide-text--sub">联系馆方：{{contact}}</text>
+    </view>
+  </view>
+</view>

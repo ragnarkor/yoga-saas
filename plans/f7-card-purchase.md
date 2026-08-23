@@ -74,13 +74,16 @@
 ### 状态机
 
 ```
-PENDING_PAY = 1   待付款/待馆方确认
-CONFIRMING  = 5   正在确认发卡（内部短暂状态）
-ISSUED      = 10  已确认收款且已发卡（成功终态）
-CLOSED      = 20  已关闭/已拒绝（终态）
+PENDING = 1   待付款 / 待馆方确认
+PAID    = 8   微信支付已成功、尚未发卡（仅 wechat 路径中转）
+CONFIRMING = 5   正在确认发卡（内部短暂状态）
+ISSUED  = 10  已确认收款且已发卡（成功终态）
+CLOSED  = 20  已关闭 / 已拒绝（终态）
 ```
 
-确认发卡必须可重试：若卡创建失败，订单从 `CONFIRMING` 恢复为 `PENDING_PAY` 并记录失败原因，不能误标为 `ISSUED`。
+发卡必须可重试且不误标：
+- 线下确认失败：`CONFIRMING → PENDING`，记录原因，可重试。
+- 微信支付后发卡失败：`CONFIRMING → PAID`（钱已到，不回退到 PENDING），记录原因，回调重推或馆主人工补发。
 
 ### 索引
 
@@ -174,18 +177,85 @@ USER_CARD_MEMO = "购卡申请确认"
 - 订单列表默认“待确认”，支持会员名、日期、状态筛选。
 - 确认页不要求上传银行凭证；线下核对是馆方的现实流程，系统只保留确认动作和备注。
 
-## 八、未来接入微信支付的预留
+## 八、微信支付接入（已实现，配置即启用）
 
-未来将支付能力作为 **订单支付方式** 扩展，不改卡与发卡核心：
+支付能力作为 **订单支付方式（`ORDER_PAY_TYPE`）** 扩展，**不改卡与发卡核心**——两条路径最终都调用同一个 `_createUserCardFromOrder`。
 
 ```
-当前：PENDING_PAY → 人工确认 → CONFIRMING → ISSUED
-未来：INIT → 微信支付成功 → PAID → CONFIRMING → ISSUED
+线下：PENDING(待馆方确认) → 馆主确认 → CONFIRMING → ISSUED / CLOSED
+微信：PENDING(待支付) → 支付回调 → CONFIRMING → ISSUED（失败回滚 PAID，可人工补发）
+退款(仅微信已发卡)：ISSUED → REFUNDING → REFUNDED（失败回滚 ISSUED）
 ```
 
-届时需另立支付技术方案并先完成技术验证，至少包括：租户自有商户号或服务商模式、多租户支付凭证安全托管、付款回调验签和金额核对、超时关单与幂等补发、退款和收入冲销，以及真实成交价字段的统计迁移。
+### 代码位置
 
-不采用已进入退市流程的腾讯云“云支付（CPay）”作为新接入基础；正式支付通道在启动时再依据微信支付与云开发的当期官方能力选型。
+| 职责 | 文件 |
+|---|---|
+| 统一下单 + 判定回调 + 解析回调 | `project/service/card_pay_service.js` |
+| 回调发卡（跨租户建上下文、幂等） | `project/service/card_notify_service.js` |
+| 会员下单（`payType=wechat` 分支、返回 `payment`） | `project/service/card_purchase_service.js` |
+| 支付成功自动发卡（复用发卡核心） | `admin_card_service.autoIssueByPay()` |
+| 回调入口拦截（先于鉴权链） | `index.js` |
+| 商户配置 | `config/config.js` 的 `WX_PAY` |
+
+### 关键设计
+
+- **回调不走路由鉴权**：微信平台直接调用云函数，event 无 `route`/`token`。`index.js` 用 `CardPayService.isPayNotify(event)` 命中后交给 `CardNotifyService.handle()`，绕开 `application.app`。
+- **回调自建租户上下文**：回调无 PID，先用 `outTradeNo(=ORDER_ID)` 跨租户查订单（`getOne(..., mustPID=false)`）取 `_pid`，再 `tenantContext.runWithPID(pid, ...)` 内发卡。
+- **发卡幂等（同人工确认）**：订单号唯一 + 状态 CAS（`PENDING/PAID → CONFIRMING` 用 `['in',[..]]` 一次抢占）+ `USER_CARD_ORDER_ID` 查重。回调可重放，全链路可安全重复调用。
+- **收款后发卡失败回滚到 PAID（不回 PENDING）**：钱已到，不能丢失支付事实；订单落到 PAID 待馆主人工补发，回调返回非 0 让微信重推重试。
+- **未配置即安全降级**：`WX_PAY.mchId/payKey` 留空时 `isEnabled()` 为 false，`getShop()` 返回 `wechatPay:false`，前端只显示线下付款；后端即使收到 `payType=wechat` 也强制回落 offline，防前端伪造。
+
+### 怎么用（开通步骤）
+
+1. 申请**微信支付商户号**，在微信支付后台把商户号与本云开发环境关联（开通云支付/cloudPay 能力）。
+2. 把商户号、支付密钥经**部署环境变量**注入：`WX_PAY_MCH_ID`、`WX_PAY_KEY`（`config.js` 已从 `process.env` 读取，**不要把密钥写进仓库**）。
+3. `WX_PAY.functionName` 保持本云函数名（默认 `cloud`），回调会打回自身。
+4. 前端下单传 `payType:'wechat'`，用返回的 `payment` 调 `wx.requestPayment`；发卡由回调自动完成，无需人工确认。
+5. 本地/CI 无商户号无法真跑支付，代码在未配置时安全降级，可正常部署验证线下流程。
+
+> 安全红线：不在数据库保存商户密钥/银行卡等敏感信息；不采用已退市的腾讯云“云支付（CPay）”作为接入基础，使用微信支付 + 云开发当期官方能力。
+
+## 八·五、订单维护：超时未支付自动关单（已实现）
+
+微信订单在 `PENDING`（待支付）停留过久会占用防重、堆积脏数据，由定时任务自动清理。
+
+| 项 | 说明 |
+|---|---|
+| 触发 | `config.json` 的 `triggers` 定时器 `cardOrderMaintain`，每 10 分钟一次；`index.js` 识别 `event.Type === 'Timer'` 分发 |
+| 逻辑 | `card_order_job_service.closeTimeoutOrders()`：跨租户扫 `微信 + PENDING + 下单超 2 小时` → CLOSED，原因「超时未支付，系统自动关闭」 |
+| 范围 | **只关微信未支付单**；线下单的 PENDING = 待馆主人工确认，绝不自动关（会员可能已线下付款） |
+| 并发安全 | CAS 关单（`edit` 匹配 `PENDING` 才生效）——若回调此刻正把订单推进到 PAID，抢不到、不误关已付款单 |
+| 无 PID | 定时任务无租户上下文，`getAll(..., mustPID=false)` 跨租户查，再逐单 `runWithPID(_pid)` 关闭 |
+| 限流 | 单次最多 200 单，剩余留给下次，防云函数超时 |
+
+> 部署提醒：`config.json` 的 triggers 需在云开发控制台确认已生效；`TIMEOUT_MS` / 频率可按业务调整。此机制可复用于未来「卡到期提醒」「PAID 待补发提醒」等定时任务。
+
+## 八·六、退款（已实现，仅微信已发卡订单）
+
+补上购卡闭环最后一块：微信支付且已发卡的订单可由馆主发起**原路退款**，退款成功后停用对应会员卡。
+
+### 代码位置
+
+| 职责 | 文件 |
+|---|---|
+| 微信退款封装 `cloudPay.refund` | `card_pay_service.refund()` |
+| 退款业务（校验/CAS/停卡/回滚） | `admin_card_service.refundCardOrder()` |
+| 已用判断 | `admin_card_service._isCardUsed()` |
+| 路由 / 控制器 | `admin/card_order_refund`、`refundCardOrder()` |
+| 前端入口 | 订单待办页「原路退款」按钮（仅 ISSUED+wechat 显示） |
+
+### 关键设计（防资损，严格顺序）
+
+1. **仅微信 + ISSUED 可退**：线下订单提示线下退款，系统不代扣；其他状态拒绝。
+2. **先校验卡未使用**：次数卡剩余 < 初始 = 已用；期限卡激活超 24h 宽限 = 已用。已用则拒绝整单退款，交人工线下核算。
+3. **CAS 抢占 `ISSUED → REFUNDING`**：防并发/重复退款，只有一次抢到。
+4. **退款单号 `RF + 订单号` 派生**：作为微信 `outRefundNo` 幂等键，重复请求微信不会多退。
+5. **成功后停卡不删卡**：卡置 STOP 保留记录便于追溯；订单落 `REFUNDED`。
+6. **失败回滚 `ISSUED`**：钱未退、卡仍有效，记录原因可重试。
+7. **幂等**：已 REFUNDED 直接返回，不重复退。
+
+> 边界闭合：F7 早前遗留的「超时关单后又收到支付 → 已收款未发卡」场景，现由退款能力兜底（对该单发起退款即可）。
 
 ## 九、实施阶段
 
@@ -205,3 +275,8 @@ USER_CARD_MEMO = "购卡申请确认"
 - [ ] 全部金额使用分进行订单计算与展示换算。
 - [ ] 页面不展示或存储完整银行卡号、付款密码、转账截图等敏感支付信息。
 - [ ] 未开启功能的场馆不显示购卡入口。
+- [ ] 定时触发器 `cardOrderMaintain` 已在云开发控制台生效，超时微信单能自动关闭。
+- [ ] 自动关单只影响微信待支付单，不误关线下待确认单。
+- [ ] 退款仅对微信已发卡订单开放；已使用的卡不能整单退款。
+- [ ] 退款用订单号派生的退款单号做幂等键，重复退款不会多退。
+- [ ] 退款成功后对应会员卡被停用且保留记录；退款失败订单回滚为已发卡。

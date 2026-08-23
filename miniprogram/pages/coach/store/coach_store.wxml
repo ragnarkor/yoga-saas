@@ -126,6 +126,28 @@
               bind:change="bindFieldChange"
               data-field="contactPhone"
             />
+            <view class="store-hours-cell">
+              <text class="store-hours-label">营业时间</text>
+              <view class="store-hours-edit">
+                <picker
+                  mode="time"
+                  value="{{storeOpenTime || '09:00'}}"
+                  data-field="storeOpenTime"
+                  bindchange="bindStoreTimeChange"
+                >
+                  <view class="store-hours-item">{{storeOpenTime || '09:00'}}</view>
+                </picker>
+                <text class="store-hours-sep">-</text>
+                <picker
+                  mode="time"
+                  value="{{storeCloseTime || '21:00'}}"
+                  data-field="storeCloseTime"
+                  bindchange="bindStoreTimeChange"
+                >
+                  <view class="store-hours-item">{{storeCloseTime || '21:00'}}</view>
+                </picker>
+              </view>
+            </view>
             <van-cell
               title="地图选点"
               is-link
@@ -153,6 +175,10 @@
           <block wx:else>
             <van-cell title="联系电话" value="{{contactPhone || '未填写'}}" />
             <van-cell title="门店地址" label="{{contactAddress || '未填写'}}" />
+            <van-cell
+              title="营业时间"
+              value="{{storeOpenTime && storeCloseTime ? storeOpenTime + '-' + storeCloseTime : '未设置'}}"
+            />
           </block>
         </van-cell-group>
 

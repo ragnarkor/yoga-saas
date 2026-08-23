@@ -1,13 +1,21 @@
 <page-meta page-style="{{pageStyle}}" />
 <view class="card-pack-page theme-scope" style="{{pageStyle}}">
-  <view class="card-pack-buy" style="background:{{themeColor}}" bindtap="bindCardShopTap"><van-icon name="shopping-cart-o" size="30rpx" color="#fff" /><text>购买会员卡</text></view>
   <view class="card-pack-toolbar">
-    <view
-      class="card-pack-toggle {{showInvalid ? 'is-active' : ''}}"
-      bindtap="bindToggleInvalidTap"
-    >
-      <van-icon name="credit-pay" size="28rpx" color="{{showInvalid ? themeColor : '#969799'}}" />
-      <text>{{showInvalid ? '查看有效卡' : '查看失效卡'}}</text>
+    <view class="card-pack-seg">
+      <view
+        class="card-pack-seg-item {{!showInvalid ? 'is-active' : ''}}"
+        bindtap="bindSegTap"
+        data-invalid="false"
+      >
+        <text>有效卡</text>
+      </view>
+      <view
+        class="card-pack-seg-item {{showInvalid ? 'is-active' : ''}}"
+        bindtap="bindSegTap"
+        data-invalid="true"
+      >
+        <text>失效卡</text>
+      </view>
     </view>
   </view>
 
@@ -56,6 +64,14 @@
           <text>{{item.statusLabel}}</text>
         </view>
       </view>
+    </view>
+  </view>
+
+  <!-- 置底购买栏 -->
+  <view class="card-pack-buy-bar">
+    <view class="card-pack-buy" style="background:{{themeColor}}" bindtap="bindCardShopTap">
+      <van-icon name="shopping-cart-o" size="30rpx" color="#fff" />
+      <text>购买会员卡</text>
     </view>
   </view>
 </view>

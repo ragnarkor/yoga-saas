@@ -19,21 +19,6 @@
       <text class="course-edit-sheet-title">{{sheetTitle}}</text>
       <text class="course-edit-sheet-sub">{{sheetSub}}</text>
     </view>
-    <!-- scope 模式：保留原有三种范围选择，只强化说明和选中状态。 -->
-    <view wx:if="{{mode === 'scope'}}" class="mcp-seg">
-      <view
-        class="mcp-seg-item {{scopeMode === 'all' ? 'is-active' : ''}}"
-        bindtap="bindScopeAllTap"
-      ><text>全馆课程</text><text class="mcp-seg-desc">不限范围</text></view>
-      <view
-        class="mcp-seg-item {{scopeMode === 'categories' ? 'is-active' : ''}}"
-        bindtap="bindScopeCategoryModeTap"
-      ><text>按分类</text><text class="mcp-seg-desc">整类可用</text></view>
-      <view
-        class="mcp-seg-item {{scopeMode === 'meets' ? 'is-active' : ''}}"
-        bindtap="bindScopeMeetModeTap"
-      ><text>指定课程</text><text class="mcp-seg-desc">精确选择</text></view>
-    </view>
 
     <scroll-view scroll-y class="course-edit-sheet-scroll" enhanced show-scrollbar="{{false}}">
       <!-- single：课程类型单选 -->
@@ -57,84 +42,80 @@
         />
       </block>
 
-      <!-- scope + all：无需列表 -->
-      <block wx:elif="{{scopeMode === 'all'}}">
-        <view class="mcp-all-state">
-          <view class="mcp-all-state-icon">✓</view>
-          <view><text class="mcp-all-state-title">适用全馆所有课程</text><text class="mcp-all-state-sub">之后新增的课程也会自动可用</text></view>
-        </view>
-      </block>
-
-      <!-- scope + categories：分类多选 -->
-      <block wx:elif="{{scopeMode === 'categories'}}">
-        <view class="mcp-section-title"><text>选择可用分类</text><text>{{scopeCategoryIds.length}} 个已选</text></view>
-        <scroll-view scroll-x class="mcp-category-tabs" enhanced show-scrollbar="{{false}}">
-          <view class="mcp-category-tabs-inner">
+      <!-- scope：分类 Tab + 课程多选（移动端点单范式）。勾「整类」= 该分类全部课程可用（含后续新增），勾单课 = 精确指定 -->
+      <block wx:elif="{{mode === 'scope'}}">
+        <scroll-view scroll-x class="mcp-tabs" enhanced show-scrollbar="{{false}}">
+          <view class="mcp-tabs-inner">
             <view
-              class="mcp-category-tab {{item.selected ? 'is-active' : ''}}"
-              wx:for="{{scopeCategories}}"
-              wx:key="id"
-              data-id="{{item.id}}"
-              bindtap="bindScopeCategoryTap"
+              class="mcp-tab {{tab.typeId === draftActiveTab ? 'is-active' : ''}}"
+              wx:for="{{tabList}}"
+              wx:key="typeId"
+              wx:for-item="tab"
+              data-type-id="{{tab.typeId}}"
+              bindtap="bindTabTap"
             >
-              <text>{{item.name}}</text>
-              <van-icon wx:if="{{item.selected}}" name="success" size="24rpx" color="{{themeColor}}" />
+              <text class="mcp-tab-name">{{tab.typeName}}</text>
+              <text wx:if="{{tab.badge}}" class="mcp-tab-badge {{tab.full ? 'is-full' : ''}}">{{tab.badge}}</text>
             </view>
           </view>
         </scroll-view>
-        <view class="mcp-category-hint">选中后，该分类下全部课程都可使用此卡</view>
-        <view class="mcp-selected-category-list">
-          <block wx:for="{{scopeCategories}}" wx:key="id">
-            <view class="mcp-selected-category-chip" wx:if="{{item.selected}}">
-              <text>{{item.name}} · {{item.meetCount || 0}} 门</text>
-              <van-icon name="cross" size="22rpx" color="{{themeColor}}" data-id="{{item.id}}" bindtap="bindScopeCategoryTap" />
-            </view>
-          </block>
-          <text wx:if="{{!scopeCategoryIds.length}}" class="mcp-no-category">还没有选择课程分类</text>
-        </view>
-        <view class="mcp-custom-entry" bindtap="bindScopeCustomTap">
-          <view>
-            <text class="mcp-custom-entry-title">自定义课程</text>
-            <text class="mcp-custom-entry-sub">只选择部分课程时使用</text>
-          </view>
-          <van-icon name="arrow" size="30rpx" color="#b5b8b5" />
-        </view>
-        <van-empty
-          wx:if="{{!categories.length && !loading}}"
-          description="暂无课程分类，请先在「我的门店」配置"
-        />
-      </block>
 
-      <!-- scope + meets：具体课程多选 -->
-      <block wx:elif="{{scopeMode === 'meets'}}">
-        <view class="mcp-section-title"><text>选择指定课程</text><text>{{scopeMeetIds.length}} 门已选</text></view>
-        <view
-          class="course-edit-type-item {{item.selected ? 'is-active' : ''}}"
-          wx:for="{{scopeMeets}}"
-          wx:key="id"
-          data-id="{{item.id}}"
-          bindtap="bindScopeMeetTap"
-        >
-          <view class="course-edit-type-dot"></view>
-          <view class="mcp-meet-text">
-            <text class="course-edit-type-name">{{item.name}}</text>
-            <text wx:if="{{item.typeName}}" class="mcp-meet-sub">{{item.typeName}}</text>
-          </view>
-          <view class="course-edit-type-check" wx:if="{{item.selected}}">
-            <van-icon name="success" size="32rpx" color="{{themeColor}}" />
-          </view>
-        </view>
-        <van-empty
-          wx:if="{{!scopeMeets.length && meetsLoaded}}"
-          description="暂无课程，请先创建课程"
-        />
         <view wx:if="{{!meetsLoaded}}" class="mcp-hint">课程加载中…</view>
+        <block wx:else>
+          <!-- 全部 Tab：全馆总开关 -->
+          <view
+            wx:if="{{draftActiveTab === ''}}"
+            class="mcp-quick {{draftAllChecked ? 'is-active' : ''}}"
+            bindtap="bindDraftAllToggle"
+          >
+            <view class="mcp-opt-text">
+              <text class="mcp-quick-name">全部课程</text>
+              <text class="mcp-opt-sub">馆内所有课程都可用，含后续新增</text>
+            </view>
+            <view class="mcp-meet-check">
+              <van-icon wx:if="{{draftAllChecked}}" name="success" size="32rpx" color="{{themeColor}}" />
+            </view>
+          </view>
+          <!-- 分类 Tab：整类快捷行 -->
+          <view
+            wx:elif="{{activeCateName}}"
+            class="mcp-quick {{activeCateFull ? 'is-active' : ''}}"
+            data-type-id="{{draftActiveTab}}"
+            catchtap="bindDraftGroupToggle"
+          >
+            <view class="mcp-opt-text">
+              <text class="mcp-quick-name">整个{{activeCateName}}</text>
+              <text class="mcp-opt-sub">本分类全部课程都可用，含后续新增</text>
+            </view>
+            <view class="mcp-meet-check">
+              <van-icon wx:if="{{activeCateFull}}" name="success" size="32rpx" color="{{themeColor}}" />
+            </view>
+          </view>
+
+          <view class="mcp-meet-list">
+            <view
+              class="mcp-meet {{item.selected ? 'is-active' : ''}}"
+              wx:for="{{activeMeets}}"
+              wx:key="id"
+              data-id="{{item.id}}"
+              data-type-id="{{item.typeId}}"
+              bindtap="bindDraftMeetToggle"
+            >
+              <text class="mcp-meet-name">{{item.name}}</text>
+              <view class="mcp-meet-check">
+                <van-icon wx:if="{{item.selected}}" name="success" size="28rpx" color="{{themeColor}}" />
+              </view>
+            </view>
+            <van-empty wx:if="{{!activeMeets.length}}" description="该分类暂无课程" />
+          </view>
+        </block>
       </block>
     </scroll-view>
 
-    <!-- 多选模式底部确认 -->
-    <view wx:if="{{mode === 'scope' && (scopeMode === 'categories' || scopeMode === 'meets')}}" class="mcp-sheet-foot">
-      <view class="mcp-done-btn" bindtap="bindCloseSheet">完成</view>
+    <!-- scope 模式：取消（丢弃草稿） / 确定（带已选计数，提交生效） -->
+    <view wx:if="{{mode === 'scope'}}" class="mcp-foot">
+      <view class="mcp-foot-btn mcp-foot-btn--ghost" bindtap="bindSheetCancel">取消</view>
+      <view class="mcp-foot-btn mcp-foot-btn--main" bindtap="bindSheetConfirm">确定{{draftCountText}}</view>
     </view>
   </view>
 </van-popup>

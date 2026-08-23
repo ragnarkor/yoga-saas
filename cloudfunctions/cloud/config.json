@@ -1,5 +1,12 @@
 {
 	"timeout": 20,
+	"triggers": [
+		{
+			"name": "cardOrderMaintain",
+			"type": "timer",
+			"config": "0 */10 * * * * *"
+		}
+	],
 	"permissions": {
 		"openapi": ["wxacode.getUnlimited", "security.imgSecCheck", "security.msgSecCheck","serviceMarket.invokeService"]
 	}

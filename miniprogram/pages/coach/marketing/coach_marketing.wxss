@@ -70,4 +70,5 @@
 .marketing-card-sale-state { padding:4rpx 12rpx; border-radius:999rpx; background:#f2f2f2; color:#9a9a9a; font-size:21rpx; }
 .marketing-card-sale-state--on { background:var(--themeColorLight,#eef6f1); color:var(--themeColor,#5b8a72); }
 .marketing-card-sale-desc { display:block; overflow:hidden; margin-top:10rpx; color:#8a958d; font-size:24rpx; text-overflow:ellipsis; white-space:nowrap; }
+.marketing-card-order { margin-top:20rpx; }
 .marketing-note { display:flex; gap:12rpx; align-items:flex-start; margin:24rpx 4rpx; color:#8a958d; font-size:23rpx; line-height:1.65; }

@@ -1,0 +1,237 @@
+.confirm {
+  min-height: 100vh;
+  background: #f5f6f8;
+  /* 底部留白，避免内容被吸底提交栏遮挡 */
+  padding-bottom: calc(150rpx + env(safe-area-inset-bottom));
+}
+
+.confirm-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 32rpx;
+  min-height: 50vh;
+  box-sizing: border-box;
+}
+
+.confirm-card {
+  margin: 24rpx 32rpx 0;
+  padding: 24rpx 28rpx;
+  border-radius: 20rpx;
+  background: #fff;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+}
+
+.confirm-section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #323233;
+  margin-bottom: 12rpx;
+}
+
+/* ============ 商品快照 ============ */
+.confirm-goods {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.confirm-goods-cover {
+  position: relative;
+  width: 140rpx;
+  height: 100rpx;
+  border-radius: 14rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 8rpx 10rpx;
+  box-sizing: border-box;
+}
+
+.confirm-goods-type {
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 6rpx;
+  padding: 2rpx 10rpx;
+  line-height: 1.4;
+}
+
+.confirm-goods-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.confirm-goods-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #323233;
+  line-height: 1.3;
+}
+
+.confirm-goods-attr {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.confirm-goods-price {
+  margin-top: 8rpx;
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+
+.confirm-goods-cur {
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.confirm-goods-num {
+  font-size: 36rpx;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.confirm-goods-origin {
+  margin-left: 8rpx;
+  font-size: 22rpx;
+  color: #c8c9cc;
+  text-decoration: line-through;
+}
+
+.confirm-goods-count {
+  font-size: 26rpx;
+  color: #969799;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+/* ============ 支付方式 ============ */
+.confirm-pay-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f5f6f8;
+}
+
+.confirm-pay-item:last-of-type {
+  border-bottom: none;
+}
+
+.confirm-pay-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.confirm-pay-name {
+  font-size: 28rpx;
+  color: #323233;
+}
+
+.confirm-pay-desc {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #969799;
+}
+
+.confirm-pay-item:active {
+  opacity: 0.92;
+}
+
+.confirm-pay-guide {
+  display: flex;
+  align-items: flex-start;
+  gap: 10rpx;
+  margin-top: 8rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 12rpx;
+  background: #f7f8fa;
+  font-size: 24rpx;
+  color: #646566;
+  line-height: 1.6;
+}
+
+/* ============ 金额汇总 ============ */
+.confirm-sum-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0;
+}
+
+.confirm-sum-label {
+  font-size: 26rpx;
+  color: #969799;
+}
+
+.confirm-sum-value {
+  font-size: 26rpx;
+  color: #323233;
+}
+
+.confirm-sum-row--total {
+  border-top: 1rpx solid #f5f6f8;
+  margin-top: 8rpx;
+  padding-top: 20rpx;
+}
+
+/* ============ 吸底提交栏 ============ */
+.confirm-bar {
+  position: fixed;
+  z-index: 100;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 28rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
+}
+
+.confirm-bar-price {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+
+.confirm-bar-label {
+  font-size: 26rpx;
+  color: #646566;
+  margin-right: 6rpx;
+}
+
+.confirm-bar-cur {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.confirm-bar-num {
+  font-size: 46rpx;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.confirm-bar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 300rpx;
+  height: 88rpx;
+  border-radius: 999rpx;
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.confirm-bar-btn:active {
+  opacity: 0.92;
+}
+
+.confirm-bar-btn.is-disabled {
+  opacity: 0.6;
+}

@@ -29,6 +29,8 @@ class AdminTenantController extends BaseAdminController {
       contactAddress: "string|max:200|name=门店地址",
       contactLatitude: "string|false|name=纬度",
       contactLongitude: "string|false|name=经度",
+      storeOpenTime: "string|false|name=营业开始时间",
+      storeCloseTime: "string|false|name=营业结束时间",
       privateSchedule: "object|false|name=私教预约规则",
     };
     let input = this.validateData(rules);
@@ -48,6 +50,8 @@ class AdminTenantController extends BaseAdminController {
       input.contactAddress,
       input.contactLatitude,
       input.contactLongitude,
+      input.storeOpenTime,
+      input.storeCloseTime,
       input.privateSchedule,
     );
   }
@@ -62,7 +66,11 @@ class AdminTenantController extends BaseAdminController {
     await this.isAdmin();
     const input = this.validateData({ rooms: "must|array|name=教室" });
     const pid = global.PID || this.getParameter("pid") || "";
-    return await new AdminTenantService().saveRooms(pid, input.rooms, this._adminType);
+    return await new AdminTenantService().saveRooms(
+      pid,
+      input.rooms,
+      this._adminType,
+    );
   }
 
   /** 客户 Tab 会员统计 */
@@ -170,11 +178,7 @@ class AdminTenantController extends BaseAdminController {
     };
     let input = this.validateData(rules);
     let service = new AdminTenantService();
-    return await service.saveTenantStatus(
-      input.pid,
-      input.status,
-      this._admin,
-    );
+    return await service.saveTenantStatus(input.pid, input.status, this._admin);
   }
 
   /** 超管：删除瑜伽馆（测试馆清理） */
@@ -186,11 +190,7 @@ class AdminTenantController extends BaseAdminController {
     };
     let input = this.validateData(rules);
     let service = new AdminTenantService();
-    return await service.delTenant(
-      input.pid,
-      input.confirmName,
-      this._admin,
-    );
+    return await service.delTenant(input.pid, input.confirmName, this._admin);
   }
 }
 

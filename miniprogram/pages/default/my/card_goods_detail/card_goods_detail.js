@@ -8,51 +8,54 @@ Page({
 
   data: {
     loading: true,
-    cards: [],
+    tplId: "",
+    card: null,
     guide: "",
     contact: "",
     themeColor: pageHelper.getThemeColor(),
     pageStyle: themeHelper.getPageMetaStyle(pageHelper.getThemeColor()),
-    wechatPay: false,
   },
 
-  onLoad() {
+  onLoad(options) {
     this._applyTheme();
-    this.load();
+    const id = options.id || "";
+    this.setData({ tplId: id, loading: !!id });
+    if (id) this.load();
+    else this.setData({ loading: false });
   },
 
   async load() {
     try {
       const r = await cloudHelper.callCloudData(
-        "my/card_shop",
-        {},
+        "my/card_goods_detail",
+        { tplId: this.data.tplId },
         { hint: false },
       );
       this.setData({
         loading: false,
-        cards: (r.cards || []).map((c) => this._decorate(c)),
-        guide: r.guide || "",
-        contact: r.contact || "",
-        wechatPay: !!r.wechatPay,
+        card: r && r.card ? this._decorate(r.card) : null,
+        guide: (r && r.guide) || "",
+        contact: (r && r.contact) || "",
       });
     } catch (e) {
-      this.setData({ loading: false });
+      // 已下架 / 购卡通道关闭：落到空态
+      this.setData({ loading: false, card: null });
       console.error(e);
     }
   },
 
-  // 把后端原始字段加工成商品卡展示字段
+  // 把后端原始字段加工成详情页展示字段（与卡商城保持一致口径）
   _decorate(c) {
     const priceFee = Number(c.priceFee) || 0;
     const originFee = Number(c.originFee) || 0;
     return Object.assign({}, c, {
       priceYuan: this._yuan(priceFee),
       originYuan: this._yuan(originFee),
-      // 仅当展示价确实低于原价时才划线
       hasDiscount: originFee > priceFee,
       typeDesc: c.type === "times" ? "次数卡" : "期限卡",
       mainAttr:
         c.type === "times" ? `${c.quota} 次课程` : `有效期 ${c.days} 天`,
+      scopeText: c.scopeDesc || (c.scopeAll ? "全部课程" : "指定课程"),
       colorDark: this._darken(c.color || "#5b8a72"),
     });
   },
@@ -76,24 +79,10 @@ Page({
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   },
 
-  // 点卡片主体：进商品详情页（淘宝式：列表 → 详情）
-  bindCardTap(e) {
-    const id = e.currentTarget.dataset.id;
-    if (!id) return;
+  bindBuyTap() {
+    if (!this.data.tplId) return;
     wx.navigateTo({
-      url: `/pages/default/my/card_goods_detail/card_goods_detail?id=${id}`,
-    });
-  },
-
-  // 立即购买：快捷进入确认订单页（支付方式 / 备注在确认页选择）
-  buy(e) {
-    // van-button 的 e.currentTarget 指向组件内部，取不到自定义 data-id；
-    // 用 mark（会冒泡）兜底，避免 tplId 为空。
-    const id = (e.mark && e.mark.id) || e.currentTarget.dataset.id;
-    if (!id)
-      return wx.showToast({ title: "套餐信息缺失，请刷新", icon: "none" });
-    wx.navigateTo({
-      url: `/pages/default/my/card_order_confirm/card_order_confirm?id=${id}`,
+      url: `/pages/default/my/card_order_confirm/card_order_confirm?id=${this.data.tplId}`,
     });
   },
 });
