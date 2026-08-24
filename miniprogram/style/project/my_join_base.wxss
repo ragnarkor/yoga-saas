@@ -40,10 +40,6 @@
   font-size: 40rpx;
 }
 
-.btn.mid {
-  padding: 0 30rpx;
-}
-
 .text-pic-list-box .item .author {
   font-size: 28rpx;
   color: #999;
@@ -62,8 +58,4 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-}
-
-.text-time {
-  color: #ccc;
 }

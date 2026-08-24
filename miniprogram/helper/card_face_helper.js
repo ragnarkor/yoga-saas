@@ -147,6 +147,28 @@ function enrichCardVisual(item) {
   };
 }
 
+// 生成卡面渐变的深色端（与 card_shop / card_order 页的 _darken 算法一致）
+function darkenColor(hex, ratio = 0.72) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || "").trim());
+  if (!m) return "#3e5a4c";
+  const n = parseInt(m[1], 16);
+  const r = Math.round(((n >> 16) & 255) * ratio);
+  const g = Math.round(((n >> 8) & 255) * ratio);
+  const b = Math.round((n & 255) * ratio);
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+// 卡面罩层：有封面时仅用中性黑系渐变轻微压暗（上浅下深、不改变封面色调），
+// 保证白字对比；无封面时品牌色渐变直接作为卡面底色
+function getCardShadeBg(color, coverUrl) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(color || "").trim());
+  const base = m ? `#${m[1]}` : "#5b8a72";
+  const dark = darkenColor(base);
+  if (coverUrl) {
+    return "background:linear-gradient(180deg,rgba(0,0,0,0.12) 0%,rgba(0,0,0,0.18) 45%,rgba(0,0,0,0.52) 100%);";
+  }
+  return `background:linear-gradient(140deg,${base} 0%,${dark} 100%);`;
+}
+
 module.exports = {
   COLOR_PRESETS,
   COVER_PRESETS,
@@ -161,4 +183,6 @@ module.exports = {
   isCustomCover,
   normalizeCoverId,
   enrichCardVisual,
+  darkenColor,
+  getCardShadeBg,
 };

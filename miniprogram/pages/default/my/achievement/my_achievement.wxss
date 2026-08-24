@@ -260,60 +260,6 @@
 
 
 
-.ach-heatmap-row {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 8rpx;
-
-  margin-bottom: 6rpx;
-
-}
-
-
-
-.ach-heatmap-label {
-
-  width: 28rpx;
-
-  font-size: 20rpx;
-
-  color: #969799;
-
-  flex-shrink: 0;
-
-}
-
-
-
-.ach-heatmap-cells {
-
-  flex: 1;
-
-  display: flex;
-
-  gap: 6rpx;
-
-}
-
-
-
-.ach-heatmap-cell {
-
-  flex: 1;
-
-  height: 24rpx;
-
-  border-radius: 4rpx;
-
-  background: #ebedf0;
-
-}
-
-
-
 .ach-heatmap-legend {
 
   display: flex;
@@ -390,18 +336,6 @@
 
 
 
-.ach-heatmap-tip {
-
-  margin-top: 12rpx;
-
-  font-size: 24rpx;
-
-  color: #646566;
-
-}
-
-
-
 .ach-badge-grid {
 
   display: grid;
@@ -428,13 +362,6 @@
   opacity: 0.45;
   filter: grayscale(1);
 }
-
-.ach-badge-emoji {
-  font-size: 44rpx;
-  line-height: 1.2;
-}
-
-
 
 .ach-badge-name {
 
@@ -520,18 +447,6 @@
 
 
 
-.ach-btn--ghost {
-
-  background: #fff;
-
-  color: #646566;
-
-  border: 1rpx solid #ebedf0;
-
-}
-
-
-
 .ach-canvas {
 
   position: fixed;
@@ -546,27 +461,6 @@
 
 }
 
-.ach-poster-preview {
-  padding: 44rpx 32rpx calc(36rpx + env(safe-area-inset-bottom));
-  background: #fcfbf8;
-}
-
-.ach-poster-preview-title {
-  display: block;
-  text-align: center;
-  color: #3d5145;
-  font-size: 34rpx;
-  font-weight: 600;
-}
-
-.ach-poster-preview-tip {
-  display: block;
-  margin-top: 10rpx;
-  text-align: center;
-  color: #96988f;
-  font-size: 23rpx;
-}
-
 .ach-poster-preview-image {
   display: block;
   width: 100%;
@@ -575,10 +469,6 @@
   border-radius: 20rpx;
   background: #f2f0ea;
   box-shadow: 0 12rpx 32rpx rgba(61, 81, 69, .13);
-}
-
-.ach-poster-preview-save {
-  width: 100%;
 }
 
 /* 成就预览统一采用黑色全屏沉浸模式。 */
@@ -613,9 +503,6 @@
 .ach-section { margin: 0 28rpx 24rpx; padding: 28rpx; border-radius: 26rpx; background: #fffdf9; box-shadow: 0 8rpx 24rpx rgba(73,77,61,.05); }
 .ach-section-title { color: #3c5145; font-size: 31rpx; }
 .ach-section-sub { color: #9a9c91; font-size: 23rpx; }
-.ach-heatmap-cell { height: 27rpx; border-radius: 7rpx; background: #eee9df; }
-.ach-heatmap-cell:active { transform: scale(.86); }
-.ach-heatmap-guide { margin-top: 18rpx; color: #9a9c91; font-size: 22rpx; }
 .ach-heatmap-legend, .ach-section-extra { color: #92958b; }
 .ach-heatmap-legend { justify-content: flex-end; }
 .ach-badge-grid { gap: 18rpx; }
@@ -654,7 +541,6 @@
 .ach-actions { display:flex; flex-direction:column; margin: 12rpx 28rpx 40rpx; padding: 0; gap: 16rpx; }
 .ach-btn { width:100%; flex:none; height: 78rpx; line-height: 78rpx; font-size: 27rpx; box-sizing: border-box; box-shadow: none; }
 .ach-btn--primary { background: var(--themeColor, #6fae96) !important; color: #fff; box-shadow: 0 6rpx 14rpx rgba(111,174,150,.22); }
-.ach-btn--ghost { background: #fff !important; color: var(--themeColor, #6fae96); border: 1rpx solid var(--themeColor, #6fae96); }
 
 /* 与教练端会员卡页一致：完整底部栏 + 内嵌品牌色主按钮。 */
 .ach-page { padding-bottom: calc(160rpx + env(safe-area-inset-bottom)); }
@@ -670,26 +556,12 @@
 /* 练习日历：用真实日期和星期标题替代需要交叉解读的坐标热力图 */
 .ach-heatmap-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:16rpx; }
 .ach-heatmap-heading .ach-section-title { margin-bottom:6rpx; }
-.ach-heatmap-summary { display:flex; align-items:center; gap:6rpx; padding-top:8rpx; white-space:nowrap; font-size:20rpx; color:#9a9c91; }
-.ach-heatmap-summary-dot { width:14rpx; height:14rpx; border-radius:4rpx; }
-.ach-heatmap-week-head { display:flex; align-items:center; gap:10rpx; margin:18rpx 0 10rpx; }
-.ach-heatmap-week-label { width:92rpx; flex-shrink:0; font-size:19rpx; color:#b0b1aa; }
-.ach-heatmap-week-days { flex:1; display:grid; grid-template-columns:repeat(7, 1fr); gap:6rpx; text-align:center; }
-.ach-heatmap-week-days text { font-size:20rpx; color:#9a9c91; }
-.ach-heatmap-row { gap:10rpx; margin-bottom:8rpx; }
-.ach-heatmap-label { width:92rpx; font-size:19rpx; color:#a0a39a; text-align:left; }
-.ach-heatmap-cells { display:grid; grid-template-columns:repeat(7, 1fr); gap:6rpx; }
-.ach-heatmap-cell { height:42rpx; display:flex; align-items:center; justify-content:center; border-radius:9rpx; background:#eee9df; color:#aaa99f; }
-.ach-heatmap-cell-day { font-size:19rpx; line-height:1; }
-.ach-heatmap-cell--on { color:#fff; font-weight:600; box-shadow:0 4rpx 8rpx rgba(76,129,101,.16); }
-.ach-heatmap-cell--today { outline:3rpx solid #d8a84e; outline-offset:2rpx; }
-.ach-heatmap-cell[ data-date=""] { opacity:.35; }
-.ach-heatmap-guide { display:flex; align-items:center; gap:6rpx; }
 
 /* 标准月历布局，用户无需理解热力图坐标 */
 .ach-calendar-month-switch { display:flex; align-items:center; gap:10rpx; padding-top:2rpx; }
 .ach-calendar-month { min-width:132rpx; text-align:center; color:#53675b; font-size:27rpx; font-weight:600; }
-.ach-calendar-arrow { width:42rpx; height:42rpx; line-height:36rpx; text-align:center; border-radius:50%; background:#f4f2ec; color:#6f806f; font-size:38rpx; }
+.ach-calendar-arrow { position:relative; width:42rpx; height:42rpx; line-height:36rpx; text-align:center; border-radius:50%; background:#f4f2ec; color:#6f806f; font-size:38rpx; }
+.ach-calendar-arrow::before { content:""; position:absolute; inset:-23rpx; }
 .ach-calendar { margin-top:18rpx; }
 .ach-calendar-week-head, .ach-calendar-row { display:grid; grid-template-columns:repeat(7, 1fr); gap:8rpx; }
 .ach-calendar-week-head { margin-bottom:10rpx; text-align:center; }
@@ -699,14 +571,6 @@
 .ach-calendar-cell--on { color:#fff; font-weight:600; box-shadow:0 5rpx 10rpx rgba(76,129,101,.18); }
 .ach-calendar-cell--today { outline:3rpx solid #d8a84e; outline-offset:2rpx; }
 .ach-calendar-cell--empty { background:transparent; }
-
-
-
-.ach-badge-popup {
-  padding: 48rpx 40rpx calc(48rpx + env(safe-area-inset-bottom));
-  text-align: center;
-  background: #fff;
-}
 
 
 

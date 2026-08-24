@@ -7,10 +7,15 @@ module.exports = Behavior({
     loading: true,
     showInvalid: false,
     cardList: [],
+    tenantName: "",
+    listIntroTitle: "正在使用",
+    listIntroSub: "",
   },
 
   methods: {
-    onLoad() {},
+    onLoad() {
+      this.setData({ tenantName: pageHelper.getTenantName() || "本馆" });
+    },
 
     onShow() {
       this._loadCards();
@@ -28,11 +33,20 @@ module.exports = Behavior({
           { activeOnly: !this.data.showInvalid },
           { hint: false },
         );
+        const list = ((res && res.list) || []).map((item) => {
+          const visual = cardFaceHelper.enrichCardVisual(item);
+          return {
+            ...visual,
+            shadeBg: cardFaceHelper.getCardShadeBg(visual.color, visual.coverUrl),
+          };
+        });
         this.setData({
-          cardList: ((res && res.list) || []).map((item) =>
-            cardFaceHelper.enrichCardVisual(item),
-          ),
+          cardList: list,
           loading: false,
+          listIntroTitle: this.data.showInvalid ? "已失效" : "正在使用",
+          listIntroSub: this.data.showInvalid
+            ? `共 ${list.length} 张 · 不可用于约课`
+            : `共 ${list.length} 张会员卡`,
         });
       } catch (err) {
         console.error(err);

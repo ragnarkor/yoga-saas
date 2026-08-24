@@ -424,23 +424,6 @@ module.exports = Behavior({
       });
     },
 
-    bindClickCmpt: async function (e) {
-      let day = e.detail.day;
-      this.setData(
-        {
-          day,
-          selectedDate: day,
-        },
-        async () => {
-          await this._loadList();
-        },
-      );
-    },
-
-    bindMonthChangeCmpt: function (e) {
-      console.log(e.detail);
-    },
-
     url: async function (e) {
       pageHelper.url(e, this);
     },

@@ -9,7 +9,7 @@
 			<view class="home-banner" wx:if="{{banners.length > 0}}">
 				<swiper class="banner-swiper" indicator-dots autoplay circular interval="4000" duration="500">
 					<swiper-item wx:for="{{banners}}" wx:key="_id">
-						<view class="banner-item" bindtap="bindBannerTap" data-url="{{item.linkUrl}}">
+						<view class="banner-item" aria-role="button" aria-label="{{item.title || '宣传图'}}" bindtap="bindBannerTap" data-url="{{item.linkUrl}}">
 							<video wx:if="{{item.type === 'video' && item.video}}" class="banner-media" src="{{item.video}}" poster="{{item.pic}}" object-fit="cover" show-center-play-btn="{{false}}" controls="{{false}}"></video>
 							<image wx:else class="banner-media" mode="aspectFill" src="{{item.pic || skin.IMG_DEFAULT_INDEX_BG}}" />
 						</view>
@@ -38,7 +38,7 @@
 					</view>
 				</view>
 				<view class="home-studio-divider"></view>
-				<view class="home-studio-phone" bindtap="bindPhoneTap">
+				<view class="home-studio-phone" aria-role="button" aria-label="拨打电话" bindtap="bindPhoneTap">
 					<van-icon name="phone-o" size="40rpx" color="{{themeColor}}" />
 				</view>
 			</view>

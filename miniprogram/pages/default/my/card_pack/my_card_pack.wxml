@@ -2,25 +2,12 @@
 <view class="card-pack-page theme-scope" style="{{pageStyle}}">
   <view class="card-pack-toolbar">
     <view class="card-pack-seg">
-      <view
-        class="card-pack-seg-item {{!showInvalid ? 'is-active' : ''}}"
-        bindtap="bindSegTap"
-        data-invalid="false"
-      >
+      <view class="card-pack-seg-item {{!showInvalid ? 'is-active' : ''}}" bindtap="bindSegTap" data-invalid="false">
         <text>有效卡</text>
       </view>
-      <view
-        class="card-pack-seg-item {{showInvalid ? 'is-active' : ''}}"
-        bindtap="bindSegTap"
-        data-invalid="true"
-      >
+      <view class="card-pack-seg-item {{showInvalid ? 'is-active' : ''}}" bindtap="bindSegTap" data-invalid="true">
         <text>失效卡</text>
       </view>
-    </view>
-    <!-- 购卡订单直达：支付进度/转账凭证不再藏于购卡商城内 -->
-    <view class="card-pack-order" bindtap="bindOrderTap">
-      <van-icon name="orders-o" size="30rpx" color="{{themeColor}}" />
-      <text>购卡订单</text>
     </view>
   </view>
 
@@ -28,54 +15,58 @@
     <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
   </view>
 
-  <van-empty
-    wx:elif="{{!cardList.length}}"
-    description="{{showInvalid ? '暂无失效会员卡' : '暂无可用会员卡'}}"
-  />
+  <van-empty wx:elif="{{!cardList.length}}" description="{{showInvalid ? '暂无失效会员卡' : '暂无可用会员卡'}}" />
 
-  <view wx:else class="card-pack-list">
-    <view class="card-pack-item" wx:for="{{cardList}}" wx:key="id" bindtap="bindCardTap" data-id="{{item.id}}">
-      <view class="card-pack-no-row">
-        <text class="card-pack-no-label">卡号：{{item.cardNo}}</text>
-        <view class="card-pack-copy" catchtap="bindCopyCardNo" data-no="{{item.cardNo}}">
-          <van-icon name="description" size="32rpx" color="{{themeColor}}" />
-        </view>
+  <block wx:else>
+    <view class="card-pack-intro {{showInvalid ? 'is-invalid' : ''}}">
+      <view class="card-pack-intro-text">
+        <text class="card-pack-intro-title">{{listIntroTitle}}</text>
+        <text class="card-pack-intro-sub">{{listIntroSub}}</text>
       </view>
+      <view class="card-pack-order-link" bindtap="bindOrderTap">
+        <text>购卡订单</text>
+        <text class="card-pack-order-arrow">›</text>
+      </view>
+    </view>
 
-      <view class="card-pack-body">
-        <view class="card-pack-visual">
-          <image
-            wx:if="{{item.coverUrl}}"
-            class="card-pack-visual-img"
-            src="{{item.coverUrl}}"
-            mode="aspectFill"
-          />
-          <view
-            wx:else
-            class="card-pack-visual-solid"
-            style="background: {{item.color}};"
-          ></view>
-          <text class="card-pack-vip">VIP CARD</text>
-          <text class="card-pack-type">{{item.typeLabel}}</text>
+    <view class="card-pack-list">
+      <view
+        wx:for="{{cardList}}"
+        wx:key="id"
+        class="card-pack-item {{item.isActive ? '' : 'is-invalid'}}"
+        bindtap="bindCardTap"
+        data-id="{{item.id}}"
+      >
+        <image wx:if="{{item.coverUrl}}" class="card-pack-cover" src="{{item.coverUrl}}" mode="aspectFill" />
+        <view class="card-pack-shade" style="{{item.shadeBg}}"></view>
+
+        <view class="card-pack-top">
+          <text class="card-pack-brand">{{tenantName}}</text>
+          <text wx:if="{{item.statusLabel && item.statusLabel !== '正常'}}" class="card-pack-badge">{{item.statusLabel}}</text>
         </view>
-
-        <view class="card-pack-info">
-          <view class="card-pack-name">{{item.name}}</view>
-          <view class="card-pack-balance">余额：{{item.balanceText}}</view>
-          <view class="card-pack-expire">到期时间：{{item.endTimeDesc}}</view>
+        <view class="card-pack-name-row">
+          <text class="card-pack-name">{{item.name}}</text>
+          <text class="card-pack-more">···</text>
         </view>
+        <text class="card-pack-sub">{{item.typeLabel}} · {{item.scopeDesc || '适用指定课程'}}</text>
 
-        <view class="card-pack-stamp {{item.isActive ? 'is-normal' : 'is-invalid'}}">
-          <text>{{item.statusLabel}}</text>
+        <view class="card-pack-bottom">
+          <view>
+            <text class="card-pack-meta-label">{{item.type === 'period' ? '练习权益' : '剩余次数'}}</text>
+            <text class="card-pack-main-value">{{item.balanceText}}</text>
+          </view>
+          <view class="card-pack-expire">
+            <text class="card-pack-meta-label">有效期至</text>
+            <text class="card-pack-expire-value">{{item.endTimeDesc}}</text>
+          </view>
         </view>
       </view>
     </view>
-  </view>
+  </block>
 
-  <!-- 置底购买栏 -->
   <view class="card-pack-buy-bar">
     <view class="card-pack-buy" style="background:{{themeColor}}" bindtap="bindCardShopTap">
-      <van-icon name="shopping-cart-o" size="30rpx" color="#fff" />
+      <van-icon name="shopping-cart-o" size="32rpx" color="#fff" />
       <text>购买会员卡</text>
     </view>
   </view>

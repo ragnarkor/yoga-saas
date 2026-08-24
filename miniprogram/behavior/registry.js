@@ -6,7 +6,6 @@ module.exports = {
   about_index_bh: require("./about_index_bh.js"),
   about_contact_bh: require("./about_contact_bh.js"),
   calendar_index_bh: require("./calendar_index_bh.js"),
-  meet_index_bh: require("./meet_index_bh.js"),
   meet_detail_bh: require("./meet_detail_bh.js"),
   my_index_bh: require("./my_index_bh.js"),
   my_join_bh: require("./my_join_bh.js"),

@@ -15,13 +15,16 @@
       class="detail-hero"
       style="background:linear-gradient(135deg, {{card.color}} 0%, {{card.colorDark}} 100%);{{card.coverStyle}}"
     >
+      <view class="detail-hero-shade"></view>
+      <view class="detail-hero-ring detail-hero-ring--lg"></view>
+      <view class="detail-hero-ring detail-hero-ring--sm"></view>
       <view class="detail-hero-tag">{{card.typeDesc}}</view>
       <view class="detail-hero-name">{{card.name}}</view>
-      <view class="detail-hero-vip">VIP CARD</view>
+      <view class="detail-hero-vip">为稳定练习留一张卡</view>
     </view>
 
-    <!-- 价格区 -->
-    <view class="detail-card detail-price-card">
+    <!-- 价格 + 套餐权益 -->
+    <view class="detail-card">
       <view class="detail-price-wrap">
         <text class="detail-price-cur" style="color:{{themeColor}}">¥</text>
         <text class="detail-price" style="color:{{themeColor}}">{{card.priceYuan}}</text>
@@ -32,12 +35,10 @@
           style="color:{{themeColor}};background:{{themeColor}}14;"
         >限时优惠</view>
       </view>
-      <view class="detail-price-desc">{{card.mainAttr}}</view>
-    </view>
+      <view class="detail-price-desc">{{card.mainAttr}} · {{card.scopeText}}</view>
 
-    <!-- 套餐权益 -->
-    <view class="detail-card">
-      <view class="detail-section-title">套餐权益</view>
+      <view class="detail-divider"></view>
+
       <view class="detail-row">
         <van-icon name="credit-pay" size="30rpx" color="{{themeColor}}" />
         <text class="detail-row-label">卡类型</text>
@@ -57,6 +58,30 @@
         <van-icon name="cluster-o" size="30rpx" color="{{themeColor}}" />
         <text class="detail-row-label">适用范围</text>
         <text class="detail-row-value">{{card.scopeText}}</text>
+      </view>
+    </view>
+
+    <!-- 购买流程 -->
+    <view class="detail-card">
+      <view class="detail-section-title">购买流程</view>
+      <view class="detail-steps">
+        <view class="detail-step">
+          <view class="detail-step-no" style="background:{{themeColor}}14;">1</view>
+          <text class="detail-step-name">提交订单</text>
+          <text class="detail-step-desc">确认套餐与金额</text>
+        </view>
+        <view class="detail-step-arrow"><van-icon name="arrow" size="24rpx" color="#c2cabf" /></view>
+        <view class="detail-step">
+          <view class="detail-step-no" style="background:{{themeColor}}14;">2</view>
+          <text class="detail-step-name">完成付款</text>
+          <text class="detail-step-desc">微信支付或银行卡转账</text>
+        </view>
+        <view class="detail-step-arrow"><van-icon name="arrow" size="24rpx" color="#c2cabf" /></view>
+        <view class="detail-step">
+          <view class="detail-step-no" style="background:{{themeColor}}14;">3</view>
+          <text class="detail-step-name">馆方发卡</text>
+          <text class="detail-step-desc">会员卡放入我的卡包</text>
+        </view>
       </view>
     </view>
 

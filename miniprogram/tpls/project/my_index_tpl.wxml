@@ -5,7 +5,7 @@
 		<!--top area begin-->
 		<view class="upside upside-shadow">
 			<image mode="aspectFill" lazy-load class="upImg loading" src="{{skin.IMG_UPIMG}}?v=8" />
-			<view class="user-bar" bindtap="bindProfileTap">
+			<view class="user-bar" bindtap="bindProfileTap" aria-role="button" aria-label="编辑个人资料">
 				<view class="avatar-wrap">
 					<image wx:if="{{showAvatarImg}}" class="avatar-img" mode="aspectFill" src="{{avatarSrc}}" />
 					<view wx:else class="avatar-placeholder">
@@ -35,7 +35,7 @@
 						<text wx:if="{{!myTodayLoading && myTodayList.length}}" class="today-badge">{{myTodayList.length}}</text>
 					</view>
 				<view class="today-head-actions">
-					<view class="today-link" bindtap="url" data-type="switch" data-url="/pages/default/news/cate1/news_cate1">
+					<view class="today-link" bindtap="url" data-type="switch" data-url="/pages/default/news/cate1/news_cate1" aria-role="button" aria-label="查看全部约课记录">
 						<text>全部记录</text>
 						<van-icon name="arrow" size="24rpx" color="#969799" />
 					</view>
@@ -60,6 +60,8 @@
 						data-url="../join_detail/my_join_detail?id={{item._id}}"
 						wx:for="{{myTodayList}}"
 						wx:key="_id"
+						aria-role="button"
+						aria-label="{{item.JOIN_MEET_TITLE}} {{item.JOIN_MEET_TIME_START}}-{{item.JOIN_MEET_TIME_END}} 预约详情"
 					>
 						<view class="today-time-col">
 							<text class="today-time-start">{{item.JOIN_MEET_TIME_START}}</text>
@@ -85,7 +87,6 @@
 			<!-- VANT 菜单列表 -->
 			<van-cell-group inset custom-class="menu-group">
 				<van-cell custom-class="mi-cell mi-card" title="我的卡包" is-link link-type="navigateTo" url="../card_pack/my_card_pack" icon="credit-pay" label="{{cardSummaryText}}" />
-				<van-cell custom-class="mi-cell mi-order" title="购卡订单" is-link link-type="navigateTo" url="../card_order/card_order" icon="orders-o" label="支付进度 · 转账凭证 · 购买记录" />
 				<van-cell custom-class="mi-cell mi-achievement" title="我的成就" is-link link-type="navigateTo" url="../achievement/my_achievement" icon="medal-o" label="{{achievementSummary}}" />
 				<van-cell custom-class="mi-cell mi-announce" title="公告通知" is-link bindtap="bindAnnounceEntryTap" icon="volume-o" label="查看馆方最新通知" />
 				<van-cell custom-class="mi-cell mi-coach" title="切换到教练版" is-link bindtap="bindSwitchCoachTap" icon="manager-o" label="馆主/教练工作台" />

@@ -2,212 +2,249 @@
 
 .card-pack-page {
   min-height: 100vh;
-  background: #f5f6f8;
-  /* 底部留白，避免列表被置底购买栏遮挡 */
   padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+  background: var(--projectBgSoft, #fafbf9);
+  box-sizing: border-box;
 }
 
 .card-pack-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-  padding: 24rpx 32rpx 8rpx;
+  padding: 24rpx 32rpx 12rpx;
 }
 
-/* 购卡订单直达入口 */
-.card-pack-order {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rpx;
-  padding: 10rpx 18rpx;
-  border-radius: 16rpx;
-  background: #fff;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
-  font-size: 20rpx;
-  color: #646566;
-  flex-shrink: 0;
-}
-
-.card-pack-order:active {
-  opacity: 0.85;
-}
-
-/* 有效/失效 分段选择器 */
 .card-pack-seg {
   display: flex;
-  padding: 6rpx;
-  border-radius: 999rpx;
-  background: #fff;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  gap: 30rpx;
+  flex: 1;
+  min-width: 0;
+  border-bottom: 1rpx solid rgba(63, 78, 68, 0.1);
 }
 
 .card-pack-seg-item {
-  min-width: 150rpx;
-  padding: 10rpx 32rpx;
-  border-radius: 999rpx;
-  font-size: 24rpx;
-  line-height: 1.4;
-  text-align: center;
-  color: #969799;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease;
+  position: relative;
+  padding: 12rpx 2rpx 16rpx;
+  color: #98a099;
+  font-size: 27rpx;
 }
 
 .card-pack-seg-item.is-active {
-  color: #fff;
+  color: #293a31;
+  font-weight: 600;
+}
+
+.card-pack-seg-item.is-active::after {
+  position: absolute;
+  right: 0;
+  bottom: -1rpx;
+  left: 0;
+  height: 5rpx;
+  border-radius: 999rpx;
   background: var(--themeColor, #5b8a72);
-  font-weight: 500;
+  content: "";
+}
+
+.card-pack-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24rpx;
+  padding: 6rpx 32rpx 0;
+}
+
+.card-pack-intro-title {
+  display: block;
+  color: #2c3a32;
+  font-size: 31rpx;
+  font-weight: 700;
+}
+
+.card-pack-intro.is-invalid .card-pack-intro-title {
+  color: #7c8680;
+}
+
+.card-pack-intro-sub {
+  display: block;
+  margin-top: 4rpx;
+  color: #8b958e;
+  font-size: 22rpx;
+}
+
+.card-pack-order-link {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  flex-shrink: 0;
+  padding: 8rpx 0 6rpx;
+  color: var(--themeColor, #5b8a72);
+  font-size: 24rpx;
+}
+
+.card-pack-order-arrow {
+  font-size: 30rpx;
+  line-height: 1;
+}
+
+.card-pack-order-link:active,
+.card-pack-item:active,
+.card-pack-buy:active {
+  opacity: 0.84;
 }
 
 .card-pack-loading {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 120rpx 32rpx;
   min-height: 50vh;
+  padding: 120rpx 32rpx;
   box-sizing: border-box;
 }
 
 .card-pack-list {
-  padding: 16rpx 24rpx;
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 28rpx;
+  padding: 16rpx 28rpx;
 }
 
 .card-pack-item {
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 24rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  position: relative;
+  height: 388rpx;
+  overflow: hidden;
+  padding: 30rpx;
+  border-radius: 28rpx;
+  color: #fff;
+  text-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.3);
+  box-shadow: 0 16rpx 36rpx rgba(43, 63, 52, 0.18);
+  box-sizing: border-box;
 }
 
-.card-pack-item:active {
-  opacity: 0.92;
+.card-pack-cover {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.card-pack-no-row {
+.card-pack-shade {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(115deg, rgba(9, 26, 17, 0.42), rgba(9, 26, 17, 0.06) 57%, rgba(255, 255, 255, 0.07));
+}
+
+.card-pack-top,
+.card-pack-name-row,
+.card-pack-name,
+.card-pack-scope,
+.card-pack-sub,
+.card-pack-bottom {
+  position: relative;
+  z-index: 2;
+}
+
+.card-pack-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20rpx;
+  gap: 16rpx;
 }
 
-.card-pack-no-label {
+.card-pack-brand {
   font-size: 24rpx;
-  color: #646566;
+  font-weight: 650;
+  letter-spacing: 2rpx;
+  opacity: 0.92;
 }
 
-.card-pack-copy {
-  padding: 8rpx;
+.card-pack-badge {
+  padding: 5rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(0, 0, 0, 0.32);
+  font-size: 20rpx;
 }
 
-.card-pack-body {
+.card-pack-name-row {
   display: flex;
-  align-items: center;
-  gap: 20rpx;
-  position: relative;
-}
-
-.card-pack-visual {
-  position: relative;
-  width: 140rpx;
-  height: 88rpx;
-  border-radius: 12rpx;
-  flex-shrink: 0;
-  overflow: hidden;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
-}
-
-.card-pack-visual-img,
-.card-pack-visual-solid {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.card-pack-vip {
-  position: absolute;
-  top: 10rpx;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 18rpx;
-  font-weight: 700;
-  letter-spacing: 1rpx;
-  color: #fff;
-  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.28);
-}
-
-.card-pack-type {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 10rpx;
-  text-align: center;
-  font-size: 22rpx;
-  color: #fff;
-  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.28);
-}
-
-.card-pack-info {
-  flex: 1;
-  min-width: 0;
+  align-items: flex-end;
+  gap: 14rpx;
+  margin-top: 48rpx;
 }
 
 .card-pack-name {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #323233;
-  margin-bottom: 8rpx;
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
+  font-size: 48rpx;
+  font-weight: 700;
+  letter-spacing: -2rpx;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.card-pack-balance {
-  font-size: 26rpx;
-  color: #323233;
-  margin-bottom: 6rpx;
+.card-pack-more {
+  flex-shrink: 0;
+  padding: 0 4rpx 4rpx;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1;
 }
 
-.card-pack-expire {
+.card-pack-sub {
+  display: block;
+  overflow: hidden;
+  margin-top: 8rpx;
   font-size: 24rpx;
-  color: #969799;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.card-pack-stamp {
+.card-pack-bottom {
   position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%) rotate(-12deg);
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 50%;
-  border: 2rpx dashed #c8c9cc;
+  right: 30rpx;
+  bottom: 26rpx;
+  left: 30rpx;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22rpx;
-  color: #969799;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+
+.card-pack-meta-label {
+  display: block;
+  font-size: 20rpx;
   opacity: 0.85;
 }
 
-.card-pack-stamp.is-normal {
-  border-color: #91d5ff;
-  color: #1890ff;
+.card-pack-main-value {
+  display: block;
+  margin-top: 5rpx;
+  font-size: 44rpx;
+  font-weight: 700;
+  letter-spacing: -1rpx;
+  line-height: 1.1;
 }
 
-.card-pack-stamp.is-invalid {
-  border-color: #d9d9d9;
-  color: #bfbfbf;
+.card-pack-expire {
+  min-width: 176rpx;
+  text-align: right;
 }
 
-/* 置底购买栏（参照成就页 .ach-actions） */
+.card-pack-expire-value {
+  display: block;
+  margin-top: 7rpx;
+  font-size: 24rpx;
+}
+
+.card-pack-item.is-invalid {
+  filter: saturate(0.28);
+}
+
+.card-pack-item.is-invalid .card-pack-shade {
+  background-color: rgba(25, 31, 28, 0.4);
+}
+
 .card-pack-buy-bar {
   position: fixed;
   z-index: 100;
@@ -215,17 +252,20 @@
   bottom: 0;
   left: 0;
   padding: 16rpx 28rpx calc(16rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid rgba(63, 78, 68, 0.08);
+  background: rgba(250, 251, 249, 0.94);
+  box-shadow: 0 -4rpx 20rpx rgba(43, 63, 52, 0.05);
+  backdrop-filter: blur(16rpx);
   box-sizing: border-box;
-  background: #fff;
-  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
 }
+
 .card-pack-buy {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10rpx;
   height: 88rpx;
-  border-radius: 16rpx;
+  border-radius: 18rpx;
   color: #fff;
   font-size: 29rpx;
   font-weight: 600;

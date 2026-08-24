@@ -7,18 +7,14 @@ const UserProfileBiz = require("../biz/user_profile_biz.js");
 const AdminWxBiz = require("../biz/admin_wx_biz.js");
 const AdminBiz = require("../biz/admin_biz.js");
 const setting = require("../setting/setting.js");
-const checkinScanHelper = require("../helper/checkin_scan_helper.js");
 
 module.exports = Behavior({
   data: {
     myTodayList: [],
     myTodayLoading: false,
-    localAvatar: "",
     showAvatarImg: false,
     avatarSrc: "",
     userNameInput: "",
-    avatarChoosing: false,
-    nicknameEditing: false,
     adminLoginShow: false,
     achievementSummary: "预约成功即计入成就",
     cardSummaryText: "查看会员卡余额与到期",
@@ -64,11 +60,6 @@ module.exports = Behavior({
       this._loadUser();
       this._loadAchievementSummary();
       this._loadCardSummary();
-    },
-
-    onHide: async function () {
-      const pending = (this._pendingNickname || "").trim();
-      if (pending) await this._syncNickname(pending);
     },
 
     onUnload: function () {},
@@ -130,125 +121,16 @@ module.exports = Behavior({
         }
 
         const cloudName = (user && user.USER_NAME) || "";
-        // 保留本地未同步完成的昵称（防止切页面回来时被空云端数据覆盖）
-        const pending = (this._pendingNickname || "").trim();
-        const displayName = cloudName || pending || fallbackName || "";
+        const displayName = cloudName || fallbackName || "";
 
-        const nextData = {
+        this.setData({
           user,
-          localAvatar: "",
           showAvatarImg: !!avatarSrc,
           avatarSrc,
           userNameInput: displayName,
-          nicknameEditing: false,
-        };
-        this.setData(nextData);
-        this._pendingNickname = displayName;
-        this._lastSyncedNickname = cloudName;
+        });
       } catch (err) {
         console.error("[_loadUser]", err);
-      }
-    },
-
-    bindAvatarTap: function () {
-      if (this.data.avatarChoosing) return;
-      this.setData({ avatarChoosing: true });
-      if (this._avatarChooseTimer) clearTimeout(this._avatarChooseTimer);
-      this._avatarChooseTimer = setTimeout(() => {
-        this.setData({ avatarChoosing: false });
-      }, 1500);
-    },
-
-    bindChooseAvatar: async function (e) {
-      if (this._avatarSaving) return;
-      const tempPath = e.detail && e.detail.avatarUrl;
-      if (!tempPath) {
-        this.setData({ avatarChoosing: false });
-        return;
-      }
-
-      this._avatarSaving = true;
-      if (this._avatarChooseTimer) clearTimeout(this._avatarChooseTimer);
-
-      this.setData({
-        localAvatar: tempPath,
-        showAvatarImg: true,
-        avatarSrc: tempPath,
-        avatarChoosing: true,
-      });
-
-      try {
-        const user = await UserProfileBiz.syncAvatar(tempPath);
-        if (user && user.USER_PIC) {
-          const avatarSrc = await UserProfileBiz.resolveAvatarUrl(
-            user.USER_PIC,
-          );
-          this.setData({
-            user,
-            localAvatar: "",
-            showAvatarImg: true,
-            avatarSrc: avatarSrc || tempPath,
-            avatarChoosing: false,
-          });
-          wx.showToast({ title: "头像已保存", icon: "success" });
-        } else {
-          this.setData({ avatarChoosing: false });
-        }
-      } catch (err) {
-        console.error(err);
-        wx.showToast({ title: "头像保存失败，请重试", icon: "none" });
-        this.setData({ avatarChoosing: false });
-      } finally {
-        this._avatarSaving = false;
-      }
-    },
-
-    bindNicknameInput: function (e) {
-      const val = e.detail.value || "";
-      this._pendingNickname = val;
-      // 不要在输入时 setData userNameInput，否则 wx:if/wx:else 会中途切换 DOM，导致输入框消失
-      if (this._nicknameTimer) clearTimeout(this._nicknameTimer);
-      this._nicknameTimer = setTimeout(() => {
-        this._syncNickname(this._pendingNickname);
-      }, 1200);
-    },
-
-    bindNicknameEditTap: function () {
-      this.setData({ nicknameEditing: true });
-    },
-
-    bindNicknameBlur: async function (e) {
-      const val = (e.detail.value || this._pendingNickname || "").trim();
-      // 编辑完成后立即更新视图显示
-      this.setData({ nicknameEditing: false, userNameInput: val });
-      this._pendingNickname = val;
-      await this._syncNickname(val);
-    },
-
-    bindNicknameReview: async function (e) {
-      const val = (e.detail.value || this._pendingNickname || "").trim();
-      this.setData({ nicknameEditing: false, userNameInput: val });
-      this._pendingNickname = val;
-      await this._syncNickname(val);
-    },
-
-    _syncNickname: async function (name) {
-      const val = (name || "").trim();
-      if (!val) return;
-      if (val === this._lastSyncedNickname) return;
-
-      try {
-        const user = await UserProfileBiz.syncName(val);
-        if (user) {
-          this.setData({
-            user,
-            userNameInput: user.USER_NAME || val,
-          });
-          this._pendingNickname = user.USER_NAME || val;
-          this._lastSyncedNickname = user.USER_NAME || val;
-        }
-      } catch (err) {
-        console.error("[syncNickname error]", err);
       }
     },
 
@@ -288,19 +170,6 @@ module.exports = Behavior({
 
     url: function (e) {
       pageHelper.url(e, this);
-    },
-
-    bindLocationCheckinTap: function (e) {
-      const timeMark = e && e.currentTarget && e.currentTarget.dataset.timeMark;
-      if (!timeMark) return;
-      checkinScanHelper.locationCheckin({
-        timeMark,
-        onSuccess: (msg) => {
-          pageHelper.showModal(msg, "签到结果", () => {
-            this._loadTodayList();
-          });
-        },
-      });
     },
 
     bindSetTap: function (e) {

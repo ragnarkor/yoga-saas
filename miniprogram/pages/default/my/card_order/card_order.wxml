@@ -43,11 +43,10 @@
 					style="{{item.coverUrl ? '' : 'background:linear-gradient(135deg, ' + item.color + ' 0%, ' + item.colorDark + ' 100%);'}}"
 				>
 					<image wx:if="{{item.coverUrl}}" class="order-goods-cover-img" src="{{item.coverUrl}}" mode="aspectFill" />
-					<text class="order-goods-type {{item.coverUrl ? 'on-img' : ''}}">{{item.typeDesc}}</text>
 				</view>
 				<view class="order-goods-info">
 					<view class="order-goods-name">{{item.name}}</view>
-					<view class="order-goods-attr">{{item.mainAttr}}</view>
+					<view class="order-goods-attr">{{item.typeDesc}} · {{item.mainAttr}}</view>
 				</view>
 				<view class="order-goods-fee">
 					<text class="order-fee-cur">¥</text>
@@ -102,12 +101,11 @@
 				</view>
 				<text wx:if="{{item.transferReference}}" class="order-transfer-reference">转账备注：{{item.transferReference}}</text>
 			</view>
-
-			<!-- 底部操作 -->
-			<view wx:if="{{item.canPay || item.canGoPack}}" class="order-foot">
-				<view wx:if="{{item.canGoPack}}" class="order-btn order-btn--ghost" bindtap="bindGoPackTap">查看卡包</view>
-				<view wx:if="{{item.canPay}}" class="order-btn order-btn--main" data-id="{{item.id}}" bindtap="bindRepayTap">继续支付</view>
-			</view>
+	
+				<!-- 底部操作：仅待支付订单需要动作，其余状态信息已完整 -->
+				<view wx:if="{{item.canPay}}" class="order-foot">
+					<view class="order-btn order-btn--main" data-id="{{item.id}}" bindtap="bindRepayTap">继续支付</view>
+				</view>
 		</view>
 	</view>
 </view>

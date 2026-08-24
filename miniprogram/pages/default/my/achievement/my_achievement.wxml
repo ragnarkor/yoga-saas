@@ -86,9 +86,9 @@
             <view class="ach-section-sub">本月已练习 {{heatmapActiveDays}} 天</view>
           </view>
           <view class="ach-calendar-month-switch">
-            <text class="ach-calendar-arrow" data-offset="-1" bindtap="bindCalendarMonthTap">‹</text>
+            <text class="ach-calendar-arrow" aria-role="button" aria-label="上个月" data-offset="-1" bindtap="bindCalendarMonthTap">‹</text>
             <text class="ach-calendar-month">{{calendarMonthLabel}}</text>
-            <text class="ach-calendar-arrow" data-offset="1" bindtap="bindCalendarMonthTap">›</text>
+            <text class="ach-calendar-arrow" aria-role="button" aria-label="下个月" data-offset="1" bindtap="bindCalendarMonthTap">›</text>
           </view>
         </view>
 
@@ -97,7 +97,7 @@
             <text wx:for="{{['日','一','二','三','四','五','六']}}" wx:key="*this">{{item}}</text>
           </view>
           <view class="ach-calendar-row" wx:for="{{calendarRows}}" wx:key="index">
-            <view class="ach-calendar-cell {{cell.on ? 'ach-calendar-cell--on' : ''}} {{cell.isToday ? 'ach-calendar-cell--today' : ''}} {{cell.date ? '' : 'ach-calendar-cell--empty'}}" wx:for="{{item.cells}}" wx:for-item="cell" wx:key="date" style="{{cell.on ? 'background:' + themeColor : ''}}" data-date="{{cell.date}}" data-on="{{cell.on}}" bindtap="bindHeatmapCellTap">
+            <view class="ach-calendar-cell {{cell.on ? 'ach-calendar-cell--on' : ''}} {{cell.isToday ? 'ach-calendar-cell--today' : ''}} {{cell.date ? '' : 'ach-calendar-cell--empty'}}" wx:for="{{item.cells}}" wx:for-item="cell" wx:key="date" style="{{cell.on ? 'background:' + themeColor : ''}}" data-date="{{cell.date}}" data-on="{{cell.on}}" bindtap="bindHeatmapCellTap" aria-role="{{cell.date ? 'button' : ''}}" aria-label="{{cell.date ? cell.date + (cell.on ? ' 已上课' : ' 未上课') : ''}}">
               <text>{{cell.day}}</text>
             </view>
           </view>
@@ -135,6 +135,8 @@
             wx:key="id"
             data-index="{{index}}"
             bindtap="bindBadgeTap"
+            aria-role="button"
+            aria-label="{{item.name}}{{item.unlocked ? ' 已解锁' : ' 未解锁'}}"
           >
             <view class="ach-badge-flip-scene">
               <view class="ach-badge-flip-card">

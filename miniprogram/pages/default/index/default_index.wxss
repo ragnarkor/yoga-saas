@@ -1,6 +1,5 @@
 @import "../../../style/project/base/appt.wxss";
 @import "../skin/skin.wxss";
-@import "../../../style/project/default_index_base.wxss";
 
 .home-page {
   background: #f7f8fa;
@@ -124,6 +123,7 @@
 }
 
 .home-studio-phone {
+  position: relative;
   width: 68rpx;
   height: 68rpx;
   display: flex;
@@ -132,6 +132,12 @@
   background: var(--projectColorLight, #edf5f0);
   border-radius: 18rpx;
   flex-shrink: 0;
+}
+
+.home-studio-phone::before {
+  content: "";
+  position: absolute;
+  inset: -10rpx;
 }
 
 .home-studio-phone:active {
@@ -168,14 +174,14 @@
 .home-announce-swiper {
   flex: 1;
   min-width: 0;
-  height: 40rpx;
+  height: 64rpx;
 }
 
 .home-announce-row {
   display: flex;
   align-items: center;
   gap: 12rpx;
-  height: 40rpx;
+  height: 64rpx;
 }
 
 /* ---- 快捷功能 ---- */
@@ -340,6 +346,8 @@
 .section-more {
   color: #8a958c;
   font-size: 23rpx;
+  padding: 20rpx 0 20rpx 20rpx;
+  margin: -20rpx -20rpx -20rpx 0;
 }
 
 /* ---- 横向滚动通用 ---- */

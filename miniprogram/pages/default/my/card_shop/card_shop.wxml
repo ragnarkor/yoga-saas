@@ -11,71 +11,49 @@
 
   <block wx:else>
     <view class="shop-hero" style="background:linear-gradient(135deg, {{themeColor}} 0%, {{themeColor}}b8 100%);">
-      <view><text class="shop-hero-eyebrow">MEMBERSHIP</text><text class="shop-hero-title">选择适合你的练习套餐</text><text class="shop-hero-sub">下单后银行卡转账，上传凭证即可等待馆方发卡</text></view>
-      <view class="shop-order-entry" bindtap="bindOrderTap"><van-icon name="orders-o" size="30rpx" color="#fff" /><text>我的订单</text></view>
+      <text class="shop-hero-eyebrow">MEMBERSHIP</text>
+      <text class="shop-hero-title">为练习留一张卡</text>
+      <text class="shop-hero-sub">选择适合你的节奏，随时开始练习</text>
     </view>
-    <view class="shop-section-head"><text>精选套餐</text><text>{{cards.length}} 款在售</text></view>
-    <!-- 商品卡列表 -->
-    <view class="shop-list">
+
+    <view class="shop-tools">
+      <view><text class="shop-tools-title">精选套餐</text><text class="shop-tools-count">{{cards.length}} 款在售</text></view>
+      <view class="view-toggle">
+        <view class="view-toggle-btn {{viewMode === 'list' ? 'is-active' : ''}}" data-mode="list" bindtap="bindViewToggle">
+          <van-icon name="bars" size="32rpx" color="{{viewMode === 'list' ? themeColor : '#9ba59f'}}" />
+        </view>
+        <view class="view-toggle-btn {{viewMode === 'grid' ? 'is-active' : ''}}" data-mode="grid" bindtap="bindViewToggle">
+          <van-icon name="apps-o" size="32rpx" color="{{viewMode === 'grid' ? themeColor : '#9ba59f'}}" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 套餐列表：list 横排行 / grid 网格卡 -->
+    <view class="shop-list {{viewMode === 'grid' ? 'shop-list--grid' : ''}}">
       <view
         wx:for="{{cards}}"
         wx:key="id"
-        class="goods"
+        class="shop-item"
         data-id="{{item.id}}"
         bindtap="bindCardTap"
       >
-        <!-- 商品主图：优先使用卡面，否则使用统一品牌卡面 -->
-        <view
-          class="goods-cover"
-          style="background:linear-gradient(135deg, {{item.color}} 0%, {{item.colorDark}} 100%);{{item.coverStyle}}"
-        >
-          <view class="goods-cover-name">{{item.name}}</view>
-          <view class="goods-cover-tag">{{item.typeDesc}}</view>
+        <view class="shop-thumb" style="background:linear-gradient(135deg, {{item.color}} 0%, {{item.colorDark}} 100%);{{item.coverStyle}}"></view>
+        <view class="shop-item-main">
+          <view class="shop-item-name">
+            <text class="shop-item-title">{{item.name}}</text>
+            <text class="shop-item-tag">{{item.typeDesc}}</text>
+          </view>
+          <text class="shop-item-desc">{{item.mainAttr}} · {{item.scopeText}}</text>
         </view>
-
-        <view class="goods-body">
-          <text class="goods-selling">{{item.sellingPoint}}</text>
-          <!-- 权益标签 -->
-          <view class="goods-attrs">
-            <view class="goods-attr">
-              <van-icon name="{{item.type === 'times' ? 'coupon-o' : 'clock-o'}}" size="26rpx" color="{{themeColor}}" />
-              <text>{{item.mainAttr}}</text>
-            </view>
-            <view class="goods-attr">
-              <van-icon name="cluster-o" size="26rpx" color="{{themeColor}}" />
-              <text>{{item.scopeText}}</text>
-            </view>
+        <view class="shop-item-aside">
+          <view class="shop-item-price">
+            <text class="shop-price-cur" style="color:{{themeColor}}">¥</text>
+            <text class="shop-price-num" style="color:{{themeColor}}">{{item.priceYuan}}</text>
+            <text wx:if="{{item.hasDiscount}}" class="shop-price-origin">¥{{item.originYuan}}</text>
           </view>
-
-          <!-- 价格 + 查看商品 -->
-          <view class="goods-foot">
-            <view class="goods-price-wrap">
-              <text class="goods-price-cur" style="color:{{themeColor}}">¥</text>
-              <text class="goods-price" style="color:{{themeColor}}">{{item.priceYuan}}</text>
-              <text wx:if="{{item.hasDiscount}}" class="goods-price-origin">¥{{item.originYuan}}</text>
-            </view>
-            <van-button
-              round
-              custom-class="goods-btn"
-              color="{{themeColor}}"
-              data-id="{{item.id}}"
-              mark:id="{{item.id}}"
-              catch:click="bindCardTap"
-            >查看套餐</van-button>
-          </view>
+          <view class="shop-item-btn" style="background:{{themeColor}};" catchtap="bindCardTap" data-id="{{item.id}}">查看套餐</view>
         </view>
       </view>
     </view>
   </block>
-
-  <view wx:if="{{!loading && (guide || contact)}}" class="shop-guide-bar">
-    <view wx:if="{{guide}}" class="shop-guide-row">
-      <van-icon name="info-o" size="28rpx" color="{{themeColor}}" />
-      <text class="shop-guide-text">购买说明：{{guide}}</text>
-    </view>
-    <view wx:if="{{contact}}" class="shop-guide-row shop-guide-row--contact">
-      <van-icon name="phone-o" size="28rpx" color="#a0a8a2" />
-      <text class="shop-guide-text shop-guide-text--sub">联系馆方：{{contact}}</text>
-    </view>
-  </view>
 </view>

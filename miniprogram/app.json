@@ -8,7 +8,6 @@
     "pages/default/about/index/about_index",
     "pages/default/about/contact/about_contact",
     "pages/default/calendar/index/calendar_index",
-    "pages/default/meet/index/meet_index",
     "pages/default/meet/detail/meet_detail",
     "pages/default/my/index/my_index",
     "pages/default/my/edit/my_edit",

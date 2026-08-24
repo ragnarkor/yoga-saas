@@ -113,7 +113,6 @@ Page({
         : "请完成转账后上传凭证",
       canUploadProof: offlinePending,
       canPay: status === 1 && payType === "wechat",
-      canGoPack: status === 10,
     };
   },
 
@@ -186,10 +185,6 @@ Page({
       data: String(sn),
       success: () => wx.showToast({ title: "订单号已复制", icon: "success" }),
     });
-  },
-
-  bindGoPackTap() {
-    wx.navigateTo({ url: "/pages/default/my/card_pack/my_card_pack" });
   },
 
   bindCopyAccountTap(e) {

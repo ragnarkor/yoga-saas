@@ -7,6 +7,7 @@ module.exports = Behavior({
     id: "",
     loading: true,
     activeTab: 0,
+    showCardBack: false,
     card: null,
     usageList: [],
     usageTotal: 0,
@@ -63,6 +64,10 @@ module.exports = Behavior({
       this.setData({ activeTab: tab });
     },
 
+    bindToggleCardFace() {
+      this.setData({ showCardBack: !this.data.showCardBack });
+    },
+
     bindCopyCardNo() {
       const no = this.data.card && this.data.card.cardNo;
       if (!no) return;
@@ -105,6 +110,11 @@ module.exports = Behavior({
         enriched.usedTimes = Math.max(0, init - left);
         enriched.usageRuleText = "每次上课按课程设置扣减卡内次数";
       }
+
+      enriched.shadeBg = cardFaceHelper.getCardShadeBg(
+        enriched.color,
+        enriched.coverUrl,
+      );
 
       return enriched;
     },

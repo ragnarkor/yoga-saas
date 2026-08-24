@@ -55,6 +55,7 @@
 }
 
 .phone-auth-btn {
+  position: relative;
   margin: 0;
   padding: 0 16rpx;
   height: 52rpx;
@@ -64,6 +65,12 @@
   background: #fff;
   border: 1rpx solid #5b8a72;
   border-radius: 8rpx;
+}
+
+.phone-auth-btn::before {
+  content: "";
+  position: absolute;
+  inset: -18rpx 0;
 }
 
 .phone-auth-btn::after {

@@ -104,6 +104,16 @@ Page({
 
   async bindSubmitTap() {
     if (this.data.submitting || !this.data.card) return;
+    if (
+      this.data.payType === "offline" &&
+      !(this.data.transferAccount && this.data.transferAccount.account)
+    ) {
+      wx.showToast({
+        title: "馆方暂未配置收款账户，请联系馆方",
+        icon: "none",
+      });
+      return;
+    }
     this.setData({ submitting: true });
     const payType = this.data.payType;
     try {

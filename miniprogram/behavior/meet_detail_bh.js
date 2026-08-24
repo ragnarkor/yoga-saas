@@ -589,10 +589,6 @@ module.exports = Behavior({
 			};
 		},
 
-		bindJoinTap: async function (e) {
-			this.bindBookTap();
-		},
-
 		url: function (e) {
 			pageHelper.url(e, this);
 		},

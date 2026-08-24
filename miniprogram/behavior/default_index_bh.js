@@ -158,7 +158,6 @@ module.exports = Behavior({
     banners: [],
     announcements: [],
     teachers: [],
-    photos: [],
     photoAlbums: [],
     memberDashboardLoaded: false,
     nextJoin: null,
@@ -216,7 +215,6 @@ module.exports = Behavior({
             publishAgo: formatPublishAgo(item.publishTime),
           })),
           teachers: [],
-          photos: [],
           photoAlbums: [],
         });
         // 个人区域晚于公共首屏加载，避免会员初始化或预约数据拖慢横幅展示。
@@ -244,7 +242,6 @@ module.exports = Behavior({
         );
         this.setData({
           teachers: (data?.teachers || []).map(mapTeacher),
-          photos,
           photoAlbums,
         });
       } catch (err) {
@@ -350,12 +347,6 @@ module.exports = Behavior({
       });
     },
 
-    bindSearchTap: function () {
-      wx.navigateTo({
-        url: "/pages/default/search/search?type=home",
-      });
-    },
-
     bindBannerTap: function (e) {
       let url = e.currentTarget.dataset.url;
       if (!url) return;
@@ -399,38 +390,6 @@ module.exports = Behavior({
 
     bindPhotoWallTap: function () {
       wx.navigateTo({ url: "/pages/default/photo/photo_wall" });
-    },
-
-    bindPhotoTap: function (e) {
-      let albumIndex = e.currentTarget.dataset.albumIndex;
-      let photoIndex = e.currentTarget.dataset.photoIndex;
-      let item = null;
-      let urls = [];
-
-      if (albumIndex !== undefined && photoIndex !== undefined) {
-        let album = this.data.photoAlbums[albumIndex];
-        if (album && album.photos) {
-          item = album.photos[photoIndex];
-          urls = album.photos.map((p) => p.pic).filter(Boolean);
-        }
-      } else {
-        let index = e.currentTarget.dataset.index;
-        item = this.data.photos[index];
-        urls = this.data.photos.map((p) => p.pic).filter(Boolean);
-      }
-
-      if (!item) return;
-      if (item.linkUrl) {
-        wx.navigateTo({ url: pageHelper.fmtURLByPID(item.linkUrl) });
-        return;
-      }
-      if (urls.length) {
-        wx.previewImage({ current: item.pic, urls });
-      }
-    },
-
-    url: async function (e) {
-      pageHelper.url(e, this);
     },
 
     onShareAppMessage: function () {},

@@ -12,10 +12,6 @@
   padding: 0;
 }
 
-.main .upside .user-bar .detail .desc {
-  color: #fff;
-}
-
 .main .down {
   margin-top: -130rpx;
   z-index: 3;
@@ -31,22 +27,6 @@
   border: 4rpx solid rgba(255, 255, 255, 0.6);
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
   background: rgba(255, 255, 255, 0.95);
-}
-
-.avatar-choose-btn {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-  opacity: 0;
-  z-index: 2;
-}
-
-.avatar-choose-btn::after {
-  border: none;
 }
 
 .avatar-placeholder {
@@ -67,15 +47,6 @@
   display: block;
 }
 
-.name-input {
-  width: 100%;
-  font-size: 36rpx;
-  font-weight: 600;
-  color: #fff;
-  height: 52rpx;
-  line-height: 52rpx;
-}
-
 .name-text {
   width: 100%;
   font-size: 36rpx;
@@ -92,30 +63,6 @@
   font-weight: 400;
   color: rgba(255, 255, 255, 0.65);
   margin-left: 12rpx;
-}
-
-.phone-auth-btn {
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.92);
-  font-size: 26rpx;
-  line-height: 1.4;
-  text-align: left;
-}
-
-.phone-auth-btn::after {
-  border: none;
-}
-
-.phone-text {
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.92);
-}
-
-.profile-hint {
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.75);
 }
 
 .profile-arrow {
@@ -188,28 +135,14 @@
   gap: 4rpx;
   font-size: 24rpx;
   color: #969799;
+  padding: 24rpx;
+  margin: -24rpx;
 }
 
 .today-head-actions {
   display: flex;
   align-items: center;
   gap: 20rpx;
-}
-
-.today-checkin-btn {
-	display: inline-flex;
-	align-items: center;
-	gap: 6rpx;
-	margin-top: 8rpx;
-	padding: 8rpx 16rpx;
-	border-radius: 999rpx;
-	background: var(--projectColorLight, #e8f2ed);
-	font-size: 24rpx;
-	color: var(--themeColor, #5b8a72);
-}
-
-.today-checkin-btn:active {
-	opacity: 0.85;
 }
 
 .today-state {
@@ -332,14 +265,6 @@
 .today-tag--pending {
   color: #646566;
   background: #f2f3f5;
-}
-
-.today-hint {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 22rpx;
-  color: #c8c9cc;
-  line-height: 1.45;
 }
 
 .today-arrow {

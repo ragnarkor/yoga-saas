@@ -10,16 +10,29 @@ Page({
   data: {
     loading: true,
     cards: [],
-    guide: "",
-    contact: "",
     themeColor: pageHelper.getThemeColor(),
     pageStyle: themeHelper.getPageMetaStyle(pageHelper.getThemeColor()),
     wechatPay: false,
+    // 套餐列表展示方式：list 横排行 / grid 网格卡（默认网格）
+    viewMode: "grid",
   },
 
   onLoad() {
+    const savedView = wx.getStorageSync("cardShopViewMode");
+    if (savedView === "grid" || savedView === "list") {
+      this.setData({ viewMode: savedView });
+    }
     this._applyTheme();
     this.load();
+  },
+
+  // 列表 / 网格视图切换（记忆用户偏好）
+  bindViewToggle(e) {
+    const mode = e.currentTarget.dataset.mode;
+    if (mode !== "grid" && mode !== "list") return;
+    if (mode === this.data.viewMode) return;
+    this.setData({ viewMode: mode });
+    wx.setStorageSync("cardShopViewMode", mode);
   },
 
   async load() {
@@ -32,8 +45,6 @@ Page({
       this.setData({
         loading: false,
         cards: (r.cards || []).map((c) => this._decorate(c)),
-        guide: r.guide || "",
-        contact: r.contact || "",
         wechatPay: !!r.wechatPay,
       });
     } catch (e) {
@@ -104,7 +115,4 @@ Page({
     });
   },
 
-  bindOrderTap() {
-    wx.navigateTo({ url: "/pages/default/my/card_order/card_order" });
-  },
 });
