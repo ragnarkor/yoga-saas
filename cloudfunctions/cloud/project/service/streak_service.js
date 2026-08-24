@@ -364,6 +364,7 @@ class StreakService extends BaseService {
         name: def.name,
         desc: def.desc,
         emoji: def.emoji,
+        type: def.type,
         category: def.category,
         categoryName: def.categoryName,
         rarity: def.rarity,
@@ -399,6 +400,29 @@ class StreakService extends BaseService {
       }
       return base;
     });
+  }
+
+  /** 首页使用：从未解锁徽章中挑选当前完成比例最高的一枚。 */
+  getNextBadgeProgress(row, now = timeUtil.time()) {
+    const locked = this._buildBadgeViews(row || {}, now)
+      .filter((badge) => !badge.unlocked && badge.target)
+      .sort((a, b) => {
+        if (b.progressPercent !== a.progressPercent) {
+          return b.progressPercent - a.progressPercent;
+        }
+        return a.target - b.target;
+      });
+    const next = locked[0] || null;
+    if (!next) return null;
+    const remaining = Math.max(0, Number(next.target) - Number(next.progress));
+    if (next.type === "classes") {
+      next.unlockHint = `再完成 ${remaining} 节课，即可点亮下一枚徽章`;
+    } else if (next.type === "streak") {
+      next.unlockHint = `再坚持 ${remaining} 周，即可点亮下一枚徽章`;
+    } else {
+      next.unlockHint = `最长连续再坚持 ${remaining} 周，即可点亮下一枚徽章`;
+    }
+    return next;
   }
 
   async getAchievement(userId) {

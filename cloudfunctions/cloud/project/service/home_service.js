@@ -14,11 +14,15 @@ const DayModel = require("../model/day_model.js");
 const AdminModel = require("../model/admin_model.js");
 const JoinModel = require("../model/join_model.js");
 const StreakModel = require("../model/streak_model.js");
+const StreakService = require("./streak_service.js");
+const AttendanceService = require("./attendance_service.js");
 const teacherAdminHelper = require("./teacher_admin_helper.js");
+const { deriveWeeklyGoal } = require("./home_progress_util.js");
 const dataUtil = require("../../framework/utils/data_util.js");
 const timeUtil = require("../../framework/utils/time_util.js");
 const dbUtil = require("../../framework/database/db_util.js");
 const cloudUtil = require("../../framework/cloud/cloud_util.js");
+const { mergeResolvedMediaUrls } = require("../utils/home_media_util.js");
 
 const HOME_COLLECTIONS = [
   "ax_banner",
@@ -99,9 +103,12 @@ class HomeService extends BaseService {
       return list.map((url) => this._fmtMediaUrlSync(url));
     }
     try {
-      let tempUrls = await cloudUtil.getTempFileURL(cloudIds);
+      const tempFiles = await cloudUtil.getTempFileURL(cloudIds);
+      const resolvedCloudUrls = mergeResolvedMediaUrls(cloudIds, tempFiles);
       let map = {};
-      for (let i in cloudIds) map[cloudIds[i]] = tempUrls[i] || cloudIds[i];
+      for (let i in cloudIds) {
+        map[cloudIds[i]] = resolvedCloudUrls[i] || cloudIds[i];
+      }
       return list.map((url) => {
         if (url && url.indexOf("cloud://") === 0) return map[url] || url;
         return this._fmtMediaUrlSync(url);
@@ -190,11 +197,29 @@ class HomeService extends BaseService {
       teacherAdminHelper.listBoundStaffForHome(),
     ]);
 
+    // 首页图片统一批量换取 CDN 临时地址，避免每个 image 节点分别解析 cloud:// 资源。
+    const mediaSources = [];
+    for (const item of rawPhotos || []) {
+      if (item.PHOTO_PIC) mediaSources.push(item.PHOTO_PIC);
+    }
+    for (const item of rawTeachers || []) {
+      if (item.TEACHER_AVATAR) mediaSources.push(item.TEACHER_AVATAR);
+      for (const pic of item.TEACHER_PIC || []) {
+        if (pic) mediaSources.push(pic);
+      }
+    }
+    const uniqueMediaSources = Array.from(new Set(mediaSources));
+    const resolvedMedia = await this._fmtMediaUrls(uniqueMediaSources);
+    const mediaMap = new Map();
+    uniqueMediaSources.forEach((source, index) => {
+      mediaMap.set(source, resolvedMedia[index] || source);
+    });
+    const resolveMedia = (url) =>
+      mediaMap.get(url) || this._fmtMediaUrlSync(url);
+
     const teachers = (rawTeachers || []).map((item) => {
-      let pics = (item.TEACHER_PIC || []).map((url) =>
-        this._fmtMediaUrlSync(url),
-      );
-      let avatar = this._fmtMediaUrlSync(item.TEACHER_AVATAR);
+      let pics = (item.TEACHER_PIC || []).map(resolveMedia);
+      let avatar = resolveMedia(item.TEACHER_AVATAR);
       return {
         _id: item._id,
         name: item.TEACHER_NAME,
@@ -206,7 +231,10 @@ class HomeService extends BaseService {
       };
     });
 
-    const photos = (rawPhotos || []).map((item) => this._mapPhotoItem(item));
+    const photos = (rawPhotos || []).map((item) => ({
+      ...this._mapPhotoItem(item),
+      pic: resolveMedia(item.PHOTO_PIC),
+    }));
     const photoAlbums = this._buildPhotoAlbums(photos);
 
     return { teachers, photos, photoAlbums };
@@ -214,6 +242,7 @@ class HomeService extends BaseService {
 
   /** 会员首页的个人区域，不能走公共首页缓存。 */
   async getMemberDashboard(userId) {
+    await new AttendanceService().settleEndedJoins({ userId });
     const now = timeUtil.time("Y-M-D h:m");
     const joinFields =
       "JOIN_IS_CHECKIN,JOIN_MEET_ID,JOIN_MEET_TITLE,JOIN_MEET_DAY,JOIN_MEET_TIME_START,JOIN_MEET_TIME_END,JOIN_STATUS";
@@ -307,12 +336,33 @@ class HomeService extends BaseService {
       streak =
         (await StreakModel.getOne(
           { STREAK_USER_ID: userId },
-          "STREAK_CURRENT,STREAK_TOTAL_CLASSES,STREAK_BADGES",
+          "STREAK_CURRENT,STREAK_MAX,STREAK_TOTAL_CLASSES,STREAK_BADGES",
         )) || {};
     } catch (err) {
       // 成就集合尚未初始化时，不影响首页的预约入口。
       console.warn("[home/member_dashboard] streak unavailable:", err.message);
     }
+
+    // 课程页/首页进度卡统计：本月完成与本周进度直接从已取出的预约记录里算。
+    const todayStr = timeUtil.time("Y-M-D");
+    const monthPrefix = todayStr.slice(0, 7);
+    const monday = new Date();
+    monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+    const pad2 = (n) => String(n).padStart(2, "0");
+    const weekMonday = `${monday.getFullYear()}-${pad2(
+      monday.getMonth() + 1,
+    )}-${pad2(monday.getDate())}`;
+    let monthClasses = 0;
+    let weekDone = 0;
+    for (const item of joins || []) {
+      if (item.JOIN_IS_CHECKIN !== 1) continue;
+      const day = String(item.JOIN_MEET_DAY || "");
+      if (day.startsWith(monthPrefix)) monthClasses += 1;
+      if (day >= weekMonday && day <= todayStr) weekDone += 1;
+    }
+    const weeklyGoal = deriveWeeklyGoal(joins, todayStr);
+    const WEEK_GOAL = weeklyGoal.goal;
+    const nextAchievement = new StreakService().getNextBadgeProgress(streak);
 
     return {
       nextJoin: next
@@ -329,7 +379,13 @@ class HomeService extends BaseService {
       progress: {
         totalClasses: Number(streak.STREAK_TOTAL_CLASSES) || 0,
         currentStreak: Number(streak.STREAK_CURRENT) || 0,
+        maxStreak: Number(streak.STREAK_MAX) || 0,
         badgeCount: (streak.STREAK_BADGES || []).length,
+        monthClasses,
+        weekDone,
+        weekGoal: WEEK_GOAL,
+        weekGoalPersonalized: weeklyGoal.personalized,
+        nextAchievement,
       },
     };
   }

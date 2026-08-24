@@ -1,64 +1,142 @@
 <template name="myCourseTpl">
   <view class="my-course-page">
-    <view class="course-hero">
-      <image class="course-hero-bg" src="{{skin.IMG_MY_COURSE_BG}}?v=2" mode="widthFix" />
-      <view class="course-hero-overlay"></view>
-      <view class="course-hero-caption">记录你的练习时光</view>
-    </view>
 
-    <view class="filter-bar">
+    <!-- 顶部：练习时光 hero + 练习统计 -->
+    <view class="course-hero">
+      <image class="course-hero-bg" src="{{skin.IMG_MY_COURSE_BG}}?v=2" mode="aspectFill" />
+      <view class="course-hero-shade"></view>
+      <view class="course-hero-ring"></view>
+      <view class="course-hero-caption">记录你的练习时光</view>
       <view
-        class="filter-pill {{activeFilter === item.type ? 'active' : ''}}"
-        wx:for="{{filterTabs}}"
-        wx:key="type"
-        bindtap="bindFilterTap"
-        data-type="{{item.type}}"
-        aria-role="tab"
-        aria-selected="{{activeFilter === item.type}}"
-        aria-label="{{item.label}}"
-      >
-        {{item.label}}
+        class="course-hero-star"
+        bindtap="bindHeroAchievementTap"
+        aria-role="button"
+        aria-label="查看我的成就"
+      >✦</view>
+      <view class="course-hero-data" wx:if="{{practiceStats}}">
+        <view class="course-hero-stat">
+          <text class="course-hero-num">{{practiceStats.totalClasses || 0}}</text>
+          <text class="course-hero-label">累计上课</text>
+        </view>
+        <view class="course-hero-stat">
+          <text class="course-hero-num">{{practiceStats.monthClasses || 0}}</text>
+          <text class="course-hero-label">本月上课</text>
+        </view>
+        <view class="course-hero-stat">
+          <text class="course-hero-num">{{practiceStats.maxStreak || 0}} 周</text>
+          <text class="course-hero-label">最长连续</text>
+        </view>
       </view>
     </view>
 
-    <view wx:if="{{isLoad===false}}" class="loading-wrap">
-      <van-loading size="48rpx" color="{{themeColor}}" type="spinner" />
-    </view>
+    <!-- 今日约课面板（复用我的页约课卡片行结构） -->
+    <view class="today-panel">
+      <view class="today-head">
+        <text class="today-title">今日约课</text>
+        <text wx:if="{{todayPendingCount}}" class="today-head-count">{{todayPendingCount}} 节待上</text>
+      </view>
 
-    <view wx:elif="{{list && list.length > 0}}" class="course-list">
-      <block wx:for="{{list}}" wx:key="_id">
+      <view
+        wx:if="{{!todayList.length}}"
+        class="today-state today-state--link"
+        bindtap="bindTodayEmptyTap"
+        aria-role="button"
+        aria-label="去约课"
+      >
+        <text class="today-state-text">今天还没有约课安排</text>
+        <text class="today-state-sub">去挑一节合适的课 ›</text>
+      </view>
+
+      <view wx:else class="today-list">
         <view
-          class="course-item"
-          bindtap="bindItemTap"
+          class="today-item"
+          wx:for="{{todayList}}"
+          wx:key="_id"
+          bindtap="bindTodayTap"
           data-id="{{item._id}}"
           aria-role="button"
-          aria-label="{{item.JOIN_MEET_TITLE}}"
+          aria-label="{{item.JOIN_MEET_TITLE}} {{item.JOIN_MEET_TIME_START}}-{{item.JOIN_MEET_TIME_END}} 预约详情"
         >
-          <image
-            class="course-cover"
-            src="{{item.coverPic}}"
-            mode="aspectFill"
-          />
-          <view class="course-info">
-            <view class="course-title text-cut">{{item.JOIN_MEET_TITLE}}</view>
-            <view class="course-meta text-cut">{{item.tenantName}}</view>
-            <view class="course-meta text-cut">{{item.scheduleText}}</view>
-            <view class="course-meta text-cut">{{item.locationText}}</view>
+          <view class="today-time-col">
+            <text class="today-time-start">{{item.JOIN_MEET_TIME_START}}</text>
+            <text class="today-time-end">{{item.JOIN_MEET_TIME_END}}</text>
+          </view>
+          <view class="today-info">
+            <text class="today-course-name">{{item.JOIN_MEET_TITLE}}</text>
+            <text wx:if="{{item.metaText}}" class="today-meta">{{item.metaText}}</text>
+          </view>
+          <text class="today-state-pill {{item.JOIN_IS_CHECKIN==1 ? 'today-state-pill--done' : ''}}">{{item.stateText}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 课程记录卡 -->
+    <view class="record-card">
+      <view class="record-head">
+        <text class="record-title">课程记录</text>
+      </view>
+
+      <scroll-view class="record-filters" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="record-filters-inner">
+          <view
+            class="record-filter {{activeFilter === item.type ? 'active' : ''}}"
+            wx:for="{{filterTabs}}"
+            wx:key="type"
+            bindtap="bindFilterTap"
+            data-type="{{item.type}}"
+            aria-role="tab"
+            aria-selected="{{activeFilter === item.type}}"
+            aria-label="{{item.label}}"
+          >
+            {{item.label}}
           </view>
         </view>
-        <view class="course-sep" wx:if="{{index < list.length - 1}}"></view>
+      </scroll-view>
+
+      <view wx:if="{{isLoad===false}}" class="loading-wrap">
+        <van-loading size="48rpx" color="{{themeColor}}" type="spinner" />
+      </view>
+
+      <block wx:elif="{{list && list.length > 0}}">
+        <view class="history-list">
+          <view
+            class="history-row"
+            wx:for="{{list}}"
+            wx:key="_id"
+            bindtap="bindItemTap"
+            data-id="{{item._id}}"
+            aria-role="button"
+            aria-label="{{item.JOIN_MEET_TITLE}}"
+          >
+            <view class="history-cover {{index % 2 === 1 ? 'alt' : ''}}">
+              <image
+                wx:if="{{item.coverPic}}"
+                class="history-cover-img"
+                src="{{item.coverPic}}"
+                mode="aspectFill"
+                lazy-load="{{true}}"
+              />
+            </view>
+            <view class="history-copy">
+              <text class="history-name text-cut">{{item.JOIN_MEET_TITLE}}</text>
+              <view class="history-meta">
+                <text class="text-cut" wx:if="{{item.locationText}}">{{item.dateText}} · {{item.locationText}}</text>
+                <text class="text-cut" wx:else>{{item.dateText}}</text>
+              </view>
+            </view>
+            <text class="history-state {{item.stateClass}}">{{item.stateText}}</text>
+          </view>
+        </view>
+
+        <view class="list-footer" wx:if="{{loading}}">
+          <van-loading size="36rpx" color="{{themeColor}}" type="spinner" />
+        </view>
       </block>
 
-      <view class="list-footer" wx:if="{{loading}}">
-        <van-loading size="36rpx" color="{{themeColor}}" type="spinner" />
-      </view>
-      <view class="list-footer list-footer--text" wx:elif="{{!hasMore}}">
-        没有更多了
+      <view wx:elif="{{isLoad}}" class="empty-wrap">
+        <van-empty description="{{emptyText}}" />
       </view>
     </view>
 
-    <view class="empty-wrap" wx:elif="{{isLoad}}">
-      <van-empty description="{{emptyText}}" />
-    </view>
   </view>
 </template>

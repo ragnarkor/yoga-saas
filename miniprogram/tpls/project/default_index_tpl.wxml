@@ -4,180 +4,200 @@
 
 	<view class="home-page">
 
-		<!-- 顶部横幅 -->
-		<view class="home-hero">
-			<view class="home-banner" wx:if="{{banners.length > 0}}">
-				<swiper class="banner-swiper" indicator-dots autoplay circular interval="4000" duration="500">
-					<swiper-item wx:for="{{banners}}" wx:key="_id">
-						<view class="banner-item" aria-role="button" aria-label="{{item.title || '宣传图'}}" bindtap="bindBannerTap" data-url="{{item.linkUrl}}">
-							<video wx:if="{{item.type === 'video' && item.video}}" class="banner-media" src="{{item.video}}" poster="{{item.pic}}" object-fit="cover" show-center-play-btn="{{false}}" controls="{{false}}"></video>
-							<image wx:else class="banner-media" mode="aspectFill" src="{{item.pic || skin.IMG_DEFAULT_INDEX_BG}}" />
-						</view>
-					</swiper-item>
-				</swiper>
-			</view>
-			<view class="home-banner home-banner-fallback" wx:else>
-				<image mode="aspectFill" src="{{skin.IMG_DEFAULT_INDEX_BG}}" />
+		<!-- 顶部文案横幅 -->
+		<view
+			class="home-editorial"
+			bindtap="bindBannerTap"
+			data-url="{{editorialLink}}"
+			aria-role="button"
+			aria-label="{{tenantName || '瑜伽馆'}}"
+		>
+			<image class="home-editorial-bg" mode="aspectFill" src="{{editorialCover}}" />
+			<view class="home-editorial-copy">
+				<text class="home-editorial-small">{{tenantName || '瑜伽馆'}} · 今天也为自己留一点时间</text>
+				<text class="home-editorial-title">{{editorialTitle}}</text>
 			</view>
 		</view>
 
-		<!-- 场馆名 + 电话 -->
-		<view class="home-studio-card">
-			<view class="home-studio-main">
-				<view class="home-studio-info" bindtap="bindStudioLocationTap">
-					<view class="home-studio-name-row">
-						<text class="home-studio-name text-cut">{{tenantName || '瑜伽馆'}}</text>
-						<view wx:if="{{openStatus}}" class="home-open-badge {{openStatus.open ? 'is-open' : 'is-closed'}}">
-							<view class="home-open-dot"></view>
-							<text>{{openStatus.label}} {{openStatus.timeText}}</text>
-						</view>
-					</view>
-					<view wx:if="{{studioAddress}}" class="home-studio-addr">
-						<van-icon name="location-o" size="22rpx" color="#9a9d96" />
-						<text class="text-cut">{{studioAddress}}</text>
-					</view>
-				</view>
-				<view class="home-studio-divider"></view>
-				<view class="home-studio-phone" aria-role="button" aria-label="拨打电话" bindtap="bindPhoneTap">
-					<van-icon name="phone-o" size="40rpx" color="{{themeColor}}" />
-				</view>
+		<!-- 场馆卡 -->
+		<view class="home-place" bindtap="bindStudioLocationTap" aria-role="button" aria-label="查看场馆位置">
+			<view class="home-place-info">
+				<text class="home-place-name text-cut">{{tenantName || '瑜伽馆'}}</text>
+				<text class="home-place-addr text-cut" wx:if="{{studioAddress}}">{{studioAddress}}</text>
 			</view>
-			<view class="home-studio-announce" wx:if="{{announcements.length}}">
-				<van-icon name="volume-o" size="25rpx" color="{{themeColor}}" />
-				<swiper class="home-announce-swiper" vertical circular autoplay="{{announcements.length > 1}}" interval="4000" duration="500">
-					<swiper-item wx:for="{{announcements}}" wx:key="_id">
-						<view class="home-announce-row" bindtap="bindAnnounceTap" data-id="{{item._id}}">
-							<text class="home-studio-announce-title text-cut">{{item.title}}</text>
-							<text wx:if="{{item.publishAgo}}" class="home-studio-announce-time">{{item.publishAgo}}</text>
-							<van-icon name="arrow" size="24rpx" color="#b2b5ae" />
-						</view>
-					</swiper-item>
-				</swiper>
-			</view>
+			<text
+				wx:if="{{openStatus}}"
+				class="home-place-state {{openStatus.open ? '' : 'closed'}}"
+			>{{openStatus.label}}{{openStatus.timeText ? ' · ' + openStatus.timeText : ''}}</text>
 		</view>
 
-		<!-- 统一行动卡：下一节课 + 推荐（无推荐时兜底私教入口） -->
-		<view class="home-action-card" wx:if="{{memberDashboardLoaded}}">
-			<view wx:if="{{nextJoin}}" class="home-action-item" data-id="{{nextJoin.id}}" bindtap="bindNextJoinTap">
-				<view class="home-action-icon">
-					<van-icon name="records" size="34rpx" color="{{themeColor}}" />
-				</view>
-				<view class="home-action-info">
-					<text class="home-action-label">下一节课</text>
-					<text class="home-action-main text-cut">{{nextJoin.title}}</text>
-					<text class="home-action-sub text-cut">{{nextJoin.subText}}</text>
-				</view>
-			</view>
-			<view wx:else class="home-action-item" bindtap="bindHomeBookingTap">
-				<view class="home-action-icon">
-					<van-icon name="records" size="34rpx" color="{{themeColor}}" />
-				</view>
-				<view class="home-action-info">
-					<text class="home-action-label">去约课</text>
-					<text class="home-action-main">暂无预约</text>
-					<text class="home-action-sub">看看本周排课</text>
-				</view>
-			</view>
-			<view wx:if="{{recommendMeets.length > 0}}" class="home-action-item" data-id="{{recommendMeets[0].meetId}}" data-type="{{recommendMeets[0].type}}" bindtap="bindRecommendTap">
-				<view class="home-action-icon">
-					<van-icon name="{{recommendMeets[0].type === 'private' ? 'friends-o' : 'star-o'}}" size="34rpx" color="{{themeColor}}" />
-				</view>
-				<view class="home-action-info">
-					<text class="home-action-label">{{recommendMeets[0].type === 'private' ? '私教体验' : '为你推荐'}}</text>
-					<text class="home-action-main text-cut">{{recommendMeets[0].title}}</text>
-					<text class="home-action-sub text-cut">{{recommendMeets[0].subText}}</text>
-				</view>
-			</view>
-			<view wx:else class="home-action-item" bindtap="bindPrivateBookingTap">
-				<view class="home-action-icon">
-					<van-icon name="friends-o" size="34rpx" color="{{themeColor}}" />
-				</view>
-				<view class="home-action-info">
-					<text class="home-action-label">私教预约</text>
-					<text class="home-action-main">一对一定制</text>
-					<text class="home-action-sub">自选教练与时间</text>
-				</view>
-			</view>
-		</view>
+		<!-- 下一节课 / 本周推荐 -->
+		<block wx:if="{{memberDashboardLoaded}}">
 
-		<view class="home-practice-card" wx:if="{{memberDashboardLoaded && practiceProgress.totalClasses > 0}}" bindtap="bindAchievementTap">
-			<view>
-				<text class="home-practice-title">练习进度</text>
-				<text class="home-practice-sub">每一次来到垫上，都会成为积累</text>
+			<view
+				wx:if="{{nextJoin}}"
+				class="home-next"
+				bindtap="bindNextJoinTap"
+				data-id="{{nextJoin.id}}"
+				aria-role="button"
+				aria-label="下一节课 {{nextJoin.title}}"
+			>
+				<view class="home-next-body">
+					<text class="home-next-label">下一节课 · {{nextJoin.subText}}</text>
+					<text class="home-next-title text-cut">{{nextJoin.title}}</text>
+					<text class="home-next-sub">{{nextJoin.checkedIn ? '已签到' : '已预约'}} · 点击查看详情</text>
+				</view>
+				<view class="home-next-btn" catchtap="bindGoCourseTap" aria-role="button" aria-label="查看课程">查看课程</view>
+				<view class="home-next-ring"></view>
 			</view>
-			<view class="home-practice-stats">
-				<view><text>{{practiceProgress.totalClasses || 0}}</text><text>次上课</text></view>
-				<view><text>{{practiceProgress.currentStreak || 0}}</text><text>周连续</text></view>
-				<view><text>{{practiceProgress.badgeCount || 0}}</text><text>枚徽章</text></view>
-			</view>
-		</view>
-		<view class="home-practice-teaser" wx:elif="{{memberDashboardLoaded}}" bindtap="bindHomeBookingTap">
-			<van-icon name="flower-o" size="32rpx" color="{{themeColor}}" />
-			<view class="home-practice-teaser-text">
-				<text class="home-practice-teaser-main">开始你的第一节瑜伽课</text>
-				<text class="home-practice-teaser-sub">每一次来到垫上，都会成为积累</text>
-			</view>
-			<van-icon name="arrow" size="24rpx" color="#b2b5ae" />
-		</view>
 
-		<!-- 金牌老师（横向滑动） -->
-		<view class="home-section" wx:if="{{teachers.length > 0}}">
-			<view class="section-head">
-				<text class="section-title">金牌老师</text>
-				<text class="section-more" bindtap="bindTeacherMoreTap">认识老师</text>
-			</view>
-			<scroll-view class="hscroll" scroll-x enhanced show-scrollbar="{{false}}">
-				<view class="hscroll-inner">
-					<view class="teacher-card" wx:for="{{teachers}}" wx:key="_id" bindtap="bindTeacherTap" data-id="{{item._id}}">
-						<image class="teacher-cover" mode="aspectFill" src="{{item.cover || item.avatar}}" />
-						<view class="teacher-shade" />
-						<view class="teacher-info">
-							<text class="teacher-name text-cut">{{item.name}}</text>
-							<text class="teacher-specialty text-cut">{{item.specialty || '瑜伽教练'}}</text>
+			<view wx:elif="{{recommendMeets.length > 0}}" class="home-week">
+				<view class="home-section-head">
+					<text class="home-section-title">本周推荐</text>
+					<text class="home-section-more" bindtap="bindHomeBookingTap" aria-role="button" aria-label="查看全部课程">查看全部 ›</text>
+				</view>
+				<scroll-view class="home-suggest" scroll-x enhanced show-scrollbar="{{false}}">
+					<view class="home-suggest-inner">
+						<view
+							class="class-mini {{index % 3 === 1 ? 'alt-a' : (index % 3 === 2 ? 'alt-b' : '')}}"
+							wx:for="{{recommendMeets}}"
+							wx:key="index"
+							bindtap="bindRecommendTap"
+							data-id="{{item.meetId}}"
+							data-type="{{item.type}}"
+							aria-role="button"
+							aria-label="{{item.title}}"
+						>
+							<image class="class-mini-bg" mode="aspectFill" src="{{item.cover}}" lazy-load="{{true}}" />
+							<view class="class-mini-shade"></view>
+							<text class="class-mini-when">{{item.smallText}}</text>
+							<text class="class-mini-name text-cut">{{item.title}}</text>
+							<text class="class-mini-sub text-cut" wx:if="{{item.spanText}}">{{item.spanText}}</text>
 						</view>
 					</view>
+				</scroll-view>
+			</view>
+
+			<view wx:else class="home-week">
+				<view class="home-section-head">
+					<text class="home-section-title">本周推荐</text>
+					<text class="home-section-more" bindtap="bindHomeBookingTap" aria-role="button" aria-label="查看全部课程">查看全部 ›</text>
 				</view>
-			</scroll-view>
+				<view class="class-mini home-private-fallback" bindtap="bindPrivateBookingTap" aria-role="button" aria-label="私教预约">
+					<text class="class-mini-when">私教体验</text>
+					<text class="class-mini-name">一对一定制</text>
+					<text class="class-mini-sub">自选教练与时间 ›</text>
+				</view>
+			</view>
+
+			<!-- 下一枚成就进度环 -->
+			<view wx:if="{{practiceProgress.nextAchievement}}" class="home-ring-card" bindtap="bindAchievementTap" aria-role="button" aria-label="查看我的成就">
+				<view class="home-ring" style="background:conic-gradient(var(--projectColor, #6fae96) 0deg {{homeRingDeg}}deg, var(--projectColorLight, #d5e7dc) {{homeRingDeg}}deg 360deg);">
+					<view class="home-ring-center">
+						<text>{{practiceProgress.nextAchievement.progress || 0}} / {{practiceProgress.nextAchievement.target}}</text>
+					</view>
+				</view>
+				<view class="home-ring-info">
+					<text class="home-ring-title">{{practiceProgress.nextAchievement.name}}</text>
+					<text class="home-ring-sub">{{practiceProgress.nextAchievement.unlockHint}}</text>
+				</view>
+				<text class="home-ring-more">成就 ›</text>
+			</view>
+		</block>
+
+		<!-- 公告 -->
+		<view class="home-notice" wx:if="{{announcements.length}}">
+			<view class="home-notice-dot"></view>
+			<swiper class="home-notice-swiper" vertical circular autoplay="{{announcements.length > 1}}" interval="4200" duration="650">
+				<swiper-item wx:for="{{announcements}}" wx:key="_id">
+					<view class="home-notice-row" bindtap="bindAnnounceTap" data-id="{{item._id}}" aria-role="button" aria-label="公告 {{item.title}}">
+						<text class="home-notice-text text-cut">{{item.title}}</text>
+						<text class="home-notice-time" wx:if="{{item.publishAgo}}">{{item.publishAgo}}</text>
+					</view>
+				</swiper-item>
+			</swiper>
+			<text class="home-notice-arrow">›</text>
 		</view>
 
-		<!-- 照片墙（相册横向滑动） -->
-		<view class="home-section" wx:if="{{photoAlbums.length > 0}}">
-			<view class="section-head">
-				<text class="section-title">照片墙</text>
-				<text class="section-more" bindtap="bindPhotoWallTap">查看相册</text>
+		<!-- 馆内时光 -->
+		<view class="home-community" wx:if="{{teachers.length > 0 || photoAlbumsTop.length > 0}}">
+			<view class="home-section-head">
+				<text class="home-section-title">馆内时光</text>
+				<view class="home-section-actions">
+					<text
+						wx:if="{{teachers.length > 1}}"
+						class="home-section-more"
+						bindtap="bindTeacherMoreTap"
+						aria-role="button"
+						aria-label="更多老师"
+					>更多老师 ›</text>
+					<text
+						wx:if="{{photoAlbumsTop.length > 0}}"
+						class="home-section-more"
+						bindtap="bindPhotoWallTap"
+						aria-role="button"
+						aria-label="更多相册"
+					>更多相册 ›</text>
+				</view>
 			</view>
-			<scroll-view class="hscroll" scroll-x enhanced show-scrollbar="{{false}}">
-				<view class="hscroll-inner">
+			<view class="home-merged {{photoAlbumsTop.length === 0 ? 'only-teacher' : ''}} {{teachers.length === 0 ? 'only-album' : ''}}">
+
+				<view class="merged-teacher" wx:if="{{teachers.length > 0}}">
+					<swiper
+						class="merged-teacher-swiper"
+						circular
+						autoplay
+						interval="4000"
+						duration="500"
+						current="{{teacherCurrent}}"
+						bindchange="bindTeacherSwiperChange"
+					>
+						<swiper-item
+							wx:for="{{teachers}}"
+							wx:key="_id"
+							bindtap="bindTeacherTap"
+							data-id="{{item._id}}"
+							aria-role="button"
+							aria-label="教练 {{item.name}}"
+						>
+							<view class="merged-teacher-card">
+								<image class="merged-teacher-bg" mode="aspectFill" src="{{item.cover || item.avatar}}" lazy-load="{{index > 0}}" />
+								<view class="merged-teacher-shade"></view>
+								<text class="merged-teacher-label">金牌老师</text>
+								<text class="merged-teacher-name text-cut">{{item.name}}</text>
+							</view>
+						</swiper-item>
+					</swiper>
+					<view class="merged-teacher-dots" wx:if="{{teachers.length > 1}}">
+						<view
+							class="merged-teacher-dot {{teacherCurrent === idx ? 'active' : ''}}"
+							wx:for="{{teachers}}"
+							wx:for-index="idx"
+							wx:key="_id"
+						></view>
+					</view>
+				</view>
+
+				<view class="merged-albums" wx:if="{{photoAlbumsTop.length > 0}}">
 					<view
-						class="photo-album-card"
-						wx:for="{{photoAlbums}}"
+						class="merged-album {{item.ready ? 'is-ready' : ''}} {{index === 1 ? 'alt' : ''}}"
+						wx:for="{{photoAlbumsTop}}"
 						wx:key="id"
 						bindtap="bindHomeAlbumTap"
 						data-index="{{index}}"
+						aria-role="button"
+						aria-label="相册 {{item.title}}"
 					>
-						<view class="photo-album-thumbs photo-album-thumbs--{{item.thumbCount || 1}}">
-							<block wx:if="{{item.thumbs.length}}">
-								<image
-									wx:for="{{item.thumbs}}"
-									wx:for-item="thumb"
-									wx:key="*this"
-									lazy-load="{{true}}"
-									class="photo-album-thumb"
-									mode="aspectFill"
-									src="{{thumb}}"
-								/>
-							</block>
-							<view wx:else class="photo-album-thumb photo-album-thumb--empty">
-								<van-icon name="photo-o" size="48rpx" color="#c8c9cc" />
-							</view>
-						</view>
-						<view class="photo-album-meta">
-							<text class="photo-title text-cut">{{item.title}}</text>
-							<text class="photo-count">{{item.count}} 张回忆</text>
-						</view>
+						<image class="merged-album-layer {{item.front === 'a' ? 'is-front' : ''}}" mode="aspectFill" src="{{item.bufA || item.thumbs[0]}}" fade-in="{{false}}" bindload="bindAlbumImageLoad" binderror="bindAlbumImageError" data-album-index="{{index}}" data-layer="a" data-pic="{{item.bufA || item.thumbs[0]}}" />
+						<image wx:if="{{item.bufB}}" class="merged-album-layer {{item.front === 'b' ? 'is-front' : ''}}" mode="aspectFill" src="{{item.bufB}}" lazy-load="{{true}}" fade-in="{{false}}" bindload="bindAlbumImageLoad" binderror="bindAlbumImageError" data-album-index="{{index}}" data-layer="b" data-pic="{{item.bufB}}" />
+						<view class="merged-album-memory"></view>
+						<view class="merged-album-shade"></view>
+						<text class="merged-album-name text-cut">{{item.title}}</text>
+						<text class="merged-album-count">{{item.count}} 张回忆</text>
 					</view>
 				</view>
-			</scroll-view>
+
+			</view>
 		</view>
 
 		<view class="home-safe-bottom"></view>

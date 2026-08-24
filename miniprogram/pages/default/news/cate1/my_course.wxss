@@ -4,81 +4,289 @@ page {
 
 .my-course-page {
   min-height: 100vh;
+  padding: 0 32rpx;
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
+/* ---- 顶部练习时光 hero ---- */
 .course-hero {
   position: relative;
   overflow: hidden;
-  margin-bottom: 8rpx;
-  line-height: 0;
-  font-size: 0;
-  border-radius: 0 0 48rpx 48rpx;
+  margin: 0 -32rpx;
+  padding: 156rpx 38rpx 88rpx;
+  color: #fff;
+  background: linear-gradient(145deg, var(--projectColor, #a5bcaa), var(--projectColorDark, #527868));
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.32);
 }
 
 .course-hero-bg {
-  width: 100%;
-  display: block;
-  vertical-align: top;
-  border-radius: 0 0 48rpx 48rpx;
-}
-
-.course-hero-overlay {
   position: absolute;
   inset: 0;
-  border-radius: 0 0 48rpx 48rpx;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.04) 0%,
-    rgba(0, 0, 0, 0.14) 100%
-  );
+  width: 100%;
+  height: 100%;
+}
+
+.course-hero-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, rgba(51, 91, 74, 0.22), rgba(23, 48, 40, 0.42));
+}
+
+.course-hero-ring {
+  position: absolute;
+  width: 540rpx;
+  height: 540rpx;
+  right: -140rpx;
+  bottom: -370rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.34);
+  border-radius: 50%;
+  box-shadow: 0 0 0 56rpx rgba(255, 255, 255, 0.09);
 }
 
 .course-hero-caption {
-  position: absolute;
-  left: 32rpx;
-  right: 32rpx;
-  bottom: 28rpx;
+  position: relative;
   z-index: 1;
   font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.92);
   letter-spacing: 1rpx;
+  color: rgba(255, 255, 255, 0.94);
 }
 
-.filter-bar {
+.course-hero-star {
+  position: absolute;
+  z-index: 2;
+  right: 34rpx;
+  top: 32rpx;
   display: flex;
   align-items: center;
-  gap: 12rpx;
-  padding: 20rpx 24rpx;
-  background: #ffffff;
+  justify-content: center;
+  width: 60rpx;
+  height: 60rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 28rpx;
 }
 
-.filter-pill {
+.course-hero-star:active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.course-hero-data {
   position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 36rpx;
+  margin-top: 56rpx;
+}
+
+.course-hero-stat {
+  min-width: 0;
+}
+
+.course-hero-num {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.course-hero-label {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 18rpx;
+  opacity: 0.8;
+}
+
+/* ---- 今日约课面板（复用我的页约课卡片） ---- */
+.today-panel {
+  position: relative;
+  z-index: 2;
+  margin: -44rpx 0 36rpx;
+  padding: 28rpx 28rpx 12rpx;
+  border-radius: 36rpx;
+  background: #ffffff;
+  box-shadow: 0 16rpx 44rpx rgba(43, 68, 56, 0.08);
+}
+
+.today-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid var(--neutralBorderLight, #f0f1f3);
+}
+
+.today-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--neutralText, #1f2329);
+}
+
+.today-head-count {
+  font-size: 20rpx;
+  color: var(--neutralTextTertiary, #8f959e);
+}
+
+.today-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  padding: 44rpx 24rpx 52rpx;
+}
+
+.today-state--link {
+  padding: 40rpx 24rpx 48rpx;
+}
+
+.today-state--link:active {
+  opacity: 0.75;
+}
+
+.today-state-text {
+  font-size: 28rpx;
+  color: #969799;
+}
+
+.today-state-sub {
+  font-size: 24rpx;
+  color: var(--projectColorDark, #52785f);
+}
+
+.today-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.today-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--neutralBorderLight, #f0f1f3);
+}
+
+.today-item:last-child {
+  border-bottom: none;
+}
+
+.today-item:active {
+  opacity: 0.85;
+}
+
+.today-time-col {
+  flex-shrink: 0;
+  width: 108rpx;
+  padding-left: 16rpx;
+  border-left: 6rpx solid var(--projectColor, #6fae96);
+}
+
+.today-time-start {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #323233;
+  line-height: 1.3;
+}
+
+.today-time-end {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #969799;
+  line-height: 1.3;
+}
+
+.today-info {
   flex: 1;
   min-width: 0;
-  text-align: center;
-  padding: 14rpx 8rpx;
+}
+
+.today-course-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #323233;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.today-meta {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  color: var(--neutralTextTertiary, #8f959e);
+}
+
+.today-state-pill {
+  flex-shrink: 0;
+  padding: 8rpx 16rpx;
   border-radius: 999rpx;
-  font-size: 26rpx;
-  font-weight: 500;
-  color: var(--neutralTextSecondary, #646a73);
-  background: var(--neutralIconBg, #f2f3f5);
-  border: 1rpx solid transparent;
+  background: var(--projectColorLight, #e8f2ed);
+  color: var(--projectColorDark, #52785f);
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
+.today-state-pill--done {
+  background: #f2f3f5;
+  color: #969799;
+}
+
+/* ---- 课程记录卡 ---- */
+.record-card {
+  margin-bottom: 4rpx;
+  padding: 0 30rpx 4rpx;
+  border-radius: 40rpx;
+  background: #ffffff;
+  box-shadow: 0 16rpx 44rpx rgba(43, 68, 56, 0.07);
+}
+
+.record-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 32rpx;
+}
+
+.record-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--neutralText, #1f2329);
+}
+
+.record-filters {
+  margin: 16rpx -30rpx 8rpx;
+  width: calc(100% + 60rpx);
+}
+
+.record-filters-inner {
+  display: flex;
+  gap: 14rpx;
+  padding: 0 30rpx;
+  white-space: nowrap;
+}
+
+.record-filter {
+  flex-shrink: 0;
+  padding: 16rpx 22rpx;
+  border-radius: 999rpx;
+  background: #f0f2f0;
+  color: var(--neutralTextTertiary, #8f959e);
+  font-size: 22rpx;
   transition: all 0.2s ease;
 }
 
-.filter-pill::before {
-  content: "";
-  position: absolute;
-  inset: -12rpx -5rpx;
-}
-
-.filter-pill.active {
+.record-filter.active {
+  background: var(--projectColor, #6fae96);
   color: #ffffff;
-  background: var(--projectColor, #5b8a72);
-  border-color: var(--projectColor, #5b8a72);
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  font-weight: 700;
 }
 
 .loading-wrap {
@@ -88,65 +296,92 @@ page {
   padding: 120rpx 0;
 }
 
-.course-list {
-  margin-top: 16rpx;
+.history-list {
+  margin-top: 8rpx;
 }
 
-.course-item {
+.history-row {
   display: flex;
-  align-items: flex-start;
-  padding: 28rpx 24rpx;
-  background: #ffffff;
+  gap: 24rpx;
+  padding: 34rpx 0;
+  border-bottom: 2rpx solid var(--neutralBorder, #e8e9eb);
 }
 
-.course-item:active {
-  background: #fafafa;
+.history-row:last-child {
+  border-bottom: 0;
 }
 
-.course-cover {
-  width: 168rpx;
-  height: 168rpx;
-  border-radius: 8rpx;
+.history-cover {
+  position: relative;
+  width: 116rpx;
+  height: 116rpx;
   flex-shrink: 0;
-  background: #f0f0f0;
+  border-radius: 20rpx;
+  overflow: hidden;
+  background: linear-gradient(135deg, #7ba591, #477465);
 }
 
-.course-info {
+.history-cover.alt {
+  background: linear-gradient(135deg, #7797aa, #486b84);
+}
+
+.history-cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.history-copy {
   flex: 1;
   min-width: 0;
-  margin-left: 24rpx;
-  padding-top: 4rpx;
 }
 
-.course-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #1a1a1a;
-  line-height: 1.4;
+.history-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 28rpx;
+  color: var(--neutralText, #1f2329);
 }
 
-.course-meta {
-  font-size: 26rpx;
-  color: #999999;
-  line-height: 1.5;
+.history-meta {
   margin-top: 10rpx;
 }
 
-.course-sep {
-  height: 16rpx;
-  background: #ececec;
+.history-meta text {
+  display: block;
+  color: var(--neutralTextTertiary, #8f959e);
+  font-size: 20rpx;
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-state {
+  align-self: center;
+  flex-shrink: 0;
+  padding: 10rpx 14rpx;
+  border-radius: 999rpx;
+  background: var(--projectColorLight, #edf5f0);
+  color: var(--projectColorDark, #4f8c76);
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
+.history-state.done,
+.history-state.cancel {
+  background: #f0f1ef;
+  color: #89918c;
 }
 
 .list-footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32rpx 0 16rpx;
-}
-
-.list-footer--text {
-  font-size: 24rpx;
-  color: #bbbbbb;
+  padding: 32rpx 0 28rpx;
 }
 
 .empty-wrap {

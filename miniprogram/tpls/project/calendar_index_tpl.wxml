@@ -102,7 +102,7 @@
 
 		<!-- 私教 · 特殊课程卡（仅配置了私教课的场馆展示，随时可约，不受分类筛选影响） -->
 		<view class="course-list" wx:if="{{showPrivateEntry}}">
-			<view class="course-card course-card--private" hover-class="course-card--press" bindtap="bindPrivateBookTap">
+			<view class="course-card course-card--private" hover-class="course-card--press" bindtap="bindPrivateBookTap" aria-role="button" aria-label="预约私教课">
 				<view class="card-time-section private-time-section">
 					<view class="pv-time-top">随时</view>
 					<view class="pv-time-sub">时间自选</view>

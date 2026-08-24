@@ -22,6 +22,7 @@ const AdminModel = require("../model/admin_model.js");
 const TeacherModel = require("../model/teacher_model.js");
 const BookingTransactionService = require("./booking_transaction_service.js");
 const StreakService = require("./streak_service.js");
+const AttendanceService = require("./attendance_service.js");
 const { distanceMeters } = require("../utils/geo_util.js");
 
 class MeetService extends BaseService {
@@ -1034,6 +1035,7 @@ class MeetService extends BaseService {
 
   /** 取得我的预约详情 */
   async getMyJoinDetail(userId, joinId) {
+    await new AttendanceService().settleEndedJoins({ userId });
     let fields =
       "JOIN_IS_CHECKIN,JOIN_REASON,JOIN_MEET_ID,JOIN_MEET_TITLE,JOIN_MEET_DAY,JOIN_MEET_TIME_START,JOIN_MEET_TIME_END,JOIN_STATUS,JOIN_ADD_TIME,JOIN_CODE,JOIN_FORMS";
 
@@ -1058,6 +1060,7 @@ class MeetService extends BaseService {
       oldTotal,
     },
   ) {
+    await new AttendanceService().settleEndedJoins({ userId });
     orderBy = orderBy || {
       //	'JOIN_MEET_DAY': 'desc',
       //	'JOIN_MEET_TIME_START': 'desc',
@@ -1108,8 +1111,9 @@ class MeetService extends BaseService {
           break;
         }
         case "succ": {
-          //预约成功
+          // 已预约：与“已签到”互斥，只保留尚未完成签到的预约。
           where.JOIN_STATUS = JoinModel.STATUS.SUCC;
+          where.JOIN_IS_CHECKIN = 0;
           break;
         }
         case "checkin": {
@@ -1142,7 +1146,9 @@ class MeetService extends BaseService {
   }
 
   /** 取得我的某日预约列表 */
+  /** 取得我的某日预约列表 */
   async getMyJoinSomeday(userId, day) {
+    await new AttendanceService().settleEndedJoins({ userId });
     let fields =
       "JOIN_IS_CHECKIN,JOIN_MEET_ID,JOIN_MEET_TITLE,JOIN_MEET_DAY,JOIN_MEET_TIME_MARK,JOIN_MEET_TIME_START,JOIN_MEET_TIME_END,JOIN_STATUS,JOIN_ADD_TIME";
 
@@ -1157,7 +1163,50 @@ class MeetService extends BaseService {
       JOIN_ADD_TIME: "desc",
     };
 
-    return await JoinModel.getAll(where, fields, orderBy);
+    const joins = await JoinModel.getAll(where, fields, orderBy);
+    if (!joins || !joins.length) return joins;
+
+    // 附加各时段教练名，供课程页今日约课卡展示
+    try {
+      const meetIds = [];
+      for (const j of joins) {
+        if (j.JOIN_MEET_ID && !meetIds.includes(j.JOIN_MEET_ID))
+          meetIds.push(j.JOIN_MEET_ID);
+      }
+      const meets = meetIds.length
+        ? await MeetModel.getAll(
+            { _id: ["in", meetIds] },
+            "_id,MEET_DAYS_SET",
+            {},
+            meetIds.length,
+          )
+        : [];
+      const meetMap = {};
+      for (const m of meets || []) meetMap[m._id] = m;
+
+      const teacherCache = {};
+      for (const j of joins) {
+        const meet = meetMap[j.JOIN_MEET_ID];
+        if (!meet) continue;
+        const timeNode = this.getTimeSetByTimeMark(meet, j.JOIN_MEET_TIME_MARK);
+        if (!timeNode) continue;
+        const profile = await this._resolveCoachProfile(
+          null,
+          timeNode,
+          meet,
+          teacherCache,
+          {},
+        );
+        j.coachName = profile.coachName || "";
+      }
+    } catch (err) {
+      console.warn(
+        "[meet/getMyJoinSomeday] coach resolve skipped:",
+        err.message,
+      );
+    }
+
+    return joins;
   }
 }
 

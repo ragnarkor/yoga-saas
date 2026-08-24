@@ -680,7 +680,7 @@ page {
   letter-spacing: 1rpx;
 }
 
-/* 私教特殊卡在上方时收紧空态，插画与私教卡保持同一视觉组 */
+/* 当天无团课但仍可预约私教时，空状态紧随私教入口。 */
 .empty-state--compact {
   padding: 30rpx 40rpx 50rpx;
 }

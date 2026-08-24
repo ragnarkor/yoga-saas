@@ -3,6 +3,7 @@ const JoinModel=require("../../model/join_model.js");
 const UserCardLogModel=require("../../model/user_card_log_model.js");
 const UserCardModel=require("../../model/user_card_model.js");
 const UserModel=require("../../model/user_model.js");
+const AttendanceService=require("../attendance_service.js");
 class JoinRosterService {
   async getJoinList({
     search,
@@ -16,6 +17,7 @@ class JoinRosterService {
     isTotal = true,
     oldTotal,
   }) {
+    await new AttendanceService().settleEndedJoins({ meetId, timeMark: mark });
     orderBy = orderBy || {
       JOIN_EDIT_TIME: "desc",
     };
