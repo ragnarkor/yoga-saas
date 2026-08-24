@@ -107,19 +107,25 @@ function getStyleLabel(coverId, color) {
 }
 
 function getCoverUrl(coverId) {
+  if (isCustomCover(coverId)) return String(coverId).trim();
   const hit = COVER_MAP[normalizeCoverId(coverId)];
   return (hit && hit.url) || "";
 }
 
 function getCoverLabel(coverId) {
+  if (isCustomCover(coverId)) return "自定义封面";
   const hit = COVER_MAP[normalizeCoverId(coverId)];
   return (hit && hit.label) || "纯色";
+}
+
+function isCustomCover(coverId) {
+  return /^cloud:\/\/[\w./-]+$/i.test(String(coverId || "").trim());
 }
 
 function normalizeCoverId(coverId) {
   if (!coverId) return "";
   const id = String(coverId).trim();
-  return COVER_MAP[id] ? id : "";
+  return COVER_MAP[id] || isCustomCover(id) ? id : "";
 }
 
 function enrichCardVisual(item) {
@@ -152,6 +158,7 @@ module.exports = {
   getStyleLabel,
   getCoverUrl,
   getCoverLabel,
+  isCustomCover,
   normalizeCoverId,
   enrichCardVisual,
 };

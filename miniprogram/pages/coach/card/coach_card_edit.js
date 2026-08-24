@@ -19,6 +19,8 @@ Page({
     selectedStyleKey: cardFaceHelper.getStyleKey('', DEFAULT_COLOR),
     selectedStyleLabel: cardFaceHelper.getStyleLabel('', DEFAULT_COLOR),
     coverPreviewUrl: '',
+    isCustomCover: false,
+    uploadingCover: false,
     scopeMode: 'all',
     scopeCategoryIds: [],
     scopeMeetIds: [],
@@ -116,6 +118,7 @@ Page({
       selectedStyleKey: cardFaceHelper.getStyleKey(coverId, color),
       selectedStyleLabel: cardFaceHelper.getStyleLabel(coverId, color),
       coverPreviewUrl: cardFaceHelper.getCoverUrl(coverId),
+      isCustomCover: cardFaceHelper.isCustomCover(coverId),
     });
   },
 
@@ -134,6 +137,37 @@ Page({
     if (pick.color) patch['form.color'] = pick.color;
     this.setData(patch);
     this._syncStyleState();
+  },
+
+  // 上传图片按横版卡面 aspectFill 呈现，避免不同比例的相册图拉伸变形。
+  bindUploadCoverTap() {
+    if (this.data.uploadingCover) return;
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: async (res) => {
+        const tempPath = (res.tempFilePaths || [])[0];
+        if (!tempPath) return;
+        this.setData({ uploadingCover: true });
+        try {
+          const coverId = await cloudHelper.transTempPicOne(
+            tempPath,
+            'admin/card_cover',
+            this.data.cardId || `new_${Date.now()}`,
+          );
+          if (!coverId) return;
+          this.setData({ 'form.coverId': coverId });
+          this._syncStyleState();
+          wx.showToast({ title: '封面已更新', icon: 'success' });
+        } catch (err) {
+          console.error(err);
+          wx.showToast({ title: '上传失败，请重试', icon: 'none' });
+        } finally {
+          this.setData({ uploadingCover: false });
+        }
+      },
+    });
   },
 
   async bindSaveTap() {

@@ -77,7 +77,21 @@
     <view class="course-edit-sheet">
       <view class="course-edit-sheet-head">
         <text class="course-edit-sheet-title">选择卡面样式</text>
-        <text class="course-edit-sheet-sub">5 款纯色与 5 款插图，同一网格选择</text>
+        <text class="course-edit-sheet-sub">可选预设卡面，或上传一张自己的横版图片</text>
+      </view>
+      <view class="card-cover-upload {{isCustomCover ? 'active' : ''}}" bindtap="bindUploadCoverTap">
+        <image wx:if="{{isCustomCover && coverPreviewUrl}}" class="card-cover-upload-img" src="{{coverPreviewUrl}}" mode="aspectFill" />
+        <view wx:else class="card-cover-upload-placeholder">
+          <van-icon name="photo-o" size="38rpx" color="{{themeColor}}" />
+          <text>上传自定义封面</text>
+        </view>
+        <view class="card-cover-upload-copy">
+          <text>{{isCustomCover ? '更换自定义封面' : '从相册或相机选择'}}</text>
+          <text class="card-cover-upload-tip">横版图片展示效果更佳</text>
+        </view>
+        <van-loading wx:if="{{uploadingCover}}" size="32rpx" color="{{themeColor}}" />
+        <van-icon wx:elif="{{isCustomCover}}" name="success" size="32rpx" color="{{themeColor}}" />
+        <van-icon wx:else name="arrow" size="30rpx" color="#c8c9cc" />
       </view>
       <view class="card-cover-grid">
         <view

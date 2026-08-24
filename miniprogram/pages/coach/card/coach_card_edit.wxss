@@ -62,6 +62,63 @@
   padding: 0 24rpx 32rpx;
 }
 
+.card-cover-upload {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin: 0 24rpx 20rpx;
+  min-height: 116rpx;
+  padding: 16rpx 18rpx;
+  box-sizing: border-box;
+  border: 2rpx dashed #d9e1dc;
+  border-radius: 16rpx;
+  background: #fafcfb;
+}
+
+.card-cover-upload.active {
+  border-style: solid;
+  border-color: var(--themeColor, #5b8a72);
+  background: var(--projectColorLight, #e5f1ec);
+}
+
+.card-cover-upload-placeholder,
+.card-cover-upload-img {
+  width: 112rpx;
+  height: 76rpx;
+  border-radius: 10rpx;
+  flex-shrink: 0;
+}
+
+.card-cover-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rpx;
+  background: #eef3f0;
+  color: #648071;
+  font-size: 18rpx;
+}
+
+.card-cover-upload-img {
+  display: block;
+}
+
+.card-cover-upload-copy {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6rpx;
+  color: #323233;
+  font-size: 26rpx;
+}
+
+.card-cover-upload-tip {
+  color: #969799;
+  font-size: 21rpx;
+}
+
 .card-cover-item {
   position: relative;
   width: calc(50% - 8rpx);
