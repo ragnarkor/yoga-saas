@@ -83,34 +83,13 @@
   margin-top: 0 !important;
 }
 
-.export-sheet {
-  max-height: 70vh;
-  display: flex;
-  flex-direction: column;
+.export-copy-btn {
+  position: relative;
 }
 
-.export-sheet-title {
-  padding: 32rpx;
-  font-size: 32rpx;
-  font-weight: 600;
-  text-align: center;
-  border-bottom: 1rpx solid #ebedf0;
+.export-copy-btn::before {
+  content: "";
+  position: absolute;
+  inset: -14rpx;
 }
 
-.export-sheet-scroll {
-  max-height: 60vh;
-}
-
-.export-sheet-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 28rpx 32rpx;
-  font-size: 30rpx;
-  color: #323233;
-  border-bottom: 1rpx solid #f2f3f5;
-}
-
-.export-sheet-item.active {
-  background: var(--projectColorLight, #e5f1ec);
-}

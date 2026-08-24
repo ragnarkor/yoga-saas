@@ -317,12 +317,6 @@
   line-height: 1.5;
 }
 
-.card-usage-tenant {
-  margin-top: 6rpx;
-  font-size: 22rpx;
-  color: #c8c9cc;
-}
-
 .card-usage-status {
   flex-shrink: 0;
   padding: 4rpx 14rpx;

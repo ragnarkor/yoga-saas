@@ -50,6 +50,10 @@ module.exports = Behavior({
 				this._startCheckinTimer();
 			} catch (err) {
 				console.error(err);
+				pageHelper.showNoneToast('加载失败，请重试');
+				this.setData({
+					isLoad: null
+				});
 			}
 		},
 
@@ -166,6 +170,7 @@ module.exports = Behavior({
 					});
 				} catch (err) {
 					console.log(err);
+					pageHelper.showNoneToast('取消失败，请重试');
 				}
 			}
 

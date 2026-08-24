@@ -336,12 +336,6 @@ Page({
     this.setData({ [field]: e.detail.value || "" });
   },
 
-  bindCategoryFieldChange(e) {
-    const idx = e.currentTarget.dataset.index;
-    const key = `categories[${idx}].name`;
-    this.setData({ [key]: e.detail || "" });
-  },
-
   bindCategoryNameInput(e) {
     const idx = Number(e.currentTarget.dataset.idx);
     if (Number.isNaN(idx)) return;

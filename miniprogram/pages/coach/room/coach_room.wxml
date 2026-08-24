@@ -8,14 +8,14 @@
     </view>
     <view wx:else class="room-list">
       <van-swipe-cell wx:for="{{rooms}}" wx:key="id" id="room-swipe-{{item.id}}" data-swipe-id="{{item.id}}" right-width="72" custom-class="room-swipe-cell" bind:open="bindSwipeOpen">
-        <view class="room-card" data-id="{{item.id}}" bindtap="bindRoomTap">
+        <view class="room-card" data-id="{{item.id}}" bindtap="bindRoomTap" aria-role="button" aria-label="{{item.name}}">
           <view class="room-card-icon" style="background:{{themeColor}}18;"><van-icon name="shop-o" size="45rpx" color="{{themeColor}}" /></view>
           <view class="room-card-info"><view class="room-card-title-row"><text class="room-card-name">{{item.name}}</text><text class="room-card-state {{item.enabled === false ? 'room-card-state--off' : ''}}">{{item.enabled === false ? '已停用' : '可排课'}}</text></view><text class="room-card-meta">{{item.location || '未设置位置'}} · {{item.capacity ? item.capacity + ' 人容量' : '容量不限'}}</text><text wx:if="{{item.equipment}}" class="room-card-equipment">{{item.equipment}}</text></view>
           <van-icon name="arrow" size="30rpx" color="#c8c9cc" />
         </view>
-        <view wx:if="{{canEdit}}" slot="right" class="room-swipe-delete" data-id="{{item.id}}" data-swipe-id="{{item.id}}" catchtap="bindDeleteTap">删除</view>
+        <view wx:if="{{canEdit}}" slot="right" class="room-swipe-delete" data-id="{{item.id}}" data-swipe-id="{{item.id}}" catchtap="bindDeleteTap" aria-role="button" aria-label="删除教室：{{item.name}}">删除</view>
       </van-swipe-cell>
     </view>
-    <view wx:if="{{canEdit}}" class="room-fab" style="background:linear-gradient(135deg, {{themeColor}}B8, {{themeColor}});" bindtap="bindAddTap"><van-icon name="plus" size="48rpx" color="#fff" /></view>
+    <view wx:if="{{canEdit}}" class="room-fab" style="background:linear-gradient(135deg, {{themeColor}}B8, {{themeColor}});" bindtap="bindAddTap" aria-role="button" aria-label="添加教室"><van-icon name="plus" size="48rpx" color="#fff" /></view>
   </block>
 </view>

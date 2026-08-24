@@ -5,6 +5,7 @@
     show-back="{{true}}"
     theme-color="{{themeColor}}"
     nav-bg="{{themeNavBg}}"
+    bind:change="bindCoachTenantChange"
   />
 
   <view class="stats-grid">
@@ -14,6 +15,8 @@
       wx:key="name"
       bindtap="onMenuTap"
       data-url="{{item.url}}"
+      aria-role="button"
+      aria-label="{{item.name}}"
     >
       <view class="stats-grid-icon" style="background: {{item.color}}20;">
         <van-icon name="{{item.icon}}" size="48rpx" color="{{item.color}}" />

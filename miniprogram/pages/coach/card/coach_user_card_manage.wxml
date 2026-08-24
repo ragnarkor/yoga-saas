@@ -15,7 +15,7 @@
 
   <block wx:else>
     <!-- 卡片视觉 -->
-    <view class="ucm-card" bindlongpress="bindDeleteTap">
+    <view class="ucm-card" bindlongpress="bindDeleteTap" aria-role="button" aria-label="{{card.name}}，{{card.statusLabel}}，长按删除">
       <image
         wx:if="{{card.coverUrl}}"
         class="ucm-card-bg"
@@ -45,6 +45,7 @@
         </view>
       </view>
     </view>
+    <view class="ucm-card-hint">长按卡片可删除</view>
 
     <!-- 操作按钮 -->
     <view class="ucm-actions" wx:if="{{card.type !== 'period'}}">
@@ -103,7 +104,7 @@
         <view class="ucm-log-body">
           <view class="ucm-log-top">
             <text class="ucm-log-title">{{item.meetTitle}}</text>
-            <text class="ucm-log-tag {{item.isManual ? 'ucm-log-tag--manual' : ''}}">{{item.statusLabel}}</text>
+            <text class="ucm-log-tag {{item.isManual ? 'ucm-log-tag--manual' : ''}}" aria-role="text" aria-label="{{item.statusLabel}}" aria-selected="{{item.isManual}}">{{item.statusLabel}}</text>
           </view>
           <view class="ucm-log-sub">{{item.deductText}} · {{item.meetTypeName}}</view>
           <view class="ucm-log-sub">{{item.scheduleText}}</view>

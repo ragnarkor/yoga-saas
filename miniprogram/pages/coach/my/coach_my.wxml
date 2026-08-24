@@ -16,26 +16,26 @@
   </view>
 
   <view class="coach-menu-group">
-    <view class="coach-menu-item" wx:for="{{menus}}" wx:key="name" bindtap="onMenuTap" data-url="{{item.url}}">
+    <view class="coach-menu-item" wx:for="{{menus}}" wx:key="name" bindtap="onMenuTap" data-url="{{item.url}}" aria-role="button" aria-label="{{item.name}}">
       <text>{{item.name}}</text>
       <text class="arrow">›</text>
     </view>
   </view>
 
   <view class="coach-menu-group">
-    <view class="coach-menu-item" bindtap="onSwitchMember">
+    <view class="coach-menu-item" bindtap="onSwitchMember" aria-role="button" aria-label="切换回会员版">
       <text>切换回会员版</text>
       <text class="arrow">›</text>
     </view>
-    <view class="coach-menu-item" wx:if="{{isSuperAdmin}}" bindtap="onPlatformTap">
+    <view class="coach-menu-item" wx:if="{{isSuperAdmin}}" bindtap="onPlatformTap" aria-role="button" aria-label="平台管理">
       <text>平台管理</text>
       <text class="arrow">›</text>
     </view>
-    <view class="coach-menu-item" wx:if="{{!isSuperAdmin}}" bindtap="onAdminLogin">
+    <view class="coach-menu-item" wx:if="{{!isSuperAdmin}}" bindtap="onAdminLogin" aria-role="button" aria-label="超管密码登录">
       <text>超管密码登录</text>
       <text class="arrow">›</text>
     </view>
-    <view class="coach-menu-item" bindtap="onLogout">
+    <view class="coach-menu-item" bindtap="onLogout" aria-role="button" aria-label="{{isSuperAdmin ? '退出超管模式' : '退出当前会话'}}">
       <text>{{isSuperAdmin ? '退出超管模式' : '退出当前会话'}}</text>
       <text class="arrow">›</text>
     </view>

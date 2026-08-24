@@ -120,6 +120,7 @@ Page({
 
 		} catch (err) {
 			console.log(err);
+			pageHelper.showErrToast('编辑失败');
 		}
 
 	},

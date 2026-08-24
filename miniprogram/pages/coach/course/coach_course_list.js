@@ -97,13 +97,6 @@ Page({
     };
   },
 
-  async bindCoachTenantChange() {
-    await this._coachOnShow();
-    this.setData({ loading: true });
-    await this._loadCategories();
-    await this._loadCourses();
-  },
-
   bindTabChange(e) {
     const idx = e.detail.index;
     const tab = this.data.tabs[idx];

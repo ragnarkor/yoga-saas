@@ -31,7 +31,7 @@
       />
       <!-- [AI_END LINES=7 TIMESTAMP=2025-01-27 16:00:00] -->
 
-      <view class="course-edit-field course-edit-field--inline issue-form-row" bindtap="bindActivateFieldTap">
+      <view class="course-edit-field course-edit-field--inline issue-form-row" bindtap="bindActivateFieldTap" aria-role="button" aria-label="激活方式，当前：{{form.activateLabel}}">
         <text class="course-edit-field-label-inline">激活方式</text>
         <view class="course-edit-field-row course-edit-field-row--inline">
           <text class="course-edit-field-value">{{form.activateLabel}}</text>
@@ -88,6 +88,9 @@
           data-value="{{item.value}}"
           data-label="{{item.label}}"
           bindtap="bindActivatePick"
+          aria-role="button"
+          aria-label="{{item.label}}，{{item.desc}}"
+          aria-selected="{{form.activate === item.value}}"
         >
           <view class="issue-activate-info">
             <text class="issue-activate-label">{{item.label}}</text>

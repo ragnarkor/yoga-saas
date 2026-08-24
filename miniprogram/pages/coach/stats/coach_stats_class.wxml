@@ -10,7 +10,7 @@
 
   <view class="cs-date-bar">
     <text class="cs-date-text">{{dateRangeText || (startDay + '至' + endDay)}}</text>
-    <view class="cs-filter-btn" bindtap="bindFilterOpenTap">
+    <view class="cs-filter-btn" bindtap="bindFilterOpenTap" aria-role="button" aria-label="筛选">
       <van-icon name="filter-o" size="32rpx" color="{{themeColor}}" />
       <text style="color: {{themeColor}}">筛选</text>
     </view>
@@ -58,6 +58,8 @@
         data-meet-id="{{courseItem.meetId}}"
         data-title="{{courseItem.title}}"
         bindtap="bindCourseTap"
+        aria-role="button"
+        aria-label="{{courseItem.title}}"
       >
         <text class="cs-course-title">{{courseItem.title}} ({{courseItem.typeName}})</text>
         <view class="cs-course-right">
@@ -118,6 +120,9 @@
             data-id=""
             bindtap="bindFilterCoachTap"
             style="{{!filterCoachId ? 'background:' + themeColor + ';border-color:' + themeColor + ';' : ''}}"
+            aria-role="button"
+            aria-selected="{{!filterCoachId}}"
+            aria-label="全部"
           >全部</view>
           <view
             class="cs-coach-chip {{filterCoachId === item.coachId ? 'is-active' : ''}}"
@@ -126,6 +131,9 @@
             data-id="{{item.coachId}}"
             bindtap="bindFilterCoachTap"
             style="{{filterCoachId === item.coachId ? 'background:' + themeColor + ';border-color:' + themeColor + ';' : ''}}"
+            aria-role="button"
+            aria-selected="{{filterCoachId === item.coachId}}"
+            aria-label="{{item.coachName}}"
           >{{item.coachName}}</view>
         </scroll-view>
       </view>

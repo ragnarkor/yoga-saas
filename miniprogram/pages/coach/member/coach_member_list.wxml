@@ -19,7 +19,13 @@
         bindconfirm="bindSearchConfirm"
       />
     </view>
-    <view class="member-add-btn" wx:if="{{!pickMode}}" bindtap="bindAddTap">
+    <view
+      class="member-add-btn"
+      wx:if="{{!pickMode}}"
+      bindtap="bindAddTap"
+      aria-role="button"
+      aria-label="新增会员"
+    >
       <van-icon name="plus" size="28rpx" color="#fff" />
       <text>新增</text>
     </view>
@@ -32,6 +38,9 @@
       class="member-filter-item {{activeFilter === item.key ? 'active' : ''}}"
       data-key="{{item.key}}"
       bindtap="bindFilterTap"
+      aria-role="tab"
+      aria-label="{{item.label}}"
+      aria-selected="{{activeFilter === item.key}}"
     >{{item.label}}</view>
   </view>
 
@@ -49,6 +58,8 @@
       data-id="{{item.USER_MINI_OPENID}}"
       data-name="{{item.USER_NAME}}"
       bindtap="{{pickMode ? 'bindMemberRowTap' : ''}}"
+      aria-role="{{pickMode ? 'button' : ''}}"
+      aria-label="{{pickMode ? (item.USER_NAME || '未命名会员') + '，点击选择该会员' : ''}}"
     >
       <view class="member-avatar">
         <image wx:if="{{item.avatarSrc}}" src="{{item.avatarSrc}}" mode="aspectFill" />
@@ -69,6 +80,8 @@
           data-id="{{item.USER_MINI_OPENID}}"
           data-name="{{item.USER_NAME}}"
           catchtap="bindCardsTap"
+          aria-role="button"
+          aria-label="{{(item.USER_NAME || '未命名会员') + ' 查看持卡'}}"
         >
           <text>持卡</text>
         </view>
@@ -77,6 +90,8 @@
           data-id="{{item.USER_MINI_OPENID}}"
           data-name="{{item.USER_NAME}}"
           catchtap="bindIssueTap"
+          aria-role="button"
+          aria-label="{{(item.USER_NAME || '未命名会员') + ' 发卡'}}"
         >
           <text>发卡</text>
         </view>

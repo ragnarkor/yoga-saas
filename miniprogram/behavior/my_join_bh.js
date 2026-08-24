@@ -18,7 +18,9 @@ module.exports = Behavior({
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad: function (options) {},
+    onLoad: function (options) {
+      this.getSearchMenu(this.data.skin, this);
+    },
 
     /**
      * 生命周期函数--监听页面初次渲染完成
@@ -149,6 +151,7 @@ module.exports = Behavior({
             });
         } catch (err) {
           console.log(err);
+          pageHelper.showNoneToast("取消失败，请重试");
         }
       };
 

@@ -16,7 +16,9 @@
 		<van-icon name="shop-o" size="80rpx" color="#c8c9cc" custom-class="empty-icon" />
 		<view class="empty-text">暂无瑜伽馆</view>
 		<view class="empty-sub">请联系超管创建瑜伽馆，或点击下方刷新</view>
-		<van-button type="primary" size="small" bind:click="bindRefreshTap">刷新</van-button>
+		<view class="tenant-refresh-btn-wrap" bindtap="bindRefreshTap" aria-role="button" aria-label="刷新瑜伽馆列表">
+			<van-button type="primary" size="small">刷新</van-button>
+		</view>
 	</view>
 
 	<view wx:else class="tenant-list">
@@ -30,6 +32,8 @@
 				bind:click="bindSelectTap"
 				is-link
 				title-style="font-weight: 600; color: #2c3e44;"
+				aria-role="button"
+				aria-label="选择{{item.TENANT_NAME}}进入管理"
 			>
 				<view slot="icon" class="tenant-icon">
 					<van-icon name="home-o" size="32rpx" color="#4a7c8c" />

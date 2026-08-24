@@ -7,7 +7,7 @@
           <view wx:else class="avatar-placeholder">
             <van-icon name="user-o" size="48rpx" color="{{themeColor}}" />
           </view>
-          <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="bindChooseAvatar"></button>
+          <button class="avatar-btn" aria-role="button" aria-label="更换头像" open-type="chooseAvatar" bindchooseavatar="bindChooseAvatar"></button>
         </view>
         <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
       </view>
@@ -21,12 +21,13 @@
       value="{{formName}}"
       placeholder="点击使用微信昵称"
       maxlength="30"
+      aria-label="名字，点击使用微信昵称"
       bind:change="bindNameInput"
       bind:blur="bindNameBlur"
       bind:nicknamereview="bindNicknameReview"
     />
 
-    <picker mode="date" value="{{formBirthday}}" end="2099-12-31" bindchange="bindBirthdayChange">
+    <picker mode="date" value="{{formBirthday}}" end="2099-12-31" bindchange="bindBirthdayChange" aria-role="button" aria-label="选择生日，当前{{formBirthday || '未填写'}}">
       <van-cell title="生日" is-link value="{{formBirthday || '选填'}}" />
     </picker>
 
@@ -36,6 +37,8 @@
       <view slot="right-icon" class="phone-cell">
         <button
           class="phone-auth-btn"
+          aria-role="button"
+          aria-label="授权更新绑定手机号"
           open-type="getPhoneNumber"
           bindgetphonenumber="bindGetPhone"
         >授权更新</button>

@@ -24,7 +24,7 @@
     </view>
 
     <view class="staff-toolbar">
-      <view class="staff-add-btn" bindtap="bindAddTap">
+      <view class="staff-add-btn" bindtap="bindAddTap" aria-role="button" aria-label="新建馆主/教练">
         <van-icon name="plus" size="32rpx" color="#fff" />
         <text>新建馆主/教练</text>
       </view>
@@ -62,6 +62,8 @@
             bindtap="bindGenTap"
             data-id="{{item.id}}"
             data-name="{{item.name}}"
+            aria-role="button"
+            aria-label="向{{item.name}}发送绑定邀请"
           >发送绑定邀请</view>
           <view
             class="staff-action staff-action--warn {{item.bound && item.canUnbind ? '' : 'disabled'}}"
@@ -70,6 +72,8 @@
             data-name="{{item.name}}"
             data-bound="{{item.bound}}"
             data-can-unbind="{{item.canUnbind}}"
+            aria-role="button"
+            aria-label="解除{{item.name}}的绑定"
           >解除绑定</view>
           <view
             wx:if="{{item.canDelete}}"
@@ -78,6 +82,8 @@
             data-id="{{item.id}}"
             data-name="{{item.name}}"
             data-can-delete="{{item.canDelete}}"
+            aria-role="button"
+            aria-label="删除{{item.name}}"
           >删除</view>
         </view>
       </view>

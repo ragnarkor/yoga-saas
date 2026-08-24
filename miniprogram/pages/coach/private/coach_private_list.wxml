@@ -3,9 +3,9 @@
   <coach-tenant-switch title="私教" show-back="{{true}}" theme-color="{{themeColor}}" nav-bg="{{themeNavBg}}" />
 
   <view class="schedule-week-bar">
-    <view class="schedule-week-btn" bindtap="bindPrevWeek">◀ 上周</view>
+    <view class="schedule-week-btn" bindtap="bindPrevWeek" aria-role="button" aria-label="上一周">◀ 上周</view>
     <view class="schedule-week-range">{{weekLabel}}</view>
-    <view class="schedule-week-btn" bindtap="bindNextWeek">下周 ▶</view>
+    <view class="schedule-week-btn" bindtap="bindNextWeek" aria-role="button" aria-label="下一周">下周 ▶</view>
   </view>
 
   <view wx:if="{{loading}}" class="coach-page-loading">
@@ -31,6 +31,8 @@
       data-type-name="{{item.typeName}}"
       data-booked="{{item.booked}}"
       bindtap="bindSessionTap"
+      aria-role="button"
+      aria-label="{{item.day}} {{item.start}}至{{item.end}} {{item.title}} {{item.teacherName || '教练'}} 已约{{item.booked}}/{{item.limit || 1}}"
     >
       <view class="private-session-time">
         <text class="private-session-day">{{item.day}}</text>
@@ -45,7 +47,7 @@
     </view>
   </view>
 
-  <view class="private-list-fab" bindtap="bindBookTap">
+  <view class="private-list-fab" bindtap="bindBookTap" aria-role="button" aria-label="代约私教">
     <van-icon name="plus" size="40rpx" color="#fff" />
     <text>代约</text>
   </view>

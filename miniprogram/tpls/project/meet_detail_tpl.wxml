@@ -62,10 +62,11 @@
 		<view class="md-times card-project shadow-project" wx:if="{{meet.MEET_DAYS_SET && meet.MEET_DAYS_SET.length > 0}}">
 			<view class="md-section-title">选择时段</view>
 			<scroll-view wx:if="{{meet.MEET_DAYS_SET.length > 1}}" class="md-day-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-				<view class="md-day-list">
+				<view class="md-day-list" aria-role="tablist">
 					<view wx:for="{{meet.MEET_DAYS_SET}}" wx:key="day"
 						class="md-day-chip {{selectedDayIdx === index ? 'active' : ''}}"
-						bindtap="bindSelectDayTap" data-dayidx="{{index}}">
+						bindtap="bindSelectDayTap" data-dayidx="{{index}}"
+						aria-role="button" aria-selected="{{selectedDayIdx === index}}" aria-label="{{item.dayDesc || item.day}}">
 						{{item.dayDesc || item.day}}
 					</view>
 				</view>
@@ -129,7 +130,9 @@
 			<button
 				class="md-book-btn {{bookDisabled || submitting ? 'disabled' : ''}}"
 				bindtap="bindBookTap"
-				disabled="{{bookDisabled || submitting}}">
+				disabled="{{bookDisabled || submitting}}"
+				aria-role="button"
+				aria-label="{{submitting ? '预约中' : bookBtnText}}">
 				{{submitting ? '预约中...' : bookBtnText}}
 			</button>
 		</view>

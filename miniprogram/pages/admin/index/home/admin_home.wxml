@@ -20,7 +20,7 @@
           <view class="platform-hero-title">平台管理</view>
           <view class="platform-hero-sub">{{admin.name}} · 超级管理员</view>
         </view>
-        <view class="platform-hero-logout" bindtap="bindExitTap">
+        <view class="platform-hero-logout" bindtap="bindExitTap" aria-role="button" aria-label="退出登录">
           <van-icon name="revoke" size="28rpx" />
           <text>退出</text>
         </view>
@@ -40,11 +40,11 @@
     </view>
 <!-- [AI_START TIMESTAMP=2025-01-27 11:10:00] -->
 <!-- Tab 切换 -->
-<view class="platform-tabs">
-  <view class="platform-tab {{platformTab === 0 ? 'platform-tab--active' : ''}}" bindtap="onPlatformTabTap" data-tab="0">
+<view class="platform-tabs" aria-role="tablist">
+  <view class="platform-tab {{platformTab === 0 ? 'platform-tab--active' : ''}}" bindtap="onPlatformTabTap" data-tab="0" aria-role="tab" aria-selected="{{platformTab === 0}}">
     <text>概览</text>
   </view>
-  <view class="platform-tab {{platformTab === 1 ? 'platform-tab--active' : ''}}" bindtap="onPlatformTabTap" data-tab="1">
+  <view class="platform-tab {{platformTab === 1 ? 'platform-tab--active' : ''}}" bindtap="onPlatformTabTap" data-tab="1" aria-role="tab" aria-selected="{{platformTab === 1}}">
     <text>瑜伽馆</text>
     <text class="platform-tab-count">{{data.tenantList.length || 0}}</text>
   </view>
@@ -60,19 +60,19 @@
     </view>
     <view class="platform-health-grid">
       <view class="platform-health-item {{data.health.zombieCount > 0 ? 'is-warn' : ''}}"
-        bindtap="bindHealthDetailTap" data-type="zombie">
+        bindtap="bindHealthDetailTap" data-type="zombie" aria-role="button" aria-label="僵尸馆，30天零预约，共{{data.health.zombieCount}}家，查看明细">
         <text class="platform-health-num">{{data.health.zombieCount}}</text>
         <text class="platform-health-label">僵尸馆</text>
         <text class="platform-health-hint">30天零预约</text>
       </view>
       <view class="platform-health-item {{data.health.expiringCount > 0 ? 'is-warn' : ''}}"
-        bindtap="bindHealthDetailTap" data-type="expiring">
+        bindtap="bindHealthDetailTap" data-type="expiring" aria-role="button" aria-label="到期预警，即将或已到期，共{{data.health.expiringCount}}家，查看明细">
         <text class="platform-health-num">{{data.health.expiringCount}}</text>
         <text class="platform-health-label">到期预警</text>
         <text class="platform-health-hint">即将/已到期</text>
       </view>
       <view class="platform-health-item {{data.health.stagnantCount > 0 ? 'is-warn' : ''}}"
-        bindtap="bindHealthDetailTap" data-type="stagnant">
+        bindtap="bindHealthDetailTap" data-type="stagnant" aria-role="button" aria-label="增长停滞，本月零新增，共{{data.health.stagnantCount}}家，查看明细">
         <text class="platform-health-num">{{data.health.stagnantCount}}</text>
         <text class="platform-health-label">增长停滞</text>
         <text class="platform-health-hint">本月零新增</text>
@@ -171,7 +171,7 @@
   <view class="health-modal">
     <view class="health-modal-head">
       <text class="health-modal-title">{{ healthModalTitle }}</text>
-      <van-icon name="cross" size="36rpx" color="#969799" bindtap="bindHealthModalCloseTap" />
+      <van-icon class="health-modal-close" name="cross" size="36rpx" color="#969799" bindtap="bindHealthModalCloseTap" aria-role="button" aria-label="关闭" />
     </view>
     <view wx:if="{{ !healthModalList.length }}" class="empty-block">暂无相关瑜伽馆</view>
     <scroll-view scroll-y class="health-modal-list" wx:else>
@@ -182,7 +182,7 @@
           <text class="health-modal-item-meta" wx:elif="{{ healthModalType === 'expiring' }}">{{ item.expireDesc }} · 近30天预约 {{ item.recentJoins }}</text>
           <text class="health-modal-item-meta" wx:else>会员 {{ item.members }} · 本月新增 {{ item.newMembers }}</text>
         </view>
-        <view class="health-modal-item-btn" data-pid="{{ item._pid }}" data-name="{{ item.TENANT_NAME }}" bindtap="bindHealthEnterTap">管理</view>
+        <view class="health-modal-item-btn" data-pid="{{ item._pid }}" data-name="{{ item.TENANT_NAME }}" bindtap="bindHealthEnterTap" aria-role="button" aria-label="进入{{ item.TENANT_NAME }}管理">管理</view>
       </view>
     </scroll-view>
   </view>
@@ -204,7 +204,7 @@
             <text wx:if="{{currentTenantName}}">{{currentTenantName}}</text>
           </view>
         </view>
-        <view class="platform-hero-logout" bindtap="bindExitTap">
+        <view class="platform-hero-logout" bindtap="bindExitTap" aria-role="button" aria-label="退出登录">
           <van-icon name="revoke" size="28rpx" />
           <text>退出</text>
         </view>

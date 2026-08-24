@@ -30,6 +30,8 @@
       style="border-left-color: {{item.color}};"
       data-id="{{item._id}}"
       bindtap="bindCourseTap"
+      aria-role="button"
+      aria-label="{{item.MEET_TITLE}}"
     >
       <image
         class="course-cover"
@@ -44,7 +46,7 @@
     </view>
   </view>
 
-  <view class="course-fab" bindtap="bindAddTap">
+  <view class="course-fab" bindtap="bindAddTap" aria-role="button" aria-label="添加课程">
     <van-icon name="add" size="48rpx" color="#fff" />
   </view>
 </view>

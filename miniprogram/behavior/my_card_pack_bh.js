@@ -8,8 +8,10 @@ module.exports = Behavior({
     showInvalid: false,
     cardList: [],
     tenantName: "",
-    listIntroTitle: "正在使用",
+    // 「共 N 张」计数文案，随有效/失效视图切换
     listIntroSub: "",
+    // 去约课反链：基于主卡适用范围生成的摘要区块
+    goBooking: null,
   },
 
   methods: {
@@ -43,33 +45,85 @@ module.exports = Behavior({
         this.setData({
           cardList: list,
           loading: false,
-          listIntroTitle: this.data.showInvalid ? "已失效" : "正在使用",
           listIntroSub: this.data.showInvalid
             ? `共 ${list.length} 张 · 不可用于约课`
             : `共 ${list.length} 张会员卡`,
         });
+        this._buildGoBooking(list);
       } catch (err) {
         console.error(err);
-        this.setData({ cardList: [], loading: false });
+        this.setData({ cardList: [], loading: false, goBooking: null });
       }
     },
 
-    bindSegTap(e) {
-      const invalid = pageHelper.dataset(e, "invalid") === "true";
-      if (invalid === this.data.showInvalid) return;
-      this.setData({ showInvalid: invalid }, () => {
-        this._loadCards();
+    // 与约课页头部玻璃条保持同一主卡规则：非待激活优先 → 次卡优先 → 到期近的优先
+    _buildGoBooking(list) {
+      if (this.data.showInvalid || !list || !list.length) {
+        this.setData({ goBooking: null });
+        return;
+      }
+      const usable = list.filter((c) => c && c.canBook);
+      if (!usable.length) {
+        this.setData({ goBooking: null });
+        return;
+      }
+      const endRank = (c) => Number(c.endTime) || 9999999999999;
+      usable.sort(
+        (a, b) =>
+          (a.isPending ? 1 : 0) - (b.isPending ? 1 : 0) ||
+          (a.type === "times" ? 0 : 1) - (b.type === "times" ? 0 : 1) ||
+          endRank(a) - endRank(b),
+      );
+
+      const main = usable[0];
+      const scope = main.scope || { mode: "all" };
+      let chips = [];
+      if (
+        scope.mode === "categories" &&
+        Array.isArray(scope.categoryIds) &&
+        scope.categoryIds.length
+      ) {
+        const names = String(main.scopeDesc || "")
+          .split("、")
+          .filter(Boolean);
+        chips = names.slice(0, 4);
+        if (names.length > 4) chips.push(`等 ${names.length} 类`);
+      }
+
+      // 适用范围只锁定一个分类时，跳回约课页自动预选该分类
+      let pendingTypeId = "";
+      let typeName = "";
+      if (
+        scope.mode === "categories" &&
+        scope.categoryIds &&
+        scope.categoryIds.length === 1
+      ) {
+        pendingTypeId = String(scope.categoryIds[0]);
+        typeName = chips[0] || "";
+      }
+
+      this.setData({
+        goBooking: {
+          name: main.name,
+          // 反链条左侧直接展示主卡卡面（封面或品牌渐变），并叠加卡类型标签
+          coverUrl: main.coverUrl || "",
+          shadeBg: main.shadeBg || "",
+          typeLabel: main.typeLabel || (main.type === "times" ? "次卡" : "期限卡"),
+          scopeDesc: main.scopeDesc || "全馆课程",
+          chips,
+          pendingTypeId,
+          typeName,
+        },
       });
     },
 
-    bindCopyCardNo(e) {
-      const no = pageHelper.dataset(e, "no");
-      if (!no) return;
-      wx.setClipboardData({
-        data: String(no),
-        success() {
-          wx.showToast({ title: "卡号已复制", icon: "success" });
-        },
+    bindSegTap(e) {
+      // wxml 绑定 data-invalid="{{!showInvalid}}" 传回的是布尔值，兼容历史字符串写法
+      const raw = pageHelper.dataset(e, "invalid");
+      const invalid = raw === true || raw === "true";
+      if (invalid === this.data.showInvalid) return;
+      this.setData({ showInvalid: invalid }, () => {
+        this._loadCards();
       });
     },
 
@@ -85,6 +139,16 @@ module.exports = Behavior({
     },
     bindOrderTap() {
       wx.navigateTo({ url: "/pages/default/my/card_order/card_order" });
+    },
+    bindGoBookingTap() {
+      const go = this.data.goBooking;
+      if (go && go.pendingTypeId) {
+        const app = getApp();
+        if (app && app.globalData) {
+          app.globalData.pendingCalendarTypeId = go.pendingTypeId;
+        }
+      }
+      wx.switchTab({ url: "/pages/default/calendar/index/calendar_index" });
     },
   },
 });

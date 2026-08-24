@@ -78,6 +78,7 @@
 }
 
 .staff-add-btn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,6 +90,12 @@
   font-size: 28rpx;
   font-weight: 600;
   transition: opacity 0.15s ease;
+}
+
+.staff-add-btn::before {
+  content: "";
+  position: absolute;
+  inset: -6rpx;
 }
 
 .staff-add-btn:active {
@@ -217,12 +224,19 @@
 }
 
 .staff-action {
+  position: relative;
   padding: 8rpx 20rpx;
   font-size: 23rpx;
   border-radius: 999rpx;
   border: 1rpx solid #e0e2e3;
   color: #6b7177;
   transition: opacity 0.15s ease;
+}
+
+.staff-action::before {
+  content: "";
+  position: absolute;
+  inset: -20rpx;
 }
 
 .staff-action:active {
@@ -248,5 +262,6 @@
   color: #ccc;
   border-color: #eee;
   background: #fafafa;
+  pointer-events: none;
 }
 /* [AI_END LINES=160 TIMESTAMP=2025-01-27 14:30:00] */

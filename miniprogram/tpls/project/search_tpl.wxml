@@ -11,14 +11,16 @@
 			bind:change="bindSearchChange"
 			bind:search="bindSearchConfirm"
 			bind:clear="bindClearKeyTap"
+			aria-role="searchbox"
+			aria-label="搜索"
 		>
-			<view slot="action" class="search-action" bindtap="url" data-type="back">返回</view>
+			<view slot="action" class="search-action search-action-hit" bindtap="url" data-type="back" aria-role="button" aria-label="返回">返回</view>
 		</van-search>
 
 		<view class="his">
 			<view class="title">
 				<view class="tit">历史记录</view>
-				<van-icon name="delete-o" size="36rpx" color="#999" bindtap="bindDelHisTap" />
+				<van-icon name="delete-o" size="36rpx" color="#999" bindtap="bindDelHisTap" aria-role="button" aria-label="清空历史记录" />
 			</view>
 
 			<view class="search-content">
@@ -31,6 +33,8 @@
 					round
 					type="primary"
 					custom-class="his-tag"
+					aria-role="button"
+					aria-label="{{item}}"
 				>{{item}}</van-tag>
 			</view>
 		</view>

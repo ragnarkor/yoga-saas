@@ -125,6 +125,13 @@
   line-height: 1.7;
 }
 
+.ucm-card-hint {
+  margin: 12rpx 32rpx 0;
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--neutralTextTertiary, #969799);
+}
+
 /* ==================== 操作按钮 ==================== */
 .ucm-actions {
   display: flex;

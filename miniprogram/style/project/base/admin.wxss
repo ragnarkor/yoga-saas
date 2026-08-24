@@ -20,34 +20,17 @@
   width: 100%;
 }
 
-.text-admin,
-.text-blue {
-  color: var(--adminColor) !important;
-}
-
 .text-red {
   color: var(--adminRedColor) !important;
 }
 
-.bg-admin,
-.bg-blue {
+.bg-admin {
   background: linear-gradient(
     135deg,
     var(--adminColor) 0%,
     var(--adminColorDark) 100%
   ) !important;
   color: #fff;
-}
-
-.bg-admin.light,
-.bg-blue.light {
-  color: var(--adminColor) !important;
-  background-color: var(--adminColorLight) !important;
-}
-
-.border-admin,
-.border-blue {
-  border-color: var(--adminColor) !important;
 }
 
 /* [AI_START TIMESTAMP=2025-01-27 09:10:00] */
@@ -68,96 +51,10 @@
   opacity: 0.85;
   transform: scale(0.97);
 }
-
-.search-form.round {
-  border-radius: var(--adminRadius, 16rpx);
-}
 /* [AI_END LINES=12 TIMESTAMP=2025-01-27 09:10:00] */
 
 .load.text-grey {
   color: var(--adminTextSecondary) !important;
-}
-
-.tabs {
-  color: var(--adminText) !important;
-  font-weight: bold;
-}
-
-.tabs .tab-menu.cur:after {
-  background-color: var(--adminColor) !important;
-}
-
-.tabs .cur {
-  color: var(--adminColor) !important;
-}
-
-.modal-admin .modal-content text {
-  text-align: left;
-  display: block;
-}
-
-.modal-admin .modal-content .pics {
-  margin-top: 30rpx;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-admin .modal-content .pics image {
-  flex: 1;
-  border-radius: var(--adminRadiusSm, 12rpx);
-  margin-bottom: 20rpx;
-}
-
-.modal-admin .modal-content .modal-list {
-  flex: 1;
-  border-radius: var(--adminRadiusSm, 12rpx);
-  margin: 20rpx 0;
-  padding: 20rpx 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.modal-admin .modal-content .modal-list .modal-list-item {
-  font-size: 26rpx;
-  line-height: 1.6;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  width: 100%;
-  margin-bottom: 10rpx;
-  padding: 10rpx 0;
-  border-bottom: 2rpx dashed var(--adminBorder);
-  padding: 20rpx 40rpx;
-}
-
-.modal-admin .modal-content .modal-list .modal-list-item .item-title {
-  width: 100%;
-  text-align: left;
-  display: flex;
-  font-size: 32rpx;
-  line-height: 1.6;
-  margin-bottom: 10rpx;
-}
-
-.modal-admin .modal-content .item-content {
-  width: 100%;
-  text-align: left;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: flex-start;
-  line-height: 50rpx;
-  border-bottom: 2rpx dashed var(--adminBorder);
-  margin-bottom: 10rpx;
-}
-
-.modal-admin .modal-content .item-content text {
-  display: block;
 }
 
 .form-box .title-desc {
@@ -281,60 +178,3 @@
   background-color: var(--adminIconBg) !important;
 }
 
-.admin-comm-list .btn-more {
-  background-color: rgba(217, 100, 74, 0.1) !important;
-  color: var(--adminRedColor);
-}
-
-.btn-admin {
-  width: 90%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  font-size: 32rpx;
-  line-height: 2.5;
-  background-color: var(--adminColor) !important;
-  color: #fff;
-  border-radius: 40rpx;
-  margin-bottom: 60rpx;
-}
-
-.btn-admin.button-hover {
-  opacity: 0.9;
-  transform: scale(0.95, 0.95);
-  position: relative;
-  top: 3rpx;
-  left: 3rpx;
-  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1) inset;
-}
-
-.btn-bottom-admin {
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-  text-align: center;
-  color: #fff;
-  line-height: 2.6;
-  font-size: 36rpx;
-  background-color: inherit;
-  padding-bottom: 0rpx;
-  /*没有安全区域的手机 */
-  padding-bottom: constant(safe-area-inset-bottom);
-  /*兼容有安全区域的手机*/
-  padding-bottom: env(safe-area-inset-bottom);
-  display: flex;
-  z-index: 99999;
-}
-
-.btn-bottom-admin > view {
-  width: 50%;
-}
-
-.btn-bottom-admin .return {
-  background-color: var(--adminRedColor);
-}
-
-.btn-bottom-admin .save {
-  background-color: var(--adminColor);
-}

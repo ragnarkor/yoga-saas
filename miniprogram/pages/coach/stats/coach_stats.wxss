@@ -39,18 +39,6 @@
   text-align: center;
 }
 
-.stats-tip {
-  margin: 16rpx 24rpx 24rpx;
-  padding: 20rpx 24rpx;
-  background: var(--neutralIconBg, #f2f3f5);
-  border-radius: var(--radius-md, 16rpx);
-  display: flex;
-  gap: 12rpx;
-  font-size: 24rpx;
-  color: var(--neutralTextTertiary, #8f959e);
-  line-height: 1.6;
-}
-
 .stats-section {
   margin: 0 0 16rpx;
   background: var(--neutralSurface, #fff);
@@ -147,11 +135,6 @@
   text-align: center;
 }
 
-.stats-rank-no.top {
-  color: var(--themeColor, #5b8a72);
-  font-weight: 700;
-}
-
 .stats-col-user {
   display: flex;
   flex-direction: column;
@@ -177,11 +160,18 @@
 }
 
 .stats-filter-item {
+  position: relative;
   padding: 12rpx 24rpx;
   border-radius: 999rpx;
   font-size: 26rpx;
   color: var(--neutralTextSecondary, #646a73);
   background: var(--neutralIconBg, #f2f3f5);
+}
+
+.stats-filter-item::before {
+  content: "";
+  position: absolute;
+  inset: -14rpx;
 }
 
 .stats-filter-item.active {
@@ -190,6 +180,7 @@
 }
 
 .stats-search-bar {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12rpx;
@@ -198,6 +189,12 @@
   height: 72rpx;
   background: var(--neutralSurface, #fff);
   border-radius: 999rpx;
+}
+
+.stats-search-bar::before {
+  content: "";
+  position: absolute;
+  inset: -8rpx;
 }
 
 .stats-search-input {

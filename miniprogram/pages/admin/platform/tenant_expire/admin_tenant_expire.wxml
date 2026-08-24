@@ -19,6 +19,8 @@
             checked="{{tenantStatus === 1}}"
             color="#4a7c8c"
             bindchange="bindStatusSwitch"
+            aria-role="switch"
+            aria-label="运营状态开关"
           />
         </view>
         <text class="field-hint">停用可立即封停违规租户，无需等到期日</text>
@@ -27,12 +29,14 @@
           loading="{{statusSubmitting}}"
           disabled="{{statusSubmitting}}"
           bindtap="bindSaveStatus"
+          aria-role="button"
+          aria-label="保存运营状态"
         >保存运营状态</button>
       </view>
 
       <view class="field">
         <text class="label">功能开关</text>
-        <view class="feature-link" bindtap="bindFeatureTap">
+        <view class="feature-link" bindtap="bindFeatureTap" aria-role="button" aria-label="管理该馆功能开关">
           <text>管理该馆功能开关</text>
           <text class="feature-link-arrow">›</text>
         </view>
@@ -46,11 +50,15 @@
             class="expire-mode {{expireMode === 'long' ? 'is-active' : ''}}"
             data-mode="long"
             bindtap="bindExpireModeTap"
+            aria-role="button"
+            aria-label="设为长期有效"
           >长期有效</view>
           <view
             class="expire-mode {{expireMode === 'date' ? 'is-active' : ''}}"
             data-mode="date"
             bindtap="bindExpireModeTap"
+            aria-role="button"
+            aria-label="设为指定到期日"
           >指定到期日</view>
         </view>
         <picker
@@ -60,13 +68,15 @@
           start="{{minExpireDay}}"
           bindchange="bindExpireDayChange"
         >
-          <view class="expire-day-pick">{{expireDay || '请选择到期日'}}</view>
+          <view class="expire-day-pick" aria-role="button" aria-label="选择到期日，当前{{expireDay || '未选择'}}">{{expireDay || '请选择到期日'}}</view>
         </picker>
         <button
           class="inline-btn"
           loading="{{submitting}}"
           disabled="{{submitting}}"
           bindtap="bindSaveExpire"
+          aria-role="button"
+          aria-label="保存有效期"
         >保存有效期</button>
       </view>
     </view>
@@ -85,6 +95,8 @@
         loading="{{deleting}}"
         disabled="{{deleting}}"
         bindtap="bindDeleteTenant"
+        aria-role="button"
+        aria-label="删除该瑜伽馆"
       >删除该瑜伽馆</button>
     </view>
   </block>

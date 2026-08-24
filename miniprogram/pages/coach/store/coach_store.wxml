@@ -16,6 +16,9 @@
           style="{{activeTab === index ? 'color:' + themeColor + ';border-color:' + themeColor : ''}}"
           data-index="{{index}}"
           bindtap="onStoreTabTap"
+          aria-role="tab"
+          aria-label="{{item.name}}"
+          aria-selected="{{activeTab === index}}"
         >
           {{item.name}}
         </view>
@@ -234,6 +237,8 @@
                     data-section="group"
                     data-list-index="{{index}}"
                     catchlongpress="bindCateDragEnable"
+                    aria-role="button"
+                    aria-label="拖动排序"
                   >
                     <van-icon name="bars" size="32rpx" color="{{item.dragEnabled ? themeColor : '#c8c9cc'}}" />
                   </view>
@@ -253,6 +258,8 @@
                     color="#c8c9cc"
                     data-idx="{{item._idx}}"
                     catchtap="bindRemoveCategory"
+                    aria-role="button"
+                    aria-label="删除分类"
                   />
                 </view>
               </movable-view>
@@ -279,11 +286,13 @@
                 color="#c8c9cc"
                 data-idx="{{item._idx}}"
                 catchtap="bindRemoveCategory"
+                aria-role="button"
+                aria-label="删除分类"
               />
             </view>
           </block>
 
-          <view wx:if="{{canEdit}}" class="store-add" bindtap="bindAddGroupCategory">
+          <view wx:if="{{canEdit}}" class="store-add" bindtap="bindAddGroupCategory" aria-role="button" aria-label="添加团课分类">
             <van-icon name="plus" size="28rpx" color="{{themeColor}}" />
             <text>添加团课分类</text>
           </view>
@@ -331,6 +340,8 @@
                     data-section="private"
                     data-list-index="{{index}}"
                     catchlongpress="bindCateDragEnable"
+                    aria-role="button"
+                    aria-label="拖动排序"
                   >
                     <van-icon name="bars" size="32rpx" color="{{item.dragEnabled ? themeColor : '#c8c9cc'}}" />
                   </view>
@@ -350,6 +361,8 @@
                     color="#c8c9cc"
                     data-idx="{{item._idx}}"
                     catchtap="bindRemoveCategory"
+                    aria-role="button"
+                    aria-label="删除分类"
                   />
                 </view>
               </movable-view>
@@ -376,11 +389,13 @@
                 color="#c8c9cc"
                 data-idx="{{item._idx}}"
                 catchtap="bindRemoveCategory"
+                aria-role="button"
+                aria-label="删除分类"
               />
             </view>
           </block>
 
-          <view wx:if="{{canEdit}}" class="store-add" bindtap="bindAddPrivateCategory">
+          <view wx:if="{{canEdit}}" class="store-add" bindtap="bindAddPrivateCategory" aria-role="button" aria-label="添加私教分类">
             <van-icon name="plus" size="28rpx" color="{{themeColor}}" />
             <text>添加私教分类</text>
           </view>
@@ -400,6 +415,9 @@
               style="background: {{item.color}};"
               data-index="{{index}}"
               bindtap="bindThemePick"
+              aria-role="button"
+              aria-label="{{item.name || '主题色 ' + (index + 1)}}"
+              aria-selected="{{themePickIndex === index}}"
             >
               <van-icon wx:if="{{themePickIndex === index}}" name="success" color="#fff" size="28rpx" />
             </view>

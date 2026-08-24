@@ -19,10 +19,10 @@
     <view class="shop-tools">
       <view><text class="shop-tools-title">精选套餐</text><text class="shop-tools-count">{{cards.length}} 款在售</text></view>
       <view class="view-toggle">
-        <view class="view-toggle-btn {{viewMode === 'list' ? 'is-active' : ''}}" data-mode="list" bindtap="bindViewToggle">
+        <view class="view-toggle-btn {{viewMode === 'list' ? 'is-active' : ''}}" data-mode="list" bindtap="bindViewToggle" aria-role="button" aria-label="切换为列表视图" aria-selected="{{viewMode === 'list'}}">
           <van-icon name="bars" size="32rpx" color="{{viewMode === 'list' ? themeColor : '#9ba59f'}}" />
         </view>
-        <view class="view-toggle-btn {{viewMode === 'grid' ? 'is-active' : ''}}" data-mode="grid" bindtap="bindViewToggle">
+        <view class="view-toggle-btn {{viewMode === 'grid' ? 'is-active' : ''}}" data-mode="grid" bindtap="bindViewToggle" aria-role="button" aria-label="切换为网格视图" aria-selected="{{viewMode === 'grid'}}">
           <van-icon name="apps-o" size="32rpx" color="{{viewMode === 'grid' ? themeColor : '#9ba59f'}}" />
         </view>
       </view>

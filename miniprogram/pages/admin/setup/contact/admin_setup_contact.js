@@ -134,6 +134,7 @@ Page({
 			});
 		} catch (err) {
 			console.log(err);
+			pageHelper.showErrToast('修改失败');
 		}
 
 	},

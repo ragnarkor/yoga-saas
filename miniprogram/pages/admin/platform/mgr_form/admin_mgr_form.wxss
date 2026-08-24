@@ -4,7 +4,8 @@
 .field-picker .picker-val {
   font-size: 30rpx;
   color: var(--adminText);
-  padding-right: 32rpx;
+  padding: 24rpx 32rpx 24rpx 0;
+  margin: -24rpx 0;
   background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%239aabb3" d="M2 4l4 4 4-4"/></svg>') no-repeat right center;
   background-size: 24rpx;
 }

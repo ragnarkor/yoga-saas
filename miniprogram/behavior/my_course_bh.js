@@ -92,6 +92,7 @@ module.exports = Behavior({
         });
       } catch (err) {
         console.error(err);
+        wx.showToast({ title: "加载失败，请重试", icon: "none" });
         this.setData({
           isLoad: true,
           loading: false,

@@ -11,7 +11,7 @@
     <view class="course-edit-section">基本信息</view>
     <!-- [AI_END LINES=1 TIMESTAMP=2025-01-25 17:30:00] -->
     <van-cell-group custom-class="course-edit-group">
-      <view class="course-edit-field" bindtap="bindTemplateTap">
+      <view class="course-edit-field" bindtap="bindTemplateTap" aria-role="button" aria-label="选择课程模板">
         <view class="course-edit-field-label">课程模板</view>
         <view wx:if="{{selectedTemplatePreview}}" class="course-edit-field-selected">
           <image class="course-edit-field-cover" src="{{selectedTemplatePreview.cover}}" mode="aspectFill" />
@@ -70,7 +70,7 @@
         bind:change="bindStyleFieldChange"
       />
 
-      <view class="course-edit-field course-edit-field--inline" bindtap="bindColorFieldTap">
+      <view class="course-edit-field course-edit-field--inline" bindtap="bindColorFieldTap" aria-role="button" aria-label="选择课程颜色">
         <!-- [AI_START TIMESTAMP=2025-01-25 17:45:00] -->
         <view class="course-edit-field-label-inline">课程颜色</view>
         <!-- [AI_END LINES=1 TIMESTAMP=2025-01-25 17:45:00] -->
@@ -200,6 +200,9 @@
           wx:key="_id"
           data-id="{{item._id}}"
           bindtap="bindTemplatePick"
+          aria-role="button"
+          aria-label="{{item.title}}"
+          aria-selected="{{formStyleSet.templateId === item._id}}"
         >
           <view class="course-color-dot course-color-dot--md" style="background: {{item.color}};"></view>
           <image class="course-edit-option-cover" src="{{item.cover}}" mode="aspectFill" />
@@ -242,6 +245,9 @@
           data-color="{{item.value}}"
           data-label="{{item.label}}"
           bindtap="bindColorTap"
+          aria-role="button"
+          aria-label="{{item.label}}"
+          aria-selected="{{formStyleSet.color === item.value}}"
         >
           <view class="course-edit-color-dot" style="background: {{item.value}};"></view>
           <view class="course-edit-color-item-info">

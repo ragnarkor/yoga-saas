@@ -7,6 +7,12 @@
 	color: #888;
 }
 
-.btn-admin{
-	margin-bottom: 20rpx;
+.btn-copy-touch {
+	position: relative;
+}
+
+.btn-copy-touch::before {
+	content: "";
+	position: absolute;
+	inset: -14rpx;
 }

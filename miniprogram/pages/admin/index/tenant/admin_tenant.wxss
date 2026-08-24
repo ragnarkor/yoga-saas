@@ -89,6 +89,17 @@
   margin-bottom: 30rpx;
 }
 
+.tenant-refresh-btn-wrap {
+  display: inline-block;
+  position: relative;
+}
+
+.tenant-refresh-btn-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -14rpx;
+}
+
 .foot-bottom {
   padding: 24rpx 0 48rpx;
 }

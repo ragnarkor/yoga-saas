@@ -54,6 +54,7 @@ page {
 }
 
 .filter-pill {
+  position: relative;
   flex: 1;
   min-width: 0;
   text-align: center;
@@ -65,6 +66,12 @@ page {
   background: var(--neutralIconBg, #f2f3f5);
   border: 1rpx solid transparent;
   transition: all 0.2s ease;
+}
+
+.filter-pill::before {
+  content: "";
+  position: absolute;
+  inset: -12rpx -5rpx;
 }
 
 .filter-pill.active {

@@ -115,9 +115,6 @@
   /* 见 coach_common.wxss */
 }
 
-.course-edit-field-value--placeholder {
-  color: #969799;
-}
 .issue-activate-list {
   padding: 8rpx 24rpx 32rpx;
 }

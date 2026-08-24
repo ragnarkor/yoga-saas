@@ -55,10 +55,6 @@
   z-index: 2;
 }
 
-.marketing-body .coach-revenue-card {
-  margin: 0 0 20rpx;
-}
-
 .marketing-loading { display:flex; justify-content:center; padding:86rpx 0; }
 .marketing-card-sale { display:flex; align-items:center; gap:22rpx; padding:30rpx 26rpx; border-radius:24rpx; background:#fff; box-shadow:0 10rpx 36rpx rgba(43,36,54,.08); }
 .marketing-card-sale:active { opacity:.88; }

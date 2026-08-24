@@ -1,8 +1,5 @@
 {
-  "usingComponents": {
-    "van-tabs": "@vant/weapp/tabs/index",
-    "van-tab": "@vant/weapp/tab/index"
-  },
+  "usingComponents": {},
   "enablePullDownRefresh": true,
   "navigationStyle": "custom",
   "navigationBarTitleText": "约课"

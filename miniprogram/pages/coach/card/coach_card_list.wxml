@@ -47,6 +47,8 @@
         data-name="{{item.CARD_TPL_NAME}}"
         bindtap="bindCardTap"
         bindlongpress="bindDeleteTap"
+        aria-role="button"
+        aria-label="{{item.CARD_TPL_NAME}}，长按可删除"
       >
         <view class="card-chip card-chip--visual">
           <image

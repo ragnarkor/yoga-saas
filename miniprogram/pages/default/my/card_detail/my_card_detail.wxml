@@ -8,7 +8,7 @@
 
   <block wx:else>
     <view class="card-detail-content">
-      <view class="card-face-wrap {{showCardBack ? 'is-back' : ''}}" bindtap="bindToggleCardFace">
+      <view class="card-face-wrap {{showCardBack ? 'is-back' : ''}}" bindtap="bindToggleCardFace" aria-role="button" aria-label="翻转查看卡背面">
         <view class="card-face card-face--front {{card.isActive ? '' : 'is-invalid'}}">
           <image wx:if="{{card.coverUrl}}" class="card-face-cover" src="{{card.coverUrl}}" mode="aspectFill" />
           <view class="card-face-shade" style="{{card.shadeBg}}"></view>

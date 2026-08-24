@@ -39,6 +39,8 @@
               wx:for-item="card"
               bindtap="onCardTap"
               data-key="{{card.key}}"
+              aria-role="button"
+              aria-label="{{card.label + '，' + card.num}}"
             >
               <view class="customer-card-icon {{section.alert ? 'customer-card-icon--alert' : ''}}">
                 <van-icon name="{{card.icon}}" size="36rpx" color="{{section.alert ? '#DD9168' : themeColor}}" />

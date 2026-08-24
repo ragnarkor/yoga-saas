@@ -221,6 +221,7 @@
 }
 
 .md-day-chip {
+	position: relative;
 	display: inline-block;
 	padding: 12rpx 28rpx;
 	font-size: 26rpx;
@@ -228,6 +229,12 @@
 	background: #f5f7f5;
 	border-radius: 999rpx;
 	border: 2rpx solid transparent;
+}
+
+.md-day-chip::before {
+	content: "";
+	position: absolute;
+	inset: -16rpx;
 }
 
 .md-day-chip.active {

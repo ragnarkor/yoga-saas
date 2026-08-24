@@ -128,22 +128,24 @@ Page({
 	},
 
 	bindDelTap: async function (e) {
-		try {
-			let options = {
-				title: '数据删除中'
-			}
-			await cloudHelper.callCloudData('admin/user_data_del', {}, options).then(res => {
-				this.setData({
-					url: '',
-					time: ''
+		let callback = async () => {
+			try {
+				let options = {
+					title: '数据删除中'
+				}
+				await cloudHelper.callCloudData('admin/user_data_del', {}, options).then(res => {
+					this.setData({
+						url: '',
+						time: ''
+					});
+					pageHelper.showSuccToast('删除成功');
 				});
-				pageHelper.showSuccToast('删除成功');
-			});
-		} catch (err) {
-			console.log(err);
-			pageHelper.showNoneToast('删除失败，请重试');
-		}
-
+			} catch (err) {
+				console.log(err);
+				pageHelper.showNoneToast('删除失败，请重试');
+			}
+		};
+		pageHelper.showConfirm('确认删除数据文件？删除不可恢复', callback);
 	},
 
 

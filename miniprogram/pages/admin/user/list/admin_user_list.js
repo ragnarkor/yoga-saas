@@ -81,6 +81,7 @@ Page({
           });
       } catch (e) {
         console.log(e);
+        pageHelper.showErrToast("删除失败");
       }
     };
     pageHelper.showConfirm("确认删除？删除不可恢复", callback);
@@ -113,6 +114,7 @@ Page({
         });
     } catch (e) {
       console.log(e);
+      pageHelper.showErrToast("设置失败");
     }
   },
 

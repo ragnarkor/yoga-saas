@@ -40,6 +40,7 @@
 }
 
 .schedule-mode-item {
+  position: relative;
   flex: 1;
   height: 64rpx;
   display: flex;
@@ -48,6 +49,12 @@
   color: #8b9289;
   font-size: 25rpx;
   border-radius: 13rpx;
+}
+
+.schedule-mode-item::before {
+  content: "";
+  position: absolute;
+  inset: -12rpx 0;
 }
 
 .schedule-mode-item.is-active {
@@ -132,6 +139,7 @@
 }
 
 .schedule-weekday {
+  position: relative;
   width: 76rpx;
   height: 60rpx;
   display: flex;
@@ -143,6 +151,12 @@
   background: #fafaf8;
   border: 1rpx solid #e6e8e2;
   border-radius: 14rpx;
+}
+
+.schedule-weekday::before {
+  content: "";
+  position: absolute;
+  inset: -14rpx -6rpx;
 }
 
 .schedule-weekday.is-selected {
@@ -164,6 +178,7 @@
 .schedule-date-picker,
 .schedule-time-picker,
 .schedule-time-end {
+  position: relative;
   height: 70rpx;
   display: flex;
   align-items: center;
@@ -175,6 +190,14 @@
   background: #fafaf8;
   border: 1rpx solid #e8e9e5;
   border-radius: 14rpx;
+}
+
+.schedule-date-picker::before,
+.schedule-time-picker::before,
+.schedule-time-end::before {
+  content: "";
+  position: absolute;
+  inset: -9rpx 0;
 }
 
 .schedule-date-range-line,
@@ -214,6 +237,7 @@
 }
 
 .schedule-add-time {
+  position: relative;
   height: 72rpx;
   display: flex;
   align-items: center;
@@ -224,6 +248,20 @@
   background: #fafbf9;
   border: 1rpx dashed #d9ddd5;
   border-radius: 14rpx;
+}
+
+.schedule-add-time::before {
+  content: "";
+  position: absolute;
+  inset: -8rpx;
+}
+
+.schedule-time-remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30rpx;
+  margin: -30rpx;
 }
 
 .schedule-edit-coach-field.coach-picker-field {
@@ -246,13 +284,6 @@
 
 .schedule-edit-del {
   margin: 24rpx 32rpx 0;
-}
-
-.schedule-edit-tip {
-  padding: 16rpx 32rpx 0;
-  font-size: 24rpx;
-  line-height: 1.5;
-  color: #969799;
 }
 
 .schedule-calendar-wrap {
@@ -286,172 +317,10 @@
 .schedule-room-option-info text { display:block; overflow:hidden; color:#323233; font-size:28rpx; font-weight:600; text-overflow:ellipsis; white-space:nowrap; }
 .schedule-room-option-info text:last-child { margin-top:7rpx; color:#969799; font-size:22rpx; font-weight:400; }
 
-.schedule-course-field {
-  padding: 24rpx 32rpx;
-  background: #fff;
-  border-bottom: 1rpx solid #ebedf0;
-}
-
-.schedule-course-field-label {
-  font-size: 28rpx;
-  color: #646566;
-  margin-bottom: 16rpx;
-}
-
-.schedule-course-required {
-  color: #ee0a24;
-  margin-left: 4rpx;
-}
-
-.schedule-course-selected,
-.schedule-course-placeholder {
+.schedule-room-close-btn {
   display: flex;
   align-items: center;
-  gap: 20rpx;
-}
-
-.schedule-course-placeholder {
-  justify-content: space-between;
-  font-size: 28rpx;
-  color: #969799;
-  padding: 8rpx 0;
-}
-
-.schedule-course-cover {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 16rpx;
-  flex-shrink: 0;
-  background: #f5f5f5;
-}
-
-.schedule-course-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.schedule-course-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #323233;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.schedule-course-meta {
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #969799;
-}
-
-.schedule-course-desc {
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #c8c9cc;
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.schedule-course-sheet {
-  max-height: 75vh;
-  display: flex;
-  flex-direction: column;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.schedule-course-sheet-head {
-  padding: 28rpx 32rpx 12rpx;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-shrink: 0;
-}
-
-.schedule-course-sheet-title {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #323233;
-}
-
-.schedule-course-sheet-sub {
-  font-size: 24rpx;
-  color: #969799;
-}
-
-.schedule-course-sheet-scroll {
-  max-height: calc(75vh - 100rpx);
-  padding: 8rpx 24rpx 24rpx;
-  box-sizing: border-box;
-}
-
-.schedule-course-option {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
-  padding: 20rpx;
-  margin-bottom: 16rpx;
-  background: #fff;
-  border-radius: 20rpx;
-  border-left: 8rpx solid #81c784;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
-}
-
-.schedule-course-option.is-active {
-  background: var(--projectColorLight, #e5f1ec);
-}
-
-.schedule-course-option-cover {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 16rpx;
-  flex-shrink: 0;
-  background: #f5f5f5;
-}
-
-.schedule-course-option-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.schedule-course-option-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #323233;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.schedule-course-option-meta {
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #969799;
-  line-height: 1.5;
-}
-
-.schedule-course-option-tag {
-  display: inline-block;
-  margin-right: 8rpx;
-  padding: 2rpx 12rpx;
-  border-radius: 999rpx;
-  font-size: 22rpx;
-  color: var(--themeColor, #5b8a72);
-  background: var(--projectColorLight, #e5f1ec);
-}
-
-.schedule-course-option-desc {
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #c8c9cc;
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  justify-content: center;
+  padding: 27rpx;
+  margin: -27rpx;
 }

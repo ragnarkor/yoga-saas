@@ -47,37 +47,6 @@
   gap: 16rpx;
 }
 
-.course-edit-color-field {
-  background: #fff;
-}
-
-.course-edit-color-preview {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
-  padding: 24rpx 32rpx 16rpx;
-}
-
-.course-edit-color-swatch {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.12);
-  flex-shrink: 0;
-}
-
-.course-edit-color-info {
-  display: flex;
-  flex-direction: column;
-  gap: 6rpx;
-}
-
-.course-edit-color-name {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #323233;
-}
-
 .course-edit-color-hex {
   font-size: 24rpx;
   color: #969799;
@@ -117,26 +86,6 @@
   color: #323233;
 }
 
-.course-edit-colors-old {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-  padding: 16rpx 32rpx 24rpx;
-}
-
-.course-edit-color {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 12rpx;
-  border: 4rpx solid transparent;
-  box-sizing: border-box;
-}
-
-.course-edit-color.active {
-  border-color: var(--themeColor, #5b8a72);
-  transform: scale(1.08);
-}
-
 .course-edit-upload {
   margin-top: 12rpx;
 }
@@ -163,22 +112,6 @@
   box-sizing: border-box;
 }
 
-.course-edit-cell-title {
-  color: #646566 !important;
-}
-
-.course-edit-cell-value {
-  color: #323233 !important;
-}
-
-.course-edit-cell-placeholder {
-  color: #969799 !important;
-}
-
-.course-edit-picker-cell .van-cell__value {
-  color: #323233;
-}
-
 /* [AI_END LINES=5 TIMESTAMP=2025-01-25 17:30:00] */
 
 /* [AI_START TIMESTAMP=2025-01-25 17:30:00] */
@@ -188,13 +121,6 @@
   margin-bottom: 16rpx;
 }
 /* [AI_END LINES=4 TIMESTAMP=2025-01-25 17:30:00] */
-
-/* [AI_START TIMESTAMP=2025-01-25 17:45:00] */
-.course-edit-required {
-  color: #ee0a24;
-  margin-right: 4rpx;
-}
-/* [AI_END LINES=4 TIMESTAMP=2025-01-25 17:45:00] */
 
 .course-edit-field-selected,
 .course-edit-field-row {
@@ -226,11 +152,6 @@
   line-height: var(--cell-line-height, 48rpx);
 }
 
-.course-edit-field-label-inline--required::before {
-  content: "*";
-  color: #ee0a24;
-  margin-right: 4rpx;
-}
 /* [AI_END LINES=10 TIMESTAMP=2025-01-25 18:00:00] */
 
 .course-edit-field-row--inline {
@@ -255,11 +176,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 28rpx;
-  color: #969799;
-}
-
-.course-edit-field-placeholder-text {
   font-size: 28rpx;
   color: #969799;
 }

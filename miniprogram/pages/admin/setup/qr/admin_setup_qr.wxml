@@ -9,7 +9,7 @@
 		<view class="checkin">
 			<view class="notice"><van-icon name="scan" size="32rpx" custom-class="margin-right-s text-bold"  />放在推广的地方展示</view>
 
-			<image bindtap="url" data-type="img" data-url="{{qrUrl}}" mode="aspectFill" class="loading" show-menu-by-longpress="true" src="{{qrUrl}}"></image>
+			<image bindtap="url" data-type="img" data-url="{{qrUrl}}" mode="aspectFill" class="loading" show-menu-by-longpress="true" src="{{qrUrl}}" aria-role="button" aria-label="查看小程序码大图"></image>
 			<view class="oprt">长按图片保存小程序码</view>
 		</view>
 

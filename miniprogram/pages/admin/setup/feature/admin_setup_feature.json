@@ -1,7 +1,6 @@
 {
   "navigationBarTitleText": "功能开关",
   "usingComponents": {
-    "van-icon": "@vant/weapp/icon/index",
     "van-cell": "@vant/weapp/cell/index",
     "van-cell-group": "@vant/weapp/cell-group/index",
     "van-switch": "@vant/weapp/switch/index",

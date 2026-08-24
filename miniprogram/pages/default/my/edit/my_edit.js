@@ -53,6 +53,8 @@ Page({
       });
     } catch (e) {
       console.error(e);
+      wx.showToast({ title: '加载失败，请重试', icon: 'none' });
+      setTimeout(() => wx.navigateBack(), 800);
     }
   },
 
@@ -128,6 +130,7 @@ Page({
       setTimeout(() => wx.navigateBack(), 500);
     } catch (e) {
       console.error(e);
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' });
     } finally {
       this.setData({ submitting: false });
     }

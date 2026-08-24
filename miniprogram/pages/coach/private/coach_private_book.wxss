@@ -112,18 +112,6 @@
   padding: 32rpx 24rpx;
 }
 
-.private-book-course-sub {
-  font-size: 22rpx;
-  color: #969799;
-  margin-left: 12rpx;
-}
-
-.card-scope-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .private-book-calendar-wrap {
   padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
 }

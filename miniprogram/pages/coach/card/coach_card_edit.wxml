@@ -19,7 +19,7 @@
       <van-field label="售价(元)" type="number" value="{{form.price}}" bind:change="bindFieldChange" data-field="price" />
       <van-field wx:if="{{form.type === 'times'}}" label="额度(次)" type="number" value="{{form.quota}}" bind:change="bindFieldChange" data-field="quota" />
 
-      <view class="course-edit-field course-edit-field--inline" bindtap="bindStyleFieldTap">
+      <view class="course-edit-field course-edit-field--inline" bindtap="bindStyleFieldTap" aria-role="button" aria-label="卡面样式，当前：{{selectedStyleLabel}}">
         <text class="course-edit-field-label-inline">卡面样式</text>
         <view class="course-edit-field-row course-edit-field-row--inline">
           <view class="course-edit-color-inline">
@@ -87,6 +87,9 @@
           wx:key="pickerKey"
           data-key="{{item.pickerKey}}"
           bindtap="bindStyleTap"
+          aria-role="button"
+          aria-label="{{item.label}}"
+          aria-selected="{{selectedStyleKey === item.pickerKey}}"
         >
           <view wx:if="{{item.url}}" class="card-cover-item-img-wrap">
             <image class="card-cover-item-img" src="{{item.url}}" mode="aspectFill" />
@@ -102,7 +105,7 @@
           />
         </view>
       </view>
-      <view class="card-cover-upload {{isCustomCover ? 'active' : ''}} {{uploadingCover ? 'uploading' : ''}}" bindtap="bindUploadCoverTap">
+      <view class="card-cover-upload {{isCustomCover ? 'active' : ''}} {{uploadingCover ? 'uploading' : ''}}" bindtap="bindUploadCoverTap" aria-role="button" aria-label="{{isCustomCover ? '更换自定义封面' : '上传自定义封面'}}">
         <view class="card-cover-upload-slot">
           <image wx:if="{{isCustomCover && coverPreviewUrl && !uploadingCover}}" class="card-cover-upload-img" src="{{coverPreviewUrl}}" mode="aspectFill" />
           <van-loading wx:elif="{{uploadingCover}}" size="30rpx" color="{{themeColor}}" />

@@ -70,6 +70,13 @@
   font-size: 24rpx;
   color: #fff;
   transition: background var(--adminTransition, 0.2s ease);
+  position: relative;
+}
+
+.platform-hero-logout::before {
+  content: "";
+  position: absolute;
+  inset: -22rpx;
 }
 
 .platform-hero-logout:active {
@@ -181,6 +188,13 @@
   transition:
     background var(--adminTransition, 0.2s ease),
     color var(--adminTransition, 0.2s ease);
+  position: relative;
+}
+
+.platform-tab::before {
+  content: "";
+  position: absolute;
+  inset: -6rpx;
 }
 
 .platform-tab--active {
@@ -215,11 +229,6 @@
   font-size: 28rpx;
   font-weight: 600;
   color: var(--adminText);
-}
-
-.platform-section-count {
-  font-size: 24rpx;
-  color: var(--adminTextSecondary);
 }
 
 /* ========== 快捷操作网格 ========== */
@@ -371,6 +380,13 @@
   background: var(--adminColor);
   border-radius: var(--adminRadiusSm, 12rpx);
   transition: opacity var(--adminTransition, 0.2s ease);
+  position: relative;
+}
+
+.tenant-row-btn::before {
+  content: "";
+  position: absolute;
+  inset: -15rpx;
 }
 
 .tenant-row-btn--ghost {
@@ -480,6 +496,11 @@
   font-size: 30rpx;
   font-weight: 600;
   color: var(--adminText, #323233);
+}
+
+.health-modal-close {
+  padding: 26rpx;
+  margin: -26rpx;
 }
 .health-modal-list {
   max-height: 60vh;

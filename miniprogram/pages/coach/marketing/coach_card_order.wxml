@@ -16,6 +16,9 @@
       style="{{activeTab === item.key ? 'color:' + themeColor + ';border-color:' + themeColor : ''}}"
       data-key="{{item.key}}"
       bindtap="bindTabTap"
+      aria-role="tab"
+      aria-label="{{item.label}}"
+      aria-selected="{{activeTab === item.key}}"
     >{{item.label}}</view>
   </view>
 
@@ -29,7 +32,7 @@
     <view class="co-card" wx:for="{{orders}}" wx:key="id">
       <view class="co-card-head">
         <text class="co-user">{{item.userName}}</text>
-        <text class="co-status co-status--{{item.status}}">{{item.statusDesc}}</text>
+        <text class="co-status co-status--{{item.status}}" aria-role="text" aria-label="状态：{{item.statusDesc}}">{{item.statusDesc}}</text>
       </view>
 
       <view class="co-tpl-row">
@@ -45,7 +48,7 @@
 
       <view wx:if="{{item.remark}}" class="co-remark">备注：{{item.remark}}</view>
       <view wx:if="{{item.hasTransferProof}}" class="co-proof">
-        <image class="co-proof-image" src="{{item.transferProof}}" mode="aspectFill" data-url="{{item.transferProof}}" catchtap="bindPreviewProofTap" />
+        <image class="co-proof-image" src="{{item.transferProof}}" mode="aspectFill" data-url="{{item.transferProof}}" catchtap="bindPreviewProofTap" aria-role="button" aria-label="查看转账凭证图片" />
         <view><text class="co-proof-title">会员已上传转账凭证</text><text wx:if="{{item.transferReference}}" class="co-proof-ref">转账备注：{{item.transferReference}}</text></view>
       </view>
       <view wx:elif="{{item.status === 1 && !item.isWechat}}" class="co-proof co-proof--empty"><van-icon name="photo-o" size="30rpx" color="#a6afa9" /><text>会员尚未上传转账凭证</text></view>

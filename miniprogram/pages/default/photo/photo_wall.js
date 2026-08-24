@@ -140,8 +140,4 @@ Page({
       wx.previewImage({ current: item.pic, urls });
     }
   },
-
-  url(e) {
-    pageHelper.url(e, this);
-  },
 });

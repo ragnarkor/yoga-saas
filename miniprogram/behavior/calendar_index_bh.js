@@ -4,6 +4,7 @@ const meetCategoryHelper = require("../helper/meet_category_helper.js");
 const defaultCoverHelper = require("../helper/default_cover_helper.js");
 const setting = require("../setting/setting.js");
 const timeHelper = require("../helper/time_helper.js");
+const cardFaceHelper = require("../helper/card_face_helper.js");
 const emptyImageHelper = require("../helper/empty_image_helper.js");
 
 // 会员端课表展示未来一个月，避免只能查看当前一周。
@@ -27,22 +28,29 @@ module.exports = Behavior({
 
     pageTitle: "瑜伽馆",
     pageSubtitle: "选择课程，开启你的练习之旅",
-    emptyText: "暂无预约课程",
+    emptyText: "暂无课程安排",
     emptyImage: emptyImageHelper.pickEmptyImage(),
     showPrivateEntry: false,
+    // 头部卡资产玻璃条：null=未加载不渲染；{has:true,...}=主卡摘要；{has:false}=无卡引导
+    cardAsset: null,
   },
 
   methods: {
     onLoad: async function (options) {
       if (setting.IS_SUB) wx.hideHomeButton();
 
-      this.setData({ emptyImage: emptyImageHelper.pickEmptyImage() });
       this._skipShowRefresh = true;
       this._initDateList();
       await this._syncTenantCategories();
       this._initTabs();
       this.setData({ isLoad: true });
+      this.setData({ emptyImage: emptyImageHelper.pickEmptyImage() });
       await Promise.all([this._loadHasList(), this._loadPrivateMeta()]);
+      await this._loadList();
+    },
+
+    bindReload: async function () {
+      await Promise.all([this._loadHasList(), this._loadPrivateMeta(), this._loadCardAsset()]);
       await this._loadList();
     },
 
@@ -275,6 +283,19 @@ module.exports = Behavior({
         );
       }
 
+      // 空态文案跟随场景：具体分类 / 有私教入口 / 全部
+      if (!result.length) {
+        const tabItem =
+          activeTabId !== "0" ? this.data.tabs[activeTab] || null : null;
+        if (tabItem && tabItem.name) {
+          this.setData({ emptyText: `暂无${tabItem.name}课程` });
+        } else if (this.data.showPrivateEntry) {
+          this.setData({ emptyText: "暂无团课安排" });
+        } else {
+          this.setData({ emptyText: "暂无课程安排" });
+        }
+      }
+
       return result;
     },
 
@@ -321,6 +342,18 @@ module.exports = Behavior({
     onReady: function () {},
 
     onShow: async function () {
+      // 卡包反链：从卡包页带着主卡适用分类回来时，预选对应分类
+      const app = getApp();
+      const pendingTypeId =
+        app && app.globalData ? app.globalData.pendingCalendarTypeId : "";
+      if (pendingTypeId) {
+        app.globalData.pendingCalendarTypeId = "";
+        const pendingIdx = (this.data.tabs || []).findIndex(
+          (t) => String(t.id) === String(pendingTypeId),
+        );
+        if (pendingIdx >= 0) this.setData({ activeTab: pendingIdx });
+      }
+
       if (this._skipShowRefresh) {
         this._skipShowRefresh = false;
       }
@@ -353,6 +386,8 @@ module.exports = Behavior({
         await Promise.all([this._loadHasList(), this._loadPrivateMeta()]);
         await this._loadList();
       });
+
+      this._loadCardAsset();
     },
 
     onHide: function () {},
@@ -360,18 +395,16 @@ module.exports = Behavior({
     onUnload: function () {},
 
     onPullDownRefresh: async function () {
-      await Promise.all([this._loadHasList(), this._loadPrivateMeta()]);
+      await Promise.all([
+        this._loadHasList(),
+        this._loadPrivateMeta(),
+        this._loadCardAsset(),
+      ]);
       await this._loadList();
       wx.stopPullDownRefresh();
     },
 
     onShareAppMessage: function () {},
-
-    bindTabChange: async function (e) {
-      const activeTab = e.detail.index;
-      const courseList = await this._transformCourseData(this.data.list, activeTab);
-      this.setData({ activeTab, courseList });
-    },
 
     bindCategoryTap: async function (e) {
       const activeTab = Number(e.currentTarget.dataset.index);
@@ -397,11 +430,6 @@ module.exports = Behavior({
       );
     },
 
-    bindReload: async function () {
-      await Promise.all([this._loadHasList(), this._loadPrivateMeta()]);
-      await this._loadList();
-    },
-
     _loadPrivateMeta: async function () {
       try {
         const meta = await cloudHelper.callCloudData(
@@ -421,6 +449,81 @@ module.exports = Behavior({
     bindPrivateBookTap: function () {
       wx.navigateTo({
         url: "/pages/default/private/book/private_book",
+      });
+    },
+
+    // ==================== 卡资产玻璃条 ====================
+
+    // 头部卡资产摘要：有可用卡展示主卡（与卡包页反链选卡规则一致），无卡展示购卡引导
+    _loadCardAsset: async function () {
+      try {
+        const res = await cloudHelper.callCloudData(
+          "my/my_card_list",
+          { activeOnly: true },
+          { hint: false },
+        );
+        const cards = ((res && res.list) || []).map((item) =>
+          cardFaceHelper.enrichCardVisual(item),
+        );
+        const usable = cards.filter((c) => c && c.canBook);
+        if (!usable.length) {
+          this.setData({ cardAsset: { has: false } });
+          return;
+        }
+
+        // 主卡选择：非待激活优先 → 次卡优先 → 到期近的优先（先到期先用）
+        const endRank = (c) => Number(c.endTime) || 9999999999999;
+        usable.sort(
+          (a, b) =>
+            (a.isPending ? 1 : 0) - (b.isPending ? 1 : 0) ||
+            (a.type === "times" ? 0 : 1) - (b.type === "times" ? 0 : 1) ||
+            endRank(a) - endRank(b),
+        );
+
+        const main = usable[0];
+        const second = usable[1] || null;
+        // endTimeDesc 形如 "2026-12-31（N天）"，取月-日作短日期；长期有效则留空
+        const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(
+          String(main.endTimeDesc || ""),
+        );
+        const endShort = m ? `${Number(m[2])}-${Number(m[3])}` : "";
+
+        this.setData({
+          cardAsset: {
+            has: true,
+            name: main.name || "会员卡",
+            type: main.type,
+            typeLabel: main.typeLabel || "",
+            quota: main.quota || 0,
+            balanceText: main.balanceText || "",
+            endShort,
+            count: usable.length,
+            frontCover: main.coverUrl || "",
+            frontShade: cardFaceHelper.getCardShadeBg(
+              main.color,
+              main.coverUrl,
+            ),
+            backCover: second ? second.coverUrl || "" : "",
+            backShade: second
+              ? cardFaceHelper.getCardShadeBg(second.color, second.coverUrl)
+              : "",
+          },
+        });
+      } catch (err) {
+        // 拉取失败保持现状（不渲染或沿用旧摘要），不打断课表加载
+        console.warn("[calendar/cardAsset]", err);
+      }
+    },
+
+    bindCardPackTap: function () {
+      wx.navigateTo({
+        url: "/pages/default/my/card_pack/my_card_pack",
+      });
+    },
+
+    bindGoCardShopTap: function () {
+      wx.navigateTo({
+        url: "/pages/default/my/card_shop/card_shop",
       });
     },
 

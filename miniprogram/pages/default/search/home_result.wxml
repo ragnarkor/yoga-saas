@@ -4,10 +4,10 @@
 </view>
 
 <view class="search-result" wx:else>
-  <view class="keyword">??????{{keyword}}</view>
+  <view class="keyword">关键词：{{keyword}}</view>
 
   <view class="group" wx:if="{{meetList.length > 0}}">
-    <view class="group-title">?? / ??</view>
+    <view class="group-title">课程 / 活动</view>
     <view class="result-item" wx:for="{{meetList}}" wx:key="_id" bindtap="bindItemTap" data-type="meet" data-id="{{item._id}}">
       <image wx:if="{{item.pic}}" class="result-pic" mode="aspectFill" src="{{item.pic}}" />
       <view class="result-body">
@@ -18,7 +18,7 @@
   </view>
 
   <view class="group" wx:if="{{newsList.length > 0}}">
-    <view class="group-title">??</view>
+    <view class="group-title">资讯</view>
     <view class="result-item" wx:for="{{newsList}}" wx:key="_id" bindtap="bindItemTap" data-type="news" data-id="{{item._id}}">
       <image wx:if="{{item.pic}}" class="result-pic" mode="aspectFill" src="{{item.pic}}" />
       <view class="result-body">
@@ -29,7 +29,7 @@
   </view>
 
   <view class="group" wx:if="{{teacherList.length > 0}}">
-    <view class="group-title">??</view>
+    <view class="group-title">老师</view>
     <view class="result-item" wx:for="{{teacherList}}" wx:key="_id" bindtap="bindItemTap" data-type="teacher" data-id="{{item._id}}">
       <image wx:if="{{item.pic}}" class="result-pic" mode="aspectFill" src="{{item.pic}}" />
       <view class="result-body">
@@ -39,5 +39,5 @@
     </view>
   </view>
 
-  <van-empty wx:if="{{meetList.length==0 && newsList.length==0 && teacherList.length==0}}" description="???????" />
+  <van-empty wx:if="{{meetList.length==0 && newsList.length==0 && teacherList.length==0}}" description="未找到相关内容" />
 </view>

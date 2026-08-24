@@ -3,13 +3,13 @@
     <view class="field field-picker">
       <text class="label">所属瑜伽馆</text>
       <picker mode="selector" range="{{tenantList}}" range-key="TENANT_NAME" value="{{tenantIndex}}" bindchange="bindTenantChange">
-        <view class="picker-val">{{tenantList[tenantIndex].TENANT_NAME || '请选择'}}</view>
+        <view class="picker-val" aria-role="button" aria-label="选择所属瑜伽馆，当前{{tenantList[tenantIndex].TENANT_NAME || '未选择'}}">{{tenantList[tenantIndex].TENANT_NAME || '请选择'}}</view>
       </picker>
     </view>
     <view class="field field-picker">
       <text class="label">角色</text>
       <picker mode="selector" range="{{roleOptions}}" range-key="label" value="{{roleIndex}}" bindchange="bindRoleChange">
-        <view class="picker-val">{{roleOptions[roleIndex].label}}</view>
+        <view class="picker-val" aria-role="button" aria-label="选择角色，当前{{roleOptions[roleIndex].label}}">{{roleOptions[roleIndex].label}}</view>
       </picker>
     </view>
     <view class="field">
@@ -26,5 +26,5 @@
     </view>
   </view>
   <view class="form-tip">创建后为待绑定空壳账号。馆主请在教练版「员工管理」中添加教练并发送绑定邀请；馆主账号由平台在新建管理员时创建。</view>
-  <button class="submit-btn" loading="{{submitting}}" disabled="{{submitting}}" bindtap="bindSubmit">创建管理员</button>
+  <button class="submit-btn" loading="{{submitting}}" disabled="{{submitting}}" bindtap="bindSubmit" aria-role="button" aria-label="创建管理员">创建管理员</button>
 </view>

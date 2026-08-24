@@ -296,6 +296,7 @@
 }
 
 .order-copy {
+  position: relative;
   flex-shrink: 0;
   margin-left: 8rpx;
   padding: 4rpx 16rpx;
@@ -303,6 +304,13 @@
   background: var(--projectColorLight, #e8f2ed);
   color: var(--themeColor, #5b8a72);
   font-size: 20rpx;
+}
+
+/* 银行卡号复制胶囊体积很小，扩大点击热区至约 88rpx */
+.order-copy::before {
+  content: "";
+  position: absolute;
+  inset: -24rpx;
 }
 
 /* 凭证：108rpx 缩略位 + 实底主行动按钮（该状态唯一 CTA） */
@@ -341,6 +349,7 @@
 }
 
 .order-proof-action {
+  position: relative;
   margin-left: auto;
   height: 64rpx;
   padding: 0 30rpx;
@@ -351,6 +360,13 @@
   color: #ffffff;
   font-size: 24rpx;
   font-weight: 500;
+}
+
+/* 64rpx 高度略低于建议热区，补足到约 88rpx */
+.order-proof-action::before {
+  content: "";
+  position: absolute;
+  inset: -12rpx;
 }
 
 .order-transfer-reference {
@@ -371,6 +387,7 @@
 }
 
 .order-btn {
+  position: relative;
   min-width: 176rpx;
   height: 64rpx;
   display: flex;
@@ -380,6 +397,13 @@
   font-size: 26rpx;
   padding: 0 32rpx;
   box-sizing: border-box;
+}
+
+/* 64rpx 高度略低于建议热区，补足到约 88rpx */
+.order-btn::before {
+  content: "";
+  position: absolute;
+  inset: -12rpx;
 }
 
 .order-btn--main {

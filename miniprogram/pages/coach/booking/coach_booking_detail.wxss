@@ -139,6 +139,7 @@
 }
 
 .bd-segment {
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
@@ -149,6 +150,12 @@
   font-size: 26rpx;
   color: #646a73;
   transition: all 0.25s ease;
+}
+
+.bd-segment::before {
+  content: "";
+  position: absolute;
+  inset: -12rpx 0;
 }
 
 .bd-segment.active {
@@ -309,7 +316,8 @@
   display: inline-flex;
   align-items: center;
   gap: 8rpx;
-  margin-top: 10rpx;
+  padding: 26rpx 0;
+  margin: -16rpx 0 -26rpx;
   font-size: 26rpx;
   color: #646a73;
 }
@@ -340,6 +348,7 @@
 }
 
 .bd-act {
+  position: relative;
   padding: 12rpx 28rpx;
   border-radius: 100rpx;
   font-size: 24rpx;
@@ -347,6 +356,12 @@
   color: #646a73;
   background: #f2f3f5;
   transition: opacity 0.2s ease;
+}
+
+.bd-act::before {
+  content: "";
+  position: absolute;
+  inset: -16rpx 0;
 }
 
 .bd-act:active {
@@ -546,27 +561,6 @@
 .bd-sheet-btns--book {
   padding: 24rpx 32rpx 0;
   box-sizing: border-box;
-}
-
-.bd-card-list {
-  width: 100%;
-  padding: 16rpx 32rpx 32rpx;
-  box-sizing: border-box;
-}
-
-.bd-card-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
-  font-size: 28rpx;
-  color: #1f2329;
-}
-
-.bd-card-item-sub {
-  font-size: 24rpx;
-  color: #969799;
 }
 
 /* [AI_END LINES=320 TIMESTAMP=2025-01-25 16:30:00] */

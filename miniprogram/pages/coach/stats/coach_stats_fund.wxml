@@ -15,6 +15,9 @@
       wx:key="key"
       data-tab="{{item.key}}"
       bindtap="bindMainTabTap"
+      aria-role="tab"
+      aria-selected="{{pageTab === item.key}}"
+      aria-label="{{item.label}}"
     >
       {{item.label}}
     </view>
@@ -29,6 +32,9 @@
         data-range="{{item.key}}"
         bindtap="bindRangeTap"
         style="{{range === item.key ? 'background:' + themeColor + ';border-color:' + themeColor + ';' : ''}}"
+        aria-role="tab"
+        aria-selected="{{range === item.key}}"
+        aria-label="{{item.label}}"
       >
         {{item.label}}
       </view>
@@ -59,7 +65,8 @@
     <view class="stats-section" wx:if="{{showTrend}}">
       <view class="stats-section-title">{{range === 'month' ? '本月耗卡趋势' : '近12月耗卡趋势'}}</view>
       <view class="income-trend-chart">
-        <canvas type="2d" id="incomeTrendCanvas" class="income-trend-canvas" />
+        <canvas type="2d" id="incomeTrendCanvas" class="income-trend-canvas" aria-hidden="true" />
+        <text class="income-trend-sr-only" aria-label="{{trendSummaryText}}">{{trendSummaryText}}</text>
       </view>
       <view class="income-trend-caption">
         <text wx:for="{{trend}}" wx:key="day">{{item.label}}</text>
@@ -155,9 +162,18 @@
             bind:click="url"
             data-type="copy"
             data-url="{{exportUrl}}"
+            aria-role="button"
+            aria-label="复制下载链接"
           >复制</van-button>
         </view>
-        <view class="export-link-box" bindtap="url" data-type="copy" data-url="{{exportUrl}}">
+        <view
+          class="export-link-box"
+          bindtap="url"
+          data-type="copy"
+          data-url="{{exportUrl}}"
+          aria-role="button"
+          aria-label="{{exportUrl ? '点击复制下载链接' : '尚未生成，点击下方按钮生成 Excel 文件'}}"
+        >
           <text class="export-link-text {{exportUrl ? '' : 'export-link-text--empty'}}">
             {{exportUrl || '尚未生成，点击下方按钮生成 Excel 文件'}}
           </text>

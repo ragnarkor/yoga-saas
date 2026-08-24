@@ -30,6 +30,7 @@
 }
 
 .member-add-btn {
+  position: relative;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -42,6 +43,12 @@
   font-size: 28rpx;
 }
 
+.member-add-btn::before {
+  content: "";
+  position: absolute;
+  inset: -8rpx;
+}
+
 .member-filters {
   display: flex;
   gap: 16rpx;
@@ -51,11 +58,18 @@
 }
 
 .member-filter-item {
+  position: relative;
   padding: 12rpx 28rpx;
   border-radius: 999rpx;
   font-size: 26rpx;
   color: var(--neutralTextSecondary, #646a73);
   background: var(--neutralIconBg, #f2f3f5);
+}
+
+.member-filter-item::before {
+  content: "";
+  position: absolute;
+  inset: -14rpx;
 }
 
 .member-filter-item.active {
@@ -117,6 +131,7 @@
 }
 
 .member-issue-btn {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4rpx;
@@ -126,6 +141,12 @@
   color: #fff;
   font-size: 26rpx;
   flex-shrink: 0;
+}
+
+.member-issue-btn::before {
+  content: "";
+  position: absolute;
+  inset: -14rpx;
 }
 
 .member-cards-btn {

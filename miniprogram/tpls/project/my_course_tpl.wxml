@@ -13,6 +13,9 @@
         wx:key="type"
         bindtap="bindFilterTap"
         data-type="{{item.type}}"
+        aria-role="tab"
+        aria-selected="{{activeFilter === item.type}}"
+        aria-label="{{item.label}}"
       >
         {{item.label}}
       </view>
@@ -28,6 +31,8 @@
           class="course-item"
           bindtap="bindItemTap"
           data-id="{{item._id}}"
+          aria-role="button"
+          aria-label="{{item.JOIN_MEET_TITLE}}"
         >
           <image
             class="course-cover"

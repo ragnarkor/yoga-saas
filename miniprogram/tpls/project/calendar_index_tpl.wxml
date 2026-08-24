@@ -13,17 +13,44 @@
 			<view class="page-header-content">
 				<view class="page-title text-cut">{{pageTitle}}</view>
 				<view class="page-subtitle">{{pageSubtitle}}</view>
+
+				<!-- 卡资产玻璃条 · 有可用卡：展示主卡摘要，点击进入我的卡包 -->
 				<view
-					wx:if="{{showPrivateEntry}}"
-					class="page-header-private"
-					hover-class="page-header-private--active"
-					bindtap="bindPrivateBookTap"
+					wx:if="{{cardAsset && cardAsset.has}}"
+					class="asset-bar"
+					hover-class="asset-bar--active"
+					bindtap="bindCardPackTap"
 				>
-					<view class="page-header-private-icon">
-						<van-icon name="clock-o" size="24rpx" color="rgba(255,255,255,0.95)" />
+					<view class="ab-stack">
+						<view wx:if="{{cardAsset.backShade}}" class="ab-chip ab-chip--back" style="{{cardAsset.backShade}}">
+							<image wx:if="{{cardAsset.backCover}}" class="ab-cover" src="{{cardAsset.backCover}}" mode="aspectFill" />
+						</view>
+						<view class="ab-chip ab-chip--front {{cardAsset.frontCover ? '' : 'ab-chip--bare'}}" style="{{cardAsset.frontShade}}">
+							<image wx:if="{{cardAsset.frontCover}}" class="ab-cover" src="{{cardAsset.frontCover}}" mode="aspectFill" />
+							<text class="ab-chip-type">{{cardAsset.typeLabel}}</text>
+						</view>
+						<view wx:if="{{cardAsset.count > 1}}" class="ab-count">{{cardAsset.count}}</view>
 					</view>
-					<text class="page-header-private-text">私教预约</text>
-					<van-icon name="arrow" size="20rpx" color="rgba(255,255,255,0.75)" custom-class="page-header-private-arrow" />
+					<view class="ab-body">
+						<view class="ab-name text-cut">{{cardAsset.name}}<text class="ab-type">{{cardAsset.typeLabel}}</text></view>
+						<view class="ab-sub" wx:if="{{cardAsset.type === 'times'}}">剩 <text class="ab-num">{{cardAsset.quota}}</text> 次{{cardAsset.endShort ? ' · 至 ' + cardAsset.endShort : ''}}</view>
+						<view class="ab-sub" wx:else>{{cardAsset.balanceText}}{{cardAsset.endShort ? ' · 至 ' + cardAsset.endShort : ''}}</view>
+					</view>
+					<view class="ab-more">我的卡包<text class="ab-more-arrow">›</text></view>
+				</view>
+
+				<!-- 卡资产玻璃条 · 无可用卡：引导购卡 -->
+				<view
+					wx:elif="{{cardAsset && !cardAsset.has}}"
+					class="asset-bar"
+					hover-class="asset-bar--active"
+					bindtap="bindGoCardShopTap"
+				>
+					<view class="ab-none">
+						<view class="ab-none-title">暂无可用会员卡</view>
+						<view class="ab-none-sub">购卡后即可预约课程</view>
+					</view>
+					<text class="ab-none-btn">去购卡</text>
 				</view>
 			</view>
 		</view>
@@ -35,6 +62,7 @@
 			scroll-x
 			enhanced
 			show-scrollbar="{{false}}"
+			aria-role="tablist"
 		>
 			<view class="category-tabs-inner">
 				<view
@@ -43,6 +71,9 @@
 					wx:key="id"
 					data-index="{{index}}"
 					bindtap="bindCategoryTap"
+					aria-role="tab"
+					aria-label="{{item.name}}"
+					aria-selected="{{activeTab === index}}"
 				>
 					<text class="category-tab-text">{{item.name}}</text>
 					<view class="category-tab-line" wx:if="{{activeTab === index}}"></view>
@@ -56,7 +87,10 @@
 				<view class="date-list">
 					<view class="date-item {{dateItem.day === selectedDate ? 'active' : ''}}"
 						wx:for="{{dateList}}" wx:key="day" wx:for-item="dateItem"
-						bindtap="bindDateSelect" data-day="{{dateItem.day}}">
+						bindtap="bindDateSelect" data-day="{{dateItem.day}}"
+						aria-role="button"
+						aria-label="{{dateItem.dateMonth}}{{dateItem.dateDay}}日 {{dateItem.weekday}}{{dateItem.hasCourse ? '，有课程' : ''}}"
+						aria-selected="{{dateItem.day === selectedDate}}">
 						<view class="date-weekday">{{dateItem.weekday}}</view>
 						<view class="date-day">{{dateItem.dateDay}}</view>
 						<view class="date-month">{{dateItem.dateMonth}}</view>
@@ -66,8 +100,36 @@
 			</scroll-view>
 		</view>
 
+		<!-- 私教 · 特殊课程卡（仅配置了私教课的场馆展示，随时可约，不受分类筛选影响） -->
+		<view class="course-list" wx:if="{{showPrivateEntry}}">
+			<view class="course-card course-card--private" hover-class="course-card--press" bindtap="bindPrivateBookTap">
+				<view class="card-time-section private-time-section">
+					<view class="pv-time-top">随时</view>
+					<view class="pv-time-sub">时间自选</view>
+				</view>
+				<view class="card-info-section">
+					<view class="course-name">私教课</view>
+					<view class="course-tags">
+						<text class="pv-badge">私教</text>
+						<text class="pv-tag">1v1</text>
+					</view>
+					<view class="course-coach">
+						<view class="coach-avatar-wrap">
+							<text class="coach-avatar-fallback">专</text>
+						</view>
+						<text class="coach-name">专属教练 · 一对一指导</text>
+					</view>
+				</view>
+				<view class="card-action-section">
+					<text class="pv-action-top">按次</text>
+					<text class="slots-label">划卡预约</text>
+					<view class="book-btn"><text>预约</text></view>
+				</view>
+			</view>
+		</view>
+
 		<!-- 课程列表 -->
-		<view class="course-list" wx:if="{{courseList && courseList.length > 0}}">
+		<view class="course-list {{showPrivateEntry ? 'course-list--joined' : ''}}" wx:if="{{courseList && courseList.length > 0}}">
 			<view class="course-card" wx:for="{{courseList}}" wx:key="cardKey"
 				bindtap="url" data-url="/pages/default/meet/detail/meet_detail?id={{item._id}}&day={{selectedDate}}&timeMark={{item.timeMark}}">
 
@@ -123,8 +185,8 @@
 			</view>
 		</view>
 
-		<!-- 空状态 -->
-		<view class="empty-state" wx:if="{{!courseList || courseList.length === 0}}">
+		<!-- 空状态：私教卡在上方时收紧排版，避免插画与私教卡脱节 -->
+		<view class="empty-state {{showPrivateEntry ? 'empty-state--compact' : ''}}" wx:if="{{!courseList || courseList.length === 0}}">
 			<view class="empty-illustration">
 				<image class="empty-image" src="{{emptyImage}}" mode="aspectFit" />
 			</view>

@@ -1,16 +1,5 @@
 <page-meta page-style="{{pageStyle}}" />
 <view class="card-pack-page theme-scope" style="{{pageStyle}}">
-  <view class="card-pack-toolbar">
-    <view class="card-pack-seg">
-      <view class="card-pack-seg-item {{!showInvalid ? 'is-active' : ''}}" bindtap="bindSegTap" data-invalid="false">
-        <text>有效卡</text>
-      </view>
-      <view class="card-pack-seg-item {{showInvalid ? 'is-active' : ''}}" bindtap="bindSegTap" data-invalid="true">
-        <text>失效卡</text>
-      </view>
-    </view>
-  </view>
-
   <view wx:if="{{loading}}" class="card-pack-loading">
     <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
   </view>
@@ -18,14 +7,19 @@
   <van-empty wx:elif="{{!cardList.length}}" description="{{showInvalid ? '暂无失效会员卡' : '暂无可用会员卡'}}" />
 
   <block wx:else>
-    <view class="card-pack-intro {{showInvalid ? 'is-invalid' : ''}}">
-      <view class="card-pack-intro-text">
-        <text class="card-pack-intro-title">{{listIntroTitle}}</text>
-        <text class="card-pack-intro-sub">{{listIntroSub}}</text>
-      </view>
-      <view class="card-pack-order-link" bindtap="bindOrderTap">
-        <text>购卡订单</text>
-        <text class="card-pack-order-arrow">›</text>
+    <view class="card-pack-intro">
+      <text class="card-pack-intro-count">{{listIntroSub}}</text>
+      <view class="card-pack-intro-links">
+        <view class="card-pack-status-chip {{showInvalid ? 'is-active' : ''}}" hover-class="card-pack-chip--press" bindtap="bindSegTap" data-invalid="{{!showInvalid}}" aria-role="button" aria-label="{{showInvalid ? '返回有效卡' : '查看失效卡'}}">
+          <van-icon wx:if="{{!showInvalid}}" name="clock-o" size="24rpx" />
+          <text wx:else class="chip-back">‹</text>
+          <text>{{showInvalid ? '返回有效卡' : '失效卡'}}</text>
+        </view>
+        <view class="card-pack-link-divider"></view>
+        <view class="card-pack-order-link" bindtap="bindOrderTap">
+          <text>购卡订单</text>
+          <text class="card-pack-order-arrow">›</text>
+        </view>
       </view>
     </view>
 
@@ -61,6 +55,23 @@
           </view>
         </view>
       </view>
+    </view>
+
+    <!-- 去约课反链：列表底部轻量行动条，分割线与卡区分隔；缩略图即主卡卡面（封面或品牌渐变） -->
+    <view class="card-pack-divider" wx:if="{{goBooking}}"></view>
+    <view class="go-booking" wx:if="{{goBooking}}" hover-class="go-booking--active" bindtap="bindGoBookingTap">
+      <view class="go-booking-ico" style="{{goBooking.shadeBg}}">
+        <image wx:if="{{goBooking.coverUrl}}" class="go-booking-cover" src="{{goBooking.coverUrl}}" mode="aspectFill" />
+        <text class="go-booking-ico-type">{{goBooking.typeLabel}}</text>
+      </view>
+      <view class="go-booking-body">
+        <text class="go-booking-label">{{goBooking.name}} · 这张卡能上</text>
+        <view class="go-booking-chips" wx:if="{{goBooking.chips.length}}">
+          <text class="go-booking-chip" wx:for="{{goBooking.chips}}" wx:key="index">{{item}}</text>
+        </view>
+        <text class="go-booking-fallback" wx:else>{{goBooking.scopeDesc}}</text>
+      </view>
+      <view class="go-booking-cta">去约课 ›</view>
     </view>
   </block>
 

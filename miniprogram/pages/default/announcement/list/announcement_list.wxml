@@ -28,6 +28,8 @@
       wx:key="_id"
       data-id="{{item._id}}"
       bindtap="bindItemTap"
+      aria-role="button"
+      aria-label="{{item.title}}{{item.isNew ? '，最新' : ''}}"
     >
       <view class="announce-list-item-icon">
         <van-icon name="volume-o" size="30rpx" color="{{themeColor}}" />

@@ -103,16 +103,4 @@ Page({
     });
   },
 
-  // 立即购买：快捷进入确认订单页（支付方式 / 备注在确认页选择）
-  buy(e) {
-    // van-button 的 e.currentTarget 指向组件内部，取不到自定义 data-id；
-    // 用 mark（会冒泡）兜底，避免 tplId 为空。
-    const id = (e.mark && e.mark.id) || e.currentTarget.dataset.id;
-    if (!id)
-      return wx.showToast({ title: "套餐信息缺失，请刷新", icon: "none" });
-    wx.navigateTo({
-      url: `/pages/default/my/card_order_confirm/card_order_confirm?id=${id}`,
-    });
-  },
-
 });

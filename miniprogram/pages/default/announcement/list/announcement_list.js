@@ -85,6 +85,7 @@ Page({
     } catch (err) {
       console.error(err);
       this.setData({ list: [], loading: false });
+      wx.showToast({ title: "加载失败，请重试", icon: "none" });
     }
   },
 
@@ -107,6 +108,7 @@ Page({
     } catch (err) {
       console.error(err);
       this.setData({ loadingMore: false });
+      wx.showToast({ title: "加载失败，请重试", icon: "none" });
     }
   },
 

@@ -5,7 +5,6 @@
     "cmpt-tenant-switch": "/cmpts/biz/tenant_switch/tenant_switch_cmpt",
     "van-loading": "@vant/weapp/loading/index",
     "van-empty": "/cmpts/public/empty/empty_cmpt",
-    "van-button": "@vant/weapp/button/index",
     "van-icon": "@vant/weapp/icon/index"
   }
 }

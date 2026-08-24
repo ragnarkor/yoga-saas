@@ -24,7 +24,6 @@
 .schedule-loading,
 .schedule-edit-loading,
 .store-loading,
-.platform-loading,
 .issue-loading {
   display: flex;
   flex-direction: column;
@@ -47,25 +46,6 @@
 
 .coach-home-body {
   padding: 24rpx 24rpx 0;
-}
-
-.coach-welcome {
-  padding: 8rpx 8rpx 20rpx;
-}
-
-.coach-welcome-title {
-  display: block;
-  font-size: 36rpx;
-  font-weight: 700;
-  color: var(--neutralText, #1f2329);
-  line-height: 1.35;
-}
-
-.coach-welcome-sub {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 26rpx;
-  color: var(--neutralTextTertiary, #8f959e);
 }
 
 .coach-stats-card {
@@ -180,22 +160,6 @@
   line-height: 1.35;
 }
 
-/* ==================== 兼容旧页头（客户/营销等） ==================== */
-.coach-header {
-  display: none;
-}
-
-.coach-header-title {
-  text-align: center;
-  font-size: 34rpx;
-  font-weight: 600;
-  color: #fff;
-}
-
-.coach-header-compact {
-  display: none;
-}
-
 .coach-notice {
   margin-bottom: 20rpx;
   background: var(--projectColorLight, #e3efe8);
@@ -220,71 +184,6 @@
   padding: 24rpx;
 }
 
-.coach-customer-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-}
-
-.coach-customer-card {
-  width: calc(33.33% - 11rpx);
-  box-sizing: border-box;
-  background: var(--neutralSurface, #fff);
-  border-radius: var(--radius-md, 16rpx);
-  padding: 24rpx 12rpx;
-  box-shadow: var(--projectShadowSm, 0 2rpx 12rpx rgba(91, 138, 114, 0.08));
-  transition: transform var(--transition-fast, 0.15s ease);
-}
-
-.coach-customer-card:active {
-  transform: scale(0.96);
-}
-
-.coach-customer-num {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: var(--themeColor, #5b8a72);
-  margin-top: 12rpx;
-}
-
-.coach-customer-label {
-  font-size: 22rpx;
-  color: var(--neutralTextTertiary, #8f959e);
-  margin-top: 8rpx;
-  line-height: 1.4;
-}
-
-/* ==================== 营销页 ==================== */
-.coach-revenue-card {
-  margin: 24rpx;
-  background: linear-gradient(
-    135deg,
-    var(--projectColorLight, #e3efe8) 0%,
-    var(--neutralSurface, #fff) 100%
-  );
-  border-radius: var(--radius-xl, 24rpx);
-  padding: 48rpx 24rpx;
-  text-align: center;
-  box-shadow: var(--projectShadow, 0 4rpx 20rpx rgba(91, 138, 114, 0.1));
-}
-
-.coach-revenue-sub {
-  font-size: 26rpx;
-  color: var(--neutralTextTertiary, #8f959e);
-}
-
-.coach-revenue-num {
-  font-size: 64rpx;
-  font-weight: 700;
-  color: var(--themeColor, #5b8a72);
-  margin: 16rpx 0;
-}
-
-.coach-revenue-link {
-  font-size: 28rpx;
-  color: var(--themeColor, #5b8a72);
-}
-
 /* ==================== 我的页 ==================== */
 .coach-profile-card {
   margin: 24rpx 24rpx 20rpx;
@@ -295,10 +194,6 @@
   align-items: center;
   gap: 24rpx;
   box-shadow: var(--projectShadowSm, 0 2rpx 12rpx rgba(91, 138, 114, 0.08));
-}
-
-.coach-profile-header {
-  display: none;
 }
 
 .coach-profile-avatar {
@@ -362,8 +257,4 @@
   margin-left: auto;
   color: var(--neutralTextTertiary, #c8c9cc);
   font-size: 28rpx;
-}
-
-.coach-theme-text {
-  color: var(--themeColor, #5b8a72);
 }

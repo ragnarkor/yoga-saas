@@ -23,7 +23,7 @@
 			<cmpt-img-upload isShowSize="{{true}}" title="介绍图片 (选填)" imgMax="8" imgList="{{formAboutPic}}" isCheck="{{false}}" bind:upload="bindUploadCmpt" data-item="formAboutPic" />
 		</view>
 		<view class="form-submit-wrap">
-			<van-button type="primary" block bind:click="bindFormSubmit">提交</van-button>
+			<van-button type="primary" block bind:click="bindFormSubmit" aria-role="button" aria-label="提交">提交</van-button>
 		</view>
 </view>
 <!-- [AI_END LINES=27 TIMESTAMP=2025-01-25 18:30:00] -->

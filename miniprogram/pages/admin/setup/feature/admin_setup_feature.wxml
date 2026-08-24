@@ -12,6 +12,9 @@
         checked="{{ features.booking }}"
         data-key="booking"
         bind:change="onFeatureChange"
+        custom-class="switch-touch"
+        aria-role="switch"
+        aria-label="预约功能"
       />
     </van-cell>
     <van-cell title="支付功能" center>
@@ -20,6 +23,9 @@
         checked="{{ features.payment }}"
         data-key="payment"
         bind:change="onFeatureChange"
+        custom-class="switch-touch"
+        aria-role="switch"
+        aria-label="支付功能"
       />
     </van-cell>
   </van-cell-group>
@@ -31,6 +37,9 @@
         checked="{{ features.teacherManage }}"
         data-key="teacherManage"
         bind:change="onFeatureChange"
+        custom-class="switch-touch"
+        aria-role="switch"
+        aria-label="教师管理"
       />
     </van-cell>
     <van-cell title="签到核销" center>
@@ -39,6 +48,9 @@
         checked="{{ features.checkin }}"
         data-key="checkin"
         bind:change="onFeatureChange"
+        custom-class="switch-touch"
+        aria-role="switch"
+        aria-label="签到核销"
       />
     </van-cell>
     <van-cell title="动态资讯" center>
@@ -47,6 +59,9 @@
         checked="{{ features.news }}"
         data-key="news"
         bind:change="onFeatureChange"
+        custom-class="switch-touch"
+        aria-role="switch"
+        aria-label="动态资讯"
       />
     </van-cell>
     <van-cell title="用户自助签到" center>
@@ -55,11 +70,14 @@
         checked="{{ features.selfCheckin }}"
         data-key="selfCheckin"
         bind:change="onFeatureChange"
+        custom-class="switch-touch"
+        aria-role="switch"
+        aria-label="用户自助签到"
       />
     </van-cell>
   </van-cell-group>
 
   <view class="form-submit-wrap">
-    <van-button type="primary" block bind:click="onSave">保存设置</van-button>
+    <van-button type="primary" block bind:click="onSave" aria-role="button" aria-label="保存设置">保存设置</van-button>
   </view>
 </view>

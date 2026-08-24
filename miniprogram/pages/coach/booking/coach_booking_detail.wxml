@@ -58,6 +58,9 @@
         class="bd-segment {{activeFilter === item.key ? 'active' : ''}}"
         data-key="{{item.key}}"
         bindtap="bindFilterTap"
+        aria-role="tab"
+        aria-label="{{item.label}}"
+        aria-selected="{{activeFilter === item.key}}"
       >
         {{item.label}}
         <text wx:if="{{item.key === 'pending' && counts.pending}}" class="bd-segment-num">{{counts.pending}}</text>
@@ -93,7 +96,7 @@
                 <text class="bd-name">{{member.name}}</text>
                 <text class="bd-status-chip bd-status-chip--{{member.groupKey}}">{{member.statusLabel}}</text>
               </view>
-              <view wx:if="{{member.mobile}}" class="bd-phone" data-phone="{{member.mobile}}" bindtap="bindPhoneTap">
+              <view wx:if="{{member.mobile}}" class="bd-phone" data-phone="{{member.mobile}}" bindtap="bindPhoneTap" aria-role="button" aria-label="拨打电话 {{member.mobile}}">
                 {{member.mobile}}
                 <van-icon name="phone-o" size="24rpx" color="{{themeColor}}" />
               </view>
@@ -238,7 +241,7 @@
       <text class="bd-sheet-title">代预约</text>
       <text class="bd-sheet-desc">{{session.title}} · {{session.day}} {{session.start}}–{{session.end}}</text>
       <view class="bd-book-fields">
-        <view class="bd-book-field" bindtap="bindPickMemberTap">
+        <view class="bd-book-field" bindtap="bindPickMemberTap" aria-role="button" aria-label="选择会员，当前{{bookUserName || '未选择'}}">
           <text class="bd-book-label">会员</text>
           <view class="bd-book-value-row">
             <text class="bd-book-value">{{bookUserName || '请选择会员'}}</text>

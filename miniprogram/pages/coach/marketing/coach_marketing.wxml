@@ -17,16 +17,16 @@
 
   <view class="marketing-body">
     <view wx:if="{{loading}}" class="marketing-loading"><van-loading size="44rpx" color="{{themeColor}}">加载中...</van-loading></view>
-    <view wx:else class="marketing-card-sale" bindtap="bindCardSaleTap">
+    <view wx:else class="marketing-card-sale" bindtap="bindCardSaleTap" aria-role="button" aria-label="会员购卡，{{purchaseEnabled ? '已开启' : '未开启'}}">
       <view class="marketing-card-sale-icon" style="background:{{themeColor}}18;"><van-icon name="coupon-o" size="48rpx" color="{{themeColor}}" /></view>
       <view class="marketing-card-sale-main">
-        <view class="marketing-card-sale-title-row"><text class="marketing-card-sale-title">会员购卡</text><text class="marketing-card-sale-state {{purchaseEnabled ? 'marketing-card-sale-state--on' : ''}}">{{purchaseEnabled ? '已开启' : '未开启'}}</text></view>
+        <view class="marketing-card-sale-title-row"><text class="marketing-card-sale-title">会员购卡</text><text class="marketing-card-sale-state {{purchaseEnabled ? 'marketing-card-sale-state--on' : ''}}" aria-role="text" aria-label="{{purchaseEnabled ? '已开启' : '未开启'}}" aria-selected="{{purchaseEnabled}}">{{purchaseEnabled ? '已开启' : '未开启'}}</text></view>
         <text class="marketing-card-sale-desc">{{purchaseEnabled ? '已有 ' + activeCount + ' 种套餐可提交购买申请' : '配置套餐与付款说明后，会员即可提交申请'}}</text>
       </view>
       <van-icon name="arrow" size="32rpx" color="#c8c9cc" />
     </view>
 
-    <view wx:if="{{!loading}}" class="marketing-card-sale marketing-card-order" bindtap="bindCardOrderTap">
+    <view wx:if="{{!loading}}" class="marketing-card-sale marketing-card-order" bindtap="bindCardOrderTap" aria-role="button" aria-label="购卡申请，查看会员购卡申请并确认发卡">
       <view class="marketing-card-sale-icon" style="background:{{themeColor}}18;"><van-icon name="orders-o" size="48rpx" color="{{themeColor}}" /></view>
       <view class="marketing-card-sale-main">
         <view class="marketing-card-sale-title-row"><text class="marketing-card-sale-title">购卡申请</text></view>

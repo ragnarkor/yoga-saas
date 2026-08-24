@@ -3,7 +3,7 @@
 
 		<!-- [AI_START TIMESTAMP=2025-01-25 18:40:00] -->
 		<view slot="searchEnd">
-			<van-button type="primary" size="small" icon="down" bind:click="url" data-url="../export/admin_user_export?condition={{dataList.condition}}" custom-class="margin-right-s">导出用户资料</van-button>
+			<van-button type="primary" size="small" icon="down" bind:click="url" data-url="../export/admin_user_export?condition={{dataList.condition}}" custom-class="margin-right-s btn-export-touch" aria-role="button" aria-label="导出用户资料">导出用户资料</van-button>
 		</view>
 		<!-- [AI_END LINES=4 TIMESTAMP=2025-01-25 18:40:00] -->
 
@@ -21,10 +21,10 @@
 				</view>
 
 				<view class="info">
-					<view class="info-item" bindtap="url" data-type="phone" data-url="{{item.USER_MOBILE}}">
+					<view class="info-item" bindtap="url" data-type="phone" data-url="{{item.USER_MOBILE}}" aria-role="button" aria-label="拨打电话">
 						<view class="title">手机</view>
 						<view class="mao">：</view>
-						<view class="content">{{item.USER_MOBILE||'未填写'}}  wx:if="{{item.USER_MOBILE}}"<van-icon name="phone-o" size="32rpx" custom-class="margin-left-s"  /></view>
+						<view class="content">{{item.USER_MOBILE||'未填写'}}<van-icon wx:if="{{item.USER_MOBILE}}" aria-role="img" aria-label="电话" name="phone-o" size="32rpx" custom-class="margin-left-s" /></view>
 					</view> 
 
 					<view class="info-item">
@@ -53,7 +53,7 @@
 
 					<view class="oprt">
 
-						<view bindtap="bindDelTap" data-id="{{item.USER_MINI_OPENID}}" class="btn  margin-right-s"><van-icon name="delete-o" size="32rpx" color="#ff976a" custom-class="margin-right-xxs text-orange"  />删除</view>
+						<view bindtap="bindDelTap" data-id="{{item.USER_MINI_OPENID}}" class="btn  margin-right-s" aria-role="button" aria-label="删除"><van-icon name="delete-o" size="32rpx" color="#ff976a" custom-class="margin-right-xxs text-orange"  />删除</view>
 
 					</view>
 				</view>

@@ -44,6 +44,7 @@
 }
 
 .income-range-tab {
+  position: relative;
   flex: 1;
   height: 76rpx;
   display: flex;
@@ -55,6 +56,12 @@
   border-radius: 14rpx;
   border: 2rpx solid transparent;
   box-sizing: border-box;
+}
+
+.income-range-tab::before {
+  content: "";
+  position: absolute;
+  inset: -6rpx;
 }
 
 .income-range-tab.is-active {
@@ -118,8 +125,19 @@
   line-height: 1.5;
 }
 
-.income-trend-chart { width: 100%; height: 360rpx; padding: 12rpx 0 0; box-sizing: border-box; }
+.income-trend-chart { width: 100%; height: 360rpx; padding: 12rpx 0 0; box-sizing: border-box; position: relative; }
 .income-trend-canvas { display: block; width: 100%; height: 100%; }
+.income-trend-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .income-trend-caption { display: flex; justify-content: space-between; padding: 0 12rpx; color: var(--neutralTextTertiary, #8f959e); font-size: 20rpx; }
 
 .income-list-row {

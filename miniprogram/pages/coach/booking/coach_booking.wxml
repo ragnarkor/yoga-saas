@@ -18,9 +18,9 @@
   </van-tabs>
 
   <view class="schedule-week-bar">
-    <view class="schedule-week-btn" bindtap="bindPrevWeek">◀ 上周</view>
+    <view class="schedule-week-btn" bindtap="bindPrevWeek" aria-role="button" aria-label="上一周">◀ 上周</view>
     <view class="schedule-week-range">{{weekLabel}}</view>
-    <view class="schedule-week-btn" bindtap="bindNextWeek">下周 ▶</view>
+    <view class="schedule-week-btn" bindtap="bindNextWeek" aria-role="button" aria-label="下一周">下周 ▶</view>
   </view>
 
   <view wx:if="{{loading}}" class="schedule-loading">
@@ -66,6 +66,8 @@
                   data-row="{{rowIdx}}"
                   data-col="{{dayIdx}}"
                   data-item-idx="{{index}}"
+                  aria-role="button"
+                  aria-label="{{(slot.isPrivate ? '私教 ' : '') + (slot.teacherName || '教练') + ' ' + slot.title}}"
                 >
                   <text wx:if="{{slot.isPrivate}}" class="schedule-card-tag">私教</text>
                   <text class="schedule-card-teacher">{{slot.teacherName || '教练'}}</text>
@@ -77,6 +79,8 @@
                   catchtap="bindOverflowTap"
                   data-row="{{rowIdx}}"
                   data-col="{{dayIdx}}"
+                  aria-role="button"
+                  aria-label="查看更多 {{cell.overflow}} 节课"
                 >+{{cell.overflow}}</view>
               </view>
             </block>
@@ -88,6 +92,8 @@
               data-row="{{rowIdx}}"
               data-col="{{dayIdx}}"
               data-item-idx="0"
+              aria-role="button"
+              aria-label="{{(cell.isPrivate ? '私教 ' : '') + (cell.teacherName || '教练') + ' ' + cell.title}}"
             >
               <text wx:if="{{cell.isPrivate}}" class="schedule-card-tag">私教</text>
               <text class="schedule-card-teacher">{{cell.teacherName || '教练'}}</text>

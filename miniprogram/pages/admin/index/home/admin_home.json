@@ -1,13 +1,9 @@
 {
 	"usingComponents": {
-		"cmpt-foot": "../../../../cmpts/biz/foot/foot_cmpt",
 		"cmpt-admin-login-panel": "/cmpts/biz/admin_login_panel/admin_login_panel_cmpt",
 		"van-loading": "@vant/weapp/loading/index",
 		"van-tag": "@vant/weapp/tag/index",
 		"van-icon": "@vant/weapp/icon/index",
-		"van-cell": "@vant/weapp/cell/index",
-		"van-cell-group": "@vant/weapp/cell-group/index",
-		"van-button": "@vant/weapp/button/index",
 		"van-popup": "@vant/weapp/popup/index"
 	},
 	"enablePullDownRefresh": true,

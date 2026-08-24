@@ -1,3 +1,11 @@
 @import "../../../../style/project/about_contact_base.wxss";
-@import "../../skin/skin.wxss"; 
-@import "../index/about_index.wxss"; 
+@import "../../skin/skin.wxss";
+@import "../index/about_index.wxss";
+
+/* 电话行触控区域偏小（约 45rpx），padding + 负 margin 撑到 ~88rpx 触控高度，不改变视觉间距。
+   选择器需匹配 about_index_base.wxss 中 .main .content .txt 的特异性，才能覆盖其 margin-bottom。 */
+.main .content .txt.txt-tap {
+	padding: 22rpx 0;
+	margin-top: -22rpx;
+	margin-bottom: 8rpx;
+}

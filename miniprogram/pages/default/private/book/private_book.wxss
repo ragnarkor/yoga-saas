@@ -45,29 +45,6 @@
   flex: 1;
 }
 
-.pb-label {
-  font-size: 28rpx;
-  color: #646566;
-  flex-shrink: 0;
-}
-
-.pb-value-row {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8rpx;
-  min-width: 0;
-}
-
-.pb-value {
-  font-size: 28rpx;
-  color: #323233;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .pb-section-title {
   padding: 24rpx 32rpx 12rpx;
   font-size: 28rpx;
@@ -124,7 +101,8 @@
   display: flex;
   align-items: center;
   gap: 10rpx;
-  padding: 0 32rpx 24rpx;
+  padding: 14rpx 32rpx 38rpx;
+  margin: -14rpx 0 -14rpx;
   color: var(--projectColor, #6fae96);
   font-size: 26rpx;
 }
@@ -164,6 +142,7 @@
 }
 
 .pb-day-schedule-row {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -171,6 +150,12 @@
   margin-bottom: 10rpx;
   border-radius: 12rpx;
   font-size: 26rpx;
+}
+
+.pb-day-schedule-row::before {
+  content: "";
+  position: absolute;
+  inset: -6rpx;
 }
 
 .pb-day-schedule-row--available {

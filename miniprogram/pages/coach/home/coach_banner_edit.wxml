@@ -7,9 +7,9 @@
       <view class="section-title">横幅内容</view>
       <van-field value="{{title}}" bind:input="bindTitleInput" label="标题" placeholder="请输入横幅标题" border="{{false}}" />
       <view class="image-label">横幅图片</view>
-      <view wx:if="{{img}}" class="banner-preview"><image src="{{img}}" mode="aspectFill" /><view class="image-delete" bindtap="bindDeleteImage"><van-icon name="cross" size="28rpx" color="#fff" /></view></view>
-      <view wx:else class="image-picker" bindtap="bindChooseImage"><van-icon name="photograph" size="54rpx" color="#b2c7ba" /><text>选择横幅图片</text><text class="image-tip">建议使用宽幅图片，会员端首页展示效果更好</text></view>
-      <view wx:if="{{img}}" class="replace-image" bindtap="bindChooseImage">更换图片</view>
+      <view wx:if="{{img}}" class="banner-preview"><image src="{{img}}" mode="aspectFill" /><view class="image-delete" bindtap="bindDeleteImage" aria-role="button" aria-label="删除图片"><van-icon name="cross" size="28rpx" color="#fff" /></view></view>
+      <view wx:else class="image-picker" bindtap="bindChooseImage" aria-role="button" aria-label="选择横幅图片"><van-icon name="photograph" size="54rpx" color="#b2c7ba" /><text>选择横幅图片</text><text class="image-tip">建议使用宽幅图片，会员端首页展示效果更好</text></view>
+      <view wx:if="{{img}}" class="replace-image" bindtap="bindChooseImage" aria-role="button" aria-label="更换图片">更换图片</view>
     </view>
     <van-button block round color="{{themeColor}}" loading="{{submitting}}" bind:click="bindSubmitTap" custom-class="banner-save">{{isEdit ? '保存修改' : '发布横幅'}}</van-button>
   </scroll-view>

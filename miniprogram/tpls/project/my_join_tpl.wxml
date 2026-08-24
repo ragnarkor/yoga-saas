@@ -12,7 +12,7 @@
 
 				<view class="item card-project shadow-project" wx:for="{{dataList.list}}" wx:key="index">
 					<view wx:if="{{item.isTimeout}}" class="status">已结束</view>
-					<view bindtap="url" data-url="../join_detail/my_join_detail?id={{item._id}}" wx:elif="{{item.JOIN_STATUS==1}}" class="qr"><van-icon name="qr" size="32rpx"  /></view>
+					<view bindtap="url" data-url="../join_detail/my_join_detail?id={{item._id}}" wx:elif="{{item.JOIN_STATUS==1}}" class="qr" aria-role="button" aria-label="查看预约详情与签到码"><van-icon name="qr" size="32rpx"  /></view>
 					<view class="title content-cut-two" bindtap="url" data-url="../join_detail/my_join_detail?id={{item._id}}">{{item.JOIN_MEET_TITLE}}</view>
 					<view class="author" bindtap="url" data-url="../join_detail/my_join_detail?id={{item._id}}">
 						<van-icon name="clock-o" size="26rpx" custom-class="margin-right-xs text-s"  /><text class="text-cut">{{item.JOIN_MEET_DAY}} {{item.JOIN_MEET_TIME_START}}～{{item.JOIN_MEET_TIME_END}}</text>
@@ -31,7 +31,7 @@
 
 					<view class="data data-button">
 						<van-button size="small" bindtap="url" data-url="../join_detail/my_join_detail?id={{item._id}}">查看详情</van-button>
-						<van-button wx:if="{{(item.JOIN_STATUS==1||item.JOIN_STATUS==0) && item.JOIN_IS_CHECKIN==0}}" size="small" plain type="danger" bindtap="bindCancelTap" data-id="{{item._id}}" custom-class="margin-left-s">取消</van-button>
+						<van-button wx:if="{{(item.JOIN_STATUS==1||item.JOIN_STATUS==0) && item.JOIN_IS_CHECKIN==0}}" size="small" plain type="danger" bindtap="bindCancelTap" data-id="{{item._id}}" custom-class="margin-left-s" aria-role="button" aria-label="取消该预约">取消</van-button>
 					</view>
 
 				</view>

@@ -27,6 +27,9 @@
           style="{{activeTab === index ? 'color:' + themeColor + ';border-color:' + themeColor : ''}}"
           data-index="{{index}}"
           bindtap="bindTabTap"
+          aria-role="tab"
+          aria-label="{{item.name}}"
+          aria-selected="{{activeTab === index}}"
         >
           <van-icon name="{{item.icon}}" size="28rpx" color="{{activeTab === index ? themeColor : '#969799'}}" />
           <text>{{item.name}}</text>
@@ -40,7 +43,7 @@
       <block wx:if="{{activeTab === 0}}">
         <van-empty wx:if="{{!banners.length}}" description="暂无横幅，会员端将显示默认封面" />
         <van-swipe-cell wx:for="{{banners}}" wx:key="_id" id="home-swipe-{{item._id}}" data-swipe-id="{{item._id}}" right-width="72" bind:open="bindSwipeOpen" custom-class="hc-swipe-cell">
-          <view class="hc-banner-card" data-type="banner" data-id="{{item._id}}" bindtap="bindEditTap">
+          <view class="hc-banner-card" data-type="banner" data-id="{{item._id}}" bindtap="bindEditTap" aria-role="button" aria-label="编辑横幅：{{item.BANNER_TITLE || '未命名横幅'}}">
             <image wx:if="{{item.BANNER_PIC}}" class="hc-banner-img" src="{{item.BANNER_PIC}}" mode="aspectFill" />
             <view wx:else class="hc-banner-img hc-banner-img--placeholder"><van-icon name="photo-o" size="48rpx" color="#c8c9cc" /></view>
             <view class="hc-banner-meta"><text class="hc-card-title">{{item.BANNER_TITLE || '未命名横幅'}}</text><text class="hc-card-desc">排序 {{item.BANNER_ORDER || 0}}</text></view>
@@ -52,7 +55,7 @@
       <block wx:else>
         <van-empty wx:if="{{!announces.length}}" description="暂无公告" />
         <van-swipe-cell wx:for="{{announces}}" wx:key="_id" id="home-swipe-{{item._id}}" data-swipe-id="{{item._id}}" right-width="72" bind:open="bindSwipeOpen" custom-class="hc-swipe-cell">
-          <view class="hc-list-card" data-type="announce" data-id="{{item._id}}" bindtap="bindEditTap">
+          <view class="hc-list-card" data-type="announce" data-id="{{item._id}}" bindtap="bindEditTap" aria-role="button" aria-label="编辑公告：{{item.ANNOUNCE_TITLE}}">
             <view class="hc-list-icon" style="background: {{themeColor}}18;"><van-icon name="volume-o" size="36rpx" color="{{themeColor}}" /></view>
             <view class="hc-list-body"><text class="hc-card-title">{{item.ANNOUNCE_TITLE}}</text><text class="hc-card-desc">{{item.ANNOUNCE_DESC || '无描述'}}</text></view>
             <van-icon name="arrow" size="28rpx" color="#c8c9cc" />
@@ -63,41 +66,5 @@
     </scroll-view>
   </block>
 
-  <van-popup wx:if="{{popupShow}}" show="{{popupShow}}" position="bottom" round bind:close="bindPopupClose" custom-class="hc-popup">
-    <view class="hc-popup-head">
-      <text class="hc-popup-title">{{popupTitle}}</text>
-      <view class="hc-popup-close" bindtap="bindPopupClose">
-        <van-icon name="cross" size="36rpx" color="#969799" />
-      </view>
-    </view>
-    <view class="hc-popup-form">
-      <van-field
-        value="{{form.title}}"
-        data-field="title"
-        bind:input="bindFormInput"
-        label="标题"
-        placeholder="请输入标题"
-        border="{{ false }}"
-      />
-      <view wx:if="{{popupType == 'banner'}}" class="hc-upload">
-        <text class="hc-upload-label">图片</text>
-        <view wx:if="{{imgList.length}}" class="hc-upload-preview">
-          <image src="{{imgList[0]}}" mode="aspectFill" class="hc-upload-img" />
-          <view class="hc-upload-del" catchtap="bindDelImg">
-            <van-icon name="cross" size="28rpx" color="#fff" />
-          </view>
-        </view>
-        <view wx:else class="hc-upload-placeholder" bindtap="bindChooseImg">
-          <van-icon name="photograph" size="48rpx" color="#c8c9cc" />
-          <text>选择图片</text>
-        </view>
-      </view>
-    </view>
-    <view class="hc-popup-foot">
-      <van-button block round color="{{themeColor}}" loading="{{submitting}}" bind:click="bindSubmitTap">
-        {{submitBtnText}}
-      </van-button>
-    </view>
-  </van-popup>
-  <view class="hc-fab" data-type="{{activeTab === 0 ? 'banner' : 'announce'}}" bindtap="bindAddTap"><van-icon name="plus" size="46rpx" color="#fff" /></view>
+  <view class="hc-fab" data-type="{{activeTab === 0 ? 'banner' : 'announce'}}" bindtap="bindAddTap" aria-role="button" aria-label="新增"><van-icon name="plus" size="46rpx" color="#fff" /></view>
 </view>

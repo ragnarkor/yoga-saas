@@ -90,6 +90,7 @@ Page({
       pageHelper.showSuccToast("保存成功");
     } catch (err) {
       console.error(err);
+      pageHelper.showErrToast("保存失败");
     }
   },
 });

@@ -1,6 +1,7 @@
 .shop {
   min-height: 100vh;
   background: var(--projectBgSoft, #fafbf9);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .shop-loading {
@@ -71,6 +72,7 @@
 }
 
 .view-toggle-btn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,6 +82,13 @@
   background: #fff;
   box-shadow: 0 4rpx 14rpx rgba(43, 63, 52, 0.08);
   transition: background-color 0.2s ease;
+}
+
+/* 扩大点击热区至约 88rpx，避免图标按钮视觉不变但难点中 */
+.view-toggle-btn::before {
+  content: "";
+  position: absolute;
+  inset: -12rpx;
 }
 
 .view-toggle-btn.is-active {
@@ -266,9 +275,4 @@
 
 .shop-list--grid .shop-price-origin {
   font-size: 20rpx;
-}
-
-/* 页面底部安全留白 */
-.shop {
-  padding-bottom: env(safe-area-inset-bottom);
 }

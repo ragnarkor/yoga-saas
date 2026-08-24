@@ -50,13 +50,11 @@ Page({
 
   data: {
     loading: true,
-    slotsLoading: false,
     submitting: false,
     themeColor: themeHelper.DEFAULT_THEME,
     courses: [],
     teachers: [],
     dateList: [],
-    slots: [],
     joinCardOptions: [],
     cardSheetShow: false,
     cardPickLoading: false,
@@ -83,7 +81,6 @@ Page({
     dayScheduleError: '',
     dayQuickSlots: [],
     customTimeHint: '',
-    timeAvailable: false,
   },
 
   onLoad(options) {
@@ -169,7 +166,6 @@ Page({
       }, () => {
         this._syncCardNeedTimes(course);
         this._loadCardSummary();
-        this._loadSlots();
       });
     } catch (e) {
       console.error(e);
@@ -221,38 +217,6 @@ Page({
     this.setData({ submitBtnText });
   },
 
-  async _loadSlots() {
-    const { form } = this.data;
-    if (!form.meetId || !form.teacherId || !form.day) {
-      this.setData({ slots: [], 'form.start': '', 'form.end': '', timeAvailable: false });
-      return;
-    }
-
-    this.setData({ slotsLoading: true, slots: [], 'form.start': '', 'form.end': '', timeAvailable: false });
-    try {
-      const res = await cloudHelper.callCloudData(
-        'private/available_slots',
-        {
-          meetId: form.meetId,
-          teacherId: form.teacherId,
-          day: form.day,
-        },
-        { hint: false },
-      );
-      this.setData({
-        slotsLoading: false,
-        slots: ((res && res.slots) || []).filter((item) => {
-          const minute = Number(String(item.start || '').split(':')[1]);
-          return minute % 30 === 0;
-        }),
-        'form.duration': (res && res.duration) || form.duration,
-      }, () => this._updateSubmitBtnText());
-    } catch (e) {
-      console.error(e);
-      this.setData({ slotsLoading: false, slots: [] });
-    }
-  },
-
   onCoursePick(e) {
     const course = (e.detail && e.detail.meet) || (e.detail && e.detail.course);
     if (!course) return;
@@ -262,7 +226,6 @@ Page({
       'form.duration': course.duration || 60,
       'form.start': '',
       'form.end': '',
-      timeAvailable: false,
     };
     if (course.teacherId && !this.data.form.teacherId) {
       patch['form.teacherId'] = course.teacherId;
@@ -271,7 +234,6 @@ Page({
     this.setData(patch, () => {
       this._syncCardNeedTimes(course);
       this._loadCardSummary();
-      this._loadSlots();
     });
   },
 
@@ -282,8 +244,7 @@ Page({
       'form.teacherName': teacherName || '',
       'form.start': '',
       'form.end': '',
-      timeAvailable: false,
-    }, () => this._loadSlots());
+    });
   },
 
   onPickerSheetChange(e) {
@@ -298,8 +259,7 @@ Page({
       'form.dayDisplay': privateScheduleHelper.buildDayDesc(day),
       'form.start': '',
       'form.end': '',
-      timeAvailable: false,
-    }, () => this._loadSlots());
+    });
   },
 
   async bindViewScheduleTap() {
@@ -334,18 +294,7 @@ Page({
       'form.start': start,
       'form.end': end,
       customTimeHint: '已选择快速时段',
-      timeAvailable: true,
       dayScheduleShow: false,
-    }, () => this._updateSubmitBtnText());
-  },
-
-  bindSlotTap(e) {
-    const { start, end } = e.currentTarget.dataset;
-    if (!start) return;
-    this.setData({
-      'form.start': start,
-      'form.end': end || '',
-      timeAvailable: !!end,
     }, () => this._updateSubmitBtnText());
   },
 
@@ -353,7 +302,7 @@ Page({
     const start = e.detail && e.detail.value;
     if (!start) return;
     const { form } = this.data;
-    this.setData({ 'form.start': start, 'form.end': '', timeAvailable: false, customTimeHint: '正在检查时间...' });
+    this.setData({ 'form.start': start, 'form.end': '', customTimeHint: '正在检查时间...' });
     try {
       const res = await cloudHelper.callCloudData(
         'private/available_slots',
@@ -362,20 +311,20 @@ Page({
       );
       const slot = res && res.customSlot;
       if (slot) {
-        this.setData({ 'form.end': slot.end, timeAvailable: true, customTimeHint: '时间可用' }, () => this._updateSubmitBtnText());
+        this.setData({ 'form.end': slot.end, customTimeHint: '时间可用' }, () => this._updateSubmitBtnText());
       } else {
-        this.setData({ 'form.end': '', timeAvailable: false, customTimeHint: '该时间不可用，请换一个时间' }, () => this._updateSubmitBtnText());
+        this.setData({ 'form.end': '', customTimeHint: '该时间不可用，请换一个时间' }, () => this._updateSubmitBtnText());
       }
     } catch (err) {
       console.error('[private/custom-time]', err);
-      this.setData({ 'form.end': '', timeAvailable: false, customTimeHint: '时间检查失败，请重试' }, () => this._updateSubmitBtnText());
+      this.setData({ 'form.end': '', customTimeHint: '时间检查失败，请重试' }, () => this._updateSubmitBtnText());
     }
   },
 
   async bindSubmitTap() {
     if (this.data.submitting) return;
     const { form, cardCanBook, cardNeedTimes } = this.data;
-    if (!form.meetId || !form.teacherId || !form.day || !form.start || !form.end || !this.data.timeAvailable) {
+    if (!form.meetId || !form.teacherId || !form.day || !form.start || !form.end) {
       wx.showToast({ title: '请选择课程、教练和时段', icon: 'none' });
       return;
     }

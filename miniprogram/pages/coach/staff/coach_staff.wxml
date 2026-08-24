@@ -25,6 +25,8 @@
         wx:if="{{canManage}}"
         class="member-add-btn"
         bindtap="bindAddOpenTap"
+        aria-role="button"
+        aria-label="新增员工"
       >
         <van-icon name="plus" size="28rpx" color="#fff" />
         <text>新增</text>
@@ -38,6 +40,9 @@
         class="member-filter-item {{activeFilter === item.key ? 'active' : ''}}"
         data-key="{{item.key}}"
         bindtap="bindFilterTap"
+        aria-role="tab"
+        aria-label="{{item.label}}"
+        aria-selected="{{activeFilter === item.key}}"
       >{{item.label}}</view>
     </view>
   </block>
@@ -66,6 +71,8 @@
         class="member-issue-btn"
         data-index="{{index}}"
         bindtap="bindActionTap"
+        aria-role="button"
+        aria-label="{{(item.name || '未命名') + ' 管理'}}"
       >
         <text>管理</text>
         <van-icon name="arrow" size="24rpx" color="#fff" />

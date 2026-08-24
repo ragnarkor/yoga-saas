@@ -4,13 +4,16 @@
 	<cmpt-tenant-switch title="购卡订单" theme-color="{{themeColor}}" show-back="{{true}}" />
 
 	<!-- 状态筛选 -->
-	<view class="order-tabs">
+	<view class="order-tabs" aria-role="tablist">
 		<view
 			wx:for="{{tabs}}"
 			wx:key="key"
 			class="order-tab {{activeTab === item.key ? 'is-active' : ''}}"
 			data-key="{{item.key}}"
 			bindtap="bindTabTap"
+			aria-role="tab"
+			aria-selected="{{activeTab === item.key}}"
+			aria-label="{{item.name}}"
 		>
 			{{item.name}}
 			<view wx:if="{{activeTab === item.key}}" class="order-tab-bar"></view>

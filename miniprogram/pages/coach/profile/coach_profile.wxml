@@ -23,7 +23,7 @@
             <view wx:else class="avatar-placeholder">
               <van-icon name="user-o" size="48rpx" color="{{themeColor}}" />
             </view>
-            <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="bindChooseAvatar"></button>
+            <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="bindChooseAvatar" aria-label="选择头像"></button>
           </view>
           <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
         </view>

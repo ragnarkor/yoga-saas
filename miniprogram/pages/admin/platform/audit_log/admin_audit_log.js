@@ -21,10 +21,6 @@ Page({
     this.setData(this._getSearchMenu());
   },
 
-  url: async function (e) {
-    pageHelper.url(e, this);
-  },
-
   bindCommListCmpt: function (e) {
     pageHelper.commListListener(this, e);
   },

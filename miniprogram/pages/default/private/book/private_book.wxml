@@ -37,13 +37,16 @@
     <view class="pb-section">
       <view class="pb-section-title">选择日期</view>
       <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="pb-date-scroll">
-        <view class="pb-date-list">
+        <view class="pb-date-list" aria-role="tablist">
           <view
             class="pb-date-item {{form.day === item.day ? 'is-active' : ''}}"
             wx:for="{{dateList}}"
             wx:key="day"
             data-day="{{item.day}}"
             bindtap="bindDayTap"
+            aria-role="button"
+            aria-selected="{{form.day === item.day}}"
+            aria-label="{{item.shortLabel}} {{item.weekday}}"
           >
             <text class="pb-date-week">{{item.weekday}}</text>
             <text class="pb-date-day">{{item.shortLabel}}</text>
@@ -51,7 +54,7 @@
         </view>
       </scroll-view>
       <view class="pb-hint">{{scheduleHint}}</view>
-      <view class="pb-schedule-link" bindtap="bindViewScheduleTap">
+      <view class="pb-schedule-link" bindtap="bindViewScheduleTap" aria-role="button" aria-label="查看{{form.teacherName || '教练'}}当天排班">
         <van-icon name="calendar-o" size="30rpx" color="{{themeColor}}" />
         <text>查看{{form.teacherName || '教练'}}当天排班</text>
         <van-icon name="arrow" size="26rpx" color="#c8c9cc" />

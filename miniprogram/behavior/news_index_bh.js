@@ -35,6 +35,9 @@ module.exports = Behavior({
       }
 
       if (setting.IS_SUB) wx.hideHomeButton();
+
+      let { sortItems, sortMenus } = await NewsBiz.getSearchMenu();
+      this.setData({ sortItems, sortMenus });
     },
 
     /**

@@ -28,7 +28,7 @@
 		</view>
 
 		<view class="form-submit-wrap">
-			<van-button type="primary" block bind:click="bindFormSubmit">提交</van-button>
+			<van-button type="primary" block bind:click="bindFormSubmit" aria-role="button" aria-label="提交">提交</van-button>
 		</view>
 
 </view>

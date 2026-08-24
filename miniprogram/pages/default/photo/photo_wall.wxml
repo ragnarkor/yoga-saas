@@ -27,6 +27,8 @@
         data-index="{{index}}"
         bindtap="bindAlbumTap"
         hover-class="photo-wall-album-card--active"
+        aria-role="button"
+        aria-label="{{item.title}}相册，{{item.count}}张"
       >
         <view class="photo-wall-album-thumbs photo-wall-album-thumbs--{{item.thumbCount || 1}}">
           <block wx:if="{{item.thumbs.length}}">
@@ -60,6 +62,8 @@
         wx:key="_id"
         data-index="{{index}}"
         bindtap="bindPhotoTap"
+        aria-role="button"
+        aria-label="查看大图"
       >
         <image class="photo-wall-img" mode="aspectFill" src="{{item.pic}}" />
       </view>

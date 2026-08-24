@@ -6,7 +6,6 @@ module.exports = Behavior({
   data: {
     id: "",
     loading: true,
-    activeTab: 0,
     showCardBack: false,
     card: null,
     usageList: [],
@@ -57,11 +56,6 @@ module.exports = Behavior({
         console.error(err);
         this.setData({ loading: false, card: null });
       }
-    },
-
-    bindTabTap(e) {
-      const tab = Number(pageHelper.dataset(e, "tab"));
-      this.setData({ activeTab: tab });
     },
 
     bindToggleCardFace() {

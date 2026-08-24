@@ -173,26 +173,6 @@
   right: 12rpx;
 }
 
-.card-style-color-divider {
-  padding: 8rpx 32rpx 16rpx;
-  border-top: 1rpx solid #ebedf0;
-  margin-top: 8rpx;
-}
-
-.card-style-color-title {
-  display: block;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #323233;
-}
-
-.card-style-color-sub {
-  display: block;
-  margin-top: 6rpx;
-  font-size: 22rpx;
-  color: #969799;
-}
-
 /* 弹窗滚动区：标题与底部按钮固定，中间内容独立滚动 */
 .card-style-sheet-scroll {
   flex: 1;

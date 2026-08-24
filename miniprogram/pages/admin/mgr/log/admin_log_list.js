@@ -48,10 +48,6 @@ Page({
    */
   onUnload: function () {},
 
-  url: async function (e) {
-    pageHelper.url(e, this);
-  },
-
   bindCommListCmpt: function (e) {
     pageHelper.commListListener(this, e);
   },

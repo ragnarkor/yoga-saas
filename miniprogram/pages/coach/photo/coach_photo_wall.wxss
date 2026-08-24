@@ -301,7 +301,8 @@
 }
 
 .cpw-popup-close {
-  padding: 8rpx;
+  padding: 26rpx;
+  margin: -18rpx;
 }
 
 .cpw-popup-form {
@@ -355,6 +356,7 @@
   align-items: center;
   justify-content: center;
 }
+.cpw-upload-del::before { content: ""; position: absolute; inset: -24rpx; }
 
 .cpw-upload-placeholder {
   display: flex;

@@ -22,6 +22,8 @@
         class="teacher-private-entry"
         hover-class="teacher-private-entry--active"
         bindtap="bindPrivateBookTap"
+        aria-role="button"
+        aria-label="预约私教"
       >
         <view class="teacher-private-entry-left">
           <view class="teacher-private-entry-icon">
@@ -46,13 +48,16 @@
       enhanced
       show-scrollbar="{{false}}"
     >
-      <view class="category-tabs-inner">
+      <view class="category-tabs-inner" aria-role="tablist">
         <view
           class="category-tab {{activeTab === index ? 'active' : ''}}"
           wx:for="{{categories}}"
           wx:key="id"
           data-index="{{index}}"
           bindtap="bindCategoryTap"
+          aria-role="tab"
+          aria-selected="{{activeTab === index}}"
+          aria-label="{{item.name}}"
         >
           <text class="category-tab-text">{{item.name}}</text>
           <view class="category-tab-line" wx:if="{{activeTab === index}}"></view>
@@ -90,6 +95,8 @@
               data-day="{{item.day}}"
               data-mark="{{item.timeMark}}"
               data-status="{{item.status}}"
+              aria-role="button"
+              aria-label="{{item.status === 'full' ? '已满，不可预约' : '预约该课程'}}"
             >{{item.status === 'full' ? '已满' : '预约'}}</view>
           </view>
         </view>
@@ -111,6 +118,8 @@
           src="{{item}}"
           bindtap="bindPreviewPic"
           data-url="{{item}}"
+          aria-role="button"
+          aria-label="查看大图"
         />
       </view>
     </view>

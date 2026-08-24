@@ -33,7 +33,7 @@
 			</view>
 			<view class="jd-card-checkin" wx:if="{{join.JOIN_STATUS==1}}">
 				<view class="jd-checkin-panel" wx:if="{{join.JOIN_IS_CHECKIN!=1}}">
-					<view class="jd-checkin-circle jd-checkin-circle--{{checkinState}}" bindtap="bindLocationCheckinTap">
+					<view class="jd-checkin-circle jd-checkin-circle--{{checkinState}}" bindtap="bindLocationCheckinTap" aria-role="button" aria-label="{{checkinCountdownText || '到店签到'}}">
 						<van-icon name="location" size="54rpx" color="{{checkinState=='ready' ? '#ffffff' : '#9aa3b2'}}" />
 						<text class="jd-checkin-circle-title">{{checkinCountdownText}}</text>
 						<text class="jd-checkin-circle-sub">{{checkinState=='before' ? '到签到时间自动开启' : (checkinState=='ended' ? '请联系前台处理' : '需在场馆附近')}}</text>
@@ -45,8 +45,8 @@
 
 		<!-- 预约操作 -->
 		<view class="jd-actions" wx:if="{{join.JOIN_STATUS==0 || join.JOIN_STATUS==1}}">
-			<view class="jd-btn jd-btn--ghost" wx:if="{{join.JOIN_IS_CHECKIN==0}}" bindtap="bindCancelTap">取消预约</view>
-			<view class="jd-btn jd-btn--primary" bindtap="bindCalendarTap">加入手机日程</view>
+			<view class="jd-btn jd-btn--ghost" wx:if="{{join.JOIN_IS_CHECKIN==0}}" bindtap="bindCancelTap" aria-role="button" aria-label="取消该预约">取消预约</view>
+			<view class="jd-btn jd-btn--primary" bindtap="bindCalendarTap" aria-role="button" aria-label="将本次课程加入手机日程">加入手机日程</view>
 		</view>
 	</view>
 </template>

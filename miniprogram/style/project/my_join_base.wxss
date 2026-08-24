@@ -40,6 +40,12 @@
   font-size: 40rpx;
 }
 
+.text-pic-list-box .item .qr::before {
+  content: "";
+  position: absolute;
+  inset: -24rpx;
+}
+
 .text-pic-list-box .item .author {
   font-size: 28rpx;
   color: #999;

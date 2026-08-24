@@ -13,3 +13,13 @@
 .form-submit-wrap {
   padding: 30rpx;
 }
+
+.switch-touch {
+  position: relative;
+}
+
+.switch-touch::before {
+  content: "";
+  position: absolute;
+  inset: -14rpx;
+}

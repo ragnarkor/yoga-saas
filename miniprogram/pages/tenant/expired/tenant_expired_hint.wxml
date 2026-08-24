@@ -1,50 +1,54 @@
-<page-meta page-style="{{pageStyle}}" />
-<view class="expired-hint theme-scope" style="{{pageStyle}}">
-  <cmpt-tenant-switch
-    wx:if="{{role === 'member'}}"
-    title="服务提示"
-    theme-color="{{themeColor}}"
-    show-switch="{{false}}"
-  />
-  <coach-tenant-switch
-    wx:else
-    title="服务提示"
-    theme-color="{{themeColor}}"
-    show-switch="{{false}}"
-  />
-  <view class="expired-card">
-    <view class="expired-icon" style="background: {{themeColorSoft}};">
-      <van-icon name="clock-o" size="72rpx" color="{{themeColor}}" />
-    </view>
-    <view class="expired-title">瑜伽馆服务已到期</view>
-    <view class="expired-name" wx:if="{{tenantName}}">「{{tenantName}}」</view>
-    <view class="expired-desc">
-      当前暂无可用的其他瑜伽馆。如需继续使用，请联系馆主或平台管理员续期服务。
-    </view>
-    <view class="expired-steps" style="background: {{themeColorSoft}};">
-      <view class="expired-step">1. 联系馆主或平台方确认续期</view>
-      <view class="expired-step">2. 续期完成后重新打开小程序</view>
-      <view class="expired-step" wx:if="{{role === 'coach'}}">3. 馆主也可从平台管理后台续期</view>
-      <view class="expired-step" wx:else>3. 若有其他场馆开放，将出现在选馆列表</view>
-    </view>
-  </view>
-
-  <view class="expired-actions">
-    <button
-      class="expired-btn expired-btn--ghost"
-      style="color: {{themeColor}}; border-color: {{themeColor}}33;"
-      bindtap="bindReselectTap"
-    >
-      重新查看可选场馆
-    </button>
-    <button
-      wx:if="{{role === 'coach'}}"
-      class="expired-btn expired-btn--primary"
-      style="background: {{themeColor}};"
-      bindtap="bindCoachAdminTap"
-    >
-      前往平台管理
-    </button>
-  </view>
-</view>
+<page-meta page-style="{{pageStyle}}" />
+<view class="expired-hint theme-scope" style="{{pageStyle}}">
+  <cmpt-tenant-switch
+    wx:if="{{role === 'member'}}"
+    title="服务提示"
+    theme-color="{{themeColor}}"
+    show-switch="{{false}}"
+  />
+  <coach-tenant-switch
+    wx:else
+    title="服务提示"
+    theme-color="{{themeColor}}"
+    show-switch="{{false}}"
+  />
+  <view class="expired-card">
+    <view class="expired-icon" style="background: {{themeColorSoft}};">
+      <van-icon name="clock-o" size="72rpx" color="{{themeColor}}" />
+    </view>
+    <view class="expired-title">瑜伽馆服务已到期</view>
+    <view class="expired-name" wx:if="{{tenantName}}">「{{tenantName}}」</view>
+    <view class="expired-desc">
+      当前暂无可用的其他瑜伽馆。如需继续使用，请通过您日常联系馆主的渠道（微信/电话等）确认续期，本页面暂无法直接联系到馆主或平台管理员。
+    </view>
+    <view class="expired-steps" style="background: {{themeColorSoft}};">
+      <view class="expired-step">1. 请通过您与馆主/平台方原有的联系方式确认续期</view>
+      <view class="expired-step">2. 续期完成后重新打开小程序</view>
+      <view class="expired-step" wx:if="{{role === 'coach'}}">3. 馆主也可从平台管理后台续期</view>
+      <view class="expired-step" wx:else>3. 若有其他场馆开放，将出现在选馆列表</view>
+    </view>
+  </view>
+
+  <view class="expired-actions">
+    <button
+      class="expired-btn expired-btn--ghost"
+      style="color: {{themeColor}}; border-color: {{themeColor}}33;"
+      bindtap="bindReselectTap"
+      aria-role="button"
+      aria-label="重新查看可选场馆"
+    >
+      重新查看可选场馆
+    </button>
+    <button
+      wx:if="{{role === 'coach'}}"
+      class="expired-btn expired-btn--primary"
+      style="background: {{themeColor}};"
+      bindtap="bindCoachAdminTap"
+      aria-role="button"
+      aria-label="前往平台管理"
+    >
+      前往平台管理
+    </button>
+  </view>
+</view>
 

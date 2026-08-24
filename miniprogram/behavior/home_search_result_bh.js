@@ -42,6 +42,7 @@ module.exports = Behavior({
         this.setData({ meetList, newsList, teacherList, isLoad: true });
       } catch (err) {
         console.error(err);
+        wx.showToast({ title: '搜索失败，请重试', icon: 'none' });
         this.setData({ meetList: [], newsList: [], teacherList: [], isLoad: true });
       }
     },
@@ -54,10 +55,6 @@ module.exports = Behavior({
       else if (type === 'news') url = '/pages/default/news/detail/news_detail?id=' + id;
       else if (type === 'teacher') url = '/pages/default/teacher/detail/teacher_detail?id=' + id;
       if (url) wx.navigateTo({ url: pageHelper.fmtURLByPID(url) });
-    },
-
-    url: function (e) {
-      pageHelper.url(e, this);
     },
   },
 });

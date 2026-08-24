@@ -1,1 +1,4 @@
-<web-view wx:if="{{url}}" src="{{url}}"></web-view>
+<web-view wx:if="{{url}}" src="{{url}}" aria-label="外部网页内容"></web-view>
+<view wx:else class="web-article-empty" aria-role="text" aria-label="链接无效或已失效">
+  <van-empty description="链接无效或已失效" />
+</view>

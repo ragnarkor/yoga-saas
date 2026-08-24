@@ -80,6 +80,7 @@
         </text>
         <van-button
           wx:if="{{url}}"
+          custom-class="export-copy-btn"
           type="primary"
           size="small"
           plain
@@ -87,9 +88,18 @@
           bind:click="url"
           data-type="copy"
           data-url="{{url}}"
+          aria-role="button"
+          aria-label="复制下载链接"
         >复制</van-button>
       </view>
-      <view class="export-link-box" bindtap="url" data-type="copy" data-url="{{url}}">
+      <view
+        class="export-link-box"
+        bindtap="url"
+        data-type="copy"
+        data-url="{{url}}"
+        aria-role="button"
+        aria-label="{{url ? '点击复制下载链接' : '尚未生成，点击下方按钮生成 Excel 文件'}}"
+      >
         <text class="export-link-text {{url ? '' : 'export-link-text--empty'}}">
           {{url || '尚未生成，点击下方按钮生成 Excel 文件'}}
         </text>

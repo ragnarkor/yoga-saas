@@ -36,6 +36,7 @@ Page({
     trend: [],
     trendUnit: 'day',
     showTrend: false,
+    trendSummaryText: '',
     list: [],
     page: 1,
     hasMore: true,
@@ -217,6 +218,11 @@ Page({
       );
       const items = (res && res.list) || [];
       const trend = (res && res.trend) || [];
+      const showTrend = this.data.range !== 'today' && trend.length > 0;
+      const rangeLabel = this.data.range === 'month' ? '本月' : this.data.range === 'today' ? '今日' : '近12月';
+      const trendSummaryText = showTrend
+        ? rangeLabel + '耗卡趋势：从' + (trend[0].amount || 0) + '元变化到' + (trend[trend.length - 1].amount || 0) + '元'
+        : '';
       this.setData({
         totalAmountText: (res && res.totalAmountText) || '0',
         timesAmountText: (res && res.timesAmountText) || '0',
@@ -227,7 +233,8 @@ Page({
         salePeriodAmountText: (res && res.salePeriodAmountText) || '0',
         trend,
         trendUnit: (res && res.trendUnit) || 'day',
-        showTrend: this.data.range !== 'today' && trend.length > 0,
+        showTrend,
+        trendSummaryText,
         list: refresh ? items : this.data.list.concat(items),
         page,
         hasMore: items.length >= 20,

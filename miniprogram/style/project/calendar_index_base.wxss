@@ -54,50 +54,192 @@ page {
   letter-spacing: 1rpx;
 }
 
-.page-header-private {
-  position: relative;
-  display: inline-flex;
+/* —— 卡资产玻璃条（融入绿色头部，非悬浮白卡） —— */
+.asset-bar {
+  display: flex;
   align-items: center;
-  gap: 10rpx;
-  margin-top: 22rpx;
-  padding: 10rpx 22rpx 10rpx 12rpx;
-  border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1rpx solid rgba(255, 255, 255, 0.28);
+  gap: 18rpx;
+  margin: 28rpx 12rpx 0;
+  padding: 16rpx 24rpx 16rpx 18rpx;
+  border-radius: 32rpx;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1rpx solid rgba(255, 255, 255, 0.26);
   backdrop-filter: blur(8px);
 }
 
-.page-header-private::before {
+.asset-bar--active {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.ab-stack {
+  position: relative;
+  width: 84rpx;
+  height: 58rpx;
+  flex-shrink: 0;
+}
+
+.ab-chip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 14rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.28);
+}
+
+/* 有封面时叠一层绿系 tint，贴近真实卡面质感；纯色卡面走动态品牌渐变 */
+.ab-chip::after {
   content: "";
   position: absolute;
-  inset: -14rpx;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(
+    140deg,
+    rgba(68, 111, 91, 0.18),
+    rgba(33, 71, 60, 0.4)
+  );
 }
 
-.page-header-private--active {
-  background: rgba(255, 255, 255, 0.24);
+.ab-chip--bare::after {
+  background: none;
 }
 
-.page-header-private-icon {
+.ab-chip--front {
+  z-index: 2;
+}
+
+.ab-chip--back {
+  transform: translate(10rpx, -4rpx);
+  z-index: 1;
+}
+
+.ab-cover {
+  width: 100%;
+  height: 100%;
+}
+
+/* 卡类型徽标：封面与渐变卡面上都叠加展示（次卡/期限卡） */
+.ab-chip-type {
+  position: absolute;
+  left: 6rpx;
+  bottom: 4rpx;
+  z-index: 2;
+  padding: 1rpx 8rpx;
+  border-radius: 8rpx;
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 16rpx;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.ab-count {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  z-index: 3;
+  min-width: 26rpx;
+  height: 26rpx;
+  padding: 0 6rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #4a7160;
+  font-size: 18rpx;
+  font-weight: 800;
+  line-height: 26rpx;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.ab-body {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.ab-name {
+  font-size: 25rpx;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ab-type {
+  margin-left: 10rpx;
+  padding: 0 12rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.35);
+  border-radius: 999rpx;
+  font-size: 18rpx;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.ab-sub {
+  margin-top: 2rpx;
+  font-size: 21rpx;
+  color: rgba(255, 255, 255, 0.78);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ab-num {
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.ab-more {
   flex-shrink: 0;
-  width: 40rpx;
-  height: 40rpx;
-  border-radius: 50%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.14);
+  gap: 4rpx;
+  padding-left: 20rpx;
+  border-left: 1rpx solid rgba(255, 255, 255, 0.22);
+  font-size: 21rpx;
+  color: rgba(255, 255, 255, 0.78);
+  white-space: nowrap;
 }
 
-.page-header-private-text {
+.ab-more-arrow {
   font-size: 26rpx;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.96);
-  letter-spacing: 1rpx;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1;
 }
 
-.page-header-private-arrow {
-  margin-left: 0;
-  opacity: 1;
+/* 玻璃条 · 无卡状态 */
+.ab-none {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.ab-none-title {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.ab-none-sub {
+  margin-top: 2rpx;
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.ab-none-btn {
+  flex-shrink: 0;
+  padding: 10rpx 26rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #4a7160;
+  font-size: 22rpx;
+  font-weight: 800;
 }
 
 /* ==================== 课程分类 Tab ==================== */
@@ -123,7 +265,10 @@ page {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  padding: 24rpx 28rpx 20rpx;
+  /* padding 撑到 ~88rpx 触控高度，负 margin 抵消对外部布局的影响 */
+  padding: 29rpx 28rpx 25rpx;
+  margin-top: -5rpx;
+  margin-bottom: -5rpx;
 }
 
 .category-tab-text {
@@ -239,6 +384,11 @@ page {
   padding: 24rpx 24rpx 0;
 }
 
+/* 私教卡在上时收紧团课列表的顶部间距，保持卡片节奏一致 */
+.course-list--joined {
+  padding-top: 4rpx;
+}
+
 .course-card {
   display: flex;
   align-items: stretch;
@@ -253,6 +403,58 @@ page {
 .course-card:active {
   transform: scale(0.98);
   box-shadow: 0 2rpx 12rpx var(--neutralShadow, rgba(31, 35, 41, 0.1));
+}
+
+.course-card--press {
+  transform: scale(0.98);
+}
+
+/* —— 私教 · 特殊课程卡（虚线描边区分常规团课） —— */
+.course-card--private {
+  border: 2rpx dashed rgba(91, 138, 114, 0.4);
+  box-shadow: none;
+}
+
+.private-time-section {
+  background: linear-gradient(180deg, #dceae2 0%, #f2f7f4 100%);
+}
+
+.pv-time-top {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #40604f;
+  line-height: 1.2;
+}
+
+.pv-time-sub {
+  font-size: 20rpx;
+  color: var(--calendarLightColor, #8ba399);
+  margin-top: 6rpx;
+  line-height: 1.2;
+}
+
+.pv-badge {
+  padding: 2rpx 14rpx;
+  border-radius: 8rpx;
+  background: rgba(91, 138, 114, 0.13);
+  color: #40604f;
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
+.pv-tag {
+  padding: 2rpx 14rpx;
+  border: 1rpx solid rgba(212, 149, 107, 0.55);
+  border-radius: 8rpx;
+  color: #c07a4e;
+  font-size: 20rpx;
+}
+
+.pv-action-top {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #40604f;
+  padding: 4rpx 0;
 }
 
 /* 时间区域 */
@@ -476,6 +678,17 @@ page {
   font-size: 28rpx;
   color: #999;
   letter-spacing: 1rpx;
+}
+
+/* 私教特殊卡在上方时收紧空态，插画与私教卡保持同一视觉组 */
+.empty-state--compact {
+  padding: 30rpx 40rpx 50rpx;
+}
+
+.empty-state--compact .empty-illustration {
+  width: 260rpx;
+  height: 260rpx;
+  margin-bottom: 16rpx;
 }
 
 /* ==================== 底部安全区 ==================== */

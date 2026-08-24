@@ -5,7 +5,6 @@ const timeHelper = require('../helper/time_helper.js');
 const dataHelper = require('../helper/data_helper.js');
 const formSetHelper = require('../cmpts/public/form/form_set_helper.js');
 const UserProfileBiz = require('../biz/user_profile_biz.js');
-const setting = require('../setting/setting.js');
 const defaultCoverHelper = require('../helper/default_cover_helper.js');
 const cardFaceHelper = require('../helper/card_face_helper.js');
 
@@ -20,7 +19,6 @@ module.exports = Behavior({
 
 	data: {
 		isLoad: false,
-		canNullTime: false,
 		bookNotes: BOOK_NOTES,
 
 		day: '',
@@ -99,7 +97,6 @@ module.exports = Behavior({
 			this.setData({
 				isLoad: true,
 				meet,
-				canNullTime: setting.MEET_CAN_NULL_TIME,
 			}, () => {
 				this._buildDisplay();
 				this._loadCardSummary();

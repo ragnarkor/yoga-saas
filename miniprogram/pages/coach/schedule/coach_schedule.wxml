@@ -20,9 +20,9 @@
     </van-tabs>
 
     <view class="schedule-week-bar">
-      <view class="schedule-week-btn" bindtap="bindPrevWeek">◀ 上周</view>
+      <view class="schedule-week-btn" bindtap="bindPrevWeek" aria-role="button" aria-label="上一周">◀ 上周</view>
       <view class="schedule-week-range">{{weekLabel}}</view>
-      <view class="schedule-week-btn" bindtap="bindNextWeek">下周 ▶</view>
+      <view class="schedule-week-btn" bindtap="bindNextWeek" aria-role="button" aria-label="下一周">下周 ▶</view>
     </view>
   </view>
 
@@ -61,6 +61,8 @@
             data-col="{{dayIdx}}"
             data-day="{{weekDays[dayIdx].day}}"
             data-time="{{item.time}}"
+            aria-role="{{cell ? '' : 'button'}}"
+            aria-label="{{cell ? '' : '添加排课'}}"
           >
             <block wx:if="{{cell && cell.mode === 'multi'}}">
               <view class="schedule-cell-stack">
@@ -75,6 +77,8 @@
                   data-row="{{rowIdx}}"
                   data-col="{{dayIdx}}"
                   data-item-idx="{{index}}"
+                  aria-role="button"
+                  aria-label="{{(slot.teacherName || '教练') + ' ' + slot.title}}"
                 >
                   <text class="schedule-card-teacher">{{slot.teacherName || '教练'}}</text>
                   <text class="schedule-card-title">{{slot.title}}</text>
@@ -86,6 +90,8 @@
                   catchtap="bindOverflowTap"
                   data-row="{{rowIdx}}"
                   data-col="{{dayIdx}}"
+                  aria-role="button"
+                  aria-label="查看更多 {{cell.overflow}} 节课"
                 >+{{cell.overflow}}</view>
               </view>
             </block>
@@ -98,6 +104,8 @@
               data-row="{{rowIdx}}"
               data-col="{{dayIdx}}"
               data-item-idx="0"
+              aria-role="button"
+              aria-label="{{(cell.teacherName || '教练') + ' ' + cell.title}}"
             >
               <text class="schedule-card-teacher">{{cell.teacherName || '教练'}}</text>
               <text class="schedule-card-title">{{cell.title}}</text>

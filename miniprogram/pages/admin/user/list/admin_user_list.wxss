@@ -3,3 +3,13 @@
 page {
   background-color: var(--adminPageBg);
 }
+
+.btn-export-touch {
+  position: relative;
+}
+
+.btn-export-touch::before {
+  content: "";
+  position: absolute;
+  inset: -14rpx;
+}

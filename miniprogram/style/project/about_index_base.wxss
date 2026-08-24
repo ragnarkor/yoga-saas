@@ -34,34 +34,6 @@
 	line-height: 1.6;
 }
 
-.main .content.content-err {
-	padding-top: 120rpx;
-	padding-bottom: 120rpx;
-}
-
-.main .content .err-icon {
-	text-align: center;
-	font-size: 150rpx;
-}
-
-.main .content .err-info {
-	text-align: center;
-	font-size: 30rpx;
-	color: #666;
-}
-
-.main .content .err-apply {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	margin-top: 60rpx;
-}
-
-.main .comm-list {
-	width: 100%;
-}
-
-
 .main .pics {
 	width: 60%;
 	margin-top: 30rpx;

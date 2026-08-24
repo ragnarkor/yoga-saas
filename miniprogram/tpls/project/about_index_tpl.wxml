@@ -17,7 +17,7 @@
 				<view class="txt" wx:if="{{about.SETUP_ABOUT}}"><text user-select="true">{{about.SETUP_ABOUT}}</text></view>
 
 				<view class="pics">
-					<image bindtap="url" data-url="{{item}}" data-type="img" wx:key="key" wx:for="{{about.SETUP_ABOUT_PIC}}" show-menu-by-longpress="{{true}}" class="loading" mode='aspectFit' lazy-load="true" src="{{item}}">
+					<image bindtap="url" data-url="{{item}}" data-type="img" wx:key="key" wx:for="{{about.SETUP_ABOUT_PIC}}" show-menu-by-longpress="{{true}}" class="loading" mode='aspectFit' lazy-load="true" src="{{item}}" aria-role="button" aria-label="查看门店介绍图片，点击放大">
 					</image>
 				</view>
 			</view>

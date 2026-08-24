@@ -50,6 +50,8 @@
         data-id="{{item.userId}}"
         data-name="{{item.USER_NAME}}"
         catchtap="bindCardsTap"
+        aria-role="button"
+        aria-label="{{(item.USER_NAME || '未命名会员') + ' 查看持卡'}}"
       >
         <text>持卡</text>
       </view>
@@ -58,6 +60,8 @@
         data-id="{{item.userId}}"
         data-name="{{item.USER_NAME}}"
         catchtap="bindIssueTap"
+        aria-role="button"
+        aria-label="{{(item.USER_NAME || '未命名会员') + ' 发卡'}}"
       >
         <text>发卡</text>
       </view>

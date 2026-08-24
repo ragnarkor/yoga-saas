@@ -66,6 +66,7 @@ Page({
     });
   },
   _loadList: async function (silent = false) {
+    const currentPid = pageHelper.getPID();
     try {
       if (this._scope === "coach") {
         const ok = await AdminWxBiz.ensureSession();
@@ -74,7 +75,10 @@ Page({
           return;
         }
         const list = await AdminWxBiz.fetchTenantList();
-        this.setData({ list: list || [], isLoad: true });
+        this.setData({
+          list: this._markCurrent(list || [], currentPid),
+          isLoad: true,
+        });
         return;
       }
       const res = await cloudHelper.callCloudData(
@@ -83,13 +87,22 @@ Page({
         silent ? { hint: false } : { title: "加载中" },
       );
       this.setData({
-        list: (res && res.list) || [],
+        list: this._markCurrent((res && res.list) || [], currentPid),
         isLoad: true,
       });
     } catch (err) {
       console.log(err);
+      wx.showToast({ title: "加载失败,请重试", icon: "none" });
       this.setData({ isLoad: true, list: [] });
     }
+  },
+  // 标记当前所在租户（若能从本地上下文识别到），用于列表高亮展示
+  _markCurrent: function (list, currentPid) {
+    if (!currentPid || !Array.isArray(list)) return list || [];
+    return list.map((item) => ({
+      ...item,
+      isCurrent: !!(item && item._pid === currentPid),
+    }));
   },
   bindSelectTap: async function (e) {
     const item = e.currentTarget.dataset.item;

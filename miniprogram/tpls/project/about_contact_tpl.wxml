@@ -20,6 +20,8 @@
 						enable-scroll="{{false}}"
 						enable-zoom="{{false}}"
 						bindtap="bindOpenMapTap"
+						aria-role="button"
+						aria-label="查看地址，打开地图导航"
 					/>
 					<view class="contact-map-tip">点击地图打开导航</view>
 				</block>
@@ -31,7 +33,7 @@
 
 				<block wx:if="{{about.SETUP_PHONE}}">
 					<view class="title text-project"><van-icon name="phone-o" size="32rpx" custom-class="margin-right-xs"  />电话</view>
-					<view bindtap="url" data-type="phone" data-url="{{about.SETUP_PHONE}}" class="txt"><text user-select="true">{{about.SETUP_PHONE}}</text><van-icon name="phone-o" size="32rpx" custom-class="margin-left-xxs"  /></view>
+					<view bindtap="url" data-type="phone" data-url="{{about.SETUP_PHONE}}" class="txt txt-tap" aria-role="button" aria-label="拨打电话"><text user-select="true">{{about.SETUP_PHONE}}</text><van-icon name="phone-o" size="32rpx" custom-class="margin-left-xxs" aria-hidden="true" /></view>
 				</block>
 
 				<block wx:if="{{about.SETUP_SERVICE_PIC.length>0}}">

@@ -8,7 +8,7 @@
 
   <block wx:else>
     <view class="private-book-section">
-      <view class="private-book-field" bindtap="bindPickMemberTap">
+      <view class="private-book-field" bindtap="bindPickMemberTap" aria-role="button" aria-label="选择会员，当前{{userName || '未选择'}}">
         <text class="private-book-label">会员</text>
         <view class="private-book-value-row">
           <text class="private-book-value">{{userName || '请选择会员'}}</text>
@@ -37,7 +37,7 @@
         bind:pick="onCoachPick"
       />
 
-      <view class="private-book-field" bindtap="bindDayTap">
+      <view class="private-book-field" bindtap="bindDayTap" aria-role="button" aria-label="选择上课日期，当前{{form.dayDisplay || '未选择'}}">
         <text class="private-book-label">上课日期</text>
         <view class="private-book-value-row">
           <text class="private-book-value">{{form.dayDisplay || '请选择'}}</text>
@@ -45,7 +45,7 @@
         </view>
       </view>
 
-      <view class="private-book-field" bindtap="bindStartTap">
+      <view class="private-book-field" bindtap="bindStartTap" aria-role="button" aria-label="选择开始时间，当前{{form.start || '未选择'}}">
         <text class="private-book-label">开始时间</text>
         <view class="private-book-value-row">
           <text class="private-book-value">{{form.start || '请选择'}}</text>
@@ -53,7 +53,7 @@
         </view>
       </view>
 
-      <view class="private-book-field" bindtap="bindEndTap">
+      <view class="private-book-field" bindtap="bindEndTap" aria-role="button" aria-label="选择结束时间，当前{{form.end || '未选择'}}">
         <text class="private-book-label">结束时间</text>
         <view class="private-book-value-row">
           <text class="private-book-value">{{form.end || '请选择'}}</text>
@@ -82,6 +82,9 @@
           class="member-filter-item {{form.bufferPreset === item.key ? 'active' : ''}}"
           data-key="{{item.key}}"
           bindtap="bindBufferPresetTap"
+          aria-role="button"
+          aria-label="{{item.label}}"
+          aria-selected="{{form.bufferPreset === item.key}}"
         >{{item.label}}</view>
       </view>
       <view wx:if="{{form.bufferPreset === 'custom'}}" class="private-book-buffer-custom">

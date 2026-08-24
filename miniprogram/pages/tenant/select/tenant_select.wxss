@@ -17,62 +17,8 @@
   color: #646a73;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  padding: 30rpx 20rpx;
-}
-
-.header-title {
-  color: var(--themeColor, #5b8a72);
-  font-weight: 600;
-}
-
 .tenant-empty {
   padding: 40rpx 0 80rpx;
-}
-
-.empty-tip {
-  text-align: center;
-  padding: 120rpx 0;
-  color: var(--neutralTextSecondary, #646a73);
-}
-
-.invite-gate {
-  margin: 24rpx 20rpx 0;
-  padding: 48rpx 32rpx;
-  background: #fff;
-  border-radius: 20rpx;
-  text-align: center;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
-}
-
-.invite-title {
-  margin-top: 28rpx;
-  font-size: 34rpx;
-  font-weight: 600;
-  color: var(--neutralText, #1f2329);
-}
-
-.invite-desc {
-  margin-top: 16rpx;
-  font-size: 26rpx;
-  line-height: 1.6;
-  color: var(--neutralTextSecondary, #646a73);
-}
-
-.invite-steps {
-  margin-top: 32rpx;
-  text-align: left;
-  padding: 24rpx 28rpx;
-  background: var(--themeColorLight, #f0f5f1);
-  border-radius: 12rpx;
-}
-
-.invite-step {
-  font-size: 24rpx;
-  color: var(--neutralTextSecondary, #646a73);
-  line-height: 1.8;
 }
 
 .loading-wrap {
@@ -93,6 +39,24 @@
   padding: 30rpx;
   margin-bottom: 20rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  border: 1rpx solid transparent;
+}
+
+.tenant-card--current {
+  border-color: var(--themeColor, #6fae96);
+}
+
+.tenant-current-badge {
+  display: inline-block;
+  margin-left: 12rpx;
+  padding: 2rpx 12rpx;
+  font-size: 20rpx;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--themeColor, #6fae96);
+  background: var(--themeColorLight, #f0f5f1);
+  border-radius: 8rpx;
+  vertical-align: middle;
 }
 
 .tenant-logo {

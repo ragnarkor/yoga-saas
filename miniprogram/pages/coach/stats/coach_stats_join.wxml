@@ -17,6 +17,7 @@
       confirm-type="search"
       bindinput="bindSearchInput"
       bindconfirm="bindSearchConfirm"
+      aria-label="搜索课程名称"
     />
   </view>
 
@@ -27,6 +28,9 @@
       class="stats-filter-item {{activeFilter === item.key ? 'active' : ''}}"
       data-key="{{item.key}}"
       bindtap="bindFilterTap"
+      aria-role="button"
+      aria-selected="{{activeFilter === item.key}}"
+      aria-label="{{item.label}}"
     >{{item.label}}</view>
   </view>
 
