@@ -21,3 +21,7 @@ project.private.config.json
 
 # Local Codex skills and workspace configuration
 .codex/
+
+# Local AI design / critique artifacts
+.frontend-design/
+.impeccable/

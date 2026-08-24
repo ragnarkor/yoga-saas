@@ -517,6 +517,13 @@ class UserCardService extends BaseService {
         if (c.isPending) return true;
         return c.isActive;
       });
+    } else {
+      // 失效列表 = 有效卡的反集（停卡/已用完/已过期），避免正常卡混入失效 tab
+      mapped = mapped.filter(
+        (c) =>
+          c.status !== UserCardModel.STATUS.NORMAL ||
+          (!c.isPending && !c.isActive),
+      );
     }
     return { list: mapped, total: mapped.length };
   }

@@ -3,6 +3,7 @@ const pageHelper = require("../../../../helper/page_helper.js");
 const timeHelper = require("../../../../helper/time_helper.js");
 const themeHelper = require("../../../../helper/theme_helper.js");
 const themeBh = require("../../../../behavior/theme_bh.js");
+const cardFaceHelper = require("../../../../helper/card_face_helper.js");
 
 // 状态机：PENDING(1) PAID(8) CONFIRMING(5) ISSUED(10) CLOSED(20) REFUNDING(15) REFUNDED(25)
 // offline: PENDING(待馆方确认) → CONFIRMING → ISSUED / CLOSED
@@ -78,15 +79,18 @@ Page({
     const snapshot = o.ORDER_TPL_SNAPSHOT || {};
     return {
       id: o.ORDER_ID,
+      sn: o.ORDER_ID,
       name: o.ORDER_TPL_NAME || snapshot.name || "会员卡套餐",
       status,
       payType,
+      payTypeDesc: payType === "wechat" ? "微信支付" : "线下付款",
       statusDesc: meta.desc,
       statusTone: meta.tone,
       tab: this._tabOf(status, payType),
       payYuan: this._yuan(Number(o.ORDER_PAY_FEE) || 0),
       timeText: timeHelper.timestamp2Time(o.ORDER_ADD_TIME, "Y-M-D h:m"),
       guide: o.ORDER_PAY_GUIDE || "",
+      coverUrl: cardFaceHelper.getCoverUrl(snapshot.cover || ""),
       color: snapshot.color || "#5b8a72",
       colorDark: this._darken(snapshot.color || "#5b8a72"),
       typeDesc: snapshot.type === "times" ? "次数卡" : "期限卡",
@@ -173,6 +177,15 @@ Page({
         },
       }),
     );
+  },
+
+  bindCopySnTap(e) {
+    const sn = e.currentTarget.dataset.sn || "";
+    if (!sn) return;
+    wx.setClipboardData({
+      data: String(sn),
+      success: () => wx.showToast({ title: "订单号已复制", icon: "success" }),
+    });
   },
 
   bindGoPackTap() {

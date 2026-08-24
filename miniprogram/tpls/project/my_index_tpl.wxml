@@ -84,7 +84,8 @@
 
 			<!-- VANT 菜单列表 -->
 			<van-cell-group inset custom-class="menu-group">
-				<van-cell custom-class="mi-cell mi-card" title="我的卡包" is-link link-type="navigateTo" url="../card_pack/my_card_pack" icon="credit-pay" label="查看会员卡余额与到期" />
+				<van-cell custom-class="mi-cell mi-card" title="我的卡包" is-link link-type="navigateTo" url="../card_pack/my_card_pack" icon="credit-pay" label="{{cardSummaryText}}" />
+				<van-cell custom-class="mi-cell mi-order" title="购卡订单" is-link link-type="navigateTo" url="../card_order/card_order" icon="orders-o" label="支付进度 · 转账凭证 · 购买记录" />
 				<van-cell custom-class="mi-cell mi-achievement" title="我的成就" is-link link-type="navigateTo" url="../achievement/my_achievement" icon="medal-o" label="{{achievementSummary}}" />
 				<van-cell custom-class="mi-cell mi-announce" title="公告通知" is-link bindtap="bindAnnounceEntryTap" icon="volume-o" label="查看馆方最新通知" />
 				<van-cell custom-class="mi-cell mi-coach" title="切换到教练版" is-link bindtap="bindSwitchCoachTap" icon="manager-o" label="馆主/教练工作台" />

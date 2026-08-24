@@ -21,6 +21,7 @@ module.exports = Behavior({
     nicknameEditing: false,
     adminLoginShow: false,
     achievementSummary: "预约成功即计入成就",
+    cardSummaryText: "查看会员卡余额与到期",
   },
 
   methods: {
@@ -62,6 +63,7 @@ module.exports = Behavior({
       this._loadTodayList();
       this._loadUser();
       this._loadAchievementSummary();
+      this._loadCardSummary();
     },
 
     onHide: async function () {
@@ -84,6 +86,33 @@ module.exports = Behavior({
         });
       } catch (e) {
         console.warn("[achievement summary]", e);
+      }
+    },
+
+    _loadCardSummary: async function () {
+      try {
+        const data = await cloudHelper.callCloudData(
+          "my/my_card_summary",
+          {},
+          { hint: false },
+        );
+        let text = "查看会员卡余额与到期";
+        if (data) {
+          if (!data.hasCard) {
+            text = "暂无有效卡 · 可购卡入会";
+          } else if (data.hasPeriod && data.timesTotal > 0) {
+            text = `期限卡畅练 · 另剩 ${data.timesTotal} 次`;
+          } else if (data.hasPeriod) {
+            text = "期限卡畅练中";
+          } else if (data.timesTotal > 0) {
+            text = `剩余 ${data.timesTotal} 次`;
+          } else if (data.count > 0) {
+            text = "有待激活的会员卡";
+          }
+        }
+        this.setData({ cardSummaryText: text });
+      } catch (e) {
+        console.warn("[card summary]", e);
       }
     },
 

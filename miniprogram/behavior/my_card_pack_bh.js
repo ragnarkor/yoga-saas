@@ -69,5 +69,8 @@ module.exports = Behavior({
     bindCardShopTap() {
       wx.navigateTo({ url: "/pages/default/my/card_shop/card_shop" });
     },
+    bindOrderTap() {
+      wx.navigateTo({ url: "/pages/default/my/card_order/card_order" });
+    },
   },
 });

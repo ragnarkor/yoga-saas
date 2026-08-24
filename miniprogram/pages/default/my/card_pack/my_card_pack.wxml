@@ -17,6 +17,11 @@
         <text>失效卡</text>
       </view>
     </view>
+    <!-- 购卡订单直达：支付进度/转账凭证不再藏于购卡商城内 -->
+    <view class="card-pack-order" bindtap="bindOrderTap">
+      <van-icon name="orders-o" size="30rpx" color="{{themeColor}}" />
+      <text>购卡订单</text>
+    </view>
   </view>
 
   <view wx:if="{{loading}}" class="card-pack-loading">

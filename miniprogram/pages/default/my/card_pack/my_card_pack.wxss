@@ -9,8 +9,29 @@
 
 .card-pack-toolbar {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
   padding: 24rpx 32rpx 8rpx;
+}
+
+/* 购卡订单直达入口 */
+.card-pack-order {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rpx;
+  padding: 10rpx 18rpx;
+  border-radius: 16rpx;
+  background: #fff;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  font-size: 20rpx;
+  color: #646566;
+  flex-shrink: 0;
+}
+
+.card-pack-order:active {
+  opacity: 0.85;
 }
 
 /* 有效/失效 分段选择器 */
