@@ -27,6 +27,8 @@ async function enrichPodiumAvatars(podium) {
   );
 }
 
+const RANK_LIST_LIMIT = 30;
+
 function splitRankList(list) {
   const top3 = (list || []).filter((item) => item.rank <= 3);
   const restList = (list || []).filter((item) => item.rank > 3);
@@ -46,6 +48,7 @@ Page({
     list: [],
     podium: [],
     restList: [],
+    truncated: false,
   },
 
   onLoad() {
@@ -73,16 +76,19 @@ Page({
     try {
       const res = await cloudHelper.callCloudData(
         'admin/stats_rank',
-        { limit: 30 },
+        { limit: RANK_LIST_LIMIT + 1 },
         { hint: false, title: 'bar' },
       );
-      const list = (res && res.list) || [];
+      const rawList = (res && res.list) || [];
+      const truncated = rawList.length > RANK_LIST_LIMIT;
+      const list = truncated ? rawList.slice(0, RANK_LIST_LIMIT) : rawList;
       const { podium, restList } = splitRankList(list);
       const podiumWithAvatar = await enrichPodiumAvatars(podium);
       this.setData({
         list,
         podium: podiumWithAvatar,
         restList,
+        truncated,
         loading: false,
       });
     } catch (e) {

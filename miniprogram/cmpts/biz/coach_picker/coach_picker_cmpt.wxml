@@ -1,4 +1,4 @@
-<view class="coach-picker-field course-edit-field course-edit-field--inline field-class" bindtap="bindFieldTap">
+<view class="coach-picker-field course-edit-field course-edit-field--inline field-class" bindtap="bindFieldTap" aria-role="button" aria-label="选择教练">
   <view class="coach-picker-label course-edit-field-label-inline {{required ? 'course-edit-field-label-inline--required' : ''}}">{{label}}</view>
   <view class="coach-picker-value-wrap course-edit-field-row course-edit-field-row--inline">
     <view class="coach-picker-main">

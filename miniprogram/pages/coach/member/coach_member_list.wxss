@@ -1,1 +1,9 @@
 @import "../coach_member_card.wxss";
+
+.member-row-pick {
+  background: var(--projectColorLight, #e3efe8);
+}
+
+.member-row-pick:active {
+  opacity: 0.88;
+}

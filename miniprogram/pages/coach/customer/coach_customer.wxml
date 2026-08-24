@@ -9,48 +9,53 @@
   />
 
   <view class="coach-customer-wrap">
-    <!-- Hero 汇总卡片 -->
-    <view class="customer-hero" style="background: {{themeColor}};">
-      <view class="customer-hero-num">{{totalMembers}}</view>
-      <view class="customer-hero-label">总会员数</view>
+    <view wx:if="{{loading}}" style="padding: 96rpx 0; text-align: center;">
+      <van-loading size="48rpx" color="{{themeColor}}">加载中...</van-loading>
     </view>
+    <block wx:else>
+      <!-- Hero 汇总卡片 -->
+      <view class="customer-hero" style="background: {{themeColor}};">
+        <view class="customer-hero-num">{{totalMembers}}</view>
+        <view class="customer-hero-label">总会员数</view>
+      </view>
 
-    <!-- 分组卡片 -->
-    <block wx:for="{{sections}}" wx:key="title" wx:for-item="section">
-      <view class="customer-section {{section.alert ? 'customer-section--alert' : ''}} {{section.banner ? 'customer-section--illustrated' : ''}}">
-        <block wx:if="{{section.banner}}">
-          <image
-            class="customer-section-bg customer-section-bg--focus-left"
-            src="/pages/coach/images/coach_member_hero.jpg?v=1"
-            mode="aspectFill"
-          />
-          <view class="customer-section-bg-overlay customer-section-bg-overlay--overview"></view>
-        </block>
-        <view class="customer-section-inner">
-          <view class="customer-section-head">
-            <text class="customer-section-title">{{section.title}}</text>
-            <text class="customer-section-desc">{{section.desc}}</text>
-          </view>
-          <view class="customer-card-grid">
-            <view
-              class="customer-card-item"
-              wx:for="{{section.cards}}"
-              wx:key="key"
-              wx:for-item="card"
-              bindtap="onCardTap"
-              data-key="{{card.key}}"
-              aria-role="button"
-              aria-label="{{card.label + '，' + card.num}}"
-            >
-              <view class="customer-card-icon {{section.alert ? 'customer-card-icon--alert' : ''}}">
-                <van-icon name="{{card.icon}}" size="36rpx" color="{{section.alert ? '#DD9168' : themeColor}}" />
+      <!-- 分组卡片 -->
+      <block wx:for="{{sections}}" wx:key="title" wx:for-item="section">
+        <view class="customer-section {{section.alert ? 'customer-section--alert' : ''}} {{section.banner ? 'customer-section--illustrated' : ''}}">
+          <block wx:if="{{section.banner}}">
+            <image
+              class="customer-section-bg customer-section-bg--focus-left"
+              src="/pages/coach/images/coach_member_hero.jpg?v=1"
+              mode="aspectFill"
+            />
+            <view class="customer-section-bg-overlay customer-section-bg-overlay--overview"></view>
+          </block>
+          <view class="customer-section-inner">
+            <view class="customer-section-head">
+              <text class="customer-section-title">{{section.title}}</text>
+              <text class="customer-section-desc">{{section.desc}}</text>
+            </view>
+            <view class="customer-card-grid">
+              <view
+                class="customer-card-item"
+                wx:for="{{section.cards}}"
+                wx:key="key"
+                wx:for-item="card"
+                bindtap="onCardTap"
+                data-key="{{card.key}}"
+                aria-role="button"
+                aria-label="{{card.label + '，' + card.num}}"
+              >
+                <view class="customer-card-icon {{section.alert ? 'customer-card-icon--alert' : ''}}">
+                  <van-icon name="{{card.icon}}" size="36rpx" color="{{section.alert ? '#DD9168' : themeColor}}" />
+                </view>
+                <view class="customer-card-num">{{card.num}}</view>
+                <view class="customer-card-label">{{card.label}}</view>
               </view>
-              <view class="customer-card-num">{{card.num}}</view>
-              <view class="customer-card-label">{{card.label}}</view>
             </view>
           </view>
         </view>
-      </view>
+      </block>
     </block>
   </view>
 

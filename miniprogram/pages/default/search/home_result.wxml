@@ -8,7 +8,7 @@
 
   <view class="group" wx:if="{{meetList.length > 0}}">
     <view class="group-title">课程 / 活动</view>
-    <view class="result-item" wx:for="{{meetList}}" wx:key="_id" bindtap="bindItemTap" data-type="meet" data-id="{{item._id}}">
+    <view class="result-item" wx:for="{{meetList}}" wx:key="_id" bindtap="bindItemTap" data-type="meet" data-id="{{item._id}}" aria-role="button" aria-label="{{item.title}}">
       <image wx:if="{{item.pic}}" class="result-pic" mode="aspectFill" src="{{item.pic}}" />
       <view class="result-body">
         <view class="result-title text-cut">{{item.title}}</view>
@@ -19,7 +19,7 @@
 
   <view class="group" wx:if="{{newsList.length > 0}}">
     <view class="group-title">资讯</view>
-    <view class="result-item" wx:for="{{newsList}}" wx:key="_id" bindtap="bindItemTap" data-type="news" data-id="{{item._id}}">
+    <view class="result-item" wx:for="{{newsList}}" wx:key="_id" bindtap="bindItemTap" data-type="news" data-id="{{item._id}}" aria-role="button" aria-label="{{item.title}}">
       <image wx:if="{{item.pic}}" class="result-pic" mode="aspectFill" src="{{item.pic}}" />
       <view class="result-body">
         <view class="result-title text-cut">{{item.title}}</view>
@@ -30,7 +30,7 @@
 
   <view class="group" wx:if="{{teacherList.length > 0}}">
     <view class="group-title">老师</view>
-    <view class="result-item" wx:for="{{teacherList}}" wx:key="_id" bindtap="bindItemTap" data-type="teacher" data-id="{{item._id}}">
+    <view class="result-item" wx:for="{{teacherList}}" wx:key="_id" bindtap="bindItemTap" data-type="teacher" data-id="{{item._id}}" aria-role="button" aria-label="{{item.title}}">
       <image wx:if="{{item.pic}}" class="result-pic" mode="aspectFill" src="{{item.pic}}" />
       <view class="result-body">
         <view class="result-title text-cut">{{item.title}}</view>

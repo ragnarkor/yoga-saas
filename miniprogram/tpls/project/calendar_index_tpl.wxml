@@ -20,6 +20,8 @@
 					class="asset-bar"
 					hover-class="asset-bar--active"
 					bindtap="bindCardPackTap"
+					aria-role="button"
+					aria-label="{{cardAsset.name}}，{{cardAsset.type === 'times' ? '剩' + cardAsset.quota + '次' : cardAsset.balanceText}}，点击查看我的卡包"
 				>
 					<view class="ab-stack">
 						<view wx:if="{{cardAsset.backShade}}" class="ab-chip ab-chip--back" style="{{cardAsset.backShade}}">
@@ -45,6 +47,8 @@
 					class="asset-bar"
 					hover-class="asset-bar--active"
 					bindtap="bindGoCardShopTap"
+					aria-role="button"
+					aria-label="暂无可用会员卡，点击去购卡"
 				>
 					<view class="ab-none">
 						<view class="ab-none-title">暂无可用会员卡</view>
@@ -131,7 +135,9 @@
 		<!-- 课程列表 -->
 		<view class="course-list {{showPrivateEntry ? 'course-list--joined' : ''}}" wx:if="{{courseList && courseList.length > 0}}">
 			<view class="course-card" wx:for="{{courseList}}" wx:key="cardKey"
-				bindtap="url" data-url="/pages/default/meet/detail/meet_detail?id={{item._id}}&day={{selectedDate}}&timeMark={{item.timeMark}}">
+				bindtap="url" data-url="/pages/default/meet/detail/meet_detail?id={{item._id}}&day={{selectedDate}}&timeMark={{item.timeMark}}"
+				aria-role="button"
+				aria-label="{{item.title}}，{{item.timeStart}}至{{item.timeEnd}}，{{item.status === 'booked' ? '已预约，点击查看' : item.status === 'full' ? '已满员，点击候补' : '点击预约'}}">
 
 				<view class="card-time-section">
 					<view class="time-primary">{{item.timeStart}}</view>

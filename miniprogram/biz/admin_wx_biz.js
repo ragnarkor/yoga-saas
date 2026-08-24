@@ -151,13 +151,20 @@ class AdminWxBiz {
     return AdminWxBiz.ensureSession();
   }
 
-  /** 解除当前馆微信绑定；adminId 可选，超管/馆长代解绑 */
-  static async unbind(adminId) {
+  /**
+   * 解除微信绑定；adminId 可选，超管/馆长代解绑他人时传入
+   * @param {string} [adminId] 被解绑的管理员ID（代解绑他人时传入）
+   * @param {boolean} [isSelf] 本次解绑目标是否为当前登录人自己，
+   *   仅此时才清空本地缓存的登录态，避免代他人解绑时误将操作者登出
+   */
+  static async unbind(adminId, isSelf) {
     const params = adminId ? { adminId } : {};
     await cloudHelper.callCloudSumbit('admin/wx_unbind', params, {
       title: '解绑中',
     });
-    AdminBiz.clearAdminToken();
+    if (isSelf) {
+      AdminBiz.clearAdminToken();
+    }
   }
 }
 

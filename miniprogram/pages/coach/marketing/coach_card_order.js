@@ -91,8 +91,12 @@ Page({
         hasTransferProof: !!o.ORDER_TRANSFER_PROOF,
         closeReason: o.ORDER_CLOSE_REASON || '',
         timeDesc: o.timeDesc,
-        // 仅“待确认”的订单可人工确认/关闭（微信支付已发卡的走回调，不在此手动处理）
-        canAct: o.ORDER_STATUS === STATUS.PENDING,
+        // “待确认”(线下待核对) 或 “已付待发”(微信已收款但自动发卡失败) 均可人工核对发卡
+        canConfirm:
+          o.ORDER_STATUS === STATUS.PENDING || o.ORDER_STATUS === STATUS.PAID,
+        // 仅“待确认”的订单允许直接关闭（PAID 已实际收款，关闭需走退款，不能直接关闭）
+        canClose: o.ORDER_STATUS === STATUS.PENDING,
+        isPaidRecovery: o.ORDER_STATUS === STATUS.PAID,
         // 仅“微信支付 + 已发卡”的订单可原路退款
         canRefund:
           o.ORDER_STATUS === STATUS.ISSUED && o.ORDER_PAY_TYPE === 'wechat',
@@ -111,10 +115,13 @@ Page({
   bindConfirmTap(e) {
     const id = e.currentTarget.dataset.id;
     const name = e.currentTarget.dataset.name || '会员';
+    const isPaidRecovery = e.currentTarget.dataset.paid;
     if (!id) return;
     wx.showModal({
       title: '确认收款并发卡',
-      content: `请核对「${name}」的转账凭证与到账金额。确认后将立即为其发卡。`,
+      content: isPaidRecovery
+        ? `「${name}」已通过微信支付成功，但系统自动发卡失败。请核对后重新发卡。`
+        : `请核对「${name}」的转账凭证与到账金额。确认后将立即为其发卡。`,
       confirmText: '确认发卡',
       confirmColor: this.data.themeColor,
       success: (r) => {

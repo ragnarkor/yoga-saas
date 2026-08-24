@@ -54,18 +54,25 @@
       <view wx:elif="{{item.status === 1 && !item.isWechat}}" class="co-proof co-proof--empty"><van-icon name="photo-o" size="30rpx" color="#a6afa9" /><text>会员尚未上传转账凭证</text></view>
       <view wx:if="{{item.closeReason}}" class="co-close-reason">{{item.closeReason}}</view>
 
-      <view wx:if="{{item.canAct}}" class="co-actions">
+      <view wx:if="{{item.canClose || item.canConfirm}}" class="co-actions">
         <view
+          wx:if="{{item.canClose}}"
           class="co-btn co-btn--ghost"
           data-id="{{item.id}}"
           catchtap="bindCloseTap"
+          aria-role="button"
+          aria-label="关闭订单"
         >关闭</view>
         <view
+          wx:if="{{item.canConfirm}}"
           class="co-btn"
           style="background:{{themeColor}}"
           data-id="{{item.id}}"
           data-name="{{item.userName}}"
+          data-paid="{{item.isPaidRecovery}}"
           catchtap="bindConfirmTap"
+          aria-role="button"
+          aria-label="核对后发卡"
         >核对后发卡</view>
       </view>
 
@@ -75,6 +82,8 @@
           data-id="{{item.id}}"
           data-name="{{item.userName}}"
           catchtap="bindRefundTap"
+          aria-role="button"
+          aria-label="原路退款"
         >原路退款</view>
       </view>
     </view>

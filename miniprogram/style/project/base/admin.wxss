@@ -138,6 +138,13 @@
   line-height: 1.5;
   font-size: 25rpx;
   margin-bottom: 20rpx;
+  position: relative;
+}
+
+.admin-comm-list .item .info .info-item::before {
+  content: "";
+  position: absolute;
+  inset: -8rpx 0;
 }
 
 .admin-comm-list .item .info .info-item .title {
@@ -176,5 +183,12 @@
   line-height: unset;
   height: 55rpx !important;
   background-color: var(--adminIconBg) !important;
+  position: relative;
+}
+
+.admin-comm-list .item .info .oprt .btn::before {
+  content: "";
+  position: absolute;
+  inset: -14rpx;
 }
 

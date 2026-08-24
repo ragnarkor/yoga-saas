@@ -119,6 +119,9 @@ Page({
     const teacherName = options.teacherName
       ? decodeURIComponent(options.teacherName)
       : '';
+    const roomName = options.room
+      ? decodeURIComponent(options.room)
+      : '';
     this.setData({
       pageTitle: options.mark ? '编辑排课' : '新增排课',
       isEdit: !!options.mark,
@@ -131,6 +134,7 @@ Page({
       formTimeSlots: [{ start: initialStart, end: initialEnd }],
       formTeacherId: options.teacherId || '',
       formTeacherName: teacherName,
+      formRoomName: roomName,
       calendarDefaultDate: formDays.length
         ? formDays.map(dayToTimestamp)
         : [new Date().getTime()],

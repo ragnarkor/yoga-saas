@@ -6,6 +6,7 @@ const MENUS = [
   { name: '收入统计', icon: 'gold-coin-o', color: '#ffb74d', url: '/pages/coach/stats/coach_stats_fund' },
   { name: '会员卡分析', icon: 'coupon-o', color: '#f48fb1', url: '/pages/coach/stats/coach_stats_card' },
   { name: '耗卡统计', icon: 'ascending', color: '#b39ddb', url: '/pages/coach/stats/coach_stats_consume' },
+  { name: '排课统计', icon: 'calendar-o', color: '#4fc3f7', url: '/pages/coach/stats/coach_stats_schedule' },
   { name: '名单导出', icon: 'down', color: '#90a4ae', url: '/pages/coach/stats/coach_stats_export' },
 ];
 

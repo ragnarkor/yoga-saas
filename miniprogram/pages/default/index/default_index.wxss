@@ -100,6 +100,30 @@ page {
   color: #89918c;
 }
 
+.home-place-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 12rpx;
+}
+
+/* 致电按钮：自身有可见背景，使用不可见 ::before/inset 命中区扩大点击范围，不放大按钮视觉尺寸 */
+.home-place-phone {
+  position: relative;
+  padding: 12rpx 16rpx;
+  border-radius: 999rpx;
+  background: var(--projectColorLight, #edf5f0);
+  color: var(--projectColorDark, #4f8c76);
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
+.home-place-phone::before {
+  content: "";
+  position: absolute;
+  inset: -14rpx;
+}
+
 /* ---- 通用 section 头 ---- */
 .home-section-head {
   display: flex;
@@ -120,9 +144,12 @@ page {
   gap: 28rpx;
 }
 
+/* “查看全部/更多”文字链接：自身无可见背景/边框，使用 padding + 负 margin 扩大点击范围，不影响周边布局 */
 .home-section-more {
   font-size: 24rpx;
   color: var(--projectColorDark, #4f8c76);
+  padding: 26rpx 14rpx;
+  margin: -26rpx -14rpx;
 }
 
 /* ---- 下一节课 ---- */
@@ -182,6 +209,13 @@ page {
   color: var(--projectColorDark, #4f8c76);
   font-size: 22rpx;
   font-weight: 700;
+}
+
+/* 查看课程按钮：自身有可见背景，使用不可见 ::before/inset 命中区扩大点击范围，不放大按钮视觉尺寸 */
+.home-next-btn::before {
+  content: "";
+  position: absolute;
+  inset: -16rpx;
 }
 
 .home-next-btn:active {
@@ -374,10 +408,16 @@ page {
   white-space: nowrap;
 }
 
+/*
+ * <swiper> 会按自身高度裁剪内容（垂直循环轮播依赖这个裁剪），
+ * 因此 .home-notice-row 的点击区域无法用 ::before/inset 或 padding 负 margin
+ * 扩到 swiper 边界之外（会被裁掉、点不到）。这里直接把 swiper 与行高一起
+ * 提到可访问的最小触摸尺寸，公告文字仍靠 align-items:center 保持垂直居中。
+ */
 .home-notice-swiper {
   flex: 1;
   min-width: 0;
-  height: 42rpx;
+  height: 88rpx;
 }
 
 .home-notice-row {
@@ -385,7 +425,7 @@ page {
   align-items: center;
   gap: 16rpx;
   width: 100%;
-  height: 42rpx;
+  height: 88rpx;
 }
 
 .home-notice-time {

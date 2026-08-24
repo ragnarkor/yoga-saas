@@ -69,6 +69,7 @@ module.exports = Behavior({
         this._applyPageHeader();
       } catch (err) {
         console.error(err);
+        wx.showToast({ title: "门店信息加载失败", icon: "none" });
       }
     },
 
@@ -200,6 +201,7 @@ module.exports = Behavior({
           courseList: [],
           isLoad: true,
         });
+        wx.showToast({ title: "课程加载失败，请重试", icon: "none" });
       }
     },
 
@@ -336,6 +338,7 @@ module.exports = Behavior({
           });
       } catch (err) {
         console.error(err);
+        wx.showToast({ title: "课程日期加载失败", icon: "none" });
       }
     },
 

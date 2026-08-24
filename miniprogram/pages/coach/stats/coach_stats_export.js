@@ -12,7 +12,6 @@ Page({
     loading: true,
     isLoad: false,
     meetId: '',
-    meetTitle: '',
     startDay: timeHelper.time('Y-M-D'),
     endDay: timeHelper.time('Y-M-D'),
     status: 1,
@@ -68,11 +67,10 @@ Page({
   },
 
   onCoursePick(e) {
-    const { meetId, course } = e.detail || {};
+    const { meetId } = e.detail || {};
     if (!meetId) return;
     this.setData({
       meetId,
-      meetTitle: (course && course.title) || '',
       url: '',
       time: '',
     });
@@ -87,9 +85,23 @@ Page({
     pageHelper.url(e, this);
   },
 
+  bindCopyTap(e) {
+    const url = e.currentTarget.dataset.url;
+    if (!url) return;
+    pageHelper.url(e, this);
+  },
+
   async bindExportTap() {
     if (!this.data.meetId) {
       pageHelper.showNoneToast('请先选择课程');
+      return;
+    }
+    if (!this.data.startDay || !this.data.endDay) {
+      pageHelper.showNoneToast('请选择导出日期');
+      return;
+    }
+    if (this.data.startDay > this.data.endDay) {
+      pageHelper.showNoneToast('起始日期不能晚于终止日期');
       return;
     }
     try {

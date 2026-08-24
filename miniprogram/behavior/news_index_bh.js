@@ -87,36 +87,5 @@ module.exports = Behavior({
      * 用户点击右上角分享
      */
     onShareAppMessage: function () {},
-
-    _setCateTitle: function (skin, cateId = null) {
-      // 获取当前小程序的页面栈
-      let pages = getCurrentPages();
-      // 数组中索引最大的页面--当前页面
-      let currentPage = pages[pages.length - 1];
-      // 附加参数
-      if (currentPage.options && currentPage.options.id) {
-        cateId = currentPage.options.id;
-      }
-      let cateList = dataHelper.getSelectOptions(skin.NEWS_CATE);
-      for (let k in cateList) {
-        if (cateList[k].val == cateId) {
-          wx.setNavigationBarTitle({
-            title: cateList[k].label,
-          });
-
-          if (cateList[k].ext) {
-            //样式
-            this.setData({
-              listMode: cateList[k].ext,
-            });
-          } else {
-            this.setData({
-              listMode: "leftpic",
-            });
-          }
-        }
-      }
-      return "";
-    },
   },
 });

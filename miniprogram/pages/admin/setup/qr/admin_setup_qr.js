@@ -35,6 +35,7 @@ Page({
 			});
 		} catch (err) {
 			console.error(err);
+			pageHelper.showErrToast('加载失败，请下拉刷新重试');
 		}
 
 	},

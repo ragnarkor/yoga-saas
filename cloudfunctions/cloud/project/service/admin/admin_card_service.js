@@ -857,9 +857,17 @@ class AdminCardService extends BaseAdminService {
 
     let now = timeUtil.time();
 
-    // 2. 原子抢占 PENDING → CONFIRMING（CAS：edit 返回受影响行数）
+    // 2. 原子抢占 PENDING/PAID → CONFIRMING（CAS：edit 返回受影响行数）
+    // PAID：微信支付成功但 autoIssueByPay 自动发卡失败时会回滚到此状态，
+    // 需允许馆主人工核对后走与 PENDING 相同的确认发卡流程完成补发。
     let seized = await CardOrderModel.edit(
-      { ORDER_ID: orderId, ORDER_STATUS: CardOrderModel.STATUS.PENDING },
+      {
+        ORDER_ID: orderId,
+        ORDER_STATUS: [
+          "in",
+          [CardOrderModel.STATUS.PENDING, CardOrderModel.STATUS.PAID],
+        ],
+      },
       {
         ORDER_STATUS: CardOrderModel.STATUS.CONFIRMING,
         ORDER_CONFIRMED_BY_ID: (operator && operator._id) || "",
@@ -899,11 +907,13 @@ class AdminCardService extends BaseAdminService {
       );
       return { ok: true, userCardId };
     } catch (err) {
-      // 6. 任一步失败：回滚到 PENDING，记录原因，可重试（绝不误标 ISSUED）
+      // 6. 任一步失败：回滚到抢占前的原状态，记录原因，可重试（绝不误标 ISSUED）。
+      // 若原状态为 PAID（微信已收款），必须回 PAID 而非 PENDING，否则会丢失
+      // “已收款”的事实，误导为待付款的线下申请。
       await CardOrderModel.edit(
         { ORDER_ID: orderId },
         {
-          ORDER_STATUS: CardOrderModel.STATUS.PENDING,
+          ORDER_STATUS: order.ORDER_STATUS,
           ORDER_CLOSE_REASON: "发卡失败：" + ((err && err.message) || "未知错误"),
           ORDER_EDIT_TIME: timeUtil.time(),
         },

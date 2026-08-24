@@ -27,6 +27,7 @@
 }
 
 .card-pack-order-link {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4rpx;
@@ -35,6 +36,13 @@
   color: var(--themeColor, #5b8a72);
   font-size: 22rpx;
   line-height: 1.6;
+}
+
+/* 购卡订单入口文字热区较小，扩大点击热区至约 88rpx */
+.card-pack-order-link::before {
+  content: "";
+  position: absolute;
+  inset: -19rpx;
 }
 
 .card-pack-order-arrow {

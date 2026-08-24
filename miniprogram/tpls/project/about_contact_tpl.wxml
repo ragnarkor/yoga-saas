@@ -39,7 +39,7 @@
 				<block wx:if="{{about.SETUP_SERVICE_PIC.length>0}}">
 					<view class="title text-project"><van-icon name="service-o" size="32rpx" custom-class="margin-right-xs"  />客服</view>
 					<view class="pics">
-						<image wx:key="key" wx:for="{{about.SETUP_SERVICE_PIC}}" show-menu-by-longpress="{{true}}" class="loading" mode='widthFix' lazy-load="true" src="{{item}}">
+						<image bindtap="url" data-url="{{item}}" data-type="img" wx:key="key" wx:for="{{about.SETUP_SERVICE_PIC}}" show-menu-by-longpress="{{true}}" class="loading" mode='widthFix' lazy-load="true" src="{{item}}" aria-role="button" aria-label="查看客服图片，点击放大">
 						</image>
 					</view>
 				</block>
@@ -47,7 +47,7 @@
 				<block wx:if="{{about.SETUP_OFFICE_PIC.length>0}}">
 					<view class="title text-project"><van-icon name="wechat" size="32rpx" custom-class="margin-right-xs"  />官微</view>
 					<view class="pics">
-						<image wx:key="key" wx:for="{{about.SETUP_OFFICE_PIC}}" show-menu-by-longpress="{{true}}" class="loading" mode='widthFix' lazy-load="true" src="{{item}}">
+						<image bindtap="url" data-url="{{item}}" data-type="img" wx:key="key" wx:for="{{about.SETUP_OFFICE_PIC}}" show-menu-by-longpress="{{true}}" class="loading" mode='widthFix' lazy-load="true" src="{{item}}" aria-role="button" aria-label="查看官微图片，点击放大">
 						</image>
 					</view>
 				</block>

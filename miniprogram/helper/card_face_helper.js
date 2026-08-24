@@ -34,8 +34,6 @@ const COVER_PRESETS = [
   },
 ];
 
-const PRESETS = COVER_PRESETS.slice();
-
 const COVER_MAP = COVER_PRESETS.reduce((acc, item) => {
   acc[item.id] = item;
   return acc;
@@ -50,10 +48,6 @@ function normalizeHexColor(color) {
   return String(color || "")
     .trim()
     .toLowerCase();
-}
-
-function getPresets() {
-  return COVER_PRESETS.slice();
 }
 
 function getStylePickerOptions() {
@@ -172,8 +166,6 @@ function getCardShadeBg(color, coverUrl) {
 module.exports = {
   COLOR_PRESETS,
   COVER_PRESETS,
-  PRESETS,
-  getPresets,
   getStylePickerOptions,
   getStyleKey,
   parseStylePick,

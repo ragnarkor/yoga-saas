@@ -58,6 +58,7 @@ Page({
     } catch (e) {
       console.error(e);
       this.setData({ loading: false, sessionList: [] });
+      wx.showToast({ title: '加载失败，请重试', icon: 'none' });
     }
   },
 

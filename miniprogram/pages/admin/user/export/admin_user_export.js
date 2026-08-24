@@ -105,26 +105,28 @@ Page({
 	},
 
 	bindExportTap: async function (e) {
-		try {
-			let options = {
-				title: '数据生成中'
+		let callback = async () => {
+			try {
+				let options = {
+					title: '数据生成中'
+				}
+
+				let params = {
+					condition: this.data.condition
+				}
+
+				await cloudHelper.callCloudData('admin/user_data_export', params, options).then(res => {
+
+					this._loadDetail(0);
+					pageHelper.showModal('数据文件生成成功(' + res.total + '条记录), 请点击「直接打开」按钮或者复制文件地址下载');
+
+				});
+			} catch (err) {
+				console.log(err);
+				pageHelper.showNoneToast('导出失败，请重试');
 			}
-
-			let params = {
-				condition: this.data.condition
-			}
-
-			await cloudHelper.callCloudData('admin/user_data_export', params, options).then(res => {
-
-				this._loadDetail(0);
-				pageHelper.showModal('数据文件生成成功(' + res.total + '条记录), 请点击「直接打开」按钮或者复制文件地址下载');
-
-			});
-		} catch (err) {
-			console.log(err);
-			pageHelper.showNoneToast('导出失败，请重试');
-		}
-
+		};
+		pageHelper.showConfirm('确认生成数据文件？文件包含用户隐私信息，请妥善保管并及时删除', callback);
 	},
 
 	bindDelTap: async function (e) {

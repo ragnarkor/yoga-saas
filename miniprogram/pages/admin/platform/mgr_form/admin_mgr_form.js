@@ -18,7 +18,9 @@ Page({
   },
 
   onLoad() {
-    if (!AdminBiz.getAdminToken() || !AdminBiz.isSuperAdmin()) {
+    if (!AdminBiz.isAdmin(this)) return;
+
+    if (!AdminBiz.isSuperAdmin()) {
       wx.showToast({ title: '无权限', icon: 'none' });
       setTimeout(() => wx.navigateBack(), 600);
       return;

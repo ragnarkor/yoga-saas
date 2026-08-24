@@ -6,6 +6,10 @@
     <van-loading size="48rpx" color="{{themeColor}}" />
   </view>
 
+  <view wx:elif="{{loadError}}" class="loading-wrap">
+    <van-empty description="加载失败，请重试" />
+  </view>
+
   <view wx:elif="{{!detail}}" class="loading-wrap">
     <van-empty description="公告不存在" />
   </view>
@@ -28,7 +32,7 @@
         <block wx:else>
           <view class="content" wx:for="{{detail.content}}" wx:key="index">
             <text wx:if="{{item.type=='text'}}">{{item.val}}</text>
-            <image wx:if="{{item.type=='img'}}" src="{{item.val}}" mode="widthFix" class="content-image" />
+            <image wx:if="{{item.type=='img'}}" bindtap="url" data-url="{{item.val}}" data-type="img" src="{{item.val}}" mode="widthFix" class="content-image" aria-role="button" aria-label="查看图片，点击放大" />
           </view>
         </block>
       </view>

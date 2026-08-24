@@ -51,7 +51,7 @@
             <text class="shop-price-num" style="color:{{themeColor}}">{{item.priceYuan}}</text>
             <text wx:if="{{item.hasDiscount}}" class="shop-price-origin">¥{{item.originYuan}}</text>
           </view>
-          <view class="shop-item-btn" style="background:{{themeColor}};" catchtap="bindCardTap" data-id="{{item.id}}">查看套餐</view>
+          <view class="shop-item-btn" style="background:{{themeColor}};padding:29rpx 26rpx;" catchtap="bindCardTap" data-id="{{item.id}}" aria-role="button" aria-label="查看套餐">查看套餐</view>
         </view>
       </view>
     </view>

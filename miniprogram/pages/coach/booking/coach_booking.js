@@ -136,6 +136,7 @@ Page({
       console.error(e);
       this._applyGrid([]);
       this.setData({ loading: false });
+      wx.showToast({ title: '加载失败，请重试', icon: 'none' });
     }
   },
 

@@ -20,7 +20,9 @@
 		<view class="his">
 			<view class="title">
 				<view class="tit">历史记录</view>
-				<van-icon name="delete-o" size="36rpx" color="#999" bindtap="bindDelHisTap" aria-role="button" aria-label="清空历史记录" />
+				<view class="his-del-hit" bindtap="bindDelHisTap" aria-role="button" aria-label="清空历史记录">
+					<van-icon name="delete-o" size="36rpx" color="#999" />
+				</view>
 			</view>
 
 			<view class="search-content">

@@ -168,7 +168,7 @@
         </view>
         <view
           class="export-link-box"
-          bindtap="url"
+          bindtap="bindCopyTap"
           data-type="copy"
           data-url="{{exportUrl}}"
           aria-role="button"

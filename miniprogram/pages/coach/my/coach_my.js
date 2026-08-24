@@ -175,4 +175,11 @@ Page({
     this._loadAdmin();
     await this._loadProfile();
   },
+
+  async bindCoachTenantChange() {
+    await this._coachOnShow();
+    this._applyCoachTheme();
+    this._loadAdmin();
+    await this._loadProfile();
+  },
 });

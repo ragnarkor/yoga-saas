@@ -567,7 +567,9 @@
 .ach-calendar-week-head { margin-bottom:10rpx; text-align:center; }
 .ach-calendar-week-head text { font-size:21rpx; color:#9a9c91; }
 .ach-calendar-row { margin-bottom:8rpx; }
-.ach-calendar-cell { height:64rpx; display:flex; align-items:center; justify-content:center; border-radius:14rpx; background:#f1eee7; color:#777b72; font-size:25rpx; }
+.ach-calendar-cell { position:relative; height:64rpx; display:flex; align-items:center; justify-content:center; border-radius:14rpx; background:#f1eee7; color:#777b72; font-size:25rpx; }
+/* 与 .ach-calendar-arrow 一致：自身有可见背景，使用不可见 ::before/inset 命中区扩大点击范围 */
+.ach-calendar-cell::before { content:""; position:absolute; inset:-12rpx; }
 .ach-calendar-cell--on { color:#fff; font-weight:600; box-shadow:0 5rpx 10rpx rgba(76,129,101,.18); }
 .ach-calendar-cell--today { outline:3rpx solid #d8a84e; outline-offset:2rpx; }
 .ach-calendar-cell--empty { background:transparent; }

@@ -105,6 +105,6 @@
       <text class="detail-bar-cur" style="color:{{themeColor}}">¥</text>
       <text class="detail-bar-num" style="color:{{themeColor}}">{{card.priceYuan}}</text>
     </view>
-    <view class="detail-bar-btn" style="background:{{themeColor}}" bindtap="bindBuyTap">立即购买</view>
+    <view class="detail-bar-btn" style="background:{{themeColor}}" bindtap="bindBuyTap" aria-role="button" aria-label="立即购买">立即购买</view>
   </view>
 </view>

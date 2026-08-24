@@ -70,6 +70,7 @@
 }
 
 .schedule-day-picker {
+  position: relative;
   min-height: 70rpx;
   display: flex;
   align-items: center;
@@ -81,6 +82,12 @@
   background: #fafaf8;
   border: 1rpx solid #e8e9e5;
   border-radius: 14rpx;
+}
+
+.schedule-day-picker::before {
+  content: "";
+  position: absolute;
+  inset: -9rpx 0;
 }
 
 .schedule-day-picker-value {

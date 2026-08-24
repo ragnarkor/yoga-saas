@@ -54,7 +54,6 @@ Page({
       this.setData({
         isLoad: true,
         albumGroups: buildAlbumGroupsFromPhotos(photos),
-        albumListKey: Date.now(),
       });
       this._syncActiveAlbumPhotos();
     } catch (err) {

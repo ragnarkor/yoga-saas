@@ -23,7 +23,7 @@
         theme-color="{{themeColor}}"
         label="私教课程"
         sheet-title="选择私教课程"
-        empty-text="暂无私教课，请先在「我的门店」将分类标记为私教并创建课程"
+        empty-text="{{metaLoadFailed ? '加载失败，请返回重试' : '暂无私教课，请先在「我的门店」将分类标记为私教并创建课程'}}"
         field-class="mcp-in-section"
         bind:pick="onCoursePick"
       />

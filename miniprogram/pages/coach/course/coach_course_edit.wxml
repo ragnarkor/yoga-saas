@@ -171,13 +171,13 @@
     </van-cell-group>
 
     <view class="course-edit-save">
-      <van-button type="primary" block color="{{themeColor}}" bind:click="bindSaveTap">
+      <van-button type="primary" block color="{{themeColor}}" loading="{{saving}}" disabled="{{saving}}" bind:click="bindSaveTap">
         {{id ? '保存课程' : '创建课程'}}
       </van-button>
     </view>
 
     <view wx:if="{{id}}" class="course-edit-del-wrap">
-      <van-button type="danger" plain block bind:click="bindDeleteTap">删除课程</van-button>
+      <van-button type="danger" plain block loading="{{deleting}}" disabled="{{deleting}}" bind:click="bindDeleteTap">删除课程</van-button>
     </view>
   </block>
 

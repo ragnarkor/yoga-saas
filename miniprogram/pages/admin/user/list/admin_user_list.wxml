@@ -1,5 +1,5 @@
 <block wx:if="{{isAdmin}}">
-	<cmpt-comm-list type="admin-meet" search="{{search}}" _menus="{{sortMenus}}" _items="{{sortItems}}" route="admin/user_list" sortMenusDefaultIndex="0" topBottom="50" placeholder="搜索" bind:list="bindCommListCmpt" sortMenusDefaultIndex="0">
+	<cmpt-comm-list type="admin-meet" search="{{search}}" _menus="{{sortMenus}}" _items="{{sortItems}}" route="admin/user_list" sortMenusDefaultIndex="0" topBottom="50" placeholder="搜索" bind:list="bindCommListCmpt">
 
 		<!-- [AI_START TIMESTAMP=2025-01-25 18:40:00] -->
 		<view slot="searchEnd">
@@ -21,7 +21,7 @@
 				</view>
 
 				<view class="info">
-					<view class="info-item" bindtap="url" data-type="phone" data-url="{{item.USER_MOBILE}}" aria-role="button" aria-label="拨打电话">
+					<view class="info-item" bindtap="{{item.USER_MOBILE ? 'url' : ''}}" data-type="phone" data-url="{{item.USER_MOBILE}}" aria-role="button" aria-label="拨打电话">
 						<view class="title">手机</view>
 						<view class="mao">：</view>
 						<view class="content">{{item.USER_MOBILE||'未填写'}}<van-icon wx:if="{{item.USER_MOBILE}}" aria-role="img" aria-label="电话" name="phone-o" size="32rpx" custom-class="margin-left-s" /></view>

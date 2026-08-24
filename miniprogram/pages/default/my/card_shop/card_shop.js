@@ -12,7 +12,6 @@ Page({
     cards: [],
     themeColor: pageHelper.getThemeColor(),
     pageStyle: themeHelper.getPageMetaStyle(pageHelper.getThemeColor()),
-    wechatPay: false,
     // 套餐列表展示方式：list 横排行 / grid 网格卡（默认网格）
     viewMode: "grid",
   },
@@ -45,7 +44,6 @@ Page({
       this.setData({
         loading: false,
         cards: (r.cards || []).map((c) => this._decorate(c)),
-        wechatPay: !!r.wechatPay,
       });
     } catch (e) {
       this.setData({ loading: false });

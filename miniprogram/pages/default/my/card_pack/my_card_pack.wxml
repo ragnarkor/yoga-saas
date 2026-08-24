@@ -16,7 +16,7 @@
           <text>{{showInvalid ? '返回有效卡' : '失效卡'}}</text>
         </view>
         <view class="card-pack-link-divider"></view>
-        <view class="card-pack-order-link" bindtap="bindOrderTap">
+        <view class="card-pack-order-link" bindtap="bindOrderTap" aria-role="button" aria-label="购卡订单">
           <text>购卡订单</text>
           <text class="card-pack-order-arrow">›</text>
         </view>
@@ -30,6 +30,8 @@
         class="card-pack-item {{item.isActive ? '' : 'is-invalid'}}"
         bindtap="bindCardTap"
         data-id="{{item.id}}"
+        aria-role="button"
+        aria-label="{{item.name}}"
       >
         <image wx:if="{{item.coverUrl}}" class="card-pack-cover" src="{{item.coverUrl}}" mode="aspectFill" />
         <view class="card-pack-shade" style="{{item.shadeBg}}"></view>

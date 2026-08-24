@@ -85,25 +85,25 @@
       <text class="platform-section-title">快捷操作</text>
     </view>
     <view class="platform-action-grid">
-      <view class="platform-action-item" bindtap="url" data-url="/pages/admin/platform/tenant_form/admin_tenant_form">
+      <view class="platform-action-item" bindtap="url" data-url="/pages/admin/platform/tenant_form/admin_tenant_form" aria-role="button" aria-label="新建瑜伽馆">
         <view class="platform-action-icon">
           <van-icon name="add-o" size="40rpx" color="#4a7c8c" />
         </view>
         <text class="platform-action-text">新建瑜伽馆</text>
       </view>
-      <view class="platform-action-item" bindtap="url" data-url="/pages/admin/platform/mgr_form/admin_mgr_form">
+      <view class="platform-action-item" bindtap="url" data-url="/pages/admin/platform/mgr_form/admin_mgr_form" aria-role="button" aria-label="新建管理员">
         <view class="platform-action-icon">
           <van-icon name="manager-o" size="40rpx" color="#4a7c8c" />
         </view>
         <text class="platform-action-text">新建管理员</text>
       </view>
-      <view class="platform-action-item" bindtap="bindPlatformTenantTabTap">
+      <view class="platform-action-item" bindtap="bindPlatformTenantTabTap" aria-role="button" aria-label="瑜伽馆管理">
         <view class="platform-action-icon">
           <van-icon name="shop-o" size="40rpx" color="#4a7c8c" />
         </view>
         <text class="platform-action-text">瑜伽馆管理</text>
       </view>
-      <view class="platform-action-item" bindtap="bindStaffManageTap">
+      <view class="platform-action-item" bindtap="bindStaffManageTap" aria-role="button" aria-label="管理员配置">
         <view class="platform-action-icon">
           <van-icon name="friends-o" size="40rpx" color="#4a7c8c" />
         </view>
@@ -116,17 +116,17 @@
     <view class="platform-section-head">
       <text class="platform-section-title">系统</text>
     </view>
-    <view class="platform-menu-item" bindtap="url" data-url="/pages/admin/mgr/log/admin_log_list">
+    <view class="platform-menu-item" bindtap="url" data-url="/pages/admin/mgr/log/admin_log_list" aria-role="button" aria-label="操作日志">
       <van-icon name="description" size="32rpx" color="#4a7c8c" />
       <text class="platform-menu-text">操作日志</text>
       <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
     </view>
-    <view class="platform-menu-item" bindtap="url" data-url="/pages/admin/platform/audit_log/admin_audit_log">
+    <view class="platform-menu-item" bindtap="url" data-url="/pages/admin/platform/audit_log/admin_audit_log" aria-role="button" aria-label="平台审计日志">
       <van-icon name="shield-o" size="32rpx" color="#4a7c8c" />
       <text class="platform-menu-text">平台审计日志</text>
       <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
     </view>
-    <view class="platform-menu-item" bindtap="bindSettingTap">
+    <view class="platform-menu-item" bindtap="bindSettingTap" aria-role="button" aria-label="清除缓存">
       <van-icon name="delete-o" size="32rpx" color="#4a7c8c" />
       <text class="platform-menu-text">清除缓存</text>
       <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
@@ -153,14 +153,18 @@
           data-pid="{{item._pid}}"
           data-name="{{item.TENANT_NAME}}"
           bindtap="bindTenantManageTap"
+          aria-role="button"
+          aria-label="管理{{item.TENANT_NAME}}"
         >管理</view>
         <view
           class="tenant-row-btn tenant-row-btn--ghost"
           data-pid="{{item._pid}}"
           data-name="{{item.TENANT_NAME}}"
           bindtap="bindTenantFeatureTap"
+          aria-role="button"
+          aria-label="{{item.TENANT_NAME}}功能设置"
         >功能</view>
-        <view class="tenant-row-btn" data-item="{{item}}" bindtap="bindEnterCoachTap">进入</view>
+        <view class="tenant-row-btn" data-item="{{item}}" bindtap="bindEnterCoachTap" aria-role="button" aria-label="进入{{item.TENANT_NAME}}">进入</view>
       </view>
     </view>
   </view>
@@ -210,17 +214,17 @@
         </view>
       </view>
       <view class="platform-hero-stats">
-        <view class="platform-hero-stat" bindtap="url" data-url="/pages/coach/booking/coach_booking">
+        <view class="platform-hero-stat" bindtap="url" data-url="/pages/coach/booking/coach_booking" aria-role="button" aria-label="预约活动">
           <text class="platform-hero-stat-num">{{data.meetCnt || 0}}</text>
           <text class="platform-hero-stat-label">预约活动</text>
         </view>
         <view class="platform-hero-divider"></view>
-        <view class="platform-hero-stat" bindtap="url" data-url="/pages/coach/booking/coach_booking">
+        <view class="platform-hero-stat" bindtap="url" data-url="/pages/coach/booking/coach_booking" aria-role="button" aria-label="预约数">
           <text class="platform-hero-stat-num">{{data.joinCnt || 0}}</text>
           <text class="platform-hero-stat-label">预约数</text>
         </view>
         <view class="platform-hero-divider"></view>
-        <view class="platform-hero-stat" bindtap="url" data-url="/pages/admin/user/list/admin_user_list">
+        <view class="platform-hero-stat" bindtap="url" data-url="/pages/admin/user/list/admin_user_list" aria-role="button" aria-label="用户">
           <text class="platform-hero-stat-num">{{data.userCnt || 0}}</text>
           <text class="platform-hero-stat-label">用户</text>
         </view>
@@ -233,23 +237,23 @@
         <text class="platform-section-title">快捷操作</text>
       </view>
       <view class="platform-action-grid">
-        <view class="platform-action-item" bindtap="url" data-url="/pages/coach/booking/coach_booking">
+        <view class="platform-action-item" bindtap="url" data-url="/pages/coach/booking/coach_booking" aria-role="button" aria-label="预约管理">
           <view class="platform-action-icon"><van-icon name="calendar-o" size="40rpx" color="#4a7c8c" /></view>
           <text class="platform-action-text">预约管理</text>
         </view>
-        <view class="platform-action-item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/coach/photo/coach_photo_wall">
+        <view class="platform-action-item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/coach/photo/coach_photo_wall" aria-role="button" aria-label="照片墙">
           <view class="platform-action-icon"><van-icon name="photo" size="40rpx" color="#4a7c8c" /></view>
           <text class="platform-action-text">照片墙</text>
         </view>
-        <view class="platform-action-item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/coach/home/coach_home_content">
+        <view class="platform-action-item" wx:if="{{admin.type=='owner'}}" bindtap="url" data-url="/pages/coach/home/coach_home_content" aria-role="button" aria-label="首页内容">
           <view class="platform-action-icon"><van-icon name="photo-o" size="40rpx" color="#4a7c8c" /></view>
           <text class="platform-action-text">首页内容</text>
         </view>
-        <view class="platform-action-item" bindtap="url" data-url="/pages/admin/user/list/admin_user_list">
+        <view class="platform-action-item" bindtap="url" data-url="/pages/admin/user/list/admin_user_list" aria-role="button" aria-label="用户管理">
           <view class="platform-action-icon"><van-icon name="friends-o" size="40rpx" color="#4a7c8c" /></view>
           <text class="platform-action-text">用户管理</text>
         </view>
-        <view class="platform-action-item" bindtap="bindEnterCoachTap">
+        <view class="platform-action-item" bindtap="bindEnterCoachTap" aria-role="button" aria-label="教练端">
           <view class="platform-action-icon"><van-icon name="apps-o" size="40rpx" color="#4a7c8c" /></view>
           <text class="platform-action-text">教练端</text>
         </view>
@@ -261,12 +265,12 @@
       <view class="platform-section-head">
         <text class="platform-section-title">系统</text>
       </view>
-      <view class="platform-menu-item" bindtap="url" data-url="/pages/admin/mgr/log/admin_log_list">
+      <view class="platform-menu-item" bindtap="url" data-url="/pages/admin/mgr/log/admin_log_list" aria-role="button" aria-label="操作日志">
         <van-icon name="description" size="32rpx" color="#4a7c8c" />
         <text class="platform-menu-text">操作日志</text>
         <van-icon name="arrow" size="24rpx" color="#c8c9cc" />
       </view>
-      <view class="platform-menu-item" bindtap="bindSettingTap">
+      <view class="platform-menu-item" bindtap="bindSettingTap" aria-role="button" aria-label="清除缓存">
         <van-icon name="delete-o" size="32rpx" color="#4a7c8c" />
         <text class="platform-menu-text">清除缓存</text>
         <van-icon name="arrow" size="24rpx" color="#c8c9cc" />

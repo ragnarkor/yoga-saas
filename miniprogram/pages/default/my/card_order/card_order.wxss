@@ -74,10 +74,18 @@
 }
 
 .order-sn {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10rpx;
   min-width: 0;
+}
+
+/* 订单号行文字热区较小，扩大点击热区至约 88rpx */
+.order-sn::before {
+  content: "";
+  position: absolute;
+  inset: -28rpx;
 }
 
 .order-sn-label {

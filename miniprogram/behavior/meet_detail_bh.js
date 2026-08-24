@@ -125,6 +125,7 @@ module.exports = Behavior({
 				this._applyCardBookState();
 			} catch (e) {
 				console.error(e);
+				pageHelper.showErrToast('会员卡信息加载失败');
 			}
 		},
 
@@ -378,11 +379,9 @@ module.exports = Behavior({
 					{ meetId, timeMark: this.data.timeMark || '' },
 					{ title: 'bar' },
 				);
-				console.log('[meet_detail_bh] join_card_options res:', res && res.list);
 				const list = ((res && res.list) || []).map((item) =>
 					cardFaceHelper.enrichCardVisual(item),
 				);
-				console.log('[meet_detail_bh] mapped joinCardOptions:', list);
 				if (!list.length) {
 					this.setData({ cardSheetShow: false, cardPickLoading: false });
 					wx.showModal({

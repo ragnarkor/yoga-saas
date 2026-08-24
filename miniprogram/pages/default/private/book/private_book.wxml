@@ -146,6 +146,9 @@
           wx:key="id"
           data-id="{{item.id}}"
           bindtap="bindCardPick"
+          aria-role="button"
+          aria-selected="{{selectedCardId === item.id}}"
+          aria-label="{{item.name}}{{selectedCardId === item.id ? '，已选中' : ''}}"
         >
           <view class="pb-card-option-visual">
             <image

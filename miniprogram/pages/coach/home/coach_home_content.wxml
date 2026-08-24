@@ -48,7 +48,7 @@
             <view wx:else class="hc-banner-img hc-banner-img--placeholder"><van-icon name="photo-o" size="48rpx" color="#c8c9cc" /></view>
             <view class="hc-banner-meta"><text class="hc-card-title">{{item.BANNER_TITLE || '未命名横幅'}}</text><text class="hc-card-desc">排序 {{item.BANNER_ORDER || 0}}</text></view>
           </view>
-          <view slot="right" class="hc-swipe-del" data-type="banner" data-id="{{item._id}}" catchtap="bindDelTap">删除</view>
+          <view slot="right" class="hc-swipe-del" data-type="banner" data-id="{{item._id}}" catchtap="bindDelTap" aria-role="button" aria-label="删除横幅：{{item.BANNER_TITLE || '未命名横幅'}}">删除</view>
         </van-swipe-cell>
       </block>
 
@@ -60,7 +60,7 @@
             <view class="hc-list-body"><text class="hc-card-title">{{item.ANNOUNCE_TITLE}}</text><text class="hc-card-desc">{{item.ANNOUNCE_DESC || '无描述'}}</text></view>
             <van-icon name="arrow" size="28rpx" color="#c8c9cc" />
           </view>
-          <view slot="right" class="hc-swipe-del" data-type="announce" data-id="{{item._id}}" catchtap="bindDelTap">删除</view>
+          <view slot="right" class="hc-swipe-del" data-type="announce" data-id="{{item._id}}" catchtap="bindDelTap" aria-role="button" aria-label="删除公告：{{item.ANNOUNCE_TITLE}}">删除</view>
         </van-swipe-cell>
       </block>
     </scroll-view>

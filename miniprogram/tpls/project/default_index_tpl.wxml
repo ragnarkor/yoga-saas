@@ -25,10 +25,19 @@
 				<text class="home-place-name text-cut">{{tenantName || '瑜伽馆'}}</text>
 				<text class="home-place-addr text-cut" wx:if="{{studioAddress}}">{{studioAddress}}</text>
 			</view>
-			<text
-				wx:if="{{openStatus}}"
-				class="home-place-state {{openStatus.open ? '' : 'closed'}}"
-			>{{openStatus.label}}{{openStatus.timeText ? ' · ' + openStatus.timeText : ''}}</text>
+			<view class="home-place-actions">
+				<text
+					wx:if="{{openStatus}}"
+					class="home-place-state {{openStatus.open ? '' : 'closed'}}"
+				>{{openStatus.label}}{{openStatus.timeText ? ' · ' + openStatus.timeText : ''}}</text>
+				<text
+					wx:if="{{phone}}"
+					class="home-place-phone"
+					catchtap="bindPhoneTap"
+					aria-role="button"
+					aria-label="拨打电话"
+				>致电</text>
+			</view>
 		</view>
 
 		<!-- 下一节课 / 本周推荐 -->
@@ -83,7 +92,7 @@
 					<text class="home-section-title">本周推荐</text>
 					<text class="home-section-more" bindtap="bindHomeBookingTap" aria-role="button" aria-label="查看全部课程">查看全部 ›</text>
 				</view>
-				<view class="class-mini home-private-fallback" bindtap="bindPrivateBookingTap" aria-role="button" aria-label="私教预约">
+				<view class="class-mini" bindtap="bindPrivateBookingTap" aria-role="button" aria-label="私教预约">
 					<text class="class-mini-when">私教体验</text>
 					<text class="class-mini-name">一对一定制</text>
 					<text class="class-mini-sub">自选教练与时间 ›</text>

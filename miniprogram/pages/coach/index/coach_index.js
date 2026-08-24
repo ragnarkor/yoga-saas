@@ -1,4 +1,3 @@
-const pageHelper = require('../../../helper/page_helper.js');
 const cloudHelper = require('../../../helper/cloud_helper.js');
 const AdminBiz = require('../../../biz/admin_biz.js');
 const AdminWxBiz = require('../../../biz/admin_wx_biz.js');
@@ -93,6 +92,7 @@ Page({
       }
     } catch (e) {
       console.error(e);
+      wx.showToast({ title: (e && e.msg) || '数据加载失败', icon: 'none' });
     }
   },
 

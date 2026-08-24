@@ -178,9 +178,17 @@
 }
 
 .card-back-copy {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10rpx;
+}
+
+/* 卡号复制热区较小，扩大点击热区至约 88rpx */
+.card-back-copy::before {
+  content: "";
+  position: absolute;
+  inset: -30rpx;
 }
 
 .card-back-memo {

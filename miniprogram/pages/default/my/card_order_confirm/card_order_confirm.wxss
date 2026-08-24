@@ -158,7 +158,9 @@
 .confirm-transfer-title { display:flex; align-items:center; gap:10rpx; color:#435248; font-size:24rpx; font-weight:600; }
 .confirm-transfer-row { display:flex; align-items:center; gap:16rpx; min-height:48rpx; margin-top:8rpx; color:#8b968f; font-size:23rpx; }
 .confirm-transfer-row text:nth-child(2) { flex:1; min-width:0; color:#435248; text-align:right; word-break:break-all; }
-.confirm-copy { padding:3rpx 10rpx; border-radius:999rpx; background:#fff; font-size:21rpx; }
+.confirm-copy { position:relative; padding:3rpx 10rpx; border-radius:999rpx; background:#fff; font-size:21rpx; }
+/* 银行卡号复制胶囊体积很小，扩大点击热区至约 88rpx */
+.confirm-copy::before { content:""; position:absolute; inset:-24rpx; }
 .confirm-transfer-empty { display:block; margin-top:12rpx; color:#9a875e; font-size:22rpx; line-height:1.55; }
 
 /* ============ 金额汇总 ============ */

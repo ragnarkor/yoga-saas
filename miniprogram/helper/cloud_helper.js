@@ -324,8 +324,9 @@
  			}).then(res => {
  				imgList[i] = res.fileID;
  			}).catch(error => {
- 				// handle error TODO:剔除图片
+ 				// 上传失败：不能静默保存本地临时路径，需中断并让调用方感知失败
  				console.error(error);
+ 				throw error;
  			})
  		}
  	}

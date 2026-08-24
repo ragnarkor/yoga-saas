@@ -478,7 +478,7 @@
     </scroll-view>
 
     <view wx:if="{{canEdit}}" class="store-save-bar">
-      <van-button round block color="{{themeColor}}" custom-class="store-save-btn" bind:click="bindSaveTap">保存</van-button>
+      <van-button round block color="{{themeColor}}" custom-class="store-save-btn" loading="{{saving}}" disabled="{{saving}}" bind:click="bindSaveTap">保存</van-button>
     </view>
     <view wx:else class="store-readonly-tip">仅馆主可修改门店配置</view>
   </block>

@@ -51,6 +51,7 @@ Page({
           isLoad: true,
         });
       } else {
+        pageHelper.showErrToast("加载失败，以下为默认值，请下拉刷新重试");
         this.setData({
           features: {
             booking: true,
@@ -65,6 +66,7 @@ Page({
       }
     } catch (err) {
       console.error(err);
+      pageHelper.showErrToast("加载失败，请下拉刷新重试");
       this.setData({ isLoad: true });
     }
   },

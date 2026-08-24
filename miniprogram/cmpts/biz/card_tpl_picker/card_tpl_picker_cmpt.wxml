@@ -1,6 +1,6 @@
 <!-- [AI_START TIMESTAMP=2025-01-27 17:00:00] -->
 <!-- 字段行：field-class 由页面传入 issue-form-row，与相邻表单项共用样式 -->
-<view class="course-edit-field course-edit-field--inline field-class ctp-field" bindtap="bindFieldTap">
+<view class="course-edit-field course-edit-field--inline field-class ctp-field" bindtap="bindFieldTap" aria-role="button" aria-label="选择卡模板">
   <view class="ctp-field-label course-edit-field-label-inline {{required ? 'course-edit-field-label-inline--required' : ''}}">{{label}}</view>
   <view class="course-edit-field-row course-edit-field-row--inline ctp-field-value-wrap">
     <view class="ctp-field-value course-edit-field-value {{selectedTpl ? '' : 'course-edit-field-placeholder-text'}}">

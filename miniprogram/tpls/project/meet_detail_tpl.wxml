@@ -74,7 +74,9 @@
 			<view class="md-time-grid">
 				<view wx:for="{{currentDayTimes}}" wx:key="mark"
 					class="md-time-chip {{selectedTimeIdx === index ? 'active' : ''}} {{item.error ? 'disabled' : ''}}"
-					bindtap="bindSelectTimeTap" data-timeidx="{{index}}">
+					bindtap="bindSelectTimeTap" data-timeidx="{{index}}"
+					aria-role="button" aria-selected="{{selectedTimeIdx === index}}"
+					aria-label="{{item.start}}–{{item.end}}{{item.error ? '，' + item.error : ''}}">
 					<text class="md-time-range">{{item.start}}–{{item.end}}</text>
 					<text wx:if="{{item.isLimit && meet.MEET_IS_SHOW_LIMIT==1}}" class="md-time-limit">
 						{{item.stat.succCnt || 0}}/{{item.limit}}
@@ -160,6 +162,9 @@
 					wx:key="id"
 					bindtap="bindCardPick"
 					data-id="{{item.id}}"
+					aria-role="button"
+					aria-selected="{{selectedCardId === item.id}}"
+					aria-label="{{item.name}}{{selectedCardId === item.id ? '，已选中' : ''}}"
 				>
 					<view class="md-card-option-visual">
 						<image

@@ -97,6 +97,7 @@
 }
 
 .expire-day-pick {
+  position: relative;
   margin-top: 16rpx;
   padding: 20rpx 24rpx;
   border-radius: 12rpx;
@@ -104,4 +105,10 @@
   border: 1rpx solid var(--adminBorder);
   font-size: 28rpx;
   color: var(--adminText);
+}
+
+.expire-day-pick::before {
+  content: "";
+  position: absolute;
+  inset: -8rpx;
 }

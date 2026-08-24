@@ -203,6 +203,7 @@ Page({
       this._updateSubmitBtnText();
     } catch (e) {
       console.error(e);
+      pageHelper.showErrToast('会员卡信息加载失败');
     }
   },
 
@@ -309,6 +310,7 @@ Page({
         { meetId: form.meetId, teacherId: form.teacherId, day: form.day, start },
         { hint: false },
       );
+      if (this.data.form.start !== start) return;
       const slot = res && res.customSlot;
       if (slot) {
         this.setData({ 'form.end': slot.end, customTimeHint: '时间可用' }, () => this._updateSubmitBtnText());
@@ -317,6 +319,7 @@ Page({
       }
     } catch (err) {
       console.error('[private/custom-time]', err);
+      if (this.data.form.start !== start) return;
       this.setData({ 'form.end': '', customTimeHint: '时间检查失败，请重试' }, () => this._updateSubmitBtnText());
     }
   },

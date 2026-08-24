@@ -17,8 +17,16 @@ Page({
   onLoad(options) {
     this._scope = options.scope === "coach" ? "coach" : "member";
     this._reason = options.reason || "";
-    this._themeColor = options.color
-      ? themeHelper.normalizeHex(decodeURIComponent(options.color))
+    let decodedColor = "";
+    if (options.color) {
+      try {
+        decodedColor = decodeURIComponent(options.color);
+      } catch (e) {
+        decodedColor = "";
+      }
+    }
+    this._themeColor = decodedColor
+      ? themeHelper.normalizeHex(decodedColor)
       : "";
     const expiredBanner =
       this._reason === "expired"

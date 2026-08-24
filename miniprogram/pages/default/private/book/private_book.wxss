@@ -139,6 +139,9 @@
 
 .pb-day-schedule-list {
   max-height: 58vh;
+  /* 左右各留 5rpx，避免 .pb-day-schedule-row::before 的负 inset 命中区被 scroll-view 裁切 */
+  padding: 0 5rpx;
+  box-sizing: border-box;
 }
 
 .pb-day-schedule-row {
@@ -155,7 +158,7 @@
 .pb-day-schedule-row::before {
   content: "";
   position: absolute;
-  inset: -6rpx;
+  inset: -5rpx;
 }
 
 .pb-day-schedule-row--available {

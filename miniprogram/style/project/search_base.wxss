@@ -11,10 +11,6 @@
   align-items: center;
 }
 
-.main-search .search {
-  width: 100%;
-}
-
 .main-search .his {
   flex: 1;
   margin-top: 2rpx;
@@ -58,3 +54,19 @@
   margin: -20rpx;
 }
 /* [AI_END LINES=5 TIMESTAMP=2026-08-24 00:00:00] */
+
+/* [AI_START TIMESTAMP=2026-08-24 00:00:01] */
+/* 清空历史记录按钮触摸区域扩展：van-icon 自身无可见背景盒，用不可见 ::before/inset 命中区包裹 */
+.his-del-hit {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.his-del-hit::before {
+  content: "";
+  position: absolute;
+  inset: -26rpx;
+}
+/* [AI_END LINES=12 TIMESTAMP=2026-08-24 00:00:01] */

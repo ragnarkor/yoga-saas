@@ -105,15 +105,15 @@
               <view wx:if="{{member.cancelReason && member.groupKey === 'cancelled'}}" class="bd-reason">原因：{{member.cancelReason}}</view>
               <view class="bd-actions">
                 <block wx:if="{{member.status === 1 && !member.checkin}}">
-                  <view class="bd-act bd-act--primary" data-id="{{member.id}}" data-flag="1" bindtap="bindCheckinTap">签到</view>
-                  <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap">取消预约</view>
+                  <view class="bd-act bd-act--primary" data-id="{{member.id}}" data-flag="1" bindtap="bindCheckinTap" aria-role="button" aria-label="签到 {{member.name}}">签到</view>
+                  <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap" aria-role="button" aria-label="取消预约 {{member.name}}">取消预约</view>
                 </block>
                 <block wx:elif="{{member.status === 1 && member.checkin}}">
-                  <view class="bd-act" data-id="{{member.id}}" data-flag="0" bindtap="bindCheckinTap">取消签到</view>
-                  <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap">取消预约</view>
+                  <view class="bd-act" data-id="{{member.id}}" data-flag="0" bindtap="bindCheckinTap" aria-role="button" aria-label="取消签到 {{member.name}}">取消签到</view>
+                  <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap" aria-role="button" aria-label="取消预约 {{member.name}}">取消预约</view>
                 </block>
                 <block wx:else>
-                  <view class="bd-act bd-act--primary" data-id="{{member.id}}" bindtap="bindRestoreTap">恢复预约</view>
+                  <view class="bd-act bd-act--primary" data-id="{{member.id}}" bindtap="bindRestoreTap" aria-role="button" aria-label="恢复预约 {{member.name}}">恢复预约</view>
                 </block>
               </view>
             </view>
@@ -136,7 +136,7 @@
               <text class="bd-name">{{member.name}}</text>
               <text class="bd-status-chip bd-status-chip--{{member.groupKey}}">{{member.statusLabel}}</text>
             </view>
-            <view wx:if="{{member.mobile}}" class="bd-phone" data-phone="{{member.mobile}}" bindtap="bindPhoneTap">
+            <view wx:if="{{member.mobile}}" class="bd-phone" data-phone="{{member.mobile}}" bindtap="bindPhoneTap" aria-role="button" aria-label="拨打电话 {{member.mobile}}">
               {{member.mobile}}
               <van-icon name="phone-o" size="24rpx" color="{{themeColor}}" />
             </view>
@@ -145,15 +145,15 @@
             <view wx:if="{{member.cancelReason && member.groupKey === 'cancelled'}}" class="bd-reason">原因：{{member.cancelReason}}</view>
             <view class="bd-actions">
               <block wx:if="{{member.status === 1 && !member.checkin}}">
-                <view class="bd-act bd-act--primary" data-id="{{member.id}}" data-flag="1" bindtap="bindCheckinTap">签到</view>
-                <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap">取消预约</view>
+                <view class="bd-act bd-act--primary" data-id="{{member.id}}" data-flag="1" bindtap="bindCheckinTap" aria-role="button" aria-label="签到 {{member.name}}">签到</view>
+                <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap" aria-role="button" aria-label="取消预约 {{member.name}}">取消预约</view>
               </block>
               <block wx:elif="{{member.status === 1 && member.checkin}}">
-                <view class="bd-act" data-id="{{member.id}}" data-flag="0" bindtap="bindCheckinTap">取消签到</view>
-                <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap">取消预约</view>
+                <view class="bd-act" data-id="{{member.id}}" data-flag="0" bindtap="bindCheckinTap" aria-role="button" aria-label="取消签到 {{member.name}}">取消签到</view>
+                <view class="bd-act" data-id="{{member.id}}" bindtap="bindCancelOneTap" aria-role="button" aria-label="取消预约 {{member.name}}">取消预约</view>
               </block>
               <block wx:else>
-                <view class="bd-act bd-act--primary" data-id="{{member.id}}" bindtap="bindRestoreTap">恢复预约</view>
+                <view class="bd-act bd-act--primary" data-id="{{member.id}}" bindtap="bindRestoreTap" aria-role="button" aria-label="恢复预约 {{member.name}}">恢复预约</view>
               </block>
             </view>
           </view>
@@ -208,8 +208,8 @@
       <view class="bd-sheet-body">
         <textarea class="bd-sheet-textarea" placeholder="取消理由（选填）" maxlength="100" value="{{cancelReason}}" bindinput="bindCancelReasonInput" />
         <view class="bd-sheet-btns">
-          <view class="bd-sheet-btn bd-sheet-btn--ghost" bindtap="bindCloseCancelOne">再想想</view>
-          <view class="bd-sheet-btn bd-sheet-btn--danger" bindtap="bindConfirmCancelOne">确认取消</view>
+          <view class="bd-sheet-btn bd-sheet-btn--ghost" bindtap="bindCloseCancelOne" aria-role="button" aria-label="再想想，不取消预约">再想想</view>
+          <view class="bd-sheet-btn bd-sheet-btn--danger" bindtap="bindConfirmCancelOne" aria-role="button" aria-label="{{cancelOneSubmitting ? '取消中' : '确认取消该预约'}}">{{cancelOneSubmitting ? '取消中…' : '确认取消'}}</view>
         </view>
       </view>
     </view>
@@ -227,8 +227,8 @@
       <view class="bd-sheet-body">
         <textarea class="bd-sheet-textarea" placeholder="取消理由（选填）" maxlength="100" value="{{cancelReason}}" bindinput="bindCancelReasonInput" />
         <view class="bd-sheet-btns">
-          <view class="bd-sheet-btn bd-sheet-btn--ghost" bindtap="bindCloseCancelAll">再想想</view>
-          <view class="bd-sheet-btn bd-sheet-btn--danger" bindtap="bindConfirmCancelAll">确认取消本节</view>
+          <view class="bd-sheet-btn bd-sheet-btn--ghost" bindtap="bindCloseCancelAll" aria-role="button" aria-label="再想想，不取消本节">再想想</view>
+          <view class="bd-sheet-btn bd-sheet-btn--danger" bindtap="bindConfirmCancelAll" aria-role="button" aria-label="{{cancelAllSubmitting ? '取消中' : '确认取消本节全部预约'}}">{{cancelAllSubmitting ? '取消中…' : '确认取消本节'}}</view>
         </view>
       </view>
     </view>
@@ -264,8 +264,8 @@
         </view>
       </view>
       <view class="bd-sheet-btns bd-sheet-btns--book">
-        <view class="bd-sheet-btn bd-sheet-btn--ghost" bindtap="bindCloseBookSheet">取消</view>
-        <view class="bd-sheet-btn bd-sheet-btn--primary" bindtap="bindConfirmBookTap">{{bookSubmitting ? '提交中…' : '确认代约'}}</view>
+        <view class="bd-sheet-btn bd-sheet-btn--ghost" bindtap="bindCloseBookSheet" aria-role="button" aria-label="取消代预约">取消</view>
+        <view class="bd-sheet-btn bd-sheet-btn--primary" bindtap="bindConfirmBookTap" aria-role="button" aria-label="{{bookSubmitting ? '提交中' : '确认代约'}}">{{bookSubmitting ? '提交中…' : '确认代约'}}</view>
       </view>
     </view>
   </van-popup>

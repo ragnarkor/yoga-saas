@@ -69,6 +69,12 @@ page {
   font-size: 28rpx;
 }
 
+.course-hero-star::before {
+  content: "";
+  position: absolute;
+  inset: -14rpx;
+}
+
 .course-hero-star:active {
   background: rgba(255, 255, 255, 0.3);
 }
@@ -274,6 +280,7 @@ page {
 }
 
 .record-filter {
+  position: relative;
   flex-shrink: 0;
   padding: 16rpx 22rpx;
   border-radius: 999rpx;
@@ -281,6 +288,12 @@ page {
   color: var(--neutralTextTertiary, #8f959e);
   font-size: 22rpx;
   transition: all 0.2s ease;
+}
+
+.record-filter::before {
+  content: "";
+  position: absolute;
+  inset: -13rpx -5rpx;
 }
 
 .record-filter.active {

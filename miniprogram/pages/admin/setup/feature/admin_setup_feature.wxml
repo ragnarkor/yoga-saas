@@ -4,6 +4,9 @@
 
 <view class="main-admin" wx:if="{{isLoad}}">
 
+  <van-cell-group>
+    <van-cell title="瑜伽馆" value="{{tenantName || '未知'}}" />
+  </van-cell-group>
 
   <van-cell-group title="预约与课程">
     <van-cell title="预约功能" center>

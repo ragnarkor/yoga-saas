@@ -20,7 +20,10 @@ module.exports = Behavior({
 		 * 生命周期函数--监听页面加载
 		 */
 		onLoad: function (options) {
-			if (!pageHelper.getOptions(this, options)) return;
+			if (!pageHelper.getOptions(this, options)) {
+				this.setData({ isLoad: null });
+				return;
+			}
 			this._loadDetail();
 		},
 
@@ -192,13 +195,6 @@ module.exports = Behavior({
 					pageHelper.showModal(msg, '签到结果', () => this._loadDetail());
 				},
 			});
-		},
-
-		bindNoticeTap: function (e) {
-			let callback = () => {
-				pageHelper.showSuccToast('开启成功');
-			}
-			MeetBiz.subscribeMessageMeet(callback);
 		},
 
 		bindCalendarTap: function (e) {

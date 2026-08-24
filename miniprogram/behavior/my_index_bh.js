@@ -58,12 +58,6 @@ module.exports = Behavior({
     },
 
     bindSwitchCoachTap: async function () {
-      if (AdminWxBiz.isSuperSession()) {
-        const ok = await AdminWxBiz.prepareCoachEntry();
-        if (!ok) return;
-        wx.navigateTo({ url: "/pages/coach/index/coach_index" });
-        return;
-      }
       const ok = await AdminWxBiz.prepareCoachEntry();
       if (!ok) return;
       wx.navigateTo({
@@ -85,10 +79,6 @@ module.exports = Behavior({
     onReachBottom: function () {},
 
     onShareAppMessage: function () {},
-
-    url: function (e) {
-      pageHelper.url(e, this);
-    },
 
     bindSetTap: function (e) {
       this.setTap(e, this.data.skin);

@@ -27,7 +27,7 @@
         <button
           class="inline-btn"
           loading="{{statusSubmitting}}"
-          disabled="{{statusSubmitting}}"
+          disabled="{{statusSubmitting || loadFailed}}"
           bindtap="bindSaveStatus"
           aria-role="button"
           aria-label="保存运营状态"
@@ -73,7 +73,7 @@
         <button
           class="inline-btn"
           loading="{{submitting}}"
-          disabled="{{submitting}}"
+          disabled="{{submitting || loadFailed}}"
           bindtap="bindSaveExpire"
           aria-role="button"
           aria-label="保存有效期"

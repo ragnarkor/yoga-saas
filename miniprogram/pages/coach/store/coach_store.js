@@ -112,6 +112,7 @@ Page({
     privateAreaHeight: 0,
     cateRowHeight: 0,
     canEdit: false,
+    saving: false,
     themeColor: themeHelper.DEFAULT_THEME,
     themePickIndex: 0,
     themeDirty: false,
@@ -519,6 +520,7 @@ Page({
   },
 
   async bindSaveTap() {
+    if (this.data.saving) return;
     const tenantName = (this.data.tenantName || "").trim();
     if (!tenantName) {
       wx.showToast({ title: "请填写门店名称", icon: "none" });
@@ -543,6 +545,7 @@ Page({
       return;
     }
 
+    this.setData({ saving: true });
     try {
       wx.showLoading({ title: "保存中", mask: true });
 
@@ -650,6 +653,8 @@ Page({
     } catch (e) {
       wx.hideLoading();
       console.error(e);
+    } finally {
+      this.setData({ saving: false });
     }
   },
 });

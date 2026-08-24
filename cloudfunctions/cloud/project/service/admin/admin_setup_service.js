@@ -91,7 +91,7 @@ class AdminSetupService extends BaseAdminService {
     pid = String(pid || "").trim();
     if (!pid) this.AppError("请选择瑜伽馆");
 
-    let setup = await tenantSetupHelper.getSetupForPid(pid, "_pid");
+    let setup = await tenantSetupHelper.getSetupForPid(pid, "_pid,SETUP_FEATURES");
     if (!setup) {
       const prevPid = global.PID;
       global.PID = pid;
@@ -108,10 +108,19 @@ class AdminSetupService extends BaseAdminService {
       return;
     }
 
+    // 与已存的开关做合并而非整体覆盖：避免前端因加载失败等原因只带回
+    // 局部字段保存时，把其余未涉及的功能开关一并清空。
+    let mergedFeatures = Object.assign(
+      {},
+      this._defaultFeatures(),
+      setup.SETUP_FEATURES || {},
+      features || {},
+    );
+
     await SetupModel.edit(
       { _pid: pid },
       {
-        SETUP_FEATURES: features,
+        SETUP_FEATURES: mergedFeatures,
         SETUP_EDIT_TIME: timeUtil.time(),
       },
       false,

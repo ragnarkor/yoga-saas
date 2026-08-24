@@ -255,7 +255,7 @@ Page({
       const path = data.bindPath || '';
       wx.showModal({
         title: '绑定邀请已生成（24小时有效）',
-        content: `员工：${name}\n\n转发以下路径给员工扫码绑定：\n${path}\n\n开发者工具：启动参数 code=${data.code}`,
+        content: `员工：${name}\n\n转发以下路径给员工扫码绑定：\n${path}`,
         confirmText: '复制路径',
         success: (r) => {
           if (r.confirm && path) wx.setClipboardData({ data: path });
@@ -275,7 +275,7 @@ Page({
       success: async (res) => {
         if (!res.confirm) return;
         try {
-          await AdminWxBiz.unbind(id);
+          await AdminWxBiz.unbind(id, this.data.selfOnly);
           wx.showToast({ title: '已解绑', icon: 'success' });
           if (this.data.selfOnly) {
             setTimeout(() => {

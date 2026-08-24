@@ -12,7 +12,7 @@ const MAIN_TABS = [
 const RANGE_TABS = [
   { key: 'today', label: '今日' },
   { key: 'month', label: '本月' },
-  { key: 'all', label: '累计' },
+  { key: 'all', label: '近12月' },
 ];
 
 Page({
@@ -126,6 +126,12 @@ Page({
   },
 
   url(e) {
+    pageHelper.url(e, this);
+  },
+
+  bindCopyTap(e) {
+    const url = e.currentTarget.dataset.url;
+    if (!url) return;
     pageHelper.url(e, this);
   },
 

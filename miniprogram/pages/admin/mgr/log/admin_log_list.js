@@ -7,7 +7,6 @@ Page({
    */
   // [AI_START TIMESTAMP=2025-01-26 10:00:00]
   data: {
-    isSuperAdmin: false,
     search: "",
     sortMenus: [],
     sortItems: [],
@@ -22,10 +21,6 @@ Page({
 
     //设置搜索菜单
     this.setData(this._getSearchMenu());
-
-    this.setData({
-      isSuperAdmin: AdminBiz.isSuperAdmin(),
-    });
   },
 
   /**

@@ -15,7 +15,7 @@
 			<view class="jd-status-tag jd-status-tag--pending" wx:if="{{join.JOIN_STATUS==0}}">待确认</view>
 			<view class="jd-status-tag jd-status-tag--cancel" wx:if="{{join.JOIN_STATUS==10}}">已取消</view>
 			<view class="jd-status-tag jd-status-tag--system" wx:if="{{join.JOIN_STATUS==99}}">系统取消</view>
-			<view class="jd-course-layout" bindtap="url" data-url="../../meet/detail/meet_detail?id={{join.JOIN_MEET_ID}}">
+			<view class="jd-course-layout" bindtap="url" data-url="../../meet/detail/meet_detail?id={{join.JOIN_MEET_ID}}" aria-role="button" aria-label="查看课程详情">
 				<view class="jd-course-body">
 					<view class="jd-course-name-wrap">
 						<text class="jd-course-name">{{join.JOIN_MEET_TITLE}}</text>

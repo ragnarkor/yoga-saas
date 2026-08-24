@@ -1,5 +1,5 @@
 <!-- 与 van-field / 卡面颜色等表单项同一套 inline 行样式 -->
-<view class="mcp-field course-edit-field course-edit-field--inline" bindtap="bindFieldTap">
+<view class="mcp-field course-edit-field course-edit-field--inline" bindtap="bindFieldTap" aria-role="button" aria-label="选择课程分类">
   <text class="course-edit-field-label-inline {{required ? 'course-edit-field-label-inline--required' : ''}}">{{label}}</text>
   <view class="course-edit-field-row course-edit-field-row--inline">
     <text class="course-edit-field-value {{fieldValueIsPlaceholder ? 'course-edit-field-placeholder-text' : ''}}">{{fieldValue}}</text>

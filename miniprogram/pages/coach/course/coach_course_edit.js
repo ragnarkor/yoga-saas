@@ -22,6 +22,8 @@ Page({
 
   data: {
     loading: true,
+    saving: false,
+    deleting: false,
     pageTitle: '新增课程',
     id: '',
     typeName: '',
@@ -292,6 +294,7 @@ Page({
   },
 
   async bindSaveTap() {
+    if (this.data.saving) return;
     const data = this.data;
     if (!data.formTitle.trim()) {
       return wx.showToast({ title: '请填写课程名称', icon: 'none' });
@@ -310,6 +313,7 @@ Page({
     styleSet.pic = data.thumbList[0] ? data.thumbList[0].url : (styleSet.pic || '');
     styleSet.carousel = data.carouselList.map((f) => f.url);
 
+    this.setData({ saving: true });
     wx.showLoading({ title: '保存中...', mask: true });
     try {
       let meetId = data.id;
@@ -333,23 +337,27 @@ Page({
     } catch (e) {
       wx.hideLoading();
       console.error(e);
+    } finally {
+      this.setData({ saving: false });
     }
   },
 
   bindDeleteTap() {
     const id = this.data.id;
-    if (!id) return;
+    if (!id || this.data.deleting) return;
     wx.showModal({
       title: '提示',
       content: '确定删除该课程吗？',
       success: async (res) => {
         if (!res.confirm) return;
+        this.setData({ deleting: true });
         try {
           await cloudHelper.callCloudSumbit('admin/meet_del', { meetId: id });
           wx.showToast({ title: '已删除', icon: 'success' });
           setTimeout(() => wx.navigateBack(), 1500);
         } catch (e) {
           console.error(e);
+          this.setData({ deleting: false });
         }
       },
     });

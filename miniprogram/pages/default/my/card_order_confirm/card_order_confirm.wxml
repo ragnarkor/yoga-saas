@@ -52,6 +52,9 @@
         class="confirm-pay-item {{payType === 'wechat' ? 'is-active' : ''}}"
         data-type="wechat"
         bindtap="bindPayTypeTap"
+        aria-role="radio"
+        aria-checked="{{payType === 'wechat'}}"
+        aria-label="微信支付"
       >
         <van-icon name="wechat-pay" size="40rpx" color="#09bb07" />
         <view class="confirm-pay-info">
@@ -68,6 +71,9 @@
         class="confirm-pay-item {{payType === 'offline' ? 'is-active' : ''}}"
         data-type="offline"
         bindtap="bindPayTypeTap"
+        aria-role="radio"
+        aria-checked="{{payType === 'offline'}}"
+        aria-label="线下付款"
       >
         <van-icon name="gold-coin-o" size="40rpx" color="#ff9c3f" />
         <view class="confirm-pay-info">
@@ -121,6 +127,8 @@
       class="confirm-bar-btn {{submitting ? 'is-disabled' : ''}}"
       style="background:{{themeColor}}"
       bindtap="bindSubmitTap"
+      aria-role="button"
+      aria-label="{{submitting ? '提交中' : '提交订单'}}"
     >{{submitting ? '提交中...' : '提交订单'}}</view>
   </view>
 </view>

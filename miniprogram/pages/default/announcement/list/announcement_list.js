@@ -125,8 +125,4 @@ Page({
   bindBackHome() {
     wx.switchTab({ url: "/pages/default/index/default_index" });
   },
-
-  url(e) {
-    pageHelper.url(e, this);
-  },
 });

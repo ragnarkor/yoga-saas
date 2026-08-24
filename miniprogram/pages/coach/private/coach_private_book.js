@@ -204,6 +204,13 @@ Page({
       }
     } catch (e) {
       console.error(e);
+      this.setData({
+        conflictText: '冲突检测失败，请重试',
+        blockText: '',
+        slotHasConflict: false,
+        slotOk: false,
+      });
+      wx.showToast({ title: '冲突检测失败，请重试', icon: 'none' });
     }
   },
 

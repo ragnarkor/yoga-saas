@@ -101,6 +101,7 @@ Page({
     } catch (err) {
       console.error("[photo_wall]", err);
       this.setData({ isLoad: true });
+      pageHelper.showErrToast("相册加载失败");
     }
   },
 

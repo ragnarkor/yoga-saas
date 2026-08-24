@@ -11,10 +11,25 @@ Page({
   },
 
   onLoad(options) {
-    const tenantName = options.name ? decodeURIComponent(options.name) : "";
+    let tenantName = "";
+    if (options.name) {
+      try {
+        tenantName = decodeURIComponent(options.name);
+      } catch (e) {
+        tenantName = "";
+      }
+    }
     const role = options.role === "coach" ? "coach" : "member";
-    this._themeColor = options.color
-      ? themeHelper.normalizeHex(decodeURIComponent(options.color))
+    let decodedColor = "";
+    if (options.color) {
+      try {
+        decodedColor = decodeURIComponent(options.color);
+      } catch (e) {
+        decodedColor = "";
+      }
+    }
+    this._themeColor = decodedColor
+      ? themeHelper.normalizeHex(decodedColor)
       : "";
     this.setData({ tenantName, role });
     this._applyTheme();

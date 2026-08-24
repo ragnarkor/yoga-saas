@@ -26,6 +26,8 @@
       data-name="{{item.name}}"
       bindtap="bindCardTap"
       bindlongpress="bindDeleteTap"
+      aria-role="button"
+      aria-label="{{item.name}}，长按可删除"
     >
       <view class="ucard-chip ucard-chip--visual">
         <image

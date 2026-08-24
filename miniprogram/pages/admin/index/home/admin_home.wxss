@@ -535,4 +535,11 @@
   color: #4a7c8c;
   border: 1rpx solid #4a7c8c;
   border-radius: 40rpx;
+  position: relative;
+}
+
+.health-modal-item-btn::before {
+  content: "";
+  position: absolute;
+  inset: -15rpx;
 }

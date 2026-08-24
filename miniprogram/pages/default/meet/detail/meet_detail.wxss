@@ -210,14 +210,16 @@
 }
 
 .md-day-scroll {
-	margin-bottom: 20rpx;
+	/* .md-day-list 上下各加了 8rpx padding 以容纳命中区，这里相应收窄外边距，保持视觉间距不变 */
+	margin-bottom: 8rpx;
 	white-space: nowrap;
 }
 
 .md-day-list {
 	display: inline-flex;
 	gap: 16rpx;
-	padding-bottom: 4rpx;
+	/* 上下多留 8rpx，避免 .md-day-chip::before 的负 inset 命中区被 scroll-view 裁切 */
+	padding: 8rpx 0;
 }
 
 .md-day-chip {
@@ -234,7 +236,7 @@
 .md-day-chip::before {
 	content: "";
 	position: absolute;
-	inset: -16rpx;
+	inset: -8rpx;
 }
 
 .md-day-chip.active {
@@ -251,6 +253,7 @@
 }
 
 .md-time-chip {
+	position: relative;
 	min-width: calc(50% - 8rpx);
 	box-sizing: border-box;
 	padding: 20rpx 16rpx;
@@ -261,6 +264,12 @@
 	flex-direction: column;
 	align-items: center;
 	gap: 6rpx;
+}
+
+.md-time-chip::before {
+	content: "";
+	position: absolute;
+	inset: -7rpx;
 }
 
 .md-time-chip.active {

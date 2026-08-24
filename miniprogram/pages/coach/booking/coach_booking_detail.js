@@ -25,7 +25,8 @@ Page({
     cancelOneShow: false,
     cancelReason: '',
     cancelTargetId: '',
-    cancelTargetIdx: -1,
+    cancelOneSubmitting: false,
+    cancelAllSubmitting: false,
     batchCheckinLoading: false,
     bookSheetShow: false,
     bookSubmitting: false,
@@ -158,6 +159,7 @@ Page({
     } catch (e) {
       console.error(e);
       this.setData({ loading: false, sections: [], displayList: [] });
+      wx.showToast({ title: '加载失败，请重试', icon: 'none' });
     }
   },
 
@@ -257,13 +259,12 @@ Page({
     this.setData({
       cancelOneShow: true,
       cancelTargetId: e.currentTarget.dataset.id || '',
-      cancelTargetIdx: Number(e.currentTarget.dataset.idx),
       cancelReason: '',
     });
   },
 
   bindCloseCancelOne() {
-    this.setData({ cancelOneShow: false, cancelTargetId: '', cancelTargetIdx: -1 });
+    this.setData({ cancelOneShow: false, cancelTargetId: '' });
   },
 
   bindCancelReasonInput(e) {
@@ -271,8 +272,10 @@ Page({
   },
 
   async bindConfirmCancelOne() {
+    if (this.data.cancelOneSubmitting) return;
     const { cancelTargetId } = this.data;
     if (!cancelTargetId) return;
+    this.setData({ cancelOneSubmitting: true });
     try {
       await cloudHelper.callCloudSumbit(
         'admin/join_status',
@@ -288,6 +291,8 @@ Page({
       this._loadRoster();
     } catch (e) {
       console.error(e);
+    } finally {
+      this.setData({ cancelOneSubmitting: false });
     }
   },
 
@@ -322,7 +327,9 @@ Page({
   },
 
   async bindConfirmCancelAll() {
+    if (this.data.cancelAllSubmitting) return;
     const { meetId, mark } = this.data;
+    this.setData({ cancelAllSubmitting: true });
     try {
       await cloudHelper.callCloudSumbit(
         'admin/meet_cancel_time_join',
@@ -344,6 +351,8 @@ Page({
       this._loadRoster();
     } catch (e) {
       console.error(e);
+    } finally {
+      this.setData({ cancelAllSubmitting: false });
     }
   },
 

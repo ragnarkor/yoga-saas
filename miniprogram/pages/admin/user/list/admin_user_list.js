@@ -87,37 +87,6 @@ Page({
     pageHelper.showConfirm("确认删除？删除不可恢复", callback);
   },
 
-  bindStatusTap: async function (e) {
-    if (!AdminBiz.isAdmin(this)) return;
-    let id = pageHelper.dataset(e, "id");
-    let status = pageHelper.dataset(e, "status");
-
-    let params = {
-      id,
-      status,
-    };
-    try {
-      await cloudHelper
-        .callCloudSumbit("admin/user_status", params)
-        .then((res) => {
-          pageHelper.modifyListNode(
-            id,
-            this.data.dataList.list,
-            "USER_STATUS",
-            status,
-            "USER_MINI_OPENID",
-          );
-          this.setData({
-            dataList: this.data.dataList,
-          });
-          pageHelper.showSuccToast("设置成功");
-        });
-    } catch (e) {
-      console.log(e);
-      pageHelper.showErrToast("设置失败");
-    }
-  },
-
   _getSearchMenu: async function () {
     let sortItems = [];
     let sortMenus = [

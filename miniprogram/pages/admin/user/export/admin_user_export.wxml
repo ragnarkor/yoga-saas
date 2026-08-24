@@ -10,9 +10,9 @@
 		</view>
 		<view class="form-group">
 			<view class="title">数据下载链接<text wx:if="{{time}}" class="text-gray text-s margin-left-s">({{time}} 生成)</text> </view>
-			<van-button type="primary" size="small" bind:click="url" data-type="copy" data-url="{{url}}" custom-class="btn-copy-touch" aria-role="button" aria-label="复制链接">复制</van-button>
+			<van-button type="primary" size="small" disabled="{{!url}}" bind:click="{{url ? 'url' : ''}}" data-type="copy" data-url="{{url}}" custom-class="btn-copy-touch" aria-role="button" aria-label="复制链接">复制</van-button>
 		</view>
-		<view class="form-group align-start" bindtap="url" data-type="copy" data-url="{{url}}" aria-role="button" aria-label="复制链接">
+		<view class="form-group align-start" bindtap="{{url ? 'url' : ''}}" data-type="copy" data-url="{{url}}" aria-role="button" aria-label="复制链接">
 			<textarea maxlength="500" placeholder="数据文件尚未生成，点击下方按钮生成" placeholder-class="phc" value="{{url}}" style="height:50rpx"></textarea>
 		</view>
 

@@ -143,13 +143,6 @@
   line-height: 1.5;
 }
 
-.ctp-card-scope {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: #969799;
-}
-
 .ctp-card-check {
   flex-shrink: 0;
 }

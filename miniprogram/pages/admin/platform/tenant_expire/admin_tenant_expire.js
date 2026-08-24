@@ -15,13 +15,16 @@ Page({
     statusDesc: '',
     deleteConfirmName: '',
     loading: true,
+    loadFailed: false,
     submitting: false,
     statusSubmitting: false,
     deleting: false,
   },
 
   onLoad(options) {
-    if (!AdminBiz.getAdminToken() || !AdminBiz.isSuperAdmin()) {
+    if (!AdminBiz.isAdmin(this)) return;
+
+    if (!AdminBiz.isSuperAdmin()) {
       wx.showToast({ title: '无权限', icon: 'none' });
       setTimeout(() => wx.navigateBack(), 600);
       return;
@@ -35,26 +38,30 @@ Page({
   },
 
   async _loadDetail(pid) {
-    this.setData({ loading: true });
+    this.setData({ loading: true, loadFailed: false });
     try {
       const res = await cloudHelper.callCloudData(
         'admin/tenant_expire_detail',
         { pid },
         { hint: false, title: 'bar' },
       );
-      const expireMode = res && res.isLongTerm ? 'long' : 'date';
+      if (!res) throw new Error('empty tenant_expire_detail response');
+      const expireMode = res.isLongTerm ? 'long' : 'date';
       this.setData({
         loading: false,
-        tenantName: (res && res.TENANT_NAME) || this.data.tenantName,
+        loadFailed: false,
+        tenantName: res.TENANT_NAME || this.data.tenantName,
         expireMode,
-        expireDay: (res && res.expireDay) || tenantExpireHelper.todayYMD(),
-        tenantStatus: (res && res.TENANT_STATUS) != null ? res.TENANT_STATUS : 1,
-        isClosed: !!(res && res.isClosed),
-        statusDesc: (res && res.statusDesc) || '',
+        expireDay: res.expireDay || tenantExpireHelper.todayYMD(),
+        tenantStatus: res.TENANT_STATUS != null ? res.TENANT_STATUS : 1,
+        isClosed: !!res.isClosed,
+        statusDesc: res.statusDesc || '',
       });
     } catch (e) {
       console.error(e);
-      this.setData({ loading: false });
+      pageHelper.showErrToast('加载失败，信息可能非最新，请下拉刷新重试');
+      // 加载失败时不能装作正常态：禁用保存，避免基于占位数据误操作
+      this.setData({ loading: false, loadFailed: true });
     }
   },
 
@@ -63,7 +70,11 @@ Page({
     if (!mode || mode === this.data.expireMode) return;
     this.setData({
       expireMode: mode,
-      expireDay: mode === 'date' ? tenantExpireHelper.todayYMD() : '',
+      // 切到「指定到期日」时，保留已加载到的真实到期日；只有从未设置过时才兜底为今天
+      expireDay:
+        mode === 'date'
+          ? this.data.expireDay || tenantExpireHelper.todayYMD()
+          : '',
     });
   },
 
@@ -92,8 +103,15 @@ Page({
   },
 
   async bindSaveExpire() {
-    const { pid, expireMode, expireDay, submitting } = this.data;
+    const { pid, expireMode, expireDay, tenantName, submitting } = this.data;
     if (!pid || submitting) return;
+
+    const content =
+      expireMode === 'long'
+        ? `确认将「${tenantName}」的服务有效期设为长期有效？`
+        : `确认将「${tenantName}」的服务有效期设为 ${expireDay || '（未选择）'}？`;
+    const ok = await pageHelper.showConfirm(content);
+    if (!ok) return;
 
     this.setData({ submitting: true });
     try {

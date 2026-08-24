@@ -92,14 +92,12 @@ module.exports = Behavior({
 
       // 适用范围只锁定一个分类时，跳回约课页自动预选该分类
       let pendingTypeId = "";
-      let typeName = "";
       if (
         scope.mode === "categories" &&
         scope.categoryIds &&
         scope.categoryIds.length === 1
       ) {
         pendingTypeId = String(scope.categoryIds[0]);
-        typeName = chips[0] || "";
       }
 
       this.setData({
@@ -112,7 +110,6 @@ module.exports = Behavior({
           scopeDesc: main.scopeDesc || "全馆课程",
           chips,
           pendingTypeId,
-          typeName,
         },
       });
     },

@@ -49,25 +49,25 @@
 
     <!-- 操作按钮 -->
     <view class="ucm-actions" wx:if="{{card.type !== 'period'}}">
-      <view class="ucm-action" data-action="add" bindtap="bindAdjustTap">
+      <view class="ucm-action" data-action="add" bindtap="bindAdjustTap" aria-role="button" aria-label="加次">
         <view class="ucm-action-icon ucm-action-icon--add">
           <van-icon name="plus" size="36rpx" color="#fff" />
         </view>
         <text class="ucm-action-label">加次</text>
       </view>
-      <view class="ucm-action" data-action="deduct" bindtap="bindAdjustTap">
+      <view class="ucm-action" data-action="deduct" bindtap="bindAdjustTap" aria-role="button" aria-label="消次">
         <view class="ucm-action-icon ucm-action-icon--deduct">
           <van-icon name="minus" size="36rpx" color="#fff" />
         </view>
         <text class="ucm-action-label">消次</text>
       </view>
-      <view class="ucm-action" wx:if="{{card.status === 1}}" data-action="stop" bindtap="bindAdjustTap">
+      <view class="ucm-action" wx:if="{{card.status === 1}}" data-action="stop" bindtap="bindAdjustTap" aria-role="button" aria-label="停卡">
         <view class="ucm-action-icon ucm-action-icon--stop">
           <van-icon name="pause" size="36rpx" color="#fff" />
         </view>
         <text class="ucm-action-label">停卡</text>
       </view>
-      <view class="ucm-action" wx:else data-action="resume" bindtap="bindAdjustTap">
+      <view class="ucm-action" wx:else data-action="resume" bindtap="bindAdjustTap" aria-role="button" aria-label="恢复">
         <view class="ucm-action-icon ucm-action-icon--resume">
           <van-icon name="play" size="36rpx" color="#fff" />
         </view>
@@ -76,13 +76,13 @@
     </view>
 
     <view class="ucm-actions ucm-actions--period" wx:else>
-      <view class="ucm-action" wx:if="{{card.status === 1}}" data-action="stop" bindtap="bindAdjustTap">
+      <view class="ucm-action" wx:if="{{card.status === 1}}" data-action="stop" bindtap="bindAdjustTap" aria-role="button" aria-label="停卡">
         <view class="ucm-action-icon ucm-action-icon--stop">
           <van-icon name="pause" size="36rpx" color="#fff" />
         </view>
         <text class="ucm-action-label">停卡</text>
       </view>
-      <view class="ucm-action" wx:else data-action="resume" bindtap="bindAdjustTap">
+      <view class="ucm-action" wx:else data-action="resume" bindtap="bindAdjustTap" aria-role="button" aria-label="恢复">
         <view class="ucm-action-icon ucm-action-icon--resume">
           <van-icon name="play" size="36rpx" color="#fff" />
         </view>
@@ -137,8 +137,8 @@
           <textarea class="ucm-field-textarea" value="{{adjustMemo}}" placeholder="必填，如：活动赠送、前台补录" maxlength="50" bindinput="bindAdjustMemoInput" />
         </view>
         <view class="ucm-sheet-btns">
-          <view class="ucm-sheet-btn ucm-sheet-btn--ghost" bindtap="bindCloseAdjust">取消</view>
-          <view class="ucm-sheet-btn ucm-sheet-btn--primary" bindtap="bindConfirmAdjust">确认</view>
+          <view class="ucm-sheet-btn ucm-sheet-btn--ghost" bindtap="bindCloseAdjust" aria-role="button" aria-label="取消">取消</view>
+          <view class="ucm-sheet-btn ucm-sheet-btn--primary" bindtap="bindConfirmAdjust" aria-role="button" aria-label="确认">确认</view>
         </view>
       </view>
     </view>

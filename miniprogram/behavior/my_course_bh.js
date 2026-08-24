@@ -94,10 +94,6 @@ module.exports = Behavior({
       });
     },
 
-    url: function (e) {
-      pageHelper.url(e, this);
-    },
-
     _loadList: async function (refresh) {
       if (this.data.loading) return;
 

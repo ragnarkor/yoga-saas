@@ -292,6 +292,7 @@ module.exports = Behavior({
         setTimeout(() => this._fetchHomeDiscovery(), 180);
       } catch (err) {
         console.error("[home/index]", err);
+        pageHelper.showErrToast("加载失败，请稍后重试");
       }
     },
 
