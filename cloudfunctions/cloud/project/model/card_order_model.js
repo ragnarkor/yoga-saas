@@ -38,6 +38,9 @@ CardOrderModel.DB_STRUCTURE = {
   ORDER_REFUND_BY_NAME: 'string|false',
   ORDER_ADD_TIME: 'int|true',
   ORDER_EDIT_TIME: 'int|true',
+  // BaseModel 会自动写入新增/编辑 IP；必须在结构中声明，否则插入订单会被判为脏数据。
+  ORDER_ADD_IP: 'string|false',
+  ORDER_EDIT_IP: 'string|false',
 };
 CardOrderModel.FIELD_PREFIX = 'ORDER_';
 // 状态机：
