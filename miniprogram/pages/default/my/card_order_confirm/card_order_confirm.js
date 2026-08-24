@@ -2,6 +2,7 @@ const cloudHelper = require("../../../../helper/cloud_helper.js");
 const pageHelper = require("../../../../helper/page_helper.js");
 const themeHelper = require("../../../../helper/theme_helper.js");
 const themeBh = require("../../../../behavior/theme_bh.js");
+const cardFaceHelper = require("../../../../helper/card_face_helper.js");
 
 Page({
   behaviors: [themeBh],
@@ -66,6 +67,9 @@ Page({
           ? `${c.quota} 次 · 有效期 ${c.days} 天`
           : `有效期 ${c.days} 天`,
       colorDark: this._darken(c.color || "#5b8a72"),
+      coverStyle: cardFaceHelper.getCoverUrl(c.cover)
+        ? `background-image:url(${cardFaceHelper.getCoverUrl(c.cover)});background-size:cover;background-position:center;`
+        : "",
     });
   },
 

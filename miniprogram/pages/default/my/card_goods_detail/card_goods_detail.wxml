@@ -13,7 +13,7 @@
     <!-- 卡面大图 -->
     <view
       class="detail-hero"
-      style="background:linear-gradient(135deg, {{card.color}} 0%, {{card.colorDark}} 100%);"
+      style="background:linear-gradient(135deg, {{card.color}} 0%, {{card.colorDark}} 100%);{{card.coverStyle}}"
     >
       <view class="detail-hero-tag">{{card.typeDesc}}</view>
       <view class="detail-hero-name">{{card.name}}</view>

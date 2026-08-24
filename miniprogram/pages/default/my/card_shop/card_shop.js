@@ -2,6 +2,7 @@ const cloudHelper = require("../../../../helper/cloud_helper.js");
 const pageHelper = require("../../../../helper/page_helper.js");
 const themeHelper = require("../../../../helper/theme_helper.js");
 const themeBh = require("../../../../behavior/theme_bh.js");
+const cardFaceHelper = require("../../../../helper/card_face_helper.js");
 
 Page({
   behaviors: [themeBh],
@@ -55,8 +56,9 @@ Page({
         c.type === "times" ? `${c.quota} 次课程` : `有效期 ${c.days} 天`,
       scopeText: c.scopeAll ? "全馆课程可用" : "指定课程可用",
       sellingPoint: c.desc || (c.type === "times" ? "灵活安排每一次练习" : "适合稳定规律的练习节奏"),
-      coverStyle: c.cover
-        ? `background-image:url(${c.cover});background-size:cover;background-position:center;`
+      // 后端保存的是预设卡面的 ID，不是可直接加载的图片 URL。
+      coverStyle: cardFaceHelper.getCoverUrl(c.cover)
+        ? `background-image:url(${cardFaceHelper.getCoverUrl(c.cover)});background-size:cover;background-position:center;`
         : "",
       colorDark: this._darken(c.color || "#5b8a72"),
     });

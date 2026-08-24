@@ -15,7 +15,7 @@
       <view class="confirm-goods">
         <view
           class="confirm-goods-cover"
-          style="background:linear-gradient(135deg, {{card.color}} 0%, {{card.colorDark}} 100%);"
+          style="background:linear-gradient(135deg, {{card.color}} 0%, {{card.colorDark}} 100%);{{card.coverStyle}}"
         >
           <text class="confirm-goods-type">{{card.typeDesc}}</text>
         </view>
