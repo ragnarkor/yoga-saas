@@ -9,6 +9,18 @@ const AdminModel = require("../../model/admin_model.js");
 const homeCacheUtil = require("../../utils/home_cache_util.js");
 
 class AdminHomeController extends BaseAdminController {
+  /**
+   * 重新按主键拉取当前登录管理员的完整记录（this._admin 仅有 isAdmin() 投影的少量字段，
+   * 部分下游逻辑需要 _id 等全字段）。用已验证过的 this._admin._pid 收窄查询范围，
+   * 避免 ADMIN_ID（弱唯一业务ID）跨租户撞车取到别的馆的管理员记录。
+   * demo/mask 模式下 this._admin 无真实 _pid，保持原本不限定的查询行为。
+   */
+  async _resolveOperator() {
+    let where = { ADMIN_ID: this._adminId };
+    if (this._admin && this._admin._pid) where._pid = this._admin._pid;
+    return await AdminModel.getOne(where, "*", {}, false);
+  }
+
   async getBannerList() {
     await this.isAdmin();
     let service = new AdminHomeService();
@@ -326,12 +338,7 @@ class AdminHomeController extends BaseAdminController {
     let operator = null;
     if (input.adminId) {
       await this.isAdmin();
-      operator = await AdminModel.getOne(
-        { ADMIN_ID: this._adminId },
-        "*",
-        {},
-        false,
-      );
+      operator = await this._resolveOperator();
     }
     return await service.wxUnbind(
       this._userId,
@@ -346,12 +353,7 @@ class AdminHomeController extends BaseAdminController {
     await this.isAdmin();
     let rules = { adminId: "must|id|name=管理员ID" };
     let input = this.validateData(rules);
-    let operator = await AdminModel.getOne(
-      { ADMIN_ID: this._adminId },
-      "*",
-      {},
-      false,
-    );
+    let operator = await this._resolveOperator();
     let service = new AdminWxService();
     return await service.genBindCode(input.adminId, operator);
   }
@@ -360,12 +362,7 @@ class AdminHomeController extends BaseAdminController {
   async listBindableAdmins() {
     await this.isAdmin();
     let pid = global.PID || this.getParameter("pid") || "";
-    let operator = await AdminModel.getOne(
-      { ADMIN_ID: this._adminId },
-      "*",
-      {},
-      false,
-    );
+    let operator = await this._resolveOperator();
     if (!operator && this._token) {
       operator = await AdminModel.getOne(
         {
@@ -384,12 +381,7 @@ class AdminHomeController extends BaseAdminController {
   /** 超管：全平台员工列表 */
   async listPlatformStaff() {
     await this.isSuperAdmin();
-    let operator = await AdminModel.getOne(
-      { ADMIN_ID: this._adminId },
-      "*",
-      {},
-      false,
-    );
+    let operator = await this._resolveOperator();
     let service = new AdminWxService();
     return await service.listPlatformStaff(operator);
   }
@@ -407,12 +399,7 @@ class AdminHomeController extends BaseAdminController {
   /** 馆主/教练：读取自己的会员端主页资料 */
   async getMyTeacherProfile() {
     await this.isAdmin();
-    let operator = await AdminModel.getOne(
-      { ADMIN_ID: this._adminId },
-      "*",
-      {},
-      false,
-    );
+    let operator = await this._resolveOperator();
     let service = new AdminHomeService();
     return await service.getMyTeacherProfile(operator);
   }
@@ -427,12 +414,7 @@ class AdminHomeController extends BaseAdminController {
       pics: "array",
     };
     let input = this.validateData(rules);
-    let operator = await AdminModel.getOne(
-      { ADMIN_ID: this._adminId },
-      "*",
-      {},
-      false,
-    );
+    let operator = await this._resolveOperator();
     let service = new AdminHomeService();
     const result = await service.saveMyTeacherProfile(operator, input);
     await homeCacheUtil.invalidateHomeCache();

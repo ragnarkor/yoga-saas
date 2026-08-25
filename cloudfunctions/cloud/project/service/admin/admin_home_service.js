@@ -10,6 +10,10 @@ const AnnouncementModel = require("../../model/announcement_model.js");
 const TeacherModel = require("../../model/teacher_model.js");
 const AdminModel = require("../../model/admin_model.js");
 const PhotoModel = require("../../model/photo_model.js");
+const MeetModel = require("../../model/meet_model.js");
+const DayModel = require("../../model/day_model.js");
+const UserCardModel = require("../../model/user_card_model.js");
+const timeUtil = require("../../../framework/utils/time_util.js");
 const teacherAdminHelper = require("../teacher_admin_helper.js");
 
 class AdminHomeService extends BaseAdminService {
@@ -74,7 +78,50 @@ class AdminHomeService extends BaseAdminService {
   }
 
   async editTeacher(id, data) {
+    let before = await TeacherModel.getOne(
+      { _id: id },
+      "TEACHER_NAME,TEACHER_ADMIN_ID",
+    );
     await TeacherModel.edit({ _id: id }, data);
+
+    let newName = typeof data.TEACHER_NAME === "string" ? data.TEACHER_NAME.trim() : "";
+    if (before && newName && newName !== before.TEACHER_NAME) {
+      await this._cascadeTeacherName(id, before.TEACHER_ADMIN_ID, newName);
+    }
+  }
+
+  /** 教练改名后，同步已引用其姓名的冗余字段（课程默认教练、已排课时段、会员卡归属教练） */
+  async _cascadeTeacherName(teacherId, adminId, newName) {
+    await MeetModel.edit(
+      { "MEET_STYLE_SET.teacherId": teacherId },
+      { "MEET_STYLE_SET.teacherName": newName },
+    );
+
+    let today = timeUtil.time("Y-M-D");
+    let days = await DayModel.getAllBig(
+      { "times.teacherId": teacherId, day: [">=", today] },
+      "times",
+      {},
+      1000,
+    );
+    for (let day of days || []) {
+      let times = day.times || [];
+      let changed = false;
+      for (let t of times) {
+        if (t && t.teacherId === teacherId && t.teacherName !== newName) {
+          t.teacherName = newName;
+          changed = true;
+        }
+      }
+      if (changed) await DayModel.edit({ _id: day._id }, { times });
+    }
+
+    if (adminId) {
+      await UserCardModel.edit(
+        { USER_CARD_COACH_ID: adminId },
+        { USER_CARD_COACH_NAME: newName },
+      );
+    }
   }
 
   async delTeacher(id) {

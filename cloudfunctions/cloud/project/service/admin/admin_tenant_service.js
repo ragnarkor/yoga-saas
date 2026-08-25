@@ -8,6 +8,7 @@ const SetupModel = require("../../model/setup_model.js");
 const UserModel = require("../../model/user_model.js");
 const JoinModel = require("../../model/join_model.js");
 const AdminModel = require("../../model/admin_model.js");
+const MeetModel = require("../../model/meet_model.js");
 const PlatformLogModel = require("../../model/platform_log_model.js");
 const cloudUtil = require("../../../framework/cloud/cloud_util.js");
 const dataUtil = require("../../../framework/utils/data_util.js");
@@ -117,6 +118,21 @@ class AdminTenantService extends BaseAdminService {
       if (id && name) list.push({ id, name, isPrivate });
     }
     return list;
+  }
+
+  /** 课程分类改名后，同步已引用该分类ID、存有分类名冗余字段的课程 */
+  async _cascadeMeetTypeNames(pid, oldCategories, newCategories) {
+    const oldNameById = {};
+    for (let c of oldCategories || []) oldNameById[c.id] = c.name;
+    for (let c of newCategories || []) {
+      const oldName = oldNameById[c.id];
+      if (oldName && c.name && oldName !== c.name) {
+        await MeetModel.edit(
+          { _pid: pid, MEET_TYPE_ID: c.id },
+          { MEET_TYPE_NAME: c.name },
+        );
+      }
+    }
   }
 
   _normalizeRooms(rooms) {
@@ -268,6 +284,19 @@ class AdminTenantService extends BaseAdminService {
       this.AppError("仅馆主可修改门店配置");
     }
 
+    let oldSetup = await tenantSetupHelper.getSetupForPid(pid, "SETUP_MEET_TYPE");
+    let oldTenant = await TenantModel.getOne(
+      { _pid: pid },
+      "TENANT_MEET_TYPE",
+      {},
+      false,
+    );
+    let oldCategories = this._parseCategories(
+      (oldSetup && oldSetup.SETUP_MEET_TYPE) ||
+        (oldTenant && oldTenant.TENANT_MEET_TYPE) ||
+        this._defaultMeetType(),
+    );
+
     let meetTypeStr = this._buildMeetTypeStr(categories);
     if (!meetTypeStr) this.AppError("请至少保留一个课程分类");
 
@@ -390,6 +419,11 @@ class AdminTenantService extends BaseAdminService {
     }
 
     await this._saveSetupForPid(pid, setupData);
+    await this._cascadeMeetTypeNames(
+      pid,
+      oldCategories,
+      this._parseCategories(meetTypeStr),
+    );
 
     await TenantModel.edit({ _pid: pid }, editData, false);
 
@@ -855,7 +889,7 @@ class AdminTenantService extends BaseAdminService {
     );
     for (let admin of admins || []) {
       if (admin && admin.ADMIN_ID) {
-        await AdminModel.del({ ADMIN_ID: admin.ADMIN_ID }, false);
+        await AdminModel.del({ _pid: pid, ADMIN_ID: admin.ADMIN_ID }, false);
       }
     }
 

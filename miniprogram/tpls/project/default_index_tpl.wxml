@@ -117,7 +117,7 @@
 		<!-- 公告 -->
 		<view class="home-notice" wx:if="{{announcements.length}}">
 			<view class="home-notice-dot"></view>
-			<swiper class="home-notice-swiper" vertical circular autoplay="{{announcements.length > 1}}" interval="4200" duration="650">
+			<swiper class="home-notice-swiper" vertical circular autoplay="{{announcements.length > 1}}" interval="4200" duration="650" disable-touch="{{true}}">
 				<swiper-item wx:for="{{announcements}}" wx:key="_id">
 					<view class="home-notice-row" bindtap="bindAnnounceTap" data-id="{{item._id}}" aria-role="button" aria-label="公告 {{item.title}}">
 						<text class="home-notice-text text-cut">{{item.title}}</text>

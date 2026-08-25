@@ -27,7 +27,10 @@ class Model {
 		else if (miss.length == 2)
 			miss = '0' + miss;
 
-		return id + miss;
+		// 随机4位，避免同毫秒并发插入撞ID
+		let rand = Math.floor(Math.random() * 36 ** 4).toString(36).padStart(4, '0');
+
+		return id + miss + rand;
 	}
 
 	/**
